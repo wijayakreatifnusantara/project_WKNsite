@@ -1,0 +1,86 @@
+{
+    "status": "success",
+    "salaryData": [
+        {
+            "Employee ID *": "WKN-001",
+            "Full Name *": "Budi Santoso",
+            "Email *": "budi@wijayakn.com",
+            "Organization Name *": "IT Department",
+            "Job Position *": "Senior Developer",
+            "Job Level *": "Senior",
+            "Status *": "Active",
+            "Gaji Pokok": 10000000,
+            "Join Date *": "01/01/2023",
+            "Contract End Date": "31/12/2025"
+        },
+        {
+            "Employee ID *": "WKN-002",
+            "Full Name *": "Siti Aminah",
+            "Email *": "siti@wijayakn.com",
+            "Organization Name *": "HR Department",
+            "Job Position *": "HR Manager",
+            "Job Level *": "Manager",
+            "Status *": "Active",
+            "Gaji Pokok": 12000000,
+            "Join Date *": "01/06/2023",
+            "Contract End Date": "2026-05-30"
+        }
+    ],
+    "attendanceData": [],
+    "adminData": [
+        {
+            "Username": "admin@wijayakn.com",
+            "Full Name": "Super Admin",
+            "Role": "Super Admin",
+            "Status": "Active"
+        }
+    ],
+    "mutationData": [],
+    "systemLogs": [],
+    "roles": [
+        {"Role Name": "Super Admin", "Permissions": "ALL"},
+        {"Role Name": "HRD", "Permissions": "CRUD_EMPLOYEE, VIEW_SALARY"}
+    ],
+    "payrollHistory": [
+        {
+            "month": 12,
+            "year": 2025,
+            "timestamp": "2025-12-25T10:00:00Z",
+            "totalExpenditure": 105000000,
+            "employeeCount": 8,
+            "data": []
+        },
+        {
+            "month": 1,
+            "year": 2026,
+            "timestamp": "2026-01-25T10:00:00Z",
+            "totalExpenditure": 110000000,
+            "employeeCount": 8,
+            "data": []
+        },
+        {
+            "month": 2,
+            "year": 2026,
+            "timestamp": "2026-02-25T10:00:00Z",
+            "totalExpenditure": 115000000,
+            "employeeCount": 9,
+            "data": []
+        },
+        {
+            "month": 3,
+            "year": 2026,
+            "timestamp": "2026-03-25T10:00:00Z",
+            "totalExpenditure": 118000000,
+            "employeeCount": 9,
+            "data": []
+        },
+        {
+            "month": 4,
+            "year": 2026,
+            "timestamp": "2026-04-25T10:00:00Z",
+            "totalExpenditure": 122000000,
+            "employeeCount": 10,
+            "data": []
+        }
+    ]
+}
