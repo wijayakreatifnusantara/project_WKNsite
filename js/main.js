@@ -1130,6 +1130,15 @@ function checkNotifications() {
             }
         }
     });
+
+    // 4. Trigger Browser Push Notifications if enabled
+    if (window.wknNotifications) {
+        unreadNotifications.forEach(n => {
+            // Remove HTML tags for the push notification body
+            const plainMessage = n.message.replace(/<[^>]*>?/gm, '');
+            wknNotifications.show(n.title, plainMessage, `${n.type}-${n.empId}`);
+        });
+    }
 }
 
 window.renderNotificationCenter = () => {

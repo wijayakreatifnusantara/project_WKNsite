@@ -11,6 +11,7 @@
     <script src="lib/chart.min.js"></script>
     <script src="lib/xlsx.full.min.js"></script>
     <link rel="icon" type="image/png" href="assets/wkn_logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <!-- Login Screen (Premium Design) -->
@@ -138,8 +139,14 @@
             </nav>
 
             <div style="margin-top: auto;">
-                <button id="btn-logout" class="btn btn-secondary" style="width: 100%; color: #ef4444;" onclick="logout()">
-                    Keluar
+                <button id="btn-toggle-notifications" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem; justify-content: flex-start; gap: 0.75rem;" onclick="wknNotifications.toggle()">
+                    <i class="fas fa-bell"></i> Notifikasi
+                </button>
+                <button id="btn-test-notification" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem; justify-content: flex-start; gap: 0.75rem; font-size: 0.75rem; opacity: 0.8;" onclick="wknNotifications.show('Tes Notifikasi', 'Ini adalah contoh notifikasi dari WKNsite.', 'test-alert')">
+                    <i class="fas fa-vial"></i> Tes Notifikasi
+                </button>
+                <button id="btn-logout" class="btn btn-secondary" style="width: 100%; color: #ef4444; justify-content: flex-start; gap: 0.75rem;" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
                 </button>
             </div>
         </aside>
@@ -161,6 +168,7 @@
             return false;
         };
     </script>
+    <script src="js/notifications.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
