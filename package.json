@@ -1,0 +1,18 @@
+{
+  "name": "project-wknsite",
+  "version": "2.4.0",
+  "description": "Corporate Database Management System for WKN",
+  "scripts": {
+    "dev:server": "uv run python apps/server/main.py",
+    "dev:client": "cd apps/client && npm run dev",
+    "dev": "npm run dev:client",
+    "start": "python apps/server/main.py"
+  },
+  "keywords": [
+    "hr",
+    "payroll",
+    "dashboard"
+  ],
+  "author": "Wijaya Kreatif Nusantara",
+  "license": "ISC"
+}
