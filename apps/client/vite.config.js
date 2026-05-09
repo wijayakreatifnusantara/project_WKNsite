@@ -17,4 +17,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-utils': ['axios', 'dayjs', 'zod'],
+          'vendor-ui': ['lucide-react', '@tabler/icons-react', 'class-variance-authority', 'clsx', 'tailwind-merge'],
+          'vendor-charts': ['recharts'],
+          'vendor-excel': ['xlsx'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
+  }
 })

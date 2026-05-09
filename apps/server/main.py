@@ -6,6 +6,12 @@ from api.dashboard import router as dashboard_router
 from api.error_monitoring import router as error_monitoring_router
 from api.ai_diagnostics import router as ai_diagnostics_router
 from api.sync import router as sync_router
+from api.payroll import router as payroll_router
+from api.attendance import router as attendance_router
+from api.leave import router as leave_router
+from api.documents import router as documents_router
+from api.assets import router as assets_router
+from api.performance import router as performance_router
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -26,6 +32,12 @@ app.include_router(dashboard_router, prefix="/api")
 app.include_router(error_monitoring_router, prefix="/api")
 app.include_router(ai_diagnostics_router, prefix="/api")
 app.include_router(sync_router, prefix="/api")
+app.include_router(payroll_router, prefix="/api")
+app.include_router(attendance_router, prefix="/api")
+app.include_router(leave_router, prefix="/api")
+app.include_router(documents_router, prefix="/api")
+app.include_router(assets_router, prefix="/api")
+app.include_router(performance_router, prefix="/api")
 
 @app.get("/api")
 @app.get("/api/")

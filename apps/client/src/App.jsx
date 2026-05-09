@@ -1,107 +1,168 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login/Login';
+import DashboardLayout from './components/Layout/DashboardLayout';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { useIsMobile } from './hooks/useIsMobile';
+import MobileLayout from './components/Layout/MobileLayout';
+import { Toaster } from 'sonner';
 
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+const Overview = React.lazy(() => import('./pages/Overview/Overview'));
+const Employees = React.lazy(() => import('./pages/Employees/Employees'));
+const Payroll = React.lazy(() => import('./pages/Payroll/Payroll'));
+const AttendanceHub = React.lazy(() => import('./pages/Attendance/AttendanceHub'));
+const InvoicingSystem = React.lazy(() => import('./pages/Finance/InvoicingSystem'));
+const QuotationBuilder = React.lazy(() => import('./pages/CRM/QuotationBuilder'));
+const RBACManager = React.lazy(() => import('./pages/Admin/RBACManager'));
+const UserManager = React.lazy(() => import('./pages/Admin/UserManager'));
+const Settings = React.lazy(() => import('./pages/Admin/Settings'));
+const DocumentHub = React.lazy(() => import('./pages/Documents/DocumentHub'));
+const AssetInventory = React.lazy(() => import('./pages/Assets/AssetInventory'));
+const PerformanceHub = React.lazy(() => import('./pages/Performance/PerformanceHub'));
+const AuditTrail = React.lazy(() => import('./pages/Admin/AuditTrail'));
+const LeaveManagementHub = React.lazy(() => import('./pages/Leave/LeaveManagementHub'));
+const AttendanceReport = React.lazy(() => import('./pages/Attendance/AttendanceReport'));
+const AttendanceRecap = React.lazy(() => import('./pages/Attendance/AttendanceRecap'));
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+const Academy = React.lazy(() => import('./pages/Academy/Academy'));
+const Recruitment = React.lazy(() => import('./pages/Recruitment/Recruitment'));
+const Expenses = React.lazy(() => import('./pages/Finance/Expenses'));
+const OrgChart = React.lazy(() => import('./pages/Company/OrgChart'));
+const Consumables = React.lazy(() => import('./pages/Assets/Consumables'));
+const Wiki = React.lazy(() => import('./pages/Company/Wiki'));
+const Wellness = React.lazy(() => import('./pages/Company/Wellness'));
+const Surveys = React.lazy(() => import('./pages/Company/Surveys'));
+const Offboarding = React.lazy(() => import('./pages/Company/Offboarding'));
+const Timesheet = React.lazy(() => import('./pages/Company/Timesheet'));
+const Succession = React.lazy(() => import('./pages/Company/Succession'));
+const Grievance = React.lazy(() => import('./pages/Company/Grievance'));
 
-  useEffect(() => {
-    // Check authentication status on app load
-    const authStatus = localStorage.getItem('WNKsite_Auth');
-    const userName = localStorage.getItem('WNKsite_UserName');
-    
-    if (authStatus === 'true' && userName) {
-      setIsAuthenticated(true);
-      setUser({
-        name: userName,
-        role: localStorage.getItem('WNKsite_Role') || 'Staff',
-        username: localStorage.getItem('WNKsite_Username') || '',
-        employeeId: localStorage.getItem('WNKsite_EmployeeId') || ''
-      });
-    }
-  }, []);
+const UnderDevelopment = React.lazy(() => import('./pages/UnderDevelopment/UnderDevelopment'));
 
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
+const ProtectedRoute = ({ children, permission }) => {
+  const { profile, loading, can } = useAuth();
 
-  const handleLogout = () => {
-    localStorage.removeItem('WNKsite_Auth');
-    localStorage.removeItem('WNKsite_UserId');
-    localStorage.removeItem('WNKsite_UserName');
-    localStorage.removeItem('WNKsite_Role');
-    localStorage.removeItem('WNKsite_Email');
-    localStorage.removeItem('WNKsite_Username');
-    localStorage.removeItem('WNKsite_EmployeeId');
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+  if (loading) return null;
+  if (!profile) return <Navigate to="/login" replace />;
 
-  // If not authenticated, show login page
-  if (!isAuthenticated) {
+  if (permission && !can(permission)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
+const MobileHome = React.lazy(() => import('./pages/ESS/MobileHome'));
+const MobilePayslip = React.lazy(() => import('./pages/ESS/MobilePayslip'));
+const DigitalCard = React.lazy(() => import('./pages/ESS/DigitalCard'));
+
+const AppContent = () => {
+  const { profile, loading, logout, PERMISSIONS } = useAuth();
+  const isMobile = useIsMobile();
+  const Layout = isMobile ? MobileLayout : DashboardLayout;
+
+  if (loading) {
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="*" element={<Login onLoginSuccess={handleLoginSuccess} />} />
-        </Routes>
-      </BrowserRouter>
+      <div className="h-screen w-screen flex items-center justify-center bg-[#f0f2f5]">
+        <div className="flex flex-col items-center gap-6">
+          <div className="h-20 w-20 bg-white shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] rounded-[2.5rem] flex items-center justify-center border-4 border-white">
+            <div className="h-10 w-10 border-4 border-[#E31E24] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Initializing Security Protocol...</p>
+        </div>
+      </div>
     );
   }
 
-  // If authenticated, show main app
+  return (
+    <Routes>
+      <Route 
+        path="/login" 
+        element={!profile ? <Login /> : <Navigate to="/dashboard" replace />} 
+      />
+
+      <Route
+        path="/*"
+        element={
+          profile ? (
+            <Layout user={profile} onLogout={logout}>
+              <React.Suspense fallback={
+                <div className="flex-1 flex items-center justify-center bg-[#f0f2f5]">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="h-12 w-12 border-4 border-[#E31E24] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Loading Module...</p>
+                  </div>
+                </div>
+              }>
+                <Routes>
+                  {/* Strategic Dashboard */}
+                  <Route path="/dashboard" element={isMobile ? <MobileHome user={profile} /> : <Overview user={profile} />} />
+
+                  {/* Human Capital */}
+                  <Route path="/employees/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><Employees /></ProtectedRoute>} />
+                  <Route path="/attendance/report" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><AttendanceReport /></ProtectedRoute>} />
+                  <Route path="/attendance/recap" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><AttendanceRecap /></ProtectedRoute>} />
+                  <Route path="/attendance" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><AttendanceHub /></ProtectedRoute>} />
+                  <Route path="/leave/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><LeaveManagementHub /></ProtectedRoute>} />
+                  <Route path="/documents/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><DocumentHub /></ProtectedRoute>} />
+                  <Route path="/performance/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><PerformanceHub /></ProtectedRoute>} />
+                  <Route path="/recruitment/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><Recruitment /></ProtectedRoute>} />
+                  <Route path="/academy/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><Academy /></ProtectedRoute>} />
+                  <Route path="/succession/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><Succession /></ProtectedRoute>} />
+
+                  {/* Company Hub */}
+                  <Route path="/org-chart/*" element={<OrgChart />} />
+                  <Route path="/wiki/*" element={<Wiki />} />
+                  <Route path="/wellness/*" element={<Wellness />} />
+                  <Route path="/surveys/*" element={<Surveys />} />
+                  <Route path="/timesheet/*" element={<Timesheet />} />
+                  <Route path="/offboarding/*" element={<Offboarding />} />
+                  <Route path="/grievance/*" element={<Grievance />} />
+
+                  {/* ESS Mobile Specific */}
+                  <Route path="/me/card/*" element={<DigitalCard user={profile} />} />
+
+                  {/* Assets */}
+                  <Route path="/assets/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><AssetInventory /></ProtectedRoute>} />
+                  <Route path="/consumables/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_WORKFORCE}><Consumables /></ProtectedRoute>} />
+
+                  {/* Treasury & Finance */}
+                  <Route path="/payroll/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_PAYROLL}>{isMobile ? <MobilePayslip user={profile} /> : <Payroll user={profile} />}</ProtectedRoute>} />
+                  <Route path="/expenses/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_TREASURY}><Expenses /></ProtectedRoute>} />
+                  <Route path="/finance/invoices/*" element={<ProtectedRoute permission={PERMISSIONS.VIEW_REVENUE}><InvoicingSystem /></ProtectedRoute>} />
+
+                  {/* CRM */}
+                  <Route path="/crm/quotations" element={<ProtectedRoute permission={PERMISSIONS.VIEW_CRM}><QuotationBuilder /></ProtectedRoute>} />
+                  <Route path="/crm/pipeline" element={<ProtectedRoute permission={PERMISSIONS.VIEW_CRM}><UnderDevelopment moduleName="Sales Pipeline" /></ProtectedRoute>} />
+                  <Route path="/crm/clients" element={<ProtectedRoute permission={PERMISSIONS.VIEW_CRM}><UnderDevelopment moduleName="Customer Portfolio" /></ProtectedRoute>} />
+
+                  {/* Admin Only */}
+                  <Route path="/settings" element={<ProtectedRoute permission={PERMISSIONS.MANAGE_SYSTEM_SETTINGS}><Settings /></ProtectedRoute>} />
+                  <Route path="/admin/rbac" element={<ProtectedRoute permission={PERMISSIONS.MANAGE_RBAC}><RBACManager /></ProtectedRoute>} />
+                  <Route path="/admin/users" element={<ProtectedRoute permission={PERMISSIONS.MANAGE_USERS}><UserManager /></ProtectedRoute>} />
+                  <Route path="/admin/audit-trail" element={<ProtectedRoute permission={PERMISSIONS.MANAGE_SYSTEM_SETTINGS}><AuditTrail /></ProtectedRoute>} />
+
+                  {/* Fallback */}
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </React.Suspense>
+            </Layout>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+    </Routes>
+  );
+};
+
+function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          element={
-            <div className="min-h-screen bg-gray-50">
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-6">
-                  <h1 className="text-3xl font-bold text-gray-900">WKNsite Dashboard</h1>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-600">
-                      Welcome, {user?.name}
-                    </span>
-                    <button 
-                      onClick={handleLogout}
-                      className="px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-xl font-semibold mb-4">Dashboard Overview</h2>
-                  <p className="text-gray-600 mb-4">Welcome to WKNsite Corporate Management System</p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-blue-900 mb-2">Employees</h3>
-                      <p className="text-blue-700">Manage employee data and information</p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-green-900 mb-2">Attendance</h3>
-                      <p className="text-green-700">Track employee attendance and schedules</p>
-                    </div>
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-purple-900 mb-2">Reports</h3>
-                      <p className="text-purple-700">Generate and view various reports</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        >
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<div>Dashboard Content</div>} />
-          <Route path="/employees" element={<div>Employee Management</div>} />
-          <Route path="/attendance" element={<div>Attendance Tracking</div>} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <Toaster position="top-center" richColors />
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

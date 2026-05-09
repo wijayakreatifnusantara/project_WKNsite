@@ -2,7 +2,7 @@ import os
 from typing import List, Dict, Any, Optional
 from supabase import create_client, Client
 
-class WKNSupebaseClient:
+class WKNSupabaseClient:
     """Official Supabase client for WKNsite operations - Direct replacement for Sheets"""
     
     def __init__(self):
@@ -16,13 +16,36 @@ class WKNSupebaseClient:
         except Exception as e:
             print(f"CRITICAL: Failed to connect to Supabase: {str(e)}")
             self.client = None
+            
+        # Optimization: Simple TTL Cache
+        self._cache = {}
+        self._cache_ttl = 60 # seconds
 
-    async def get_employees(self) -> List[Dict[str, Any]]:
-        """Get all employees with frontend compatibility mapping"""
-        if not self.client: return []
+    async def get_employees(self, q: Optional[str] = None, page: int = 1, page_size: int = 50) -> Dict[str, Any]:
+        """Get employees with pagination, server-side filtering and total count"""
+        if not self.client: return {"data": [], "total": 0}
+        
+        # Check cache only for first page of non-filtered requests
+        import time
+        if not q and page == 1 and "employees_p1" in self._cache:
+            cache_data, timestamp = self._cache["employees_p1"]
+            if time.time() - timestamp < self._cache_ttl:
+                return cache_data
+
         try:
-            response = self.client.table("employees").select("*").execute()
+            # Calculate range for pagination
+            start = (page - 1) * page_size
+            end = start + page_size - 1
+            
+            query = self.client.table("employees").select("*", count="exact")
+            
+            if q:
+                # Optimized server-side filtering
+                query = query.or_(f"name.ilike.%{q}%,id.ilike.%{q}%,email.ilike.%{q}%")
+            
+            response = query.order("name").range(start, end).execute()
             data = response.data
+            total = response.count
             
             # Mapping back to Sheets format for frontend compatibility
             compat_data = []
@@ -38,18 +61,32 @@ class WKNSupebaseClient:
                     "Status *": e.get("status"),
                     "Gaji Pokok *": str(e.get("base_salary", 0)),
                     "JOIN DATE": e.get("join_date"),
-                    "Contract End Date": e.get("contract_end_date")
+                    "Contract End Date": e.get("contract_end_date"),
+                    "Resign Date": e.get("resign_date"),
+                    "is_resigned": e.get("is_resigned")
                 })
-            return compat_data
+            
+            result = {
+                "data": compat_data,
+                "total": total,
+                "page": page,
+                "page_size": page_size
+            }
+            
+            # Update cache for first page of non-filtered requests
+            if not q and page == 1:
+                self._cache["employees_p1"] = (result, time.time())
+                
+            return result
         except Exception as e:
             print(f"Error fetching employees: {str(e)}")
-            return []
+            return {"data": [], "total": 0}
 
     async def get_admins(self) -> List[Dict[str, Any]]:
-        """Get all admin accounts with compatibility mapping"""
+        """Get all admin accounts from profiles table"""
         if not self.client: return []
         try:
-            response = self.client.table("admin_accounts").select("*").execute()
+            response = self.client.table("profiles").select("*").execute()
             data = response.data
             
             # Mapping to match legacy Sheets column names
@@ -68,19 +105,31 @@ class WKNSupebaseClient:
             return []
 
     async def authenticate_user(self, username: str, password: str) -> Optional[Dict[str, Any]]:
-        """Authenticate user against Supabase admin_accounts table"""
+        """Authenticate user against profiles table (with Absolute Path Logging)"""
         if not self.client: return None
+        log_path = "e:/project_WKNsite/apps/server/auth_debug.log"
         try:
-            # Note: Dalam produksi, gunakan hashing password!
-            response = self.client.table("admin_accounts") \
+            clean_username = username.strip()
+            clean_password = password.strip()
+            
+            with open(log_path, "a") as f:
+                f.write(f"\n[DEBUG] Login attempt at {clean_username}\n")
+
+            # Mencari di tabel profiles (plural)
+            response = self.client.table("profiles") \
                 .select("*") \
-                .eq("username", username.lower().strip()) \
-                .eq("password", password.strip()) \
+                .ilike("username", clean_username) \
                 .execute()
             
-            if response.data and len(response.data) > 0:
-                user = response.data[0]
-                # Return with legacy keys for frontend compatibility
+            if not response.data:
+                with open(log_path, "a") as f:
+                    f.write(f"[ERROR] User {clean_username} NOT FOUND in 'profiles' table.\n")
+                return None
+            
+            user = response.data[0]
+            if user.get("password") == clean_password:
+                with open(log_path, "a") as f:
+                    f.write(f"[SUCCESS] Login OK for {clean_username}\n")
                 return {
                     "Username": user.get("username"),
                     "Password": user.get("password"),
@@ -88,9 +137,13 @@ class WKNSupebaseClient:
                     "Role": user.get("role"),
                     "Status": user.get("status")
                 }
-            return None
+            else:
+                with open(log_path, "a") as f:
+                    f.write(f"[ERROR] Password mismatch for {clean_username}\n")
+                return None
         except Exception as e:
-            print(f"Auth error: {str(e)}")
+            with open(log_path, "a") as f:
+                f.write(f"[CRITICAL] System Error: {str(e)}\n")
             return None
 
     async def add_employee(self, employee_data: Dict[str, Any]) -> bool:
@@ -109,7 +162,19 @@ class WKNSupebaseClient:
                 "status": employee_data.get("Status *", "Active"),
                 "base_salary": float(str(employee_data.get("Gaji Pokok *", 0)).replace(",", "")) if employee_data.get("Gaji Pokok *") else 0,
                 "join_date": employee_data.get("JOIN DATE"),
-                "contract_end_date": employee_data.get("Contract End Date")
+                "contract_end_date": employee_data.get("Contract End Date"),
+                "bank_branch": employee_data.get("Bank Branch"),
+                "payroll_method": employee_data.get("Payroll Method"),
+                "npwp_16_digit": employee_data.get("NPWP 16 Digit"),
+                "tax_method": employee_data.get("Tax Method"),
+                "kpp_name": employee_data.get("KPP Name"),
+                "faskes_tk1": employee_data.get("Faskes TK1"),
+                "employment_type": employee_data.get("Employment Type"),
+                "probation_end_date": employee_data.get("Probation End Date"),
+                "working_location": employee_data.get("Working Location"),
+                "overtime_eligible": employee_data.get("Overtime Eligible"),
+                "resign_date": employee_data.get("Resign Date"),
+                "is_resigned": employee_data.get("is_resigned", False)
             }
             self.client.table("employees").insert(db_data).execute()
             return True
@@ -129,7 +194,19 @@ class WKNSupebaseClient:
                 "organization_name": employee_data.get("Organization Name *"),
                 "status": employee_data.get("Status *"),
                 "base_salary": float(str(employee_data.get("Gaji Pokok *", 0)).replace(",", "")) if employee_data.get("Gaji Pokok *") else 0,
-                "contract_end_date": employee_data.get("Contract End Date")
+                "contract_end_date": employee_data.get("Contract End Date"),
+                "bank_branch": employee_data.get("Bank Branch"),
+                "payroll_method": employee_data.get("Payroll Method"),
+                "npwp_16_digit": employee_data.get("NPWP 16 Digit"),
+                "tax_method": employee_data.get("Tax Method"),
+                "kpp_name": employee_data.get("KPP Name"),
+                "faskes_tk1": employee_data.get("Faskes TK1"),
+                "employment_type": employee_data.get("Employment Type"),
+                "probation_end_date": employee_data.get("Probation End Date"),
+                "working_location": employee_data.get("Working Location"),
+                "overtime_eligible": employee_data.get("Overtime Eligible"),
+                "resign_date": employee_data.get("Resign Date"),
+                "is_resigned": employee_data.get("is_resigned")
             }
             self.client.table("employees").update(db_data).eq("id", employee_id).execute()
             return True
@@ -188,6 +265,91 @@ class WKNSupebaseClient:
             print(f"Error fetching attendance: {str(e)}")
             return []
 
+    async def get_attendance_summary_today(self) -> Dict[str, Any]:
+        """Get summary of today's attendance"""
+        if not self.client: return {}
+        try:
+            from datetime import date
+            today = date.today().isoformat()
+            
+            # Get all attendance for today
+            res = self.client.table("attendance").select("*").eq("date", today).execute()
+            data = res.data
+            
+            # Get active employee count
+            emp_res = self.client.table("employees").select("id", count="exact").eq("status", "Active").execute()
+            total_active = emp_res.count or 0
+            
+            present = len([r for r in data if r.get("status") in ["Present", "Late"]])
+            late = len([r for r in data if r.get("status") == "Late"])
+            absent = total_active - present
+            
+            return {
+                "present": present,
+                "late": late,
+                "absent": max(0, absent),
+                "total": total_active
+            }
+        except Exception as e:
+            print(f"Error getting today summary: {str(e)}")
+            return {"present": 0, "late": 0, "absent": 0, "total": 0}
+
+    async def get_attendance_trends(self, period: str) -> List[Dict[str, Any]]:
+        """Get daily attendance trends for a specific period (YYYY-MM)"""
+        if not self.client: return []
+        try:
+            # Simple aggregation for now
+            res = self.client.table("attendance") \
+                .select("date, status") \
+                .ilike("date", f"{period}%") \
+                .execute()
+            
+            data = res.data
+            # Group by date
+            trends = {}
+            for r in data:
+                d = r.get("date")
+                if d not in trends:
+                    trends[d] = {"date": d, "present": 0, "late": 0}
+                if r.get("status") in ["Present", "Late"]:
+                    trends[d]["present"] += 1
+                if r.get("status") == "Late":
+                    trends[d]["late"] += 1
+            
+            return sorted(list(trends.values()), key=lambda x: x["date"])
+        except Exception as e:
+            print(f"Error getting trends: {str(e)}")
+            return []
+
+    async def get_attendance_for_payroll(self, period: str) -> Dict[str, Any]:
+        """Aggregate attendance metrics per employee for payroll calculation"""
+        if not self.client: return {}
+        try:
+            res = self.client.table("attendance") \
+                .select("employee_id, status, late_minutes") \
+                .ilike("date", f"{period}%") \
+                .execute()
+            
+            data = res.data
+            summary = {}
+            for r in data:
+                eid = r.get("employee_id")
+                if eid not in summary:
+                    summary[eid] = {"late_minutes": 0, "absences": 0, "unpaid_leaves": 0}
+                
+                summary[eid]["late_minutes"] += r.get("late_minutes", 0)
+                if r.get("status") == "Absent":
+                    summary[eid]["absences"] += 1
+                elif r.get("status") == "Unpaid Leave":
+                    summary[eid]["unpaid_leaves"] += 1
+            
+            return summary
+
+
+        except Exception as e:
+            print(f"Error getting payroll attendance: {str(e)}")
+            return {}
+
     async def get_all_data(self) -> Dict[str, Any]:
         """Fetch all tables at once for dashboard sync"""
         if not self.client: return {}
@@ -213,5 +375,219 @@ class WKNSupebaseClient:
             print(f"Error in get_all_data: {str(e)}")
             return {}
 
+    # -----------------------------------------------------------------------
+    # T007, T008, T009: Geofencing & System Config Methods
+    # -----------------------------------------------------------------------
+
+    async def get_system_config(self, key: str) -> Optional[Dict[str, Any]]:
+        """
+        T007: Get system configuration value by key from system_configs table.
+        
+        Args:
+            key: Configuration key (e.g., 'hq_location')
+        
+        Returns:
+            Dictionary with config value, or None if not found
+        """
+        if not self.client:
+            return None
+        try:
+            import time
+            cache_key = f"sysconfig_{key}"
+            if cache_key in self._cache:
+                cached_val, timestamp = self._cache[cache_key]
+                if time.time() - timestamp < self._cache_ttl:
+                    return cached_val
+
+            res = self.client.table("system_configs").select("*").eq("key", key).execute()
+            if res.data:
+                value = res.data[0].get("value")
+                self._cache[cache_key] = (value, time.time())
+                return value
+            return None
+        except Exception as e:
+            print(f"Error getting system config '{key}': {str(e)}")
+            return None
+
+    async def set_system_config(self, key: str, value: Dict[str, Any]) -> bool:
+        """
+        T008: Update or insert a system configuration value.
+        
+        Args:
+            key: Configuration key (e.g., 'hq_location')
+            value: Configuration value as dictionary
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.client:
+            return False
+        try:
+            from datetime import datetime, timezone
+            data = {
+                "key": key,
+                "value": value,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            self.client.table("system_configs").upsert(data).execute()
+            
+            # Invalidate cache for this key
+            cache_key = f"sysconfig_{key}"
+            if cache_key in self._cache:
+                del self._cache[cache_key]
+            
+            return True
+        except Exception as e:
+            print(f"Error setting system config '{key}': {str(e)}")
+            return False
+
+    async def get_employee_by_id(self, employee_id: str) -> Optional[Dict[str, Any]]:
+        """
+        T009: Get a single employee record with geofencing fields.
+        
+        Args:
+            employee_id: The employee's ID string
+        
+        Returns:
+            Employee dictionary including is_field_team, assigned_site_lat, assigned_site_long
+        """
+        if not self.client:
+            return None
+        try:
+            res = self.client.table("employees") \
+                .select("id, name, status, is_field_team, assigned_site_lat, assigned_site_long") \
+                .eq("id", employee_id) \
+                .execute()
+            if res.data:
+                return res.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting employee '{employee_id}': {str(e)}")
+            return None
+
+    async def add_attendance_record(self, employee_id: str, date: str, status: str,
+                                    check_in_time: str, late_minutes: int = 0,
+                                    notes: str = "") -> Dict[str, Any]:
+        """
+        Insert attendance record, handling unique constraint (double check-in prevention).
+        
+        Returns:
+            dict with 'success': bool and 'already_checked_in': bool
+        """
+        if not self.client:
+            return {"success": False, "already_checked_in": False}
+        try:
+            data = {
+                "employee_id": employee_id,
+                "date": date,
+                "status": status,
+                "check_in_time": check_in_time,
+                "late_minutes": late_minutes,
+                "notes": notes
+            }
+            self.client.table("attendance").insert(data).execute()
+            return {"success": True, "already_checked_in": False}
+        except Exception as e:
+            err_msg = str(e)
+            # Detect UNIQUE constraint violation
+            if "attendance_employee_date_unique" in err_msg or "duplicate key" in err_msg.lower() or "23505" in err_msg:
+                # Fetch existing record
+                try:
+                    existing = self.client.table("attendance") \
+                        .select("*") \
+                        .eq("employee_id", employee_id) \
+                        .eq("date", date) \
+                        .execute()
+                    return {
+                        "success": False,
+                        "already_checked_in": True,
+                        "existing_record": existing.data[0] if existing.data else None
+                    }
+                except Exception:
+                    pass
+                return {"success": False, "already_checked_in": True}
+            print(f"Error adding attendance for {employee_id}: {err_msg}")
+            return {"success": False, "already_checked_in": False, "error": err_msg}
+
+    async def get_late_alerts(self, days: int = 30, threshold: int = 3) -> List[Dict[str, Any]]:
+        """
+        T021: Get employees with more than `threshold` late arrivals in last `days` days.
+        
+        Returns:
+            List of employee dicts with late_count
+        """
+        if not self.client:
+            return []
+        try:
+            from datetime import date, timedelta
+            start_date = (date.today() - timedelta(days=days)).isoformat()
+            
+            res = self.client.table("attendance") \
+                .select("employee_id, status") \
+                .eq("status", "Late") \
+                .gte("date", start_date) \
+                .execute()
+            
+            # Count late arrivals per employee
+            late_counts: Dict[str, int] = {}
+            for r in res.data:
+                eid = r.get("employee_id")
+                late_counts[eid] = late_counts.get(eid, 0) + 1
+            
+            # Filter by threshold
+            alerts = []
+            for eid, count in late_counts.items():
+                if count > threshold:
+                    alerts.append({"employee_id": eid, "late_count": count, "period_days": days})
+            
+            return sorted(alerts, key=lambda x: x["late_count"], reverse=True)
+        except Exception as e:
+            print(f"Error getting late alerts: {str(e)}")
+            return []
+
+    async def sync_leave_to_attendance(self, employee_id: str, start_date: str,
+                                        end_date: str, leave_type: str) -> int:
+        """
+        T022: Sync approved leave to attendance table.
+        Inserts attendance records with status 'Leave' for each day in the range.
+        
+        Returns:
+            Number of days successfully synced
+        """
+        if not self.client:
+            return 0
+        try:
+            from datetime import date, timedelta
+            start = date.fromisoformat(start_date)
+            end = date.fromisoformat(end_date)
+            synced = 0
+            
+            current = start
+            while current <= end:
+                # Skip weekends (optional — comment out if leave applies on weekends)
+                # if current.weekday() < 5:  # Monday=0, Friday=4
+                data = {
+                    "employee_id": employee_id,
+                    "date": current.isoformat(),
+                    "status": "Leave",
+                    "notes": leave_type,
+                    "late_minutes": 0
+                }
+                try:
+                    self.client.table("attendance").insert(data).execute()
+                    synced += 1
+                except Exception as insert_err:
+                    # ON CONFLICT — already has attendance record for this day, skip
+                    if "duplicate key" in str(insert_err).lower() or "23505" in str(insert_err):
+                        pass  # Skip silently
+                    else:
+                        print(f"Error inserting leave attendance for {current}: {str(insert_err)}")
+                current += timedelta(days=1)
+            
+            return synced
+        except Exception as e:
+            print(f"Error syncing leave to attendance: {str(e)}")
+            return 0
+
 # Singleton instance
-supabase_client = WKNSupebaseClient()
+supabase_client = WKNSupabaseClient()

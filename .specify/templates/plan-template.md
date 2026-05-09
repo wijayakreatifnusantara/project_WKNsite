@@ -27,15 +27,11 @@
 **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
-## Pengecekan Konstitusi
+## Constitution Check
 
-*GERBANG: Harus lulus sebelum Riset Fase 0. Periksa kembali setelah Desain Fase 1.*
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **I. Tata Kelola Keamanan Utama**: Apakah fitur ini melibatkan data sensitif (gaji, info pribadi)? Jika ya, apakah kontrol akses dan log audit sudah direncanakan?
-- **II. Frontend Berbasis Komponen**: Apakah elemen UI baru dirancang sebagai komponen yang dapat digunakan kembali? Apakah sesuai dengan token desain WKNsite?
-- **III. Pengembangan Berbasis Spesifikasi**: Apakah ada `spec.md` yang sesuai? Apakah rencana ini langsung menjawab kebutuhannya?
-- **IV. Integritas & Konsistensi Data**: Bagaimana perubahan ini memengaruhi database? Apakah operasi atomik dan validasi sudah ditentukan?
-- **V. Responsivitas Mobile-First**: Apakah rencana UI sudah diverifikasi untuk resolusi ponsel dan tablet?
+[Gates determined based on constitution file]
 
 ## Project Structure
 

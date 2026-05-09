@@ -45,6 +45,16 @@ async def create_employee(employee: EmployeeCreate):
             "bank_name": "Bank Name",
             "bank_account": "Bank Account",
             "bank_account_holder": "Bank Account Holder",
+            "bank_branch": "Bank Branch",
+            "payroll_method": "Payroll Method",
+            "npwp_16_digit": "NPWP 16 Digit",
+            "tax_method": "Tax Method",
+            "kpp_name": "KPP Name",
+            "faskes_tk1": "Faskes TK1",
+            "employment_type": "Employment Type",
+            "probation_end_date": "Probation End Date",
+            "working_location": "Working Location",
+            "overtime_eligible": "Overtime Eligible",
             "ktp_document_link": "KTP Document (Link)",
             "npwp_document_link": "NPWP Document (Link)",
             "kk_document_link": "KK Document (Link)",
@@ -91,15 +101,11 @@ async def create_employee(employee: EmployeeCreate):
         )
 
 @router.get("/employees")
-async def get_employees(q: Optional[str] = None):
+async def get_employees(q: Optional[str] = None, page: int = 1, size: int = 50):
     try:
-        if q:
-            # Search logic can be improved later with Supabase ilike
-            employees = await supabase_client.get_employees()
-            employees = [e for e in employees if q.lower() in e["EMPLOYEE NAME"].lower()]
-        else:
-            employees = await supabase_client.get_employees()
-        return employees
+        # Optimized: Pagination and Filtering handled at database level
+        result = await supabase_client.get_employees(q=q, page=page, page_size=size)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching employees: {str(e)}")
 
@@ -141,6 +147,16 @@ async def update_employee(employee_id: str, employee: EmployeeCreate):
             "bank_name": "Bank Name",
             "bank_account": "Bank Account",
             "bank_account_holder": "Bank Account Holder",
+            "bank_branch": "Bank Branch",
+            "payroll_method": "Payroll Method",
+            "npwp_16_digit": "NPWP 16 Digit",
+            "tax_method": "Tax Method",
+            "kpp_name": "KPP Name",
+            "faskes_tk1": "Faskes TK1",
+            "employment_type": "Employment Type",
+            "probation_end_date": "Probation End Date",
+            "working_location": "Working Location",
+            "overtime_eligible": "Overtime Eligible",
             "ktp_document_link": "KTP Document (Link)",
             "npwp_document_link": "NPWP Document (Link)",
             "kk_document_link": "KK Document (Link)",

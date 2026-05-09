@@ -5,10 +5,29 @@ Provides endpoints for database connection monitoring and auto-repair
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from utils.ai_database_diagnostics import ai_diagnostics
+from utils.ai_data_diagnostics import ai_data_diagnostics
+from utils.supabase_client import supabase_client
 from typing import Dict, Any, Optional
 import asyncio
 
 router = APIRouter()
+
+@router.get("/diagnostics/data")
+async def run_data_diagnostics():
+    """Run AI diagnostics on employee data"""
+    try:
+        # Fetch actual data
+        employees = await supabase_client.get_employees()
+        
+        # Run diagnostics
+        result = ai_data_diagnostics.scan_employees(employees)
+        
+        return {
+            "status": "success",
+            "data": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Data diagnostics failed: {str(e)}")
 
 @router.get("/diagnostics/run")
 async def run_diagnostics():

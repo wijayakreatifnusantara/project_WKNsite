@@ -32,22 +32,36 @@ class EmployeeBase(BaseModel):
     job_level: str
     status: str = "Active"
     
-    # Financial (U-Y)
+    # Financial & Banking (U-Y)
     gaji_pokok: float = 0
     position_allowance: float = 0
     communication_allowance: float = 0
     meal_allowance: float = 0
     transport_allowance: float = 0
     
-    # Administrative (Z-AG)
+    # Professional Banking Details
+    bank_name: Optional[str] = None
+    bank_account: Optional[str] = None
+    bank_account_holder: Optional[str] = None
+    bank_branch: Optional[str] = None
+    payroll_method: Optional[str] = "Bank Transfer"
+    
+    # Tax & Government (Z-AG)
     join_date: Optional[str] = None
     ptkp_status: Optional[str] = None
     bpjs_ketenagakerjaan: Optional[str] = None
     bpjs_kesehatan: Optional[str] = None
     npwp: Optional[str] = None
-    bank_name: Optional[str] = None
-    bank_account: Optional[str] = None
-    bank_account_holder: Optional[str] = None
+    npwp_16_digit: Optional[str] = None
+    tax_method: Optional[str] = "Gross"
+    kpp_name: Optional[str] = None
+    faskes_tk1: Optional[str] = None
+    
+    # Detailed Employment
+    employment_type: Optional[str] = "Permanent"
+    probation_end_date: Optional[str] = None
+    working_location: Optional[str] = "Head Office"
+    overtime_eligible: bool = True
     
     # Documents (AH-AO)
     ktp_document_link: Optional[str] = None

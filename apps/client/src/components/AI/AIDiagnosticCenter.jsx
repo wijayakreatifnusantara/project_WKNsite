@@ -1,0 +1,225 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { 
+  IconShieldCheck, 
+  IconAlertTriangle, 
+  IconCircleCheck, 
+  IconActivity, 
+  IconRotate, 
+  IconSearch, 
+  IconDatabase, 
+  IconBrain,
+  IconArrowRight,
+  IconInfoCircle,
+  IconX
+} from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+const AIDiagnosticCenter = ({ isOpen, onClose }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  useEffect(() => {
+    if (isOpen) {
+      runDiagnostics();
+    }
+  }, [isOpen]);
+
+  const runDiagnostics = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/diagnostics/data');
+      setData(response.data.data);
+    } catch (error) {
+      console.error('Error running AI diagnostics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  const filteredIssues = data?.issues.filter(issue => 
+    activeFilter === 'all' || issue.severity === activeFilter
+  ) || [];
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+      <div 
+        className="w-full max-w-6xl h-[90vh] bg-[#f0f2f5] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <header className="h-24 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-12 shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl flex items-center justify-center text-[#E31E24]">
+              <IconBrain size={28} className="animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-slate-800 font-outfit uppercase tracking-tight">AI Diagnostic Center</h1>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-70">Intelligent Data Integrity Engine</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={runDiagnostics}
+              className="h-12 px-6 flex items-center gap-3 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] transition-all active:shadow-inner"
+              disabled={loading}
+            >
+              <IconRotate size={18} className={loading ? 'animate-spin' : ''} />
+              {loading ? 'Analyzing...' : 'Deep Scan Now'}
+            </button>
+            <button 
+              onClick={onClose}
+              className="h-12 w-12 flex items-center justify-center bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl text-slate-400 hover:text-red-500 transition-all"
+            >
+              <IconX size={24} />
+            </button>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+          <div className="grid grid-cols-12 gap-10">
+            
+            {/* Left: Score & Recommendations */}
+            <div className="col-span-4 space-y-10">
+              {/* Health Score Gauge */}
+              <div className="bg-[#f0f2f5] shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] rounded-[3rem] p-10 border-4 border-white flex flex-col items-center text-center">
+                <div className="relative h-48 w-48 flex items-center justify-center mb-6">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle
+                      cx="96"
+                      cy="96"
+                      r="80"
+                      stroke="white"
+                      strokeWidth="16"
+                      fill="transparent"
+                      className="opacity-20"
+                    />
+                    <circle
+                      cx="96"
+                      cy="96"
+                      r="80"
+                      stroke={data?.health_score > 80 ? '#22c55e' : data?.health_score > 50 ? '#f59e0b' : '#ef4444'}
+                      strokeWidth="16"
+                      strokeDasharray={502.6}
+                      strokeDashoffset={502.6 - (502.6 * (data?.health_score || 0)) / 100}
+                      strokeLinecap="round"
+                      fill="transparent"
+                      className="transition-all duration-1000 ease-out"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-5xl font-black text-slate-800">{data?.health_score || 0}%</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Health Score</span>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-black text-slate-800 uppercase">
+                    {data?.health_score > 90 ? 'Excellent' : data?.health_score > 70 ? 'Optimal' : 'Needs Review'}
+                  </h3>
+                  <p className="text-xs text-slate-400 font-bold leading-relaxed px-4">
+                    Based on {data?.stats.total_records || 0} employee records scanned.
+                  </p>
+                </div>
+              </div>
+
+              {/* AI Recommendations */}
+              <div className="bg-[#f0f2f5] shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] rounded-[2.5rem] p-8 border-4 border-white">
+                <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <IconInfoCircle size={18} className="text-[#E31E24]" />
+                  AI Intelligence Insights
+                </h4>
+                <div className="space-y-4">
+                  {data?.recommendations.map((rec, i) => (
+                    <div key={i} className="flex gap-3 items-start p-4 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-2xl">
+                      <IconArrowRight size={14} className="text-[#E31E24] mt-1 shrink-0" />
+                      <p className="text-[11px] font-bold text-slate-600 leading-relaxed italic">"{rec}"</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Issues List */}
+            <div className="col-span-8 space-y-8">
+              {/* Severity Filters */}
+              <div className="flex items-center gap-4 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] p-2 rounded-2xl border-2 border-white w-fit">
+                {['all', 'critical', 'high', 'medium', 'low'].map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setActiveFilter(s)}
+                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeFilter === s ? 'bg-[#E31E24] text-white shadow-[4px_4px_10px_rgba(227,30,36,0.2)]' : 'text-slate-400 hover:text-slate-600'}`}
+                  >
+                    {s} ({s === 'all' ? data?.issues.length : data?.stats.severity_counts[s] || 0})
+                  </button>
+                ))}
+              </div>
+
+              {/* Issues Scroll Area */}
+              <div className="space-y-6">
+                {loading ? (
+                  <div className="py-20 text-center flex flex-col items-center gap-4 opacity-50">
+                    <IconActivity size={48} className="text-[#E31E24] animate-pulse" />
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">AI is scanning database neurons...</p>
+                  </div>
+                ) : filteredIssues.length > 0 ? (
+                  filteredIssues.map((issue, i) => (
+                    <div 
+                      key={i} 
+                      className="group bg-[#f0f2f5] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] rounded-[2rem] p-8 border-4 border-white flex gap-6 hover:translate-x-2 transition-all"
+                    >
+                      <div className={`h-16 w-16 rounded-2xl flex items-center justify-center shrink-0 shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] ${
+                        issue.severity === 'critical' ? 'text-red-500' : 
+                        issue.severity === 'high' ? 'text-orange-500' : 
+                        'text-blue-500'
+                      }`}>
+                        <IconAlertTriangle size={32} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="text-sm font-black text-slate-800 uppercase tracking-tight">{issue.message}</h5>
+                          <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-sm ${
+                            issue.severity === 'critical' ? 'bg-red-500' : 
+                            issue.severity === 'high' ? 'bg-orange-500' : 
+                            'bg-blue-500'
+                          }`}>
+                            {issue.severity} Severity
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-6 mt-4">
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Source Entity</p>
+                            <p className="text-xs font-black text-slate-600">{issue.employee_name} ({issue.employee_id})</p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Suggested Fix</p>
+                            <p className="text-xs font-black text-[#E31E24]">{issue.suggestion}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <button className="self-center h-12 px-6 rounded-2xl bg-white shadow-[4px_4px_8px_#d1d9e6] text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#E31E24] hover:text-white transition-all">
+                        Auto-Repair
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-20 text-center flex flex-col items-center gap-4 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-[3rem] border-4 border-white">
+                    <IconCircleCheck size={48} className="text-green-500" />
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">No data anomalies detected</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AIDiagnosticCenter;

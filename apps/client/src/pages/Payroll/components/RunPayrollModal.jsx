@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import { 
+  IconCalculator, 
+  IconAlertCircle, 
+  IconCheck, 
+  IconLoader2 
+} from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import dayjs from 'dayjs';
+
+const RunPayrollModal = ({ isOpen, onClose, onCalculate, loading }) => {
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'));
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-[#f0f2f5] w-full max-w-md rounded-[2.5rem] border-4 border-white shadow-[20px_20px_60px_#d1d9e6,-20px_-20px_60px_#ffffff] overflow-hidden">
+        <div className="p-8 space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 bg-white shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] rounded-2xl flex items-center justify-center text-[#E31E24]">
+              <IconCalculator size={28} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight font-outfit">Run Payroll Engine</h3>
+              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Initialize Monthly Disbursement</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Target Period</label>
+              <input 
+                type="month" 
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="w-full h-12 px-5 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-none rounded-2xl text-sm font-bold text-slate-700 focus:outline-none"
+              />
+            </div>
+
+            <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-100 flex gap-3">
+              <IconAlertCircle size={18} className="text-amber-500 shrink-0" />
+              <p className="text-[10px] text-amber-700 font-bold leading-relaxed uppercase tracking-tight">
+                Sistem akan menghitung Gaji Pokok, Tunjangan, PPh 21 (TER), dan BPJS untuk seluruh karyawan aktif pada periode ini.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 pt-2">
+            <Button 
+              onClick={onClose}
+              variant="outline" 
+              className="flex-1 h-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:shadow-none transition-all"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => onCalculate(selectedMonth)}
+              disabled={loading}
+              className="flex-1 h-12 rounded-2xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-2"
+            >
+              {loading ? <IconLoader2 className="animate-spin" size={16} /> : <IconCheck size={16} />}
+              {loading ? 'Calculating...' : 'Start Logic'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RunPayrollModal;

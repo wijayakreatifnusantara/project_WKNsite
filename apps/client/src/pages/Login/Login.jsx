@@ -12,7 +12,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Eye, EyeOff, Lock, Mail, Loader2, AlertCircle, Shield, CheckCircle } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
 
-const Login = ({ onLoginSuccess }) => {
+import { useAuth } from '@/context/AuthContext';
+
+const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,44 +28,11 @@ const Login = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (authError) {
-        setError(authError.message || 'Login gagal. Periksa kembali email dan password Anda.');
-        return;
-      }
-
-      if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('admin_accounts')
-          .select('*')
-          .eq('email', email)
-          .single();
-
-        const userData = {
-          id: data.user.id,
-          email: data.user.email,
-          name: profile?.name || profile?.username || data.user.email.split('@')[0],
-          role: profile?.role || 'Admin',
-          username: profile?.username || email,
-          employeeId: profile?.employee_id || ''
-        };
-
-        localStorage.setItem('WNKsite_Auth', 'true');
-        localStorage.setItem('WNKsite_UserId', userData.id);
-        localStorage.setItem('WNKsite_UserName', userData.name);
-        localStorage.setItem('WNKsite_Role', userData.role);
-        localStorage.setItem('WNKsite_Email', userData.email);
-        localStorage.setItem('WNKsite_Username', userData.username);
-        localStorage.setItem('WNKsite_EmployeeId', userData.employeeId);
-
-        onLoginSuccess(userData);
-      }
+      // 🚀 Call the professional login function from AuthContext
+      await login(email, password);
+      // On success, AuthContext handles state and redirect is managed by App.jsx
     } catch (err) {
-      setError('Terjadi kesalahan saat login. Silakan coba lagi.');
+      setError(err.message || 'Login gagal. Periksa kembali email dan password Anda.');
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);

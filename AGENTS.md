@@ -1,6 +1,7 @@
 <!-- SPECKIT START -->
-Rencana implementasi aktif: [Notifikasi Browser (003-browser-push-notifications)](file:///e:/project_website_database_gaji/specs/003-browser-push-notifications/plan.md)
-Gunakan rencana ini untuk memahami struktur proyek, database, dan standar UI.
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan at:
+`specs/015-attendance-workforce-optimization/plan.md`
 <!-- SPECKIT END -->
 
 # 🔒 DESIGN LOCK
@@ -8,3 +9,8 @@ Gunakan rencana ini untuk memahami struktur proyek, database, dan standar UI.
 - **Status**: **FINAL & LOCKED**
 - **Design Style**: Red Embossed (Neumorphism), Non-Scrollable Frame, Soft Fade-in Animation.
 - **Note**: Do not modify this file during dashboard or other feature development unless explicitly requested.
+
+# 🔑 MEMORY & CREDENTIALS
+- **Authorized User**: adianto@wijayakn.com
+- **Default Password**: admin
+- **Role**: System Owner / Administrator
