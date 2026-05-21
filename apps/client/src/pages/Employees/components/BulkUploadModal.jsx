@@ -8,7 +8,6 @@ import {
   IconAlertTriangle,
   IconDownload
 } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
 import { supabase } from '@/lib/supabaseClient';
 import * as XLSX from 'xlsx';
 
@@ -39,54 +38,50 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
           const data = XLSX.utils.sheet_to_json(ws);
 
           if (data.length === 0) {
-            throw new Error("File is empty or invalid format.");
+            throw new Error("File template kosong atau format tidak sesuai.");
           }
 
           setProgress({ current: 0, total: data.length });
 
-          // Mapping logic - mapping column names from Excel to Supabase columns
+          // Mapping columns from Excel to database
           const mappedData = data.map(row => {
             const generatedId = row['Employee ID'] || row['ID'] || `WKN-TMP-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
             return {
-              id: generatedId, // Map to primary key 'id'
-              employee_id: generatedId, // Map to business key 'employee_id'
+              id: generatedId,
+              employee_id: generatedId,
               name: row['Full Name'] || row['Name'],
-            email: row['Email'],
-            phone_number: row['Phone Number'] || row['Phone'],
-            whatsapp_number: row['WhatsApp'],
-            gender: row['Gender'] || 'Laki-laki',
-            date_of_birth: row['Date of Birth'],
-            marital_status: row['Marital Status'] || 'Belum Kawin',
-            nik: row['NIK'] || row['National ID'],
-            address: row['Address'],
-            organization_name: row['Organization'] || row['Unit'] || 'WIJAYA KREATIF NUSANTARA',
-            job_position: row['Position'],
-            job_level: row['Level'] || 'Staff',
-            status: row['Status'] || 'Active',
-            base_salary: parseFloat(row['Base Salary'] || 0),
-            join_date: row['Join Date'] || new Date().toISOString().split('T')[0],
-            contract_end_date: row['Contract End Date'],
-            // Financial/Bank
-            bank_name: row['Bank Name'],
-            bank_account: row['Bank Account'],
-            bank_account_holder: row['Bank Account Holder'],
-            bank_branch: row['Bank Branch'],
-            payroll_method: row['Payroll Method'] || 'Bank Transfer',
-            // Tax
-            npwp: row['NPWP'],
-            npwp_16_digit: row['NPWP 16 Digit'],
-            ptkp_status: row['PTKP Status'] || 'TK/0',
-            tax_method: row['Tax Method'] || 'Gross',
-            kpp_name: row['KPP Name'],
-            faskes_tk1: row['Faskes TK1'],
-            // Employment
-            employment_type: row['Employment Type'] || 'Permanent',
-            working_location: row['Working Location'] || 'Head Office',
-            overtime_eligible: row['Overtime Eligible'] === 'Yes' || row['Overtime Eligible'] === true
+              email: row['Email'],
+              phone_number: row['Phone Number'] || row['Phone'],
+              whatsapp_number: row['WhatsApp'],
+              gender: row['Gender'] || 'Laki-laki',
+              date_of_birth: row['Date of Birth'],
+              marital_status: row['Marital Status'] || 'Belum Kawin',
+              nik: row['NIK'] || row['National ID'],
+              address: row['Address'],
+              organization_name: row['Organization'] || row['Unit'] || 'WIJAYA KREATIF NUSANTARA',
+              job_position: row['Position'],
+              job_level: row['Level'] || 'Staff',
+              status: row['Status'] || 'Active',
+              base_salary: parseFloat(row['Base Salary'] || 0),
+              join_date: row['Join Date'] || new Date().toISOString().split('T')[0],
+              contract_end_date: row['Contract End Date'],
+              bank_name: row['Bank Name'],
+              bank_account: row['Bank Account'],
+              bank_account_holder: row['Bank Account Holder'],
+              bank_branch: row['Bank Branch'],
+              payroll_method: row['Payroll Method'] || 'Bank Transfer',
+              npwp: row['NPWP'],
+              npwp_16_digit: row['NPWP 16 Digit'],
+              ptkp_status: row['PTKP Status'] || 'TK/0',
+              tax_method: row['Tax Method'] || 'Gross',
+              kpp_name: row['KPP Name'],
+              faskes_tk1: row['Faskes TK1'],
+              employment_type: row['Employment Type'] || 'Permanent',
+              working_location: row['Working Location'] || 'Head Office',
+              overtime_eligible: row['Overtime Eligible'] === 'Yes' || row['Overtime Eligible'] === true
             };
           });
 
-          // Insert in chunks of 50 to prevent timeout
           const chunkSize = 50;
           for (let i = 0; i < mappedData.length; i += chunkSize) {
             const chunk = mappedData.slice(i, i + chunkSize);
@@ -158,71 +153,71 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-[500px] bg-[#f0f2f5] shadow-[20px_20px_60px_#00000040] rounded-[2.5rem] overflow-hidden flex flex-col border border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-[460px] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="h-16 bg-[#f0f2f5] border-b border-white flex items-center justify-between px-8 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-blue-500 shadow-lg rounded-xl flex items-center justify-center text-white">
-              <IconFileUpload size={22} />
+        <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+              <IconFileUpload size={18} />
             </div>
             <div>
-              <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">Neural Data Ingestion</h2>
-              <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1 opacity-70">Bulk workforce synchronization</p>
+              <h2 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-none">Neural Data Ingestion</h2>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Bulk workforce synchronization</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="h-9 w-9 flex items-center justify-center bg-white shadow-sm rounded-xl text-slate-400 hover:text-[#E31E24] transition-all"
+            className="h-8 w-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#E31E24] hover:bg-slate-50 transition-all shadow-sm"
           >
-            <IconX size={18} />
+            <IconX size={16} />
           </button>
         </header>
 
-        <div className="p-10 flex flex-col items-center text-center space-y-8">
+        <div className="p-8 flex flex-col items-center text-center">
           {success ? (
-            <div className="py-10 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-500">
-              <div className="h-20 w-20 bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.4)] rounded-full flex items-center justify-center text-white">
-                <IconCheck size={40} strokeWidth={3} />
+            <div className="py-8 flex flex-col items-center gap-5 animate-in zoom-in-95 duration-300">
+              <div className="h-16 w-16 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                <IconCheck size={32} strokeWidth={2.5} />
               </div>
               <div>
-                <p className="text-lg font-black text-slate-800 uppercase tracking-tighter">Ingestion Successful</p>
-                <p className="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] mt-1">{progress.total} Records Processed</p>
+                <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">Impor Berhasil</p>
+                <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mt-1">{progress.total} Data Karyawan Diproses</p>
               </div>
             </div>
           ) : loading ? (
-            <div className="py-10 w-full flex flex-col items-center gap-8">
+            <div className="py-8 w-full flex flex-col items-center gap-6">
               <div className="relative">
-                <IconLoader2 size={64} className="text-blue-500 animate-spin" strokeWidth={1} />
+                <IconLoader2 size={48} className="text-[#E31E24] animate-spin" strokeWidth={1.5} />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[10px] font-black text-slate-400">{Math.round((progress.current / progress.total) * 100)}%</span>
+                  <span className="text-[9px] font-bold text-slate-500">{Math.round((progress.current / progress.total) * 100)}%</span>
                 </div>
               </div>
-              <div className="w-full space-y-3">
-                <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden shadow-inner">
+              <div className="w-full space-y-2">
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
                   <div 
-                    className="h-full bg-blue-500 transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]" 
+                    className="h-full bg-[#E31E24] transition-all duration-300" 
                     style={{ width: `${(progress.current / progress.total) * 100}%` }}
                   ></div>
                 </div>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                  Ingesting: <span className="text-blue-500">{progress.current}</span> / {progress.total}
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Mengimpor: <span className="text-[#E31E24] font-mono">{progress.current}</span> / {progress.total} Data
                 </p>
               </div>
             </div>
           ) : (
-            <>
-              <div className="w-full space-y-4">
+            <div className="w-full flex flex-col gap-6">
+              <div className="w-full">
                 <div 
                   onClick={() => document.getElementById('bulk-upload-input').click()}
-                  className="w-full aspect-video bg-[#f0f2f5] shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] rounded-[2rem] border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-blue-400 hover:bg-white/50 transition-all group"
+                  className="w-full aspect-video bg-slate-55/40 hover:bg-red-50/10 border-2 border-dashed border-slate-200 hover:border-[#E31E24]/30 rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group"
                 >
-                  <IconFileSpreadsheet size={48} className="text-slate-300 group-hover:text-blue-500 transition-colors" strokeWidth={1} />
+                  <IconFileSpreadsheet size={40} className="text-slate-300 group-hover:text-[#E31E24] transition-colors" strokeWidth={1.2} />
                   <div>
-                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Drop Excel File or Click</p>
-                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Supports .xlsx, .xls, .csv</p>
+                    <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">Drop Excel File or Click</p>
+                    <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Supports .xlsx, .xls, .csv</p>
                   </div>
                   <input 
                     id="bulk-upload-input" 
@@ -234,26 +229,26 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
                 </div>
 
                 {error && (
-                  <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl animate-in slide-in-from-top-2">
-                    <IconAlertTriangle size={18} className="text-red-500 shrink-0" />
-                    <p className="text-[9px] font-bold text-red-600 text-left leading-relaxed">{error}</p>
+                  <div className="flex items-center gap-3 p-3 bg-rose-50 border border-rose-100 rounded-xl mt-4 animate-in slide-in-from-top-2">
+                    <IconAlertTriangle size={16} className="text-[#E31E24] shrink-0" />
+                    <p className="text-[9px] font-bold text-rose-600 text-left leading-relaxed">{error}</p>
                   </div>
                 )}
               </div>
 
-              <div className="w-full pt-4 border-t border-white flex flex-col gap-3">
+              <div className="w-full pt-6 border-t border-slate-100 flex flex-col gap-4">
                 <button 
                   onClick={downloadTemplate}
-                  className="w-full h-12 flex items-center justify-center gap-3 bg-white shadow-sm border border-white rounded-xl text-slate-600 hover:text-blue-500 transition-all group"
+                  className="w-full h-10 flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-lg text-slate-650 hover:text-[#E31E24] hover:bg-slate-50 transition-all shadow-sm group"
                 >
-                  <IconDownload size={18} className="group-hover:bounce" />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Download Data Template</span>
+                  <IconDownload size={14} className="group-hover:bounce text-slate-400 group-hover:text-[#E31E24]" />
+                  <span className="text-[9px] font-bold uppercase tracking-widest">Download Data Template</span>
                 </button>
-                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-                  Use the official template to ensure neural compatibility.<br/>ID generation is automatic if empty.
+                <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest leading-normal">
+                  Gunakan template resmi untuk keselarasan data.<br/>Penghasilan ID otomatis jika dikosongkan.
                 </p>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
