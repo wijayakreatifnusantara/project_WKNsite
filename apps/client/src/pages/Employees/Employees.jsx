@@ -44,11 +44,13 @@ import AddEmployeeModal from './components/AddEmployeeModal';
 import BulkUploadModal from './components/BulkUploadModal';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/context/AuthContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const Employees = () => {
   const { profile, isOwner, isAdmin, isManager } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // Sync viewMode with URL: /employees/neural or /employees/registry (default)
   const viewMode = location.pathname.includes('/neural') ? 'neural' : 'registry';
@@ -523,11 +525,118 @@ const Employees = () => {
           </div>
         </div>
       </div>
-
       <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-h-0">
-        <div className="flex-1 p-6 max-w-[1400px] mx-auto w-full flex flex-col pb-0 min-h-0 min-w-[1000px]">
+        <div className={`flex-1 p-4 md:p-6 max-w-[1400px] mx-auto w-full flex flex-col pb-0 min-h-0 ${isMobile ? '' : 'min-w-[1000px]'}`}>
           {viewMode === 'registry' ? (
-            <div className="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
+            isMobile ? (
+              <div className="flex-1 flex flex-col min-h-0 space-y-3 overflow-y-auto pb-24 px-1">
+                {loading ? (
+                  <div className="py-24 text-center">
+                    <IconLoader2 className="mx-auto animate-spin text-[#E31E24]" size={40} />
+                  </div>
+                ) : filteredEmployees.length > 0 ? (
+                  filteredEmployees.map((emp, idx) => (
+                    <div key={idx} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
+                            {emp["Photo"] || emp.photo ? (
+                              <img src={emp["Photo"] || emp.photo} alt={emp["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
+                            ) : (
+                              emp["EMPLOYEE NAME"]?.[0] || 'A'
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-800 uppercase leading-none">{emp["EMPLOYEE NAME"]}</h4>
+                            <p className="text-[9px] text-slate-400 font-mono tracking-tight mt-1">{emp["EMPLOYEE ID"]}</p>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
+                          emp["Status *"] === 'Permanent' 
+                            ? 'bg-blue-50 text-blue-600 border-blue-100' 
+                            : emp["Status *"] === 'RESIGNED'
+                            ? 'bg-rose-50 text-rose-600 border-rose-100'
+                            : 'bg-amber-50 text-amber-600 border-amber-100'
+                        }`}>
+                          {emp["Status *"]}
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[10px]">
+                        <div>
+                          <span className="text-slate-400 font-bold uppercase block">Departemen</span>
+                          <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Organization Name *"]}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 font-bold uppercase block">Jabatan</span>
+                          <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Job Position *"]}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-slate-100">
+                        <button 
+                          onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} 
+                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                        >
+                          Lihat
+                        </button>
+                        <button 
+                          onClick={() => {setEditingEmployee(emp); setIsAddModalOpen(true);}} 
+                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                        >
+                          Edit
+                        </button>
+                        {isAdmin() && (
+                          <>
+                            {emp.is_resigned || String(emp["Status *"] || emp.status || "").toUpperCase() === 'RESIGNED' ? (
+                              <button 
+                                onClick={() => handleActivateEmployee(emp.id || emp["EMPLOYEE ID"])} 
+                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-md hover:bg-emerald-100/50 transition-colors"
+                              >
+                                Aktifkan
+                              </button>
+                            ) : (
+                              <button 
+                                onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} 
+                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-100 rounded-md hover:bg-rose-100/50 transition-colors"
+                              >
+                                Resign
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-20 text-center text-slate-350 font-bold text-[12px] uppercase tracking-widest bg-white rounded-xl border border-slate-200 shadow-sm">
+                    Tidak Ada Data Karyawan
+                  </div>
+                )}
+
+                {/* Mobile Pagination Control */}
+                <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-sm">
+                  <button 
+                    disabled={currentPage === 1 || loading}
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className="h-8 px-3 rounded border border-slate-200 bg-white text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
+                  >
+                    Prev
+                  </button>
+                  <span className="text-[9px] font-black text-slate-600 uppercase tracking-wider">
+                    {currentPage} / {Math.ceil(totalEmployees / pageSize) || 1}
+                  </span>
+                  <button 
+                    disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
+                    onClick={() => setCurrentPage(p => p + 1)}
+                    className="h-8 px-3 rounded border border-slate-200 bg-white text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
                 {/* 📌 STATIONARY HEADER TABLE */}
                 <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0">
                   <thead className="bg-slate-50 border-b border-slate-200">
@@ -660,7 +769,7 @@ const Employees = () => {
                       <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">System Operational</span>
                     </div>
-                    <div className="h-4 w-[1px] bg-slate-200"></div>
+                    <div className="h-4 w-[1px] bg-slate-250"></div>
                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">
                       Terpilih: <span className="text-[#E31E24]">{selectedIds.size}</span> item
                     </span>
@@ -712,7 +821,8 @@ const Employees = () => {
                   </div>
                 </div>
             </div>
-          ) : (
+          )
+        ) : (
             <div className="flex-1 bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden">
               <OrgChart employees={filteredEmployees} />
             </div>

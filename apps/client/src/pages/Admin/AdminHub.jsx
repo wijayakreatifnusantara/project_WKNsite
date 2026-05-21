@@ -22,12 +22,12 @@ const AdminHub = () => {
   ];
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#f0f2f5] font-inter">
-      {/* 🚀 PREMIUM GLASSMORPHIC SUB-HEADER & TAB BAR */}
-      <div className="bg-[#f0f2f5]/95 backdrop-blur-xl border-b border-white z-10 shrink-0">
+    <div className="flex-1 flex flex-col min-h-0 bg-[#f8fafc] font-inter animate-fade-in">
+      {/* 🚀 PREMIUM FLAT SUB-HEADER & TAB BAR */}
+      <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-slate-200 z-10 shrink-0">
         <div className="max-w-[1400px] mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
+            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
               <IconShieldCheck size={22} stroke={2.5} />
             </div>
             <div>
@@ -36,8 +36,8 @@ const AdminHub = () => {
             </div>
           </div>
 
-          {/* Premium Glassmorphic Tab Selector */}
-          <div className="flex p-0.5 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-xl border border-white/50">
+          {/* Premium Flat Tab Selector */}
+          <div className="flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/60">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -46,7 +46,7 @@ const AdminHub = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${
                     isActive 
-                      ? 'bg-white shadow-[2px_2px_6px_rgba(0,0,0,0.05)] text-[#E31E24]' 
+                      ? 'bg-white shadow-sm border border-slate-200/50 text-[#E31E24]' 
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >

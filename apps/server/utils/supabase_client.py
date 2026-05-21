@@ -130,12 +130,30 @@ class WKNSupabaseClient:
             if user.get("password") == clean_password:
                 with open(log_path, "a") as f:
                     f.write(f"[SUCCESS] Login OK for {clean_username}\n")
+                
+                # Fetch employee ID and is_field_team status
+                employee_id = None
+                is_field_team = False
+                try:
+                    emp_res = self.client.table("employees") \
+                        .select("id, is_field_team") \
+                        .eq("email", clean_username) \
+                        .execute()
+                    if emp_res.data:
+                        employee_id = emp_res.data[0].get("id")
+                        is_field_team = emp_res.data[0].get("is_field_team", False)
+                except Exception as ex:
+                    with open(log_path, "a") as f:
+                        f.write(f"[WARN] Failed to fetch employee detail: {str(ex)}\n")
+
                 return {
                     "Username": user.get("username"),
                     "Password": user.get("password"),
                     "Full Name": user.get("full_name"),
                     "Role": user.get("role"),
-                    "Status": user.get("status")
+                    "Status": user.get("status"),
+                    "employee_id": employee_id,
+                    "is_field_team": is_field_team
                 }
             else:
                 with open(log_path, "a") as f:

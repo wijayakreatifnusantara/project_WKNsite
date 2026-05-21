@@ -15,7 +15,8 @@ import {
   IconLock,
   IconClock,
   IconEye,
-  IconUserShield
+  IconUserShield,
+  IconTrash
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,7 +57,7 @@ const Settings = () => {
     <input 
       type={type}
       placeholder={placeholder}
-      className="h-8 w-48 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg px-3 text-[10px] font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20"
+      className="h-8 w-48 bg-slate-50 border border-slate-200 rounded-lg px-3 text-[10px] font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20 focus:border-[#E31E24]/20"
     />
   );
 
@@ -67,7 +68,7 @@ const Settings = () => {
   );
 
   return (
-    <div className="p-4 h-full overflow-y-auto no-scrollbar bg-[#f0f2f5] animate-fade-in custom-scrollbar">
+    <div className="p-4 h-full overflow-y-auto no-scrollbar bg-[#f8fafc] animate-fade-in custom-scrollbar">
       <div className="max-w-[1200px] mx-auto space-y-4 pb-20">
         
         {/* HEADER */}
@@ -108,13 +109,13 @@ const Settings = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all duration-300 ${
+                className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all duration-300 border ${
                   activeTab === tab.id 
-                  ? 'bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border border-white' 
-                  : 'bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] hover:scale-[1.01]'
+                  ? 'bg-white border-slate-200 shadow-sm' 
+                  : 'bg-transparent border-transparent hover:bg-slate-100/50 hover:translate-x-0.5'
                 }`}
               >
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${activeTab === tab.id ? 'bg-[#E31E24] text-white shadow-sm' : 'bg-white text-slate-400 shadow-sm'}`}>
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all border ${activeTab === tab.id ? 'bg-[#E31E24] border-[#E31E24] text-white shadow-sm' : 'bg-white border-slate-200 text-slate-400 shadow-sm'}`}>
                   {tab.icon}
                 </div>
                 <div className="text-left leading-none">
@@ -129,8 +130,8 @@ const Settings = () => {
           <div className="lg:col-span-4 space-y-4">
             {activeTab === 'general' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3">
+                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Brand Identity</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -145,8 +146,8 @@ const Settings = () => {
                     </SettingRow>
                   </CardContent>
                 </Card>
-                <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3">
+                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Environment</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -168,8 +169,8 @@ const Settings = () => {
             )}
 
             {activeTab === 'security' && (
-              <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3">
+              <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
                   <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Security & Auth Policy</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
@@ -197,8 +198,8 @@ const Settings = () => {
 
             {activeTab === 'notifications' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3 flex flex-row items-center justify-between">
+                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Email Engine (SMTP)</CardTitle>
                     <IconMail size={14} className="text-slate-400" />
                   </CardHeader>
@@ -214,8 +215,8 @@ const Settings = () => {
                     </SettingRow>
                   </CardContent>
                 </Card>
-                <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3 flex flex-row items-center justify-between">
+                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">WhatsApp Gateway</CardTitle>
                     <IconMessageDots size={14} className="text-green-500" />
                   </CardHeader>
@@ -235,8 +236,8 @@ const Settings = () => {
             )}
 
             {activeTab === 'network' && (
-              <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3">
+              <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
                   <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Localization & Global Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
@@ -264,7 +265,7 @@ const Settings = () => {
                     { label: 'Last Backup', val: '2h ago', icon: <IconClock size={14} /> },
                     { label: 'Storage', val: '1.2 GB', icon: <IconDatabase size={14} /> }
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white border-2 border-white shadow-sm rounded-xl p-3 flex items-center justify-between transition-all hover:scale-[1.02]">
+                    <div key={i} className="bg-white border border-slate-200 shadow-sm rounded-xl p-3 flex items-center justify-between transition-all hover:translate-y-[-1px]">
                       <div className="space-y-0.5">
                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
                         <p className="text-xs font-black text-slate-800">{stat.val}</p>
@@ -275,8 +276,8 @@ const Settings = () => {
                     </div>
                   ))}
                 </div>
-                <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3">
+                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Maintenance & Recovery</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">

@@ -119,14 +119,14 @@ const RBACManager = () => {
   };
 
   return (
-    <div className="p-4 h-full overflow-y-auto no-scrollbar bg-[#f0f2f5] animate-fade-in">
+    <div className="p-4 h-full overflow-y-auto no-scrollbar bg-[#f8fafc] animate-fade-in">
       <div className="max-w-[1200px] mx-auto space-y-4 pb-20">
         
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-white shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
+              <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
                 <IconLockAccess size={20} />
               </div>
               <div>
@@ -166,21 +166,21 @@ const RBACManager = () => {
                 onClick={() => setSelectedRole(role)}
                 className={`w-full p-3 rounded-xl flex items-center justify-between transition-all duration-300 group ${
                   selectedRole === role 
-                  ? 'bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border border-white' 
-                  : 'bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] hover:scale-[1.01]'
+                  ? 'bg-white border border-[#E31E24] shadow-sm' 
+                  : 'bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:scale-[1.01]'
                 }`}
               >
                 <div className="flex flex-col items-start text-left">
                   <span className={`text-[10px] font-black uppercase tracking-widest ${selectedRole === role ? 'text-[#E31E24]' : 'text-slate-600'}`}>{role}</span>
                   <span className="text-[7px] text-slate-400 font-bold">System Hierarchy {role === 'owner' ? '0' : '1'}</span>
                 </div>
-                <div className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${selectedRole === role ? 'bg-[#E31E24] text-white shadow-sm' : 'bg-white text-slate-300 shadow-sm'}`}>
+                <div className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${selectedRole === role ? 'bg-[#E31E24] text-white shadow-sm' : 'bg-slate-50 text-slate-400 border border-slate-200 shadow-sm'}`}>
                   <IconShieldCheck size={12} />
                 </div>
               </button>
             ))}
             
-            <Card className="mt-6 border-white border-2 bg-slate-800 text-white rounded-xl overflow-hidden shadow-lg">
+            <Card className="mt-6 border border-slate-700 bg-slate-800 text-white rounded-xl overflow-hidden shadow-lg">
               <CardContent className="p-4 space-y-2">
                 <div className="h-8 w-8 bg-white/10 rounded-lg flex items-center justify-center">
                   <IconDeviceAnalytics size={16} className="text-red-400" />
@@ -202,8 +202,8 @@ const RBACManager = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {permissionGroups.map((group, gIdx) => (
-                  <Card key={gIdx} className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl overflow-hidden transition-all hover:shadow-md">
-                    <CardHeader className="border-b border-white/50 bg-white/30 px-5 py-3">
+                  <Card key={gIdx} className="border border-slate-200 shadow-sm bg-white rounded-xl overflow-hidden transition-all hover:shadow-md">
+                    <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
                       <div className="flex items-center gap-2">
                         <div className="text-[#E31E24] opacity-70">{React.cloneElement(group.icon, { size: 16 })}</div>
                         <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">{group.title}</CardTitle>
@@ -216,10 +216,10 @@ const RBACManager = () => {
                           onClick={() => togglePermission(item.id)}
                           className="flex items-start gap-3 cursor-pointer group"
                         >
-                          <div className={`mt-0.5 h-5 w-5 rounded bg-white border-2 flex items-center justify-center transition-all ${
+                          <div className={`mt-0.5 h-5 w-5 rounded border flex items-center justify-center transition-all ${
                             rolePermissions.includes(item.id) 
-                            ? 'bg-[#E31E24] border-[#E31E24] shadow-sm shadow-red-200' 
-                            : 'border-slate-200'
+                            ? 'bg-[#E31E24] border-[#E31E24]' 
+                            : 'border-slate-300 bg-white'
                           }`}>
                             {rolePermissions.includes(item.id) && <IconCheck size={14} className="text-white" stroke={4} />}
                           </div>

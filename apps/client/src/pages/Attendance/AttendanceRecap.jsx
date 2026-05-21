@@ -180,11 +180,11 @@ const AttendanceRecap = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
-      <div className="max-w-[1400px] mx-auto space-y-8">
+    <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
+      <div className="max-w-[1400px] mx-auto space-y-4">
         
         {/* 🚀 ULTRA-COMPACT HEADER */}
-        <div className="flex items-center justify-between bg-white/40 p-2 px-4 rounded-2xl border border-white shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between bg-white p-3 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/attendance')}
@@ -199,7 +199,7 @@ const AttendanceRecap = () => {
           </div>
 
           <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-xl border border-white shadow-inner">
+             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Cycle:</span>
                <input 
                   type="month" 
@@ -224,9 +224,9 @@ const AttendanceRecap = () => {
           </div>
         </div>
         {/* 📊 COMPACT STATS BAR */}
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 flex items-center gap-3 bg-white/30 p-2 px-4 rounded-2xl border border-white shadow-sm">
-                <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center text-[#E31E24] shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
+            <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-[#E31E24] shadow-sm">
                     <IconCalendarStats size={16} />
                 </div>
                 <div>
@@ -235,8 +235,8 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 bg-white/30 p-2 px-4 rounded-2xl border border-white shadow-sm">
-                <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center text-amber-500 shadow-sm">
+            <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-amber-500 shadow-sm">
                     <IconSettings size={16} />
                 </div>
                 <div>
@@ -250,8 +250,8 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 bg-white/30 p-2 px-4 rounded-2xl border border-white shadow-sm">
-                <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center text-emerald-500 shadow-sm">
+            <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-emerald-500 shadow-sm">
                     <IconBriefcase size={16} />
                 </div>
                 <div>
@@ -260,8 +260,8 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-[2] flex items-center gap-3 bg-white/50 p-1.5 px-4 rounded-2xl border border-white shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff]">
-                <IconSearch size={14} className="text-slate-300" />
+            <div className="flex-[2] flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-md group">
+                <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
                 <input 
                     type="text" 
                     placeholder="Search Personnel..."
@@ -273,11 +273,11 @@ const AttendanceRecap = () => {
         </div>
 
         {/* 📜 HIGH DENSITY TABLE */}
-        <div className="bg-[#f0f2f5] shadow-[10px_10px_30px_#d1d9e6,-10px_-10px_30px_#ffffff] rounded-[2rem] border-[4px] border-white overflow-hidden">
+        <div className="bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] rounded-3xl border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-white/50 border-b border-white/50">
+                <tr className="bg-slate-50/80 border-b border-slate-100 backdrop-blur-md">
                   <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Employee</th>
                   <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
                   <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Target</th>
@@ -288,7 +288,7 @@ const AttendanceRecap = () => {
                   <th className="px-6 py-3 text-right text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Achievement</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/30">
+              <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
                     <td colSpan="8" className="py-12 text-center text-[9px] font-black text-slate-300 uppercase tracking-widest animate-pulse">Syncing Metrics...</td>
@@ -303,10 +303,10 @@ const AttendanceRecap = () => {
                     const achievement = workingDaysTarget > 0 ? Math.round((emp.present / workingDaysTarget) * 100) : 0;
                     
                     return (
-                      <tr key={emp.id} className="hover:bg-white/30 transition-all group">
+                      <tr key={emp.id} className="hover:bg-slate-50/50 transition-all group border-b border-transparent hover:border-slate-100">
                         <td className="px-6 py-2">
                           <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-[10px] font-black text-[#E31E24]">
+                            <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 border border-[#E31E24]/5 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
                               {emp.name?.charAt(0)}
                             </div>
                             <div>

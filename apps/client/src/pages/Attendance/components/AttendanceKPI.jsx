@@ -31,14 +31,14 @@ const AttendanceKPI = ({ title, value, total, unit = "", icon, color, compact = 
   }
 
   return (
-    <Card className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-5 transition-all hover:scale-[1.02] cursor-pointer group">
+    <Card className="border-slate-200 border bg-white shadow-sm rounded-2xl p-5 transition-all hover:translate-y-[-2px] cursor-pointer group">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] ${colorConfig[color].split(' ')[0]} flex items-center justify-center transition-transform group-hover:scale-110 duration-300`}>
+          <div className={`h-12 w-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 ${colorConfig[color]}`}>
             {icon}
           </div>
           {total > 0 && unit !== "%" && (
-            <div className="px-3 py-1 rounded-lg bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] text-[9px] font-black uppercase tracking-widest text-slate-400">
+            <div className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-400">
               {percentage}% OF TOTAL
             </div>
           )}

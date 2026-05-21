@@ -38,7 +38,9 @@ export const AuthProvider = ({ children }) => {
           username: rawUser.Username,
           fullName: rawUser['Full Name'],
           role: rawUser.Role,
-          status: rawUser.Status
+          status: rawUser.Status,
+          employee_id: rawUser.employee_id,
+          is_field_team: rawUser.is_field_team
         };
         setUser(userData);
         localStorage.setItem('wkn_auth_user', JSON.stringify(userData));
