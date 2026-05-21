@@ -394,7 +394,7 @@ const Employees = () => {
   }, [filterDept, filterPos, filterLevel, filterStatus]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#f0f2f5] animate-fade-in font-outfit relative">
+    <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
@@ -413,36 +413,36 @@ const Employees = () => {
       `}</style>
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
-      <div className="bg-[#f0f2f5]/95 backdrop-blur-xl border-b border-white z-30 shadow-sm shrink-0">
-        <div className="max-w-[1400px] mx-auto p-3 space-y-2">
+      <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">
+        <div className="max-w-[1400px] mx-auto p-4 space-y-3">
           
           {/* HEADER ROW */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
-                <IconUsers size={20} stroke={2.5} />
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24]">
+                <IconUsers size={22} stroke={2} />
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-800 tracking-tighter uppercase leading-none">Workforce Registry</h1>
-                <p className="text-[7px] font-black text-[#E31E24] uppercase tracking-[0.2em] mt-0.5 opacity-80">Talent & Resource Ecosystem</p>
+                <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">Database Karyawan</h1>
+                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1.5">Sistem Manajemen & Informasi Karyawan</p>
               </div>
-              <div className="h-6 w-[1px] bg-slate-300/40 ml-2 hidden md:block"></div>
-              <div className="hidden md:flex bg-white/50 p-0.5 rounded-xl border border-white">
-                <ViewToggle active={viewMode === 'registry'} onClick={() => setViewMode('registry')} label="REGISTRY" icon={<IconTable size={12} />} />
-                <ViewToggle active={viewMode === 'neural'} onClick={() => setViewMode('neural')} label="NEURAL" icon={<IconHierarchy2 size={12} />} />
+              <div className="h-6 w-[1px] bg-slate-200 ml-3 hidden md:block"></div>
+              <div className="hidden md:flex bg-slate-100 p-1 rounded-xl">
+                <ViewToggle active={viewMode === 'registry'} onClick={() => setViewMode('registry')} label="TABEL" icon={<IconTable size={14} />} />
+                <ViewToggle active={viewMode === 'neural'} onClick={() => setViewMode('neural')} label="STRUKTUR" icon={<IconHierarchy2 size={14} />} />
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={() => setIsOnboardingOpen(true)} className="h-9 px-4 bg-white text-slate-600 shadow-sm border border-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:text-[#E31E24] transition-all flex items-center justify-center gap-2">
+              <Button onClick={() => setIsOnboardingOpen(true)} className="h-9 px-3 bg-white text-slate-600 shadow-sm border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-[#E31E24] hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5">
                 <IconBolt size={14} className="text-[#E31E24]" /> Lifecycle
               </Button>
-              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-4 bg-white text-slate-600 shadow-sm border border-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:text-blue-500 transition-all flex items-center justify-center gap-2">
-                <IconTable size={14} className="text-blue-500" /> Bulk Upload
+              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-white text-slate-600 shadow-sm border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-blue-600 hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5">
+                <IconTable size={14} className="text-blue-500" /> Impor Bulk
               </Button>
               {isAdmin() && (
-                <Button onClick={() => { setEditingEmployee(null); setIsAddModalOpen(true); }} className="h-9 px-4 bg-[#E31E24] text-white shadow-md rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-[#C1181E] transition-all flex items-center justify-center gap-2">
-                  <IconPlus size={14} /> Add Talent
+                <Button onClick={() => { setEditingEmployee(null); setIsAddModalOpen(true); }} className="h-9 px-4 bg-[#E31E24] text-white shadow-sm rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
+                  <IconPlus size={14} /> Tambah Karyawan
                 </Button>
               )}
             </div>
@@ -450,21 +450,21 @@ const Employees = () => {
 
           {/* STATS & QUICK ACTIONS */}
           <div className="flex flex-col md:flex-row gap-3 items-center">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 w-full md:w-[480px]">
-              <MiniStat label="STRENGTH" value={employees.length} color="text-slate-800" />
-              <MiniStat label="ACTIVE" value={employees.filter(e => !(e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date)).length} color="text-green-600" />
-              <MiniStat label="RESIGNED" value={employees.filter(e => e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date).length} color="text-red-500" />
-              <MiniStat label="UNITS" value={new Set(employees.map(e => e?.["Organization Name *"]).filter(Boolean)).size} color="text-blue-600" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full md:w-[680px] shrink-0">
+              <MiniStat label="Total Karyawan" value={employees.length} color="text-slate-800" icon={<IconUsers size={16} />} />
+              <MiniStat label="Aktif" value={employees.filter(e => !(e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date)).length} color="text-emerald-600" icon={<IconUserCheck size={16} />} />
+              <MiniStat label="Resigned" value={employees.filter(e => e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date).length} color="text-rose-500" icon={<IconUserX size={16} />} />
+              <MiniStat label="Unit / Departemen" value={new Set(employees.map(e => e?.["Organization Name *"]).filter(Boolean)).size} color="text-blue-600" icon={<IconBuildingSkyscraper size={16} />} />
             </div>
             
-            <div className="flex-1 w-full relative group">
-              <IconSearch size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
+            <div className="flex-1 w-full relative">
+              <IconSearch size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
-                placeholder="SEARCH TALENT BY NAME OR ID..." 
+                placeholder="Cari karyawan berdasarkan nama atau ID..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-9 pl-11 pr-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-lg text-[9px] font-black text-slate-800 tracking-widest focus:outline-none focus:bg-white transition-all"
+                className="w-full h-10 pl-11 pr-10 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-white focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400"
               />
               {searchTerm && (
                 <button 
@@ -476,8 +476,8 @@ const Employees = () => {
               )}
             </div>
 
-            <div className="flex p-0.5 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-lg">
-              <TabButton active={activeTab === 'active'} onClick={() => { setActiveTab('active'); setViewMode('registry'); }} label="ACTIVE" />
+            <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg shrink-0">
+              <TabButton active={activeTab === 'active'} onClick={() => { setActiveTab('active'); setViewMode('registry'); }} label="AKTIF" />
               <TabButton active={activeTab === 'resigned'} onClick={() => { setActiveTab('resigned'); setViewMode('registry'); }} label="RESIGNED" />
             </div>
           </div>
@@ -492,7 +492,7 @@ const Employees = () => {
                 onChange={setFilterDept} 
               />
               <FilterSelect 
-                label="POSITION" 
+                label="JABATAN" 
                 value={filterPos} 
                 options={['ALL POSITIONS', ...Array.from(new Set(employees.map(e => e["Job Position *"])))]} 
                 onChange={setFilterPos} 
@@ -504,7 +504,7 @@ const Employees = () => {
                 onChange={setFilterLevel} 
               />
               <FilterSelect 
-                label="STATUS" 
+                label="STATUS KEPEGAWAIAN" 
                 value={filterStatus} 
                 options={['ALL STATUSES', ...Array.from(new Set(employees.map(e => e["Status *"])))]} 
                 onChange={setFilterStatus} 
@@ -513,11 +513,11 @@ const Employees = () => {
             {isFilterActive && (
               <button 
                 onClick={resetFilters}
-                className="h-10 px-4 bg-white shadow-sm border border-white rounded-xl text-slate-400 hover:text-[#E31E24] hover:bg-red-50 transition-all flex items-center gap-2 group shrink-0"
+                className="h-9 px-4 bg-white shadow-sm border border-slate-200 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
                 title="Reset All Filters"
               >
                 <IconRefresh size={14} className="group-hover:rotate-180 transition-all duration-500" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Reset</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Reset</span>
               </button>
             )}
           </div>
@@ -527,12 +527,12 @@ const Employees = () => {
       <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-h-0">
         <div className="flex-1 p-6 max-w-[1400px] mx-auto w-full flex flex-col pb-0 min-h-0 min-w-[1000px]">
           {viewMode === 'registry' ? (
-            <div className="bg-[#f0f2f5] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] rounded-t-[1.5rem] border-t-[3px] border-x-[3px] border-white overflow-hidden flex flex-col flex-1 min-h-0">
+            <div className="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
                 {/* 📌 STATIONARY HEADER TABLE */}
                 <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0">
-                  <thead className="bg-white">
+                  <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="w-[5%] pl-6 py-3">
+                      <th className="w-[5%] pl-6 py-3.5 bg-slate-50">
                         <div 
                           onClick={() => {
                             const allIds = filteredEmployees.map(emp => emp["EMPLOYEE ID"]);
@@ -542,21 +542,21 @@ const Employees = () => {
                               setSelectedIds(new Set(allIds));
                             }
                           }}
-                          className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
+                          className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                             filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length
                             ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
                             : 'bg-white border-slate-300 hover:border-[#E31E24]'
                           }`}
                         >
-                          {filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length && <IconCheck size={12} className="text-white" stroke={5} />}
+                          {filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length && <IconCheck size={10} className="text-white" stroke={4} />}
                         </div>
                       </th>
-                      <TableHead label="TALENT ID" width="10%" />
-                      <TableHead label="IDENTITY NAME" width="25%" />
-                      <TableHead label="ORG. UNIT" width="15%" />
-                      <TableHead label="PROFESSIONAL ROLE" width="15%" />
+                      <TableHead label="ID KARYAWAN" width="12%" />
+                      <TableHead label="NAMA LENGKAP" width="28%" />
+                      <TableHead label="DEPARTEMEN" width="15%" />
+                      <TableHead label="JABATAN" width="15%" />
                       <TableHead label="STATUS" center width="15%" />
-                      <TableHead label="ACTIONS" right width="15%" />
+                      <TableHead label="AKSI" right width="15%" />
                     </tr>
                   </thead>
                 </table>
@@ -564,7 +564,7 @@ const Employees = () => {
                 {/* 📜 SCROLLABLE DATA BODY */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar bg-white min-h-0">
                   <table className="w-full text-left border-separate border-spacing-0 table-fixed">
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-slate-100">
                       {loading ? (
                         <tr>
                           <td colSpan="7" className="py-24 text-center">
@@ -573,28 +573,28 @@ const Employees = () => {
                         </tr>
                       ) : filteredEmployees.length > 0 ? (
                         filteredEmployees.map((emp, idx) => (
-                          <tr key={idx} className={`group hover:bg-[#f8f9fa] transition-all duration-200 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/50' : ''}`}>
-                            <td className="w-[5%] pl-6 py-1.5">
+                          <tr key={idx} className={`group hover:bg-slate-50/50 transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
+                            <td className="w-[5%] pl-6 py-2.5">
                               <div 
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleSelectRow(emp["EMPLOYEE ID"]);
                                 }}
-                                className={`w-3.5 h-3.5 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
+                                className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                                   selectedIds.has(emp["EMPLOYEE ID"]) 
                                   ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
                                   : 'bg-white border-slate-300 hover:border-[#E31E24]'
                                 }`}
                               >
-                                {selectedIds.has(emp["EMPLOYEE ID"]) && <IconCheck size={12} className="text-white" stroke={5} />}
+                                {selectedIds.has(emp["EMPLOYEE ID"]) && <IconCheck size={10} className="text-white" stroke={4} />}
                               </div>
                             </td>
-                            <td className="w-[10%] px-4 py-1.5">
-                              <span className="text-[9px] font-black text-slate-400 tracking-tighter uppercase">{emp["EMPLOYEE ID"] || 'N/A'}</span>
+                            <td className="w-[12%] px-4 py-2.5">
+                              <span className="text-xs font-semibold text-slate-500 font-mono tracking-tighter uppercase">{emp["EMPLOYEE ID"] || 'N/A'}</span>
                             </td>
-                            <td className="w-[25%] px-4 py-1.5">
-                              <div className="flex items-center gap-2.5">
-                                <div className="h-7 w-7 rounded-lg bg-[#f0f2f5] shadow-sm border border-white flex items-center justify-center text-[8px] font-black text-slate-500 shrink-0 overflow-hidden">
+                            <td className="w-[28%] px-4 py-2.5">
+                              <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                                   {emp["Photo"] || emp.photo ? (
                                     <img src={emp["Photo"] || emp.photo} alt={emp["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
                                   ) : (
@@ -602,34 +602,40 @@ const Employees = () => {
                                   )}
                                 </div>
                                 <div className="flex flex-col min-w-0 leading-none">
-                                  <span className="text-[10px] font-black text-slate-800 uppercase tracking-tight truncate mb-0.5">{emp["EMPLOYEE NAME"]}</span>
-                                  <span className="text-[7px] font-bold text-slate-400 truncate tracking-wide lowercase">{emp["EMAIL"]}</span>
+                                  <span className="text-xs font-bold text-slate-800 uppercase tracking-tight truncate mb-1">{emp["EMPLOYEE NAME"]}</span>
+                                  <span className="text-[10px] text-slate-400 truncate tracking-wide lowercase">{emp["EMAIL"]}</span>
                                 </div>
                               </div>
                             </td>
-                            <td className="w-[15%] px-4 py-1.5">
-                              <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight truncate block">{emp["Organization Name *"]}</span>
+                            <td className="w-[15%] px-4 py-2.5">
+                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Organization Name *"]}</span>
                             </td>
-                            <td className="w-[15%] px-4 py-1.5">
-                              <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight truncate block">{emp["Job Position *"]}</span>
+                            <td className="w-[15%] px-4 py-2.5">
+                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Position *"]}</span>
                             </td>
-                            <td className="w-[15%] px-4 py-1.5 text-center">
-                              <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest ${emp["Status *"] === 'Permanent' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
+                            <td className="w-[15%] px-4 py-2.5 text-center">
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
+                                emp["Status *"] === 'Permanent' 
+                                  ? 'bg-blue-50 text-blue-600 border-blue-100' 
+                                  : emp["Status *"] === 'RESIGNED'
+                                  ? 'bg-rose-50 text-rose-600 border-rose-100'
+                                  : 'bg-amber-50 text-amber-600 border-amber-100'
+                              }`}>
                                 {emp["Status *"]?.toUpperCase()}
                               </span>
                             </td>
-                            <td className="w-[15%] px-4 py-1.5 text-right">
-                              <div className="flex items-center justify-end gap-1 transition-all">
-                                <ActionButton onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} icon={<IconEye size={12} />} hover="hover:text-blue-500" label="VIEW" />
-                                <ActionButton onClick={() => {setEditingEmployee(emp); setIsAddModalOpen(true);}} icon={<IconEdit size={12} />} hover="hover:text-green-500" label="EDIT" />
+                            <td className="w-[15%] px-4 py-2.5 text-right">
+                              <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                                <ActionButton onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} icon={<IconEye size={14} />} hover="hover:text-blue-600 hover:bg-blue-50" label="LIHAT" />
+                                <ActionButton onClick={() => {setEditingEmployee(emp); setIsAddModalOpen(true);}} icon={<IconEdit size={14} />} hover="hover:text-green-600 hover:bg-green-50" label="EDIT" />
                                 {isAdmin() && (
                                   <>
                                     {emp.is_resigned || String(emp["Status *"] || emp.status || "").toUpperCase() === 'RESIGNED' ? (
-                                      <ActionButton onClick={() => handleActivateEmployee(emp.id || emp["EMPLOYEE ID"])} icon={<IconUserCheck size={12} />} hover="hover:text-blue-500" label="ACTIVATE" />
+                                      <ActionButton onClick={() => handleActivateEmployee(emp.id || emp["EMPLOYEE ID"])} icon={<IconUserCheck size={14} />} hover="hover:text-emerald-600 hover:bg-emerald-50" label="AKTIFKAN" />
                                     ) : (
-                                      <ActionButton onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} icon={<IconUserX size={12} />} hover="hover:text-red-500" label="RESIGN" />
+                                      <ActionButton onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} icon={<IconUserX size={14} />} hover="hover:text-rose-600 hover:bg-rose-50" label="RESIGN" />
                                     )}
-                                    <ActionButton onClick={() => handleDeleteEmployee(emp.id || emp["EMPLOYEE ID"])} icon={<IconTrash size={12} />} hover="hover:text-slate-800" label="DELETE" />
+                                    <ActionButton onClick={() => handleDeleteEmployee(emp.id || emp["EMPLOYEE ID"])} icon={<IconTrash size={14} />} hover="hover:text-slate-800 hover:bg-slate-100" label="HAPUS" />
                                   </>
                                 )}
                               </div>
@@ -638,8 +644,8 @@ const Employees = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="7" className="py-32 text-center text-slate-300 font-black text-[12px] uppercase tracking-[0.3em]">
-                            No Talent Records Found
+                          <td colSpan="7" className="py-32 text-center text-slate-350 font-bold text-[12px] uppercase tracking-widest">
+                            Tidak Ada Data Karyawan
                           </td>
                         </tr>
                       )}
@@ -648,34 +654,34 @@ const Employees = () => {
                 </div>
 
                 {/* 📌 STRUCTURAL FOOTER */}
-                <div className="h-10 bg-white border-t border-slate-100 px-6 flex items-center justify-between shrink-0">
+                <div className="h-11 bg-slate-50 border-t border-slate-200 px-6 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 bg-[#E31E24] rounded-full animate-pulse"></div>
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">System Healthy</span>
+                      <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">System Operational</span>
                     </div>
-                    <div className="h-4 w-[1px] bg-slate-100"></div>
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                      Selection: <span className="text-[#E31E24]">{selectedIds.size}</span> items
+                    <div className="h-4 w-[1px] bg-slate-200"></div>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                      Terpilih: <span className="text-[#E31E24]">{selectedIds.size}</span> item
                     </span>
                     
                     {/* PAGINATION CONTROLS */}
-                    <div className="h-4 w-[1px] bg-slate-100 mx-2"></div>
-                    <div className="flex items-center gap-2">
+                    <div className="h-4 w-[1px] bg-slate-200 mx-1"></div>
+                    <div className="flex items-center gap-1">
                       <button 
                         disabled={currentPage === 1 || loading}
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-white text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-400 transition-all"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-white text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
                       >
                         <IconChevronDown size={14} className="rotate-90" />
                       </button>
-                      <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest min-w-[60px] text-center">
-                        PAGE {currentPage} / {Math.ceil(totalEmployees / pageSize) || 1}
+                      <span className="text-[9px] font-bold text-slate-600 uppercase tracking-wider min-w-[70px] text-center">
+                        HALAMAN {currentPage} / {Math.ceil(totalEmployees / pageSize) || 1}
                       </span>
                       <button 
                         disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
                         onClick={() => setCurrentPage(p => p + 1)}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-white text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-400 transition-all"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-white text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
                       >
                         <IconChevronDown size={14} className="-rotate-90" />
                       </button>
@@ -683,31 +689,31 @@ const Employees = () => {
 
                     {selectedIds.size > 0 && (
                       <div className="flex items-center gap-2 animate-slide-in-left">
-                        <div className="h-4 w-[1px] bg-slate-100 mx-1"></div>
+                        <div className="h-4 w-[1px] bg-slate-200 mx-1"></div>
                         <button 
                           onClick={handleBulkResign}
-                          className="px-3 py-1 bg-slate-800 text-white text-[7px] font-black uppercase tracking-widest rounded hover:bg-slate-700 transition-all flex items-center gap-1.5"
+                          className="px-2.5 py-1 bg-slate-800 text-white text-[9px] font-bold uppercase tracking-wider rounded-md hover:bg-slate-700 transition-all flex items-center gap-1"
                         >
-                          <IconUserX size={10} /> Bulk Resign
+                          <IconUserX size={12} /> Bulk Resign
                         </button>
                         <button 
                           onClick={handleBulkDelete}
-                          className="px-3 py-1 bg-[#E31E24] text-white text-[7px] font-black uppercase tracking-widest rounded hover:bg-[#C1181E] transition-all flex items-center gap-1.5"
+                          className="px-2.5 py-1 bg-[#E31E24] text-white text-[9px] font-bold uppercase tracking-wider rounded-md hover:bg-[#C1181E] transition-all flex items-center gap-1"
                         >
-                          <IconTrash size={10} /> Bulk Delete
+                          <IconTrash size={12} /> Bulk Hapus
                         </button>
                       </div>
                     )}
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Total: {totalEmployees} Records</span>
-                    <div className="h-4 w-[1px] bg-slate-100"></div>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">WKN.OS v2.1.0-OPT</span>
+                    <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wider">Total: {totalEmployees} Records</span>
+                    <div className="h-4 w-[1px] bg-slate-200"></div>
+                    <span className="text-[9px] font-bold text-slate-405 uppercase tracking-wider">WKNsite CMS v1.2</span>
                   </div>
                 </div>
             </div>
           ) : (
-            <div className="flex-1 bg-white shadow-xl rounded-[1.5rem] border-[4px] border-white overflow-hidden">
+            <div className="flex-1 bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden">
               <OrgChart employees={filteredEmployees} />
             </div>
           )}
@@ -736,50 +742,82 @@ const Employees = () => {
 
 // UI ATOMS
 const ViewToggle = ({ active, onClick, label, icon }) => (
-  <button onClick={onClick} className={`px-5 py-2 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all ${active ? 'bg-[#E31E24] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+  <button 
+    onClick={onClick} 
+    className={`px-4 py-1.5 rounded-lg flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-all ${
+      active 
+        ? 'bg-slate-900 text-white shadow-sm' 
+        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'
+    }`}
+  >
     {icon} {label}
   </button>
 );
 
-const MiniStat = ({ label, value, color }) => (
-  <div className="bg-white shadow-sm border border-white px-5 py-3 rounded-xl flex flex-col justify-center items-center text-center w-full">
-    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">{label}</p>
-    <p className={`text-xl font-black leading-none ${color}`}>{value}</p>
+const MiniStat = ({ label, value, color, icon }) => (
+  <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between w-full">
+    <div className="space-y-1 min-w-0">
+      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider truncate">{label}</p>
+      <p className={`text-xl font-bold leading-none ${color}`}>{value}</p>
+    </div>
+    <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-slate-400 shrink-0">
+      {icon}
+    </div>
   </div>
 );
 
 const TabButton = ({ active, onClick, label }) => (
-  <button onClick={onClick} className={`flex-1 min-w-[100px] px-6 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${active ? 'bg-white shadow-md text-[#E31E24]' : 'text-slate-400 hover:text-slate-600'}`}>
+  <button 
+    onClick={onClick} 
+    className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
+      active 
+        ? 'bg-white text-[#E31E24] shadow-sm border border-slate-200/40' 
+        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/30'
+    }`}
+  >
     {label}
   </button>
 );
 
 const FilterSelect = ({ label, value, options, onChange }) => (
-  <div className="space-y-1.5 flex-1">
-    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</p>
-    <div className="relative group">
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full appearance-none h-8 px-4 bg-white shadow-sm border border-white rounded-lg text-[8px] font-black text-slate-700 focus:outline-none cursor-pointer uppercase tracking-widest transition-all hover:bg-slate-50">
-        {options.map((opt, i) => (<option key={i} value={opt}>{opt}</option>))}
+  <div className="flex flex-col gap-1 flex-1 min-w-0">
+    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider ml-0.5">{label}</label>
+    <div className="relative">
+      <select 
+        value={value} 
+        onChange={(e) => onChange(e.target.value)} 
+        className="w-full appearance-none h-9 pl-3 pr-8 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all hover:bg-slate-50 cursor-pointer uppercase tracking-wide"
+      >
+        {options.map((opt, i) => (
+          <option key={i} value={opt}>{opt}</option>
+        ))}
       </select>
-      <IconChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+      <IconChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
     </div>
   </div>
 );
 
 const TableHead = ({ label, center, right, width }) => (
-  <th style={{ width }} className={`px-6 py-5 bg-white border-b-2 border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest ${center ? 'text-center' : ''} ${right ? 'text-right' : ''}`}>
+  <th 
+    style={{ width }} 
+    className={`px-4 py-3 bg-slate-50 border-b border-slate-200 text-[9px] font-bold text-slate-400 uppercase tracking-wider ${
+      center ? 'text-center' : ''
+    } ${right ? 'text-right' : ''}`}
+  >
     {label}
   </th>
 );
 
 const ActionButton = ({ onClick, icon, hover, label }) => (
   <div className="group/tip relative flex items-center justify-center">
-    <button onClick={onClick} className={`h-7 w-7 flex items-center justify-center bg-[#f0f2f5] shadow-sm text-slate-400 ${hover} rounded-md transition-all border border-white hover:scale-110 active:scale-90`}>
+    <button 
+      onClick={onClick} 
+      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-md border border-transparent hover:border-slate-200 transition-all`}
+    >
       {icon}
     </button>
-    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-slate-800 text-white text-[7px] font-black uppercase tracking-[0.15em] rounded opacity-0 group-hover/tip:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl translate-x-1 group-hover/tip:translate-x-0">
+    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[8px] font-bold uppercase tracking-wider rounded shadow-md opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
       {label}
-      <div className="absolute left-full top-1/2 -translate-y-1/2 border-[3px] border-transparent border-l-slate-800"></div>
     </div>
   </div>
 );

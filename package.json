@@ -14,5 +14,10 @@
     "dashboard"
   ],
   "author": "Wijaya Kreatif Nusantara",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^3.0.2",
+    "@supabase/supabase-js": "^2.105.4",
+    "react-native-url-polyfill": "^3.0.0"
+  }
 }
