@@ -298,10 +298,20 @@ class WKNSupabaseClient:
         """Get daily attendance trends for a specific period (YYYY-MM)"""
         if not self.client: return []
         try:
-            # Simple aggregation for now
+            import calendar
+            try:
+                year, month = map(int, period.split('-'))
+                last_day = calendar.monthrange(year, month)[1]
+                start_date = f"{period}-01"
+                end_date = f"{period}-{last_day:02d}"
+            except Exception:
+                start_date = f"{period}-01"
+                end_date = f"{period}-31"
+
             res = self.client.table("attendance") \
                 .select("date, status") \
-                .ilike("date", f"{period}%") \
+                .gte("date", start_date) \
+                .lte("date", end_date) \
                 .execute()
             
             data = res.data
@@ -325,9 +335,20 @@ class WKNSupabaseClient:
         """Aggregate attendance metrics per employee for payroll calculation"""
         if not self.client: return {}
         try:
+            import calendar
+            try:
+                year, month = map(int, period.split('-'))
+                last_day = calendar.monthrange(year, month)[1]
+                start_date = f"{period}-01"
+                end_date = f"{period}-{last_day:02d}"
+            except Exception:
+                start_date = f"{period}-01"
+                end_date = f"{period}-31"
+
             res = self.client.table("attendance") \
                 .select("employee_id, status, late_minutes") \
-                .ilike("date", f"{period}%") \
+                .gte("date", start_date) \
+                .lte("date", end_date) \
                 .execute()
             
             data = res.data

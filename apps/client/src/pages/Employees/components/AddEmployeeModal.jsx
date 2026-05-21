@@ -91,7 +91,8 @@ const initialFormData = {
   bank_account_holder: '',
   npwp: '',
   ptkp_status: 'TK/0',
-  tax_method: 'Gross'
+  tax_method: 'Gross',
+  mobile_password: ''
 };
 
 const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
@@ -176,25 +177,27 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
   const generateAutoID = async () => {
     try {
-      // Query all IDs that start with WKN- to find the highest number
+      // Query only the single highest ID starting with WKN- to optimize performance
       const { data, error } = await supabase
         .from('employees')
         .select('id')
-        .like('id', 'WKN-%');
+        .like('id', 'WKN-%')
+        .not('id', 'like', 'WKN-TMP-%')
+        .order('id', { ascending: false })
+        .limit(1);
 
       if (error) throw error;
 
       let maxNum = 0;
       if (data && data.length > 0) {
-        data.forEach(item => {
-          const parts = item.id.split('-');
-          if (parts.length > 1) {
-            const num = parseInt(parts[1]);
-            if (!isNaN(num) && num > maxNum) {
-              maxNum = num;
-            }
+        const item = data[0];
+        const parts = item.id.split('-');
+        if (parts.length > 1) {
+          const num = parseInt(parts[1]);
+          if (!isNaN(num)) {
+            maxNum = num;
           }
-        });
+        }
       }
 
       const nextNum = maxNum + 1;
@@ -222,6 +225,11 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         submissionData.id = formData.employee_id;
       }
       delete submissionData.employee_id;
+
+      // Jika password mobile kosong, beri default 12345
+      if (!submissionData.mobile_password || submissionData.mobile_password.trim() === '') {
+        submissionData.mobile_password = '12345';
+      }
 
       Object.keys(submissionData).forEach(key => {
         if (submissionData[key] === '') {
@@ -590,6 +598,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   </InputWrapper>
                   <InputWrapper label="NIK (ID Number)" icon={IconCreditCard}>
                     <input required name="nik" placeholder="16 Digit NIK" value={formData.nik} onChange={handleChange} className={inputStyle} />
+                  </InputWrapper>
+                  <InputWrapper label="Mobile App Password" icon={IconId}>
+                    <input name="mobile_password" placeholder="Pass untuk absen (Opsional)" value={formData.mobile_password} onChange={handleChange} className={`${inputStyle} lowercase`} />
                   </InputWrapper>
                   <InputWrapper label="Place of Birth" icon={IconMapPin}>
                     <input name="place_of_birth" placeholder="e.g. Jakarta" value={formData.place_of_birth} onChange={handleChange} className={inputStyle} />
