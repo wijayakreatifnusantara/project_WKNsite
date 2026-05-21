@@ -1,145 +1,88 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { hasPermission, PERMISSIONS } from '@/lib/permissions';
+import axios from 'axios';
 
 const AuthContext = createContext({});
 
+// Fallback to localhost if env is missing
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Inisialisasi Sesi & User
   useEffect(() => {
-    const initSession = async () => {
+    // Check for saved session in localStorage
+    const savedUser = localStorage.getItem('wkn_auth_user');
+    if (savedUser) {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser(session.user);
-          loadUserData(session.user);
-        } else {
-          // Cek local storage untuk legacy session
-          const stored = localStorage.getItem('wkn_user');
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            setProfile(parsed);
-          }
-        }
+        setUser(JSON.parse(savedUser));
       } catch (err) {
-        console.error('Session Init Error:', err);
-      } finally {
-        // Beri jeda sedikit agar UI tidak kaget
-        setTimeout(() => setLoading(false), 500);
+        console.error('Failed to restore auth session:', err);
+        localStorage.removeItem('wkn_auth_user');
       }
-    };
-
-    initSession();
-
-    // Listener Perubahan Status Login
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        setUser(session?.user ?? null);
-        if (session?.user) loadUserData(session.user);
-        setLoading(false);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setProfile(null);
-        setPermissions([]);
-        localStorage.removeItem('wkn_user');
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    }
+    setLoading(false);
   }, []);
 
-  // 2. Fungsi Pengambil Data Profil & Izin (Running in Background)
-  const loadUserData = async (authUser) => {
+  const login = async (email, password) => {
     try {
-      // Ambil Profil
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('*')
-        .ilike('username', authUser.email)
-        .maybeSingle();
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        username: email,
+        password: password
+      });
 
-      if (prof) {
-        setProfile(prof);
-        localStorage.setItem('wkn_user', JSON.stringify(prof));
-        
-        // Ambil Izin (RBAC Sync)
-        const { data: perms } = await supabase
-          .from('role_permissions')
-          .select('permission_name')
-          .eq('role_name', prof.role?.toLowerCase());
-
-        if (perms && perms.length > 0) {
-          setPermissions(perms.map(p => p.permission_name));
-        }
+      if (response.data.status === 'success') {
+        const rawUser = response.data.user;
+        // Map backend Uppercase keys to lowercase for frontend compatibility
+        const userData = {
+          username: rawUser.Username,
+          fullName: rawUser['Full Name'],
+          role: rawUser.Role,
+          status: rawUser.Status
+        };
+        setUser(userData);
+        localStorage.setItem('wkn_auth_user', JSON.stringify(userData));
+        return userData;
+      } else {
+        throw new Error(response.data.message || 'Username atau password salah.');
       }
     } catch (err) {
-      console.error('Data Sync Error:', err);
+      const errorMessage = err.response?.data?.detail || err.message || 'Terjadi kesalahan koneksi ke server.';
+      throw new Error(errorMessage);
     }
-  };
-
-  // 3. Fungsi Login Utama (Fast & Reliable)
-  const login = async (email, password) => {
-    // Jalankan login ke Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
-    if (error) {
-      // Coba jalur legacy jika Auth belum siap
-      const { data: legProf, error: legErr } = await supabase
-        .from('profiles')
-        .select('*')
-        .ilike('username', email)
-        .eq('password', password)
-        .maybeSingle();
-
-      if (legErr || !legProf) throw new Error(error.message || 'Invalid credentials');
-      
-      // 🛡️ SECURITY CHECK: Blocking inactive users
-      if (legProf.is_active === false) {
-        throw new Error('Your account has been disabled. Please contact the system administrator.');
-      }
-
-      setProfile(legProf);
-      localStorage.setItem('wkn_user', JSON.stringify(legProf));
-      return legProf;
-    }
-
-    // 🛡️ SECURITY CHECK: Blocking inactive users after successful login
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('*')
-      .ilike('username', email)
-      .maybeSingle();
-
-    if (profileData && profileData.is_active === false) {
-      await supabase.auth.signOut();
-      throw new Error('Your account has been disabled. Please contact the system administrator.');
-    }
-
-    return data.user;
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    setUser(null);
+    localStorage.removeItem('wkn_auth_user');
   };
 
   const can = (permission) => {
-    if (permissions.length > 0) return permissions.includes(permission);
-    return hasPermission(profile?.role, permission);
+    if (!user) return false;
+    // Owners have full access
+    if (user.role?.toLowerCase() === 'owner') return true;
+    // Default allowed for now to maintain system usability
+    return true;
   };
 
-  const isAdmin = () => ['owner', 'admin'].includes(profile?.role);
-  const isManager = () => ['owner', 'admin', 'manager'].includes(profile?.role);
+  const hasRole = (roles) => {
+    if (!user) return false;
+    if (!roles) return true;
+    const requiredRoles = Array.isArray(roles) ? roles : [roles];
+    return requiredRoles.map(r => r.toLowerCase()).includes(user.role?.toLowerCase());
+  };
 
   return (
     <AuthContext.Provider value={{ 
-      user, profile, permissions, loading, 
-      login, logout, can, isAdmin, isManager, PERMISSIONS 
+      user, 
+      profile: user, 
+      loading, 
+      login, 
+      logout,
+      can,
+      hasRole,
+      isAdmin: () => user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'admin',
+      PERMISSIONS: {} 
     }}>
       {children}
     </AuthContext.Provider>

@@ -146,9 +146,9 @@ const AttendanceReport = () => {
           <div className="flex items-center gap-5">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-10 w-10 rounded-xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95"
+              className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
             >
-              <IconArrowLeft size={18} />
+              <IconArrowLeft size={16} />
             </button>
             <div>
               <h2 className="text-base font-black text-slate-800 uppercase tracking-tight flex items-center gap-3 leading-none">

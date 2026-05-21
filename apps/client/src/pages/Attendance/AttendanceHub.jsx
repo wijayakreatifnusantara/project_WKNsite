@@ -12,7 +12,7 @@ import {
   IconCloudUpload,
   IconLayoutGrid,
   IconHistory,
-  IconChartInfographic,
+  IconChartPie,
   IconMapPin
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -27,9 +27,11 @@ import LocationManager from './components/LocationManager';
 import { Card } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
 
 const AttendanceHub = () => {
   const navigate = useNavigate();
+  const { can, PERMISSIONS } = useAuth();
   const { todaySummary, trends, fetchTodaySummary, fetchTrends, loading } = useAttendance();
   const [selectedPeriod, setSelectedPeriod] = useState(new Date().toISOString().slice(0, 7));
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
@@ -88,59 +90,69 @@ const AttendanceHub = () => {
 
               {/* Module Navigators */}
               <div className="flex items-center gap-1">
-                <Button 
-                  variant="ghost"
-                  onClick={() => navigate('/attendance/report')}
-                  className="h-8 px-3 rounded-lg text-slate-500 font-black text-[8px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
-                >
-                  <IconHistory size={14} />
-                  Logs
-                </Button>
-                <Button 
-                   variant="ghost"
-                  onClick={() => navigate('/attendance/recap')}
-                  className="h-8 px-3 rounded-lg text-slate-500 font-black text-[8px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
-                >
-                  <IconChartInfographic size={14} />
-                  Performance
-                </Button>
-                {/* T019: Location Config Tab */}
-                <Button 
-                  variant="ghost"
-                  onClick={() => setActiveView(v => v === 'location' ? 'dashboard' : 'location')}
-                  className={`h-8 px-3 rounded-lg font-black text-[8px] uppercase tracking-widest flex gap-2 items-center transition-all ${
-                    activeView === 'location'
-                      ? 'text-[#E31E24] bg-[#E31E24]/10'
-                      : 'text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5'
-                  }`}
-                >
-                  <IconMapPin size={14} />
-                  Location
-                </Button>
+                {can(PERMISSIONS.VIEW_ATTENDANCE_REPORTS) && (
+                  <>
+                    <Button 
+                      variant="ghost"
+                      onClick={() => navigate('/attendance/report')}
+                      className="h-8 px-3 rounded-lg text-slate-500 font-black text-[8px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                    >
+                      <IconHistory size={14} />
+                      Logs
+                    </Button>
+                    <Button 
+                      variant="ghost"
+                      onClick={() => navigate('/attendance/recap')}
+                      className="h-8 px-3 rounded-lg text-slate-500 font-black text-[8px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                    >
+                      <IconChartPie size={14} />
+                      Performance
+                    </Button>
+
+                  </>
+                )}
+                
+                {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+                  <Button 
+                    variant="ghost"
+                    onClick={() => setActiveView(v => v === 'location' ? 'dashboard' : 'location')}
+                    className={`h-8 px-3 rounded-lg font-black text-[8px] uppercase tracking-widest flex gap-2 items-center transition-all ${
+                      activeView === 'location'
+                        ? 'text-[#E31E24] bg-[#E31E24]/10'
+                        : 'text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5'
+                    }`}
+                  >
+                    <IconMapPin size={14} />
+                    Location
+                  </Button>
+                )}
               </div>
 
               <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
 
               {/* Action Buttons */}
-              <Button 
-                onClick={() => setIsBulkModalOpen(true)}
-                className="h-8 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50 shadow-sm flex gap-2 items-center"
-              >
-                <IconCloudUpload size={14} className="text-[#E31E24]" />
-                Bulk
-              </Button>
-              
-              <Button 
-                onClick={() => setIsManualModalOpen(true)}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest shadow-md hover:bg-[#C1181E] flex gap-2 items-center"
-              >
-                <IconPlus size={14} />
-                Entry
-              </Button>
+              {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+                <>
+                  <Button 
+                    onClick={() => setIsBulkModalOpen(true)}
+                    className="h-8 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50 shadow-sm flex gap-2 items-center"
+                  >
+                    <IconCloudUpload size={14} className="text-[#E31E24]" />
+                    Bulk
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => setIsManualModalOpen(true)}
+                    className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest shadow-md hover:bg-[#C1181E] flex gap-2 items-center"
+                  >
+                    <IconPlus size={14} />
+                    Entry
+                  </Button>
+                </>
+              )}
           </div>
         </div>
 
-        {/* 📊 KPI STRIP */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <AttendanceKPI 
                 title="Present" 
@@ -176,12 +188,10 @@ const AttendanceHub = () => {
               />
         </div>
 
-        {/* T019: Location Config View OR Dashboard View */}
         {activeView === 'location' ? (
-          <LocationManager />
+          <LocationManager onBack={() => setActiveView('dashboard')} />
         ) : (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-          {/* Main Visuals (Span 9) */}
           <div className="md:col-span-9 space-y-3">
              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
@@ -220,8 +230,6 @@ const AttendanceHub = () => {
                 </div>
              </div>
           </div>
-
-          {/* Real-time Feed (Span 3) */}
           <div className="md:col-span-3">
              <LiveFeed loading={loading} limit={12} />
           </div>
@@ -251,3 +259,4 @@ const AttendanceHub = () => {
 };
 
 export default AttendanceHub;
+

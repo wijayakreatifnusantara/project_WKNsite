@@ -188,7 +188,7 @@ const AttendanceRecap = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-white shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
+              className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>

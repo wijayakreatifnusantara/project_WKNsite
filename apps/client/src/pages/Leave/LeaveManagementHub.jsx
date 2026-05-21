@@ -12,16 +12,19 @@ import {
   IconClock,
   IconActivity,
   IconAlertCircle,
-  IconUserCircle
+  IconUserCircle,
+  IconArrowLeft
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import LeaveRequestModal from './components/LeaveRequestModal';
 import { toast } from 'sonner';
 
 const LeaveManagementHub = () => {
+  const navigate = useNavigate();
   const { profile, isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [requests, setRequests] = useState([]);
@@ -159,6 +162,12 @@ const LeaveManagementHub = () => {
         {/* 🚀 PREMIUM COMPACT HEADER */}
         <div className="flex items-center justify-between bg-white p-2 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
           <div className="flex items-center gap-4">
+             <button 
+               onClick={() => navigate('/attendance')}
+               className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95"
+             >
+               <IconArrowLeft size={16} />
+             </button>
              <div className="h-8 w-8 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
                 <IconClipboardCheck size={18} />
              </div>

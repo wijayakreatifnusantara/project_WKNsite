@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   IconMapPin, IconFingerprint, IconLoader2, IconCircleCheck,
-  IconAlertCircle, IconClockExclamation, IconClock,
-  IconBuildingSkyscraper, IconHardHat, IconRefresh
+  IconAlertCircle, IconClock,
+  IconBuildingSkyscraper, IconUser, IconRefresh, IconLock
 } from '@tabler/icons-react';
+import { useAuth } from '@/context/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -25,7 +26,7 @@ const STATUS_CONFIG = {
   },
   success_late: {
     bg: 'bg-amber-50', shadow: 'shadow-[inset_4px_4px_8px_#fde68a,inset_-4px_-4px_8px_#ffffff]',
-    icon: <IconClockExclamation size={48} className="text-amber-500" />,
+    icon: <IconClock size={48} className="text-amber-500" />,
     label: 'TERLAMBAT', sublabel: 'Check-in tercatat dengan keterlambatan', color: 'text-amber-600',
   },
   out_of_range: {
@@ -45,10 +46,6 @@ const STATUS_CONFIG = {
   },
 };
 
-/**
- * T011, T015: CheckInCard — ESS check-in dengan geofencing
- * Props: employeeId (string), isFieldTeam (bool)
- */
 const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
   const [status, setStatus] = useState('idle');
   const [result, setResult] = useState(null);
@@ -67,7 +64,11 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
       .catch(() => setSettings({ hq_location: { name: 'WKN HQ', radius: 100 } }));
   }, []);
 
+  const { can, PERMISSIONS } = useAuth();
+  const hasCheckInPerm = can(PERMISSIONS.CAN_CHECK_IN);
+
   const handleCheckIn = useCallback(async () => {
+    if (!hasCheckInPerm) return;
     if (!employeeId) { alert('Employee ID tidak ditemukan.'); return; }
     if (!navigator.geolocation) {
       setStatus('error'); setResult({ message: 'Browser tidak mendukung GPS.' }); return;
@@ -100,15 +101,20 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, [employeeId]);
+  }, [employeeId, hasCheckInPerm]);
 
-  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.idle;
+  const cfg = !hasCheckInPerm ? {
+    bg: 'bg-slate-50', shadow: 'shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff]',
+    icon: <IconLock size={48} className="text-slate-300" />,
+    label: 'TERBATAS', sublabel: 'Akses absen tidak tersedia', color: 'text-slate-400',
+  } : (STATUS_CONFIG[status] || STATUS_CONFIG.idle);
+
   const hqName = settings?.hq_location?.name || 'WKN HQ';
   const hqRadius = settings?.hq_location?.radius || 100;
-  const canCheckIn = ['idle', 'error', 'out_of_range'].includes(status);
+  const canCheckIn = hasCheckInPerm && ['idle', 'error', 'out_of_range'].includes(status);
 
-  const fmtTime = d => d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jakarta' });
-  const fmtDate = d => d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
+  const fmtTime = d => d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const fmtDate = d => d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <div className="space-y-4">
@@ -129,7 +135,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
         {/* Field Badge */}
         {isFieldTeam && (
           <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5">
-            <IconHardHat size={12} className="text-amber-600" />
+            <IconUser size={12} className="text-amber-600" />
             <span className="text-[8px] font-black text-amber-700 uppercase tracking-widest">Field Team</span>
           </div>
         )}
@@ -174,7 +180,11 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
 
         {/* Buttons */}
         <div className="w-full space-y-2">
-          {canCheckIn && (
+          {!hasCheckInPerm ? (
+            <div className="w-full h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 border border-slate-200">
+              <IconLock size={16} /> Restricted Access
+            </div>
+          ) : canCheckIn && (
             <button id="checkin-btn" onClick={handleCheckIn} disabled={status === 'loading'}
               className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.2em] shadow-[5px_5px_15px_rgba(227,30,36,0.3)] flex items-center justify-center gap-3 active:shadow-none active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
               {status === 'loading'
@@ -195,7 +205,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
       <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 bg-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24] flex-shrink-0">
-            {isFieldTeam ? <IconHardHat size={16} /> : <IconBuildingSkyscraper size={16} />}
+            {isFieldTeam ? <IconUser size={16} /> : <IconBuildingSkyscraper size={16} />}
           </div>
           <div>
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Lokasi Target</p>

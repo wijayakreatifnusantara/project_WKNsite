@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  IconMapPin, IconBuildingSkyscraper, IconHardHat, IconLoader2,
+  IconMapPin, IconBuildingSkyscraper, IconClock, IconLoader2,
   IconCircleCheck, IconAlertCircle, IconEdit, IconDeviceFloppy,
-  IconUsers, IconX
+  IconUsers, IconX, IconArrowLeft
 } from '@tabler/icons-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -175,7 +175,7 @@ const FieldTeamTable = () => {
   return (
     <>
       <div className="flex items-center gap-2 mb-3">
-        <IconHardHat size={16} className="text-amber-500" />
+        <IconClock size={16} className="text-amber-500" />
         <h4 className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Field Team — Site Assignment</h4>
         <span className="ml-auto text-[8px] font-black text-slate-400">{employees.length} anggota</span>
       </div>
@@ -230,9 +230,27 @@ const FieldTeamTable = () => {
 /**
  * T018: LocationManager — Admin UI for managing HQ coordinates and field team site assignments
  */
-const LocationManager = () => {
+const LocationManager = ({ onBack }) => {
   return (
     <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center gap-4 bg-white p-2 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+         <button 
+           onClick={onBack}
+           className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
+         >
+           <IconArrowLeft size={16} />
+         </button>
+         <div className="h-8 w-8 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+            <IconMapPin size={18} />
+         </div>
+         <div>
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
+              Location <span className="text-[#E31E24]">Manager</span>
+            </h2>
+            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mt-1">Geofencing & Site Assignments</p>
+         </div>
+      </div>
+      
       {/* HQ Config */}
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
         <HQConfigForm />
