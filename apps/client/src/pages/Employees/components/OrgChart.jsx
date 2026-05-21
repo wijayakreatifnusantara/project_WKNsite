@@ -6,13 +6,9 @@ import {
   IconMaximize, 
   IconUsers, 
   IconBuildingSkyscraper,
-  IconChevronRight,
-  IconChevronDown,
   IconSearch,
-  IconArrowsMove,
-  IconHandGrab
+  IconArrowsMove
 } from "@tabler/icons-react";
-import { Card } from "@/components/ui/card";
 
 const OrgChart = ({ employees, viewMode, setViewMode }) => {
   const [zoom, setZoom] = useState(0.8);
@@ -31,7 +27,6 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
     if (viewportRef.current && employees.length > 0) {
       const timer = setTimeout(() => {
         const viewport = viewportRef.current;
-        // Center relative to the actual content dimensions
         const centerX = (viewport.scrollWidth - viewport.clientWidth) / 2;
         const centerY = (viewport.scrollHeight - viewport.clientHeight) / 2;
         viewport.scrollTo({
@@ -44,7 +39,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
     }
   }, [employees.length, viewMode]);
 
-  // Group employees by department for the chart
+  // Group employees by department
   const deptTree = useMemo(() => {
     const departments = {};
     const empList = Array.isArray(employees) ? employees : [];
@@ -85,46 +80,46 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5] animate-fade-in relative">
+    <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 animate-fade-in relative">
       {/* Chart Header */}
-      <header className="h-20 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-10 shrink-0 z-10 relative">
-        <div className="flex items-center gap-4">
-          <div className="h-10 w-10 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
-            <IconHierarchy2 size={24} />
+      <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-10 relative">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+            <IconHierarchy2 size={18} />
           </div>
           <div>
-            <h1 className="text-sm font-black text-slate-800 font-outfit uppercase tracking-tight leading-none">Neural Structure</h1>
+            <h1 className="text-xs font-bold text-slate-800 font-outfit uppercase tracking-tight leading-none">Struktur Organisasi</h1>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[8px] font-black text-[#E31E24] bg-red-50 px-2 py-0.5 rounded-full border border-red-100">{employees.length} PERSONNEL LOADED</span>
-              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest opacity-70">• Drag to Pan</p>
+              <span className="text-[8px] font-bold text-[#E31E24] bg-red-50/50 px-2 py-0.5 rounded-full border border-red-100/60">{employees.length} KARYAWAN TERLOAD</span>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider opacity-70">• Geser untuk menggeser bagan</p>
             </div>
           </div>
         </div>
 
         {/* Right Aligned Controls Row */}
-        <div className="flex items-center gap-6">
-          <div className="relative group">
-            <IconSearch size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#E31E24] transition-colors" />
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <IconSearch size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
-              placeholder="Locate Personnel..." 
+              placeholder="Cari Karyawan..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-48 h-10 pl-10 pr-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-[10px] font-black text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all uppercase tracking-widest"
+              className="w-44 h-9 pl-9 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase tracking-wider"
             />
           </div>
 
-          <div className="flex items-center gap-2 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] p-1.5 rounded-xl border-white border-2">
-            <button onClick={() => handleZoom(-0.1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white transition-all text-slate-400 hover:text-[#E31E24]">
-              <IconZoomOut size={16} />
+          <div className="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-lg shadow-sm">
+            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:bg-slate-50 transition-all text-slate-400 hover:text-[#E31E24]">
+              <IconZoomOut size={14} />
             </button>
-            <span className="text-[10px] font-black text-slate-500 min-w-[40px] text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => handleZoom(0.1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white transition-all text-slate-400 hover:text-[#E31E24]">
-              <IconZoomIn size={16} />
+            <span className="text-[9px] font-bold text-slate-500 min-w-[36px] text-center">{Math.round(zoom * 100)}%</span>
+            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:bg-slate-50 transition-all text-slate-400 hover:text-[#E31E24]">
+              <IconZoomIn size={14} />
             </button>
-            <div className="w-[1px] h-4 bg-slate-200 mx-1"></div>
-            <button onClick={() => setZoom(0.8)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white transition-all text-slate-400 hover:text-[#E31E24]">
-              <IconMaximize size={16} />
+            <div className="w-[1px] h-3 bg-slate-200 mx-1"></div>
+            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded hover:bg-slate-50 transition-all text-slate-400 hover:text-[#E31E24]">
+              <IconMaximize size={14} />
             </button>
           </div>
         </div>
@@ -137,60 +132,60 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}
-        className={`flex-1 overflow-hidden relative cursor-${isDragging ? 'grabbing' : 'grab'} bg-slate-50/30`}
+        className={`flex-1 overflow-hidden relative cursor-${isDragging ? 'grabbing' : 'grab'} bg-slate-50/50`}
       >
         <div 
           className="p-[300px] min-w-max transition-transform duration-100 origin-center flex flex-col items-center"
           style={{ transform: `scale(${zoom})` }}
         >
-          {/* Root Node: Company (Compact) */}
-          <div className="bg-white shadow-[15px_15px_30px_rgba(0,0,0,0.05)] rounded-[2rem] border-[4px] border-white p-6 w-[280px] text-center mb-16 relative">
-            <div className="h-14 w-14 bg-[#f0f2f5] shadow-sm rounded-xl flex items-center justify-center mx-auto mb-4 border border-slate-100 text-[#E31E24]">
-              <IconBuildingSkyscraper size={28} />
+          {/* Root Node: Company */}
+          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-5 w-[260px] text-center mb-16 relative">
+            <div className="h-10 w-10 bg-[#E31E24]/10 rounded-lg flex items-center justify-center mx-auto mb-3 text-[#E31E24]">
+              <IconBuildingSkyscraper size={22} />
             </div>
-            <h2 className="text-base font-black text-slate-800 uppercase tracking-tight font-outfit">PT. Wijaya Karya Nusantara</h2>
-            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">HQ Master Node</p>
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight font-outfit">PT. Wijaya Karya Nusantara</h2>
+            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Kantor Pusat / Head Office</p>
             
-            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-1 h-16 bg-gradient-to-b from-slate-200 to-transparent"></div>
+            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[1px] h-16 bg-slate-250"></div>
           </div>
 
           {/* Department Level */}
-          <div className="flex gap-16 items-start">
+          <div className="flex gap-12 items-start">
             {Object.entries(deptTree).map(([dept, staff]) => (
               <div key={dept} className="flex flex-col items-center">
-                {/* Dept Node (Compact) */}
-                <div className="bg-white shadow-[10px_10px_20px_rgba(0,0,0,0.03)] rounded-[1.5rem] border-2 border-white p-5 w-[220px] relative">
+                {/* Dept Node */}
+                <div className="bg-white border border-slate-200/80 shadow-sm rounded-xl p-4 w-[210px] relative">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
-                      <IconUsers size={20} />
+                    <div className="h-8 w-8 bg-blue-50/50 border border-blue-100/50 rounded-lg flex items-center justify-center text-blue-600">
+                      <IconUsers size={16} />
                     </div>
                     <div>
-                      <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-tight leading-tight">{dept}</h3>
-                      <p className="text-[8px] font-black text-[#E31E24] uppercase mt-0.5">{staff.length} Units</p>
+                      <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight leading-tight">{dept}</h3>
+                      <p className="text-[8px] font-bold text-[#E31E24] uppercase mt-0.5">{staff.length} Karyawan</p>
                     </div>
                   </div>
                   <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-8 bg-slate-200"></div>
                 </div>
 
-                {/* Staff Cards (High Density) */}
-                <div className="mt-8 space-y-3 flex flex-col items-center">
+                {/* Staff Cards */}
+                <div className="mt-8 space-y-2.5 flex flex-col items-center">
                   {staff.filter(e => !searchTerm || e["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 15).map((emp) => (
                     <div 
                       key={emp["EMPLOYEE ID"]} 
-                      className={`group bg-white/80 shadow-sm rounded-xl border border-slate-100 p-3 w-[200px] flex items-center gap-3 hover:translate-x-1 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-2 ring-[#E31E24] bg-red-50' : ''}`}
+                      className={`group bg-white border border-slate-200/60 shadow-sm rounded-lg p-2.5 w-[190px] flex items-center gap-2.5 hover:border-[#E31E24]/20 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-1 ring-[#E31E24] bg-red-50/10' : ''}`}
                     >
-                      <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-[9px] font-black text-[#E31E24] shrink-0">
+                      <div className="h-7 w-7 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center text-[9px] font-bold text-slate-600 shrink-0">
                         {emp["EMPLOYEE NAME"].split(' ').map(n => n[0]).join('')}
                       </div>
-                      <div className="flex-1 overflow-hidden text-left">
-                        <h4 className="text-[9px] font-black text-slate-800 uppercase truncate leading-none mb-1">{emp["EMPLOYEE NAME"]}</h4>
-                        <p className="text-[7px] font-bold text-slate-400 uppercase truncate">{emp["Job Position *"]}</p>
+                      <div className="flex-1 overflow-hidden text-left leading-none">
+                        <h4 className="text-[9px] font-bold text-slate-800 uppercase truncate mb-1">{emp["EMPLOYEE NAME"]}</h4>
+                        <p className="text-[7px] font-semibold text-slate-450 uppercase truncate">{emp["Job Position *"]}</p>
                       </div>
                     </div>
                   ))}
                   {staff.length > 15 && (
-                    <div className="text-[8px] font-black text-slate-300 uppercase tracking-widest py-2">
-                      +{staff.length - 15} More Nodes
+                    <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest py-2">
+                      +{staff.length - 15} Karyawan Lainnya
                     </div>
                   )}
                 </div>
@@ -201,15 +196,15 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
       </div>
 
       {/* Floating Legend */}
-      <div className="absolute bottom-6 left-6">
-        <div className="bg-white/90 backdrop-blur shadow-xl rounded-2xl p-4 border border-white flex flex-col gap-2">
+      <div className="absolute bottom-6 left-6 z-15">
+        <div className="bg-white/90 backdrop-blur border border-slate-200/80 shadow-md rounded-xl p-3 flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Division Cluster</span>
+            <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
+            <span className="text-[8px] font-bold text-slate-550 uppercase tracking-wider">Kluster Divisi / Unit</span>
           </div>
           <div className="flex items-center gap-2">
-            <IconArrowsMove size={12} className="text-slate-400" />
-            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Hold Left-Click to Move</span>
+            <IconArrowsMove size={11} className="text-slate-400" />
+            <span className="text-[8px] font-bold text-slate-450 uppercase tracking-wider">Klik-Kiri & Tahan untuk Menggeser</span>
           </div>
         </div>
       </div>

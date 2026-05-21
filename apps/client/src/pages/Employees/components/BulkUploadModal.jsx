@@ -164,8 +164,8 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
               <IconFileUpload size={18} />
             </div>
             <div>
-              <h2 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-none">Neural Data Ingestion</h2>
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Bulk workforce synchronization</p>
+              <h2 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-none">Impor Massal Karyawan</h2>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sinkronisasi Data Massal</p>
             </div>
           </div>
           <button 
