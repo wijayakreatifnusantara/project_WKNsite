@@ -42,6 +42,21 @@ class DepartmentUpdateRequest(BaseModel):
     is_active: Optional[bool] = None
 
 
+class PositionCreateRequest(BaseModel):
+    """Request body for creating a position"""
+    name: str
+    level: Optional[str] = None
+    description: Optional[str] = None
+
+
+class PositionUpdateRequest(BaseModel):
+    """Request body for updating a position"""
+    name: Optional[str] = None
+    level: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
 # ─── Organization Endpoints ────────────────────────────────────────────────────
 
 @router.get("/organizations")
@@ -200,7 +215,83 @@ async def delete_department(dept_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ─── Migration Endpoint ───────────────────────────────────────────────────────
+# ─── Position Endpoints ────────────────────────────────────────────────────────
+
+@router.get("/departments/{dept_id}/positions")
+async def list_positions(dept_id: str, active_only: bool = True):
+    """Get positions belonging to a department"""
+    try:
+        data = await supabase_client.get_positions(dept_id=dept_id, active_only=active_only)
+        return {"status": "success", "data": data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/departments/{dept_id}/positions")
+async def create_position(dept_id: str, body: PositionCreateRequest):
+    """Create a new position under a department"""
+    try:
+        insert_data = {
+            "department_id": dept_id,
+            "name": body.name,
+        }
+        if body.level is not None:
+            insert_data["level"] = body.level
+        if body.description is not None:
+            insert_data["description"] = body.description
+
+        result = await supabase_client.create_position(insert_data)
+        if not result:
+            raise HTTPException(status_code=500, detail="Gagal membuat posisi")
+        return {
+            "status": "success",
+            "message": f"Posisi '{body.name}' berhasil dibuat.",
+            "data": result,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/positions/{pos_id}")
+async def update_position(pos_id: str, body: PositionUpdateRequest):
+    """Update an existing position"""
+    try:
+        update_data = body.model_dump(exclude_none=True)
+        if not update_data:
+            raise HTTPException(status_code=400, detail="Tidak ada data yang diperbarui")
+
+        success = await supabase_client.update_position(pos_id, update_data)
+        if not success:
+            raise HTTPException(status_code=500, detail="Gagal memperbarui posisi")
+        return {
+            "status": "success",
+            "message": "Posisi berhasil diperbarui.",
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/positions/{pos_id}")
+async def delete_position(pos_id: str):
+    """Soft-delete a position (set is_active = false)"""
+    try:
+        success = await supabase_client.delete_position(pos_id)
+        if not success:
+            raise HTTPException(status_code=500, detail="Gagal menghapus posisi")
+        return {
+            "status": "success",
+            "message": "Posisi berhasil dihapus.",
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 @router.post("/organizations/migrate-employees")
 async def migrate_employees_to_org_id():

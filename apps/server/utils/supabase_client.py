@@ -732,5 +732,55 @@ class WKNSupabaseClient:
             print(f"Error deleting department: {str(e)}")
             return False
 
+    # -----------------------------------------------------------------------
+    # Positions CRUD
+    # -----------------------------------------------------------------------
+
+    async def get_positions(self, dept_id: Optional[str] = None, active_only: bool = True) -> List[Dict[str, Any]]:
+        """Get positions, optionally filtered by department."""
+        if not self.client: return []
+        try:
+            query = self.client.table("positions").select("*").order("name")
+            if dept_id:
+                query = query.eq("department_id", dept_id)
+            if active_only:
+                query = query.eq("is_active", True)
+            res = query.execute()
+            return res.data
+        except Exception as e:
+            print(f"Error fetching positions: {str(e)}")
+            return []
+
+    async def create_position(self, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new position."""
+        if not self.client: return None
+        try:
+            res = self.client.table("positions").insert(data).execute()
+            return res.data[0] if res.data else None
+        except Exception as e:
+            print(f"Error creating position: {str(e)}")
+            return None
+
+    async def update_position(self, pos_id: str, data: Dict[str, Any]) -> bool:
+        """Update a position."""
+        if not self.client: return False
+        try:
+            self.client.table("positions").update(data).eq("id", pos_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating position: {str(e)}")
+            return False
+
+    async def delete_position(self, pos_id: str) -> bool:
+        """Soft-delete a position by setting is_active = false."""
+        if not self.client: return False
+        try:
+            self.client.table("positions").update({"is_active": False}).eq("id", pos_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error deleting position: {str(e)}")
+            return False
+
 # Singleton instance
 supabase_client = WKNSupabaseClient()
+
