@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { 
   IconUsers, 
   IconClock, 
+  IconMapPin, 
   IconCreditCard, 
   IconLayoutDashboard, 
   IconPower, 
@@ -134,6 +135,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       '/employees': ['Core HR', 'Database Karyawan'],
       '/employees/onboarding': ['Core HR', 'Onboarding Karyawan'],
       '/attendance': ['Core HR', 'Absensi Karyawan'],
+      '/attendance/location': ['Core HR', 'Set Lokasi Kantor'],
       '/leave': ['Core HR', 'Manajemen Cuti'],
       '/performance': ['Core HR', 'Kinerja Karyawan'],
       '/documents': ['Core HR', 'Dokumen Hub'],
@@ -210,6 +212,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     if (path.includes('/overview')) return 'SYSTEM OVERVIEW';
     if (path.includes('/employees/onboarding')) return 'ONBOARDING KARYAWAN';
     if (path.includes('/employees')) return 'DATABASE KARYAWAN';
+    if (path.includes('/attendance/location')) return 'SET LOKASI KANTOR';
     if (path.includes('/attendance')) return 'ABSENSI KARYAWAN';
     if (path.includes('/leave')) return 'MANAJEMEN CUTI';
     if (path.includes('/payroll')) return 'PENGGAJIAN KARYAWAN';
@@ -262,6 +265,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconClock size={15} />} label="Absensi Karyawan" to="/attendance" />
+            )}
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+              <NavItem icon={<IconMapPin size={15} />} label="Set Lokasi Kantor" to="/attendance/location" />
             )}
             {can(PERMISSIONS.CAN_CHECK_IN) && (
               <NavItem icon={<IconClipboardCheck size={15} />} label="Manajemen Cuti" to="/leave" />

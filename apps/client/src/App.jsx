@@ -26,6 +26,7 @@ import Wiki from './pages/Company/Wiki';
 import Succession from './pages/Company/Succession';
 import Offboarding from './pages/Company/Offboarding';
 import OnboardingPage from './pages/Employees/OnboardingPage';
+import LocationManagerPage from './pages/Attendance/LocationManagerPage';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import MobileLayout from './components/Layout/MobileLayout';
 import MobileHome from './pages/ESS/MobileHome';
@@ -84,6 +85,7 @@ function App() {
             <Route path="/employees/onboarding" element={<OnboardingPage />} />
             <Route path="/attendance" element={isMobile ? <MobileHome /> : <AttendanceHub />} />
             <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
+            <Route path="/attendance/location" element={<LocationManagerPage />} />
             <Route path="/attendance/report" element={<AttendanceReport />} />
             <Route path="/attendance/recap" element={<AttendanceRecap />} />
             <Route path="/leave" element={<LeaveManagementHub />} />

@@ -23,7 +23,6 @@ import DeptLateChart from './components/DeptLateChart';
 import LiveFeed from './components/LiveFeed';
 import ManualAttendanceModal from './components/ManualAttendanceModal';
 import BulkAttendanceUploadModal from './components/BulkAttendanceUploadModal';
-import LocationManager from './components/LocationManager';
 import { Card } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
@@ -36,7 +35,6 @@ const AttendanceHub = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(new Date().toISOString().slice(0, 7));
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-  const [activeView, setActiveView] = useState('dashboard'); // 'dashboard' | 'location'
 
   useEffect(() => {
     fetchTodaySummary();
@@ -124,12 +122,8 @@ const AttendanceHub = () => {
                 {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
                   <Button 
                     variant="ghost"
-                    onClick={() => setActiveView(v => v === 'location' ? 'dashboard' : 'location')}
-                    className={`h-8 px-3 rounded-lg font-black text-[8px] uppercase tracking-widest flex gap-2 items-center transition-all ${
-                      activeView === 'location'
-                        ? 'text-[#E31E24] bg-[#E31E24]/10'
-                        : 'text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5'
-                    }`}
+                    onClick={() => navigate('/attendance/location')}
+                    className="h-8 px-3 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5 font-black text-[8px] uppercase tracking-widest flex gap-2 items-center transition-all"
                   >
                     <IconMapPin size={14} />
                     Location
@@ -197,9 +191,6 @@ const AttendanceHub = () => {
               />
         </div>
 
-        {activeView === 'location' ? (
-          <LocationManager onBack={() => setActiveView('dashboard')} />
-        ) : (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           <div className="md:col-span-9 space-y-3">
              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
@@ -243,7 +234,6 @@ const AttendanceHub = () => {
              <LiveFeed loading={loading} limit={12} />
           </div>
         </div>
-        )}
       </div>
 
       <ManualAttendanceModal 
