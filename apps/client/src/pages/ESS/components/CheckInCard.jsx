@@ -6,7 +6,7 @@ import {
 } from '@tabler/icons-react';
 import { useAuth } from '@/context/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const STATUS_CONFIG = {
   idle: {
@@ -58,7 +58,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_BASE}/attendance/settings`)
+    fetch(`${API_URL}/attendance/settings`)
       .then(r => r.json())
       .then(d => { if (d.status === 'success') setSettings(d.data); })
       .catch(() => setSettings({ hq_location: { name: 'WKN HQ', radius: 100 } }));
@@ -78,7 +78,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude, longitude } }) => {
         try {
-          const res = await fetch(`${API_BASE}/attendance/check-in`, {
+          const res = await fetch(`${API_URL}/attendance/check-in`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ employee_id: employeeId, latitude, longitude }),

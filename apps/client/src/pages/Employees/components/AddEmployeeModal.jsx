@@ -31,21 +31,21 @@ import "react-datepicker/dist/react-datepicker.css";
 import { IconScan, IconSparkles } from "@tabler/icons-react";
 
 const InputWrapper = ({ label, icon: Icon, children }) => (
-  <div className="space-y-1">
-    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest pl-1">{label}</label>
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider pl-1">{label}</label>
     <div className="relative">
-      <Icon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+      <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
       {children}
     </div>
   </div>
 );
 
-const inputStyle = "w-full h-9 pl-9 pr-3 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg text-[10px] font-black text-slate-700 focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case";
-const dateInputStyle = "w-full h-9 pl-9 pr-8 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg text-[10px] font-black text-slate-700 focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
+const inputStyle = "w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
+const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
 
 const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon }) => (
   <div className="relative w-full">
-    {Icon && <Icon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 z-10 pointer-events-none" />}
+    {Icon && <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />}
     <DatePicker
       selected={selected ? new Date(selected) : null}
       onChange={onChange}
@@ -54,7 +54,7 @@ const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon })
       showYearDropdown
       scrollableYearDropdown
       yearDropdownItemNumber={100}
-      className={`${dateInputStyle} !pl-9`}
+      className={`${dateInputStyle} !pl-10`}
       popperClassName="premium-calendar-popper"
       calendarClassName="premium-calendar"
     />
@@ -75,10 +75,14 @@ const initialFormData = {
   ktp_address: '',
   domicile_address: '',
   photo: '',
-  organization_name: 'WIJAYA KREATIF NUSANTARA',
+  organization_name: '',
+  organization_id: '',
+  department_id: '',
   job_position: '',
   job_level: 'Staff',
   status: 'PERMANENT',
+  employment_type: 'Permanent',
+  working_location: 'Head Office',
   base_salary: 0,
   join_date: new Date().toISOString().split('T')[0],
   contract_end_date: '',
@@ -86,6 +90,9 @@ const initialFormData = {
   emergency_contact_1_name: '',
   emergency_contact_1_rel: '',
   emergency_contact_1_phone: '',
+  emergency_contact_2_name: '',
+  emergency_contact_2_rel: '',
+  emergency_contact_2_phone: '',
   bank_name: '',
   bank_account: '',
   bank_account_holder: '',
@@ -95,12 +102,65 @@ const initialFormData = {
   mobile_password: ''
 };
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
 const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [isScanning, setIsScanning] = useState(false);
+  const [organizations, setOrganizations] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const fileInputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    fetch(`${API_URL}/organizations?active_only=true`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success') {
+          setOrganizations(d.data || []);
+        }
+      })
+      .catch(err => console.error('Failed to load organizations:', err));
+  }, []);
+
+  // Fetch departments when organization_id changes
+  React.useEffect(() => {
+    if (formData.organization_id) {
+      fetch(`${API_URL}/organizations/${formData.organization_id}/departments?active_only=true`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.status === 'success') {
+            setDepartments(d.data || []);
+          } else {
+            setDepartments([]);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load departments:', err);
+          setDepartments([]);
+        });
+    } else {
+      setDepartments([]);
+    }
+  }, [formData.organization_id]);
+
+  // Match organization_id when organizations are loaded or edited organization name is set
+  React.useEffect(() => {
+    if (organizations.length > 0 && formData.organization_name && !formData.organization_id) {
+      const matchedOrg = organizations.find(o => o.name === formData.organization_name);
+      if (matchedOrg) {
+        setFormData(prev => ({
+          ...prev,
+          organization_id: matchedOrg.id
+        }));
+        // If it's a new employee, set correct initial auto ID format based on organization code
+        if (!editData && !formData.employee_id) {
+          generateAutoID(matchedOrg.code);
+        }
+      }
+    }
+  }, [organizations, formData.organization_name, editData]);
 
   React.useEffect(() => {
     if (isOpen && editData) {
@@ -169,20 +229,17 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
     }
   };
 
-  React.useEffect(() => {
-    if (isOpen && !formData.employee_id && !editData) {
-      generateAutoID();
-    }
-  }, [isOpen, editData]);
+  // Auto-generation of ID is handled dynamically when organization is selected.
 
-  const generateAutoID = async () => {
+  const generateAutoID = async (orgCode) => {
+    const code = (orgCode || 'WKN').toUpperCase();
     try {
-      // Query only the single highest ID starting with WKN- to optimize performance
+      // Query only the single highest ID starting with the org code to optimize performance
       const { data, error } = await supabase
         .from('employees')
         .select('id')
-        .like('id', 'WKN-%')
-        .not('id', 'like', 'WKN-TMP-%')
+        .like('id', `${code}-%`)
+        .not('id', 'like', `${code}-TMP-%`)
         .order('id', { ascending: false })
         .limit(1);
 
@@ -202,11 +259,34 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
       const nextNum = maxNum + 1;
       // We'll use 3-digit padding to match your existing WKN-001 format
-      const nextID = `WKN-${nextNum.toString().padStart(3, '0')}`;
+      const nextID = `${code}-${nextNum.toString().padStart(3, '0')}`;
       setFormData(prev => ({ ...prev, employee_id: nextID }));
     } catch (err) {
       console.error('Error generating ID:', err);
-      setFormData(prev => ({ ...prev, employee_id: 'WKN-001' }));
+      setFormData(prev => ({ ...prev, employee_id: `${code}-001` }));
+    }
+  };
+
+  const handleOrgChange = async (e) => {
+    const orgName = e.target.value;
+    const org = organizations.find(o => o.name === orgName);
+    
+    if (org) {
+      setFormData(prev => ({
+        ...prev,
+        organization_name: org.name,
+        organization_id: org.id,
+        department_id: '' // reset department
+      }));
+      // Auto generate ID based on selected organization code
+      await generateAutoID(org.code);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        organization_name: '',
+        organization_id: '',
+        department_id: ''
+      }));
     }
   };
 
@@ -216,14 +296,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Clean data & Map IDs
       const submissionData = { ...formData };
-      
-      // If adding new, map WKN ID to the primary 'id' column
-      // If editing, 'id' is already in submissionData from useEffect
-      if (!editData) {
-        submissionData.id = formData.employee_id;
-      }
+      // Map form's employee_id to database's primary 'id' column for both add and edit
+      submissionData.id = formData.employee_id;
       delete submissionData.employee_id;
 
       // Jika password mobile kosong, beri default 12345
@@ -477,19 +552,19 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
       <div 
-        className="w-full max-w-[850px] bg-[#f0f2f5] shadow-[20px_20px_60px_#00000030] rounded-[2rem] overflow-hidden flex flex-col border border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-5xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col border border-slate-150 animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="h-14 bg-[#f0f2f5] border-b border-white flex items-center justify-between px-6 shrink-0">
+        <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`h-9 w-9 ${editData ? 'bg-green-500' : 'bg-[#E31E24]'} shadow-md rounded-xl flex items-center justify-center text-white`}>
+            <div className={`h-9 w-9 ${editData ? 'bg-green-500' : 'bg-[#E31E24]'} shadow-sm rounded-lg flex items-center justify-center text-white`}>
               {editData ? <IconEdit size={18} /> : <IconUserPlus size={18} />}
             </div>
             <div>
-              <h2 className="text-xs font-black text-slate-800 uppercase tracking-tight leading-none">
+              <h2 className="text-xs font-bold text-slate-850 uppercase tracking-tight leading-none">
                 {editData ? 'Update Talent Profile' : 'Master Personnel Onboarding'}
               </h2>
-              <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1 opacity-70">
+              <p className="text-[7px] font-semibold text-slate-400 uppercase tracking-[0.3em] mt-1 opacity-70">
                 {editData ? `Editing ID: ${editData.id}` : 'Cloud identity synchronization'}
               </p>
             </div>
@@ -499,7 +574,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isScanning}
-              className="h-9 px-4 bg-white shadow-sm border border-[#E31E24]/20 rounded-xl text-[8px] font-black text-[#E31E24] uppercase tracking-widest hover:bg-red-50 transition-all flex items-center gap-2 group"
+              className="h-9 px-4 bg-white border border-[#E31E24] rounded-lg text-[9px] font-bold text-[#E31E24] hover:bg-[#E31E24] hover:text-white transition-all flex items-center gap-2 shadow-sm group"
             >
               {isScanning ? (
                 <IconLoader2 size={14} className="animate-spin" />
@@ -517,7 +592,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
             />
             <button 
               onClick={handleClose}
-              className="h-8 w-8 flex items-center justify-center bg-white shadow-sm rounded-lg text-slate-400 hover:text-[#E31E24] transition-all"
+              className="h-8 w-8 flex items-center justify-center bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all border border-slate-100"
             >
               <IconX size={16} />
             </button>
@@ -536,33 +611,33 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
               background: transparent;
             }
             .custom-scrollbar::-webkit-scrollbar-thumb {
-              background: #d1d9e6;
+              background: #e2e8f0;
               border-radius: 10px;
             }
             .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-              background: #E31E24;
+              background: #cbd5e1;
             }
           `}</style>
           {success ? (
             <div className="py-20 flex flex-col items-center justify-center gap-4 animate-in zoom-in-95 duration-500">
-              <div className="h-16 w-16 bg-green-500 shadow-lg rounded-full flex items-center justify-center text-white">
+              <div className="h-16 w-16 bg-green-500 shadow-md rounded-full flex items-center justify-center text-white">
                 <IconCircleCheck size={32} strokeWidth={3} />
               </div>
-              <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Master Record Synchronized</p>
+              <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Master Record Synchronized</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* PHOTO UPLOAD SECTION */}
               <div className="flex justify-center pt-2 pb-6">
                 <div className="relative group">
-                  <div className="h-28 w-28 rounded-[2rem] bg-white shadow-lg border-[4px] border-white overflow-hidden flex items-center justify-center text-slate-300">
+                  <div className="h-28 w-28 rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center text-slate-400 shadow-sm">
                     {formData.photo ? (
                       <img src={formData.photo} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <IconUser size={40} />
                     )}
                   </div>
-                  <label className="absolute -bottom-2 -right-2 h-10 w-10 bg-[#E31E24] text-white rounded-xl flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#C1181E] hover:scale-110 active:scale-95 transition-all">
+                  <label className="absolute -bottom-2 -right-2 h-9 w-9 bg-[#E31E24] text-white rounded-lg flex items-center justify-center shadow-md cursor-pointer hover:bg-[#C1181E] hover:scale-105 active:scale-95 transition-all">
                     <IconCamera size={18} />
                     <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
                   </label>
@@ -570,7 +645,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     <button 
                       type="button"
                       onClick={() => setFormData(prev => ({...prev, photo: ''}))}
-                      className="absolute -top-2 -right-2 h-7 w-7 bg-white text-slate-400 rounded-lg flex items-center justify-center shadow hover:text-[#E31E24] transition-all"
+                      className="absolute -top-2 -right-2 h-7 w-7 bg-white text-slate-400 rounded-lg flex items-center justify-center border border-slate-100 shadow hover:text-[#E31E24] transition-all"
                     >
                       <IconX size={14} />
                     </button>
@@ -580,8 +655,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
               {/* SECTION 1: IDENTITY */}
               <div className="space-y-3">
-                <h3 className="text-[9px] font-black text-[#E31E24] uppercase tracking-widest flex items-center gap-2">
-                  <span className="h-1 w-4 bg-[#E31E24] rounded-full"></span> Identity Profile
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-[#E31E24] rounded-full"></span> Identity Profile
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <InputWrapper label="Employee ID (System Locked)" icon={IconId}>
@@ -590,7 +665,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       name="employee_id" 
                       placeholder="Generating..." 
                       value={formData.employee_id} 
-                      className={`${inputStyle} text-slate-400 bg-slate-50 cursor-not-allowed border-l-2 border-l-slate-300 shadow-none font-black tracking-widest`} 
+                      className={`${inputStyle} text-slate-400 bg-slate-100 cursor-not-allowed border-l-2 border-l-slate-300 shadow-none font-bold tracking-widest`} 
                     />
                   </InputWrapper>
                   <InputWrapper label="Full Name" icon={IconUser}>
@@ -641,8 +716,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
               {/* SECTION 2: CONTACT & LOCALIZATION */}
               <div className="space-y-3">
-                <h3 className="text-[9px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2">
-                  <span className="h-1 w-4 bg-blue-500 rounded-full"></span> Contact & Localization
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-blue-650 rounded-full bg-blue-600"></span> Contact & Localization
                 </h3>
                 
                 {/* Addresses First */}
@@ -652,18 +727,18 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   </InputWrapper>
                   
                   <div className="space-y-1 relative">
-                    <div className="flex items-center justify-between px-1">
-                      <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Alamat Domisili (Tempat Tinggal Sekarang)</label>
+                     <div className="flex items-center justify-between px-1">
+                      <label className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Alamat Domisili (Tempat Tinggal Sekarang)</label>
                       <button 
                         type="button"
                         onClick={() => setFormData(prev => ({...prev, domicile_address: prev.ktp_address}))}
-                        className="text-[7px] font-black text-[#E31E24] uppercase tracking-widest hover:bg-red-50 px-2 py-0.5 rounded border border-red-100 transition-all flex items-center gap-1"
+                        className="text-[8px] font-bold text-[#E31E24] uppercase tracking-wider hover:bg-red-50 px-2 py-1 rounded border border-[#E31E24]/20 transition-all flex items-center gap-1"
                       >
                         <IconCheck size={10} /> Sama dengan KTP
                       </button>
                     </div>
                     <div className="relative">
-                      <IconMapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                      <IconMapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                       <input name="domicile_address" placeholder="Masukkan alamat lengkap tempat tinggal saat ini..." value={formData.domicile_address} onChange={handleChange} className={inputStyle} />
                     </div>
                   </div>
@@ -682,13 +757,13 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
               {/* SECTION 2.5: EMERGENCY CONTACTS */}
               <div className="space-y-3">
-                <h3 className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2">
-                  <span className="h-1 w-4 bg-rose-500 rounded-full"></span> Emergency Contacts
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-rose-600 rounded-full"></span> Emergency Contacts
                 </h3>
-                <div className="grid grid-cols-2 gap-6 bg-white/30 p-4 rounded-2xl border border-white">
+                <div className="grid grid-cols-2 gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
                   {/* Contact 1 */}
                   <div className="space-y-3">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic">Primary Contact</p>
+                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider italic">Primary Contact</p>
                     <div className="grid grid-cols-1 gap-2">
                       <InputWrapper label="Full Name" icon={IconUser}>
                         <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name} onChange={handleChange} className={inputStyle} />
@@ -705,7 +780,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   </div>
                   {/* Contact 2 */}
                   <div className="space-y-3">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic">Secondary Contact</p>
+                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider italic">Secondary Contact</p>
                     <div className="grid grid-cols-1 gap-2">
                       <InputWrapper label="Full Name" icon={IconUser}>
                         <input name="emergency_contact_2_name" value={formData.emergency_contact_2_name} onChange={handleChange} className={inputStyle} />
@@ -725,14 +800,30 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
               {/* SECTION 3: EMPLOYMENT & FINANCE */}
               <div className="space-y-3">
-                <h3 className="text-[9px] font-black text-green-600 uppercase tracking-widest flex items-center gap-2">
-                  <span className="h-1 w-4 bg-green-600 rounded-full"></span> Career & Treasury
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-emerald-600 rounded-full"></span> Career & Treasury
                 </h3>
                 <div className="grid grid-cols-4 gap-4">
                   <InputWrapper label="Org Name" icon={IconBuildingSkyscraper}>
-                    <select name="organization_name" value={formData.organization_name} onChange={handleChange} className={inputStyle}>
-                      <option>WIJAYA KREATIF NUSANTARA</option>
-                      <option>WIJAYA KUSUMA</option>
+                    <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle}>
+                      <option value="">PILIH ORGANISASI</option>
+                      {organizations.map(org => (
+                        <option key={org.id} value={org.name}>{org.name.toUpperCase()}</option>
+                      ))}
+                    </select>
+                  </InputWrapper>
+                  <InputWrapper label="Department" icon={IconBuildingSkyscraper}>
+                    <select 
+                      name="department_id" 
+                      value={formData.department_id || ''} 
+                      onChange={handleChange} 
+                      className={inputStyle}
+                      disabled={!formData.organization_id}
+                    >
+                      <option value="">PILIH DEPARTEMEN</option>
+                      {departments.map(dept => (
+                        <option key={dept.id} value={dept.id}>{dept.name.toUpperCase()}</option>
+                      ))}
                     </select>
                   </InputWrapper>
                   <InputWrapper label="Position" icon={IconBriefcase}>
@@ -763,18 +854,16 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       placeholder="DD/MM/YYYY"
                     />
                   </InputWrapper>
-                  <div className="col-span-2">
-                    <InputWrapper label="Base Salary (Monthly)" icon={IconWallet}>
-                      <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} />
-                    </InputWrapper>
-                  </div>
+                  <InputWrapper label="Base Salary (Monthly)" icon={IconWallet}>
+                    <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} />
+                  </InputWrapper>
                 </div>
               </div>
 
               {/* SECTION 4: BANKING & TAX INTELLIGENCE */}
               <div className="space-y-3">
-                <h3 className="text-[9px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-2">
-                  <span className="h-1 w-4 bg-amber-500 rounded-full"></span> Banking & Tax Intelligence
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-amber-600 rounded-full"></span> Banking & Tax Intelligence
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <InputWrapper label="Bank Name" icon={IconBuildingSkyscraper}>
@@ -813,7 +902,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
               <div className="pt-2">
                 <Button 
                   disabled={loading}
-                  className="w-full h-11 rounded-xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-md hover:bg-[#C1181E] active:scale-95 transition-all flex gap-3"
+                  className="w-full h-11 rounded-lg bg-[#E31E24] text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-sm hover:bg-[#C1181E] active:scale-98 transition-all flex gap-3"
                 >
                   {loading ? (
                     <IconLoader2 size={18} className="animate-spin" />

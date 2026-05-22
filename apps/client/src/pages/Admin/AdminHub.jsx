@@ -3,18 +3,21 @@ import Settings from './Settings';
 import UserManager from './UserManager';
 import RBACManager from './RBACManager';
 import AuditTrail from './AuditTrail';
+import OrganizationManager from './OrganizationManager';
 import { 
   IconSettings, 
   IconUsers, 
   IconWorld, 
   IconShieldLock,
-  IconShieldCheck
+  IconShieldCheck,
+  IconBuilding
 } from "@tabler/icons-react";
 
 const AdminHub = () => {
-  const [activeTab, setActiveTab] = useState('settings');
+  const [activeTab, setActiveTab] = useState('organizations');
 
   const tabs = [
+    { id: 'organizations', label: 'Organisasi & Unit', icon: <IconBuilding size={18} />, component: <OrganizationManager /> },
     { id: 'settings', label: 'Konfigurasi Sistem', icon: <IconSettings size={18} />, component: <Settings /> },
     { id: 'users', label: 'Manajemen User', icon: <IconUsers size={18} />, component: <UserManager /> },
     { id: 'rbac', label: 'Hak Akses (RBAC)', icon: <IconWorld size={18} />, component: <RBACManager /> },

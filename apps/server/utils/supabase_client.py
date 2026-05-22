@@ -628,5 +628,109 @@ class WKNSupabaseClient:
             print(f"Error syncing leave to attendance: {str(e)}")
             return 0
 
+    # -----------------------------------------------------------------------
+    # Organizations & Departments CRUD
+    # -----------------------------------------------------------------------
+
+    async def get_organizations(self, active_only: bool = True) -> List[Dict[str, Any]]:
+        """Get all organizations, optionally filtered by active status."""
+        if not self.client: return []
+        try:
+            query = self.client.table("organizations").select("*").order("name")
+            if active_only:
+                query = query.eq("is_active", True)
+            res = query.execute()
+            return res.data
+        except Exception as e:
+            print(f"Error fetching organizations: {str(e)}")
+            return []
+
+    async def get_organization_by_id(self, org_id: str) -> Optional[Dict[str, Any]]:
+        """Get a single organization by ID."""
+        if not self.client: return None
+        try:
+            res = self.client.table("organizations").select("*").eq("id", org_id).execute()
+            return res.data[0] if res.data else None
+        except Exception as e:
+            print(f"Error fetching organization: {str(e)}")
+            return None
+
+    async def create_organization(self, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new organization."""
+        if not self.client: return None
+        try:
+            res = self.client.table("organizations").insert(data).execute()
+            return res.data[0] if res.data else None
+        except Exception as e:
+            print(f"Error creating organization: {str(e)}")
+            return None
+
+    async def update_organization(self, org_id: str, data: Dict[str, Any]) -> bool:
+        """Update an organization."""
+        if not self.client: return False
+        try:
+            from datetime import datetime, timezone
+            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            self.client.table("organizations").update(data).eq("id", org_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating organization: {str(e)}")
+            return False
+
+    async def delete_organization(self, org_id: str) -> bool:
+        """Delete an organization from the database."""
+        if not self.client: return False
+        try:
+            self.client.table("organizations").delete().eq("id", org_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error deleting organization: {str(e)}")
+            raise e
+
+    async def get_departments(self, org_id: Optional[str] = None, active_only: bool = True) -> List[Dict[str, Any]]:
+        """Get departments, optionally filtered by organization."""
+        if not self.client: return []
+        try:
+            query = self.client.table("departments").select("*, organizations(name, code)").order("name")
+            if org_id:
+                query = query.eq("organization_id", org_id)
+            if active_only:
+                query = query.eq("is_active", True)
+            res = query.execute()
+            return res.data
+        except Exception as e:
+            print(f"Error fetching departments: {str(e)}")
+            return []
+
+    async def create_department(self, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new department."""
+        if not self.client: return None
+        try:
+            res = self.client.table("departments").insert(data).execute()
+            return res.data[0] if res.data else None
+        except Exception as e:
+            print(f"Error creating department: {str(e)}")
+            return None
+
+    async def update_department(self, dept_id: str, data: Dict[str, Any]) -> bool:
+        """Update a department."""
+        if not self.client: return False
+        try:
+            self.client.table("departments").update(data).eq("id", dept_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating department: {str(e)}")
+            return False
+
+    async def delete_department(self, dept_id: str) -> bool:
+        """Soft-delete a department by setting is_active = false."""
+        if not self.client: return False
+        try:
+            self.client.table("departments").update({"is_active": False}).eq("id", dept_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error deleting department: {str(e)}")
+            return False
+
 # Singleton instance
 supabase_client = WKNSupabaseClient()

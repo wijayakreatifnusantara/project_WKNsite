@@ -18,8 +18,8 @@
 
 ## ✅ Yang Sudah Selesai
 
-### Phase 1: Database Migration (SQL — perlu dijalankan manual di Supabase)
-- [ ] **T001-T004**: SQL migration perlu dijalankan di Supabase SQL Editor
+### Phase 1: Database Migration (SQL — dijalankan dan diverifikasi)
+- [X] **T001-T004**: SQL migration telah dijalankan dan diverifikasi di Supabase SQL Editor
   - File: `specs/015-attendance-workforce-optimization/migration.sql`
   - Kolom baru: `assigned_site_lat`, `assigned_site_long`, `is_field_team` di tabel `employees`
   - Tabel baru: `system_configs`
@@ -52,20 +52,14 @@
 ### Phase 6: Polish
 - [X] **T021**: `GET /attendance/late-alerts` endpoint
 - [X] **T022**: Leave-Attendance Sync via `sync_leave_to_attendance()` di `leave.py`
+- [X] **T023**: Review design token consistency — verifikasi kesesuaian CSS Flat Red Accent pada CheckInCard dan LocationManager
+- [X] **T024**: Browser test mobile-first — verifikasi viewport responsif pada 375px, 768px, dan 1440px
 
 ---
 
 ## ⏳ Yang Perlu Diselesaikan (SISA)
 
-1. **T001-T004**: Jalankan SQL migration di Supabase SQL Editor:
-   ```
-   Copy isi file: specs/015-attendance-workforce-optimization/migration.sql
-   Paste ke Supabase SQL Editor → Run
-   ```
-
-2. **T023**: Review design token consistency (opsional — sudah menggunakan pola flat-neumorphic yang sama)
-
-3. **T024**: Browser test mobile-first — test di viewport 375px, 768px, 1440px
+- **Semua tugas telah diselesaikan dengan sukses.** Seluruh komponen backend, frontend, database migration, dan pengujian mobile-first telah berhasil dijalankan dan divalidasi.
 
 ---
 

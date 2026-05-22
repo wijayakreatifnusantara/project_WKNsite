@@ -18,10 +18,10 @@
 
 **Tujuan**: Persiapan database dan struktur file baru sebelum implementasi fitur
 
-- [ ] T001 Jalankan SQL migration: tambah kolom `assigned_site_lat`, `assigned_site_long`, `is_field_team` ke tabel `employees` di Supabase (via SQL Editor)
-- [ ] T002 Jalankan SQL migration: buat tabel `system_configs` dengan kolom `key`, `value` (JSONB), `updated_at` di Supabase
-- [ ] T003 Insert seed data default HQ location ke tabel `system_configs` (key: `hq_location`, value: `{"lat": -6.2088, "lon": 106.8456, "radius": 100, "name": "WKN HQ Jakarta"}`)
-- [ ] T004 Jalankan SQL migration: tambah UNIQUE constraint `attendance_employee_date_unique` pada kolom `(employee_id, date)` di tabel `attendance`
+- [x] T001 Jalankan SQL migration: tambah kolom `assigned_site_lat`, `assigned_site_long`, `is_field_team` ke tabel `employees` di Supabase (via SQL Editor)
+- [x] T002 Jalankan SQL migration: buat tabel `system_configs` dengan kolom `key`, `value` (JSONB), `updated_at` di Supabase
+- [x] T003 Insert seed data default HQ location ke tabel `system_configs` (key: `hq_location`, value: `{"lat": -6.2088, "lon": 106.8456, "radius": 100, "name": "WKN HQ Jakarta"}`)
+- [x] T004 Jalankan SQL migration: tambah UNIQUE constraint `attendance_employee_date_unique` pada kolom `(employee_id, date)` di tabel `attendance`
 
 **Checkpoint**: Database siap — lanjut ke Phase 2
 
@@ -96,11 +96,11 @@
 
 **Tujuan**: Penyempurnaan yang mempengaruhi semua user story
 
-- [ ] T020 [P] Update memory progress file di `.specify/memory/attendance-optimization-progress.md` — tandai semua fase sebagai selesai
+- [X] T020 [P] Update memory progress file di `.specify/memory/attendance-optimization-progress.md` — tandai semua fase sebagai selesai
 - [X] T021 Tambahkan endpoint `GET /attendance/late-alerts` di `apps/server/api/attendance.py`
 - [X] T022 [P] Implementasi Leave-Attendance Sync via `supabase_client.sync_leave_to_attendance()` di `apps/server/api/leave.py`
-- [ ] T023 [P] Review design token consistency
-- [ ] T024 Verifikasi mobile-first viewport test
+- [X] T023 [P] Review design token consistency
+- [X] T024 Verifikasi mobile-first viewport test
 
 ---
 

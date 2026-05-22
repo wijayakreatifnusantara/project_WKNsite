@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { hasPermission, PERMISSIONS } from '@/lib/permissions';
 
 const AuthContext = createContext({});
 
@@ -61,10 +62,8 @@ export const AuthProvider = ({ children }) => {
 
   const can = (permission) => {
     if (!user) return false;
-    // Owners have full access
     if (user.role?.toLowerCase() === 'owner') return true;
-    // Default allowed for now to maintain system usability
-    return true;
+    return hasPermission(user.role, permission);
   };
 
   const hasRole = (roles) => {
@@ -84,7 +83,7 @@ export const AuthProvider = ({ children }) => {
       can,
       hasRole,
       isAdmin: () => user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'admin',
-      PERMISSIONS: {} 
+      PERMISSIONS: PERMISSIONS 
     }}>
       {children}
     </AuthContext.Provider>

@@ -23,3 +23,6 @@ Thumbs.db
 # Specify
 .agents/
 .specify/feature.json
+
+# Node dependencies
+node_modules/

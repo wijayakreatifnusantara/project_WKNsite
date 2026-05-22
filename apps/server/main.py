@@ -12,6 +12,7 @@ from api.leave import router as leave_router
 from api.documents import router as documents_router
 from api.assets import router as assets_router
 from api.performance import router as performance_router
+from api.organizations import router as organizations_router
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -38,6 +39,7 @@ app.include_router(leave_router, prefix="/api")
 app.include_router(documents_router, prefix="/api")
 app.include_router(assets_router, prefix="/api")
 app.include_router(performance_router, prefix="/api")
+app.include_router(organizations_router, prefix="/api")
 
 @app.get("/api")
 @app.get("/api/")

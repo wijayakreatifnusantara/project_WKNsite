@@ -5,7 +5,7 @@ import {
   IconUsers, IconX, IconArrowLeft
 } from '@tabler/icons-react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 // ─── HQ Config Form ──────────────────────────────────────────────────────────
 const HQConfigForm = () => {
@@ -15,7 +15,7 @@ const HQConfigForm = () => {
   const [msg, setMsg] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/attendance/settings`)
+    fetch(`${API_URL}/attendance/settings`)
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success' && d.data.hq_location) {
@@ -28,7 +28,7 @@ const HQConfigForm = () => {
   const handleSave = async () => {
     setSaving(true); setMsg(null);
     try {
-      const res = await fetch(`${API_BASE}/attendance/settings`, {
+      const res = await fetch(`${API_URL}/attendance/settings`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: 'hq_location', value: { ...config, lat: parseFloat(config.lat), lon: parseFloat(config.lon), radius: parseInt(config.radius) } }),
@@ -94,7 +94,7 @@ const AssignSiteModal = ({ employee, onClose, onSaved }) => {
   const handleSave = async () => {
     setSaving(true); setMsg(null);
     try {
-      const res = await fetch(`${API_BASE}/attendance/employees/${employee.id}/site`, {
+      const res = await fetch(`${API_URL}/attendance/employees/${employee.id}/site`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assigned_site_lat: parseFloat(form.lat), assigned_site_long: parseFloat(form.lon), is_field_team: form.is_field_team }),
@@ -159,7 +159,7 @@ const FieldTeamTable = () => {
   const fetchFieldTeam = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/employees?page_size=100`);
+      const res = await fetch(`${API_URL}/employees?page_size=100`);
       const data = await res.json();
       const fieldTeam = (data.data || []).filter(e => e.is_field_team || e['Job Position *']?.toLowerCase().includes('field'));
       setEmployees(fieldTeam);

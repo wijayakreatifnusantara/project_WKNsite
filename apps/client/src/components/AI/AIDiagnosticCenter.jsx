@@ -52,30 +52,30 @@ const AIDiagnosticCenter = ({ isOpen, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <header className="h-24 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-12 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl flex items-center justify-center text-[#E31E24]">
-              <IconBrain size={28} className="animate-pulse" />
+        <header className="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 bg-red-50 border border-red-100 rounded-xl flex items-center justify-center text-[#E31E24] shrink-0">
+              <IconBrain size={20} className="animate-pulse" />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-slate-800 font-outfit uppercase tracking-tight">AI Diagnostic Center</h1>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-70">Intelligent Data Integrity Engine</p>
+              <h1 className="text-base font-bold text-slate-800 font-outfit uppercase tracking-tight leading-none">AI Diagnostic Center</h1>
+              <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Intelligent Data Integrity Engine</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               onClick={runDiagnostics}
-              className="h-12 px-6 flex items-center gap-3 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] transition-all active:shadow-inner"
+              className="h-9 px-4 flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-600 font-bold text-xs uppercase tracking-wider hover:text-[#E31E24] hover:bg-red-50/50 hover:border-[#E31E24]/20 transition-all active:scale-95"
               disabled={loading}
             >
-              <IconRotate size={18} className={loading ? 'animate-spin' : ''} />
+              <IconRotate size={14} className={loading ? 'animate-spin' : ''} />
               {loading ? 'Analyzing...' : 'Deep Scan Now'}
             </button>
             <button 
               onClick={onClose}
-              className="h-12 w-12 flex items-center justify-center bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl text-slate-400 hover:text-red-500 transition-all"
+              className="h-9 w-9 flex items-center justify-center bg-slate-50 border border-slate-200/80 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50/50 hover:border-red-200 transition-all"
             >
-              <IconX size={24} />
+              <IconX size={18} />
             </button>
           </div>
         </header>

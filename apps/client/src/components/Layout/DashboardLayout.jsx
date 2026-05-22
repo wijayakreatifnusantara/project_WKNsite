@@ -79,12 +79,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     <div className="flex h-screen bg-[#f0f2f5] overflow-hidden font-inter animate-fade-in">
       {/* Premium Dark Slate Sidebar */}
       <aside className="w-72 bg-[#0f172a] flex flex-col hidden lg:flex shrink-0 relative z-20 shadow-[10px_0_30px_-10px_rgba(0,0,0,0.25)]">
-        <div className="h-24 flex flex-col justify-center items-center px-6 border-b border-slate-800 shrink-0">
-          <div className="flex items-center gap-3 mb-1">
-            <img src="/assets/wkn_logo.png" alt="WKN" className="h-7 w-auto object-contain" />
-            <h1 className="font-outfit font-black text-xl text-slate-100 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
+        <div className="h-16 flex items-center px-6 border-b border-slate-800 shrink-0 gap-2.5">
+          <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
+          <div className="flex flex-col">
+            <h1 className="font-outfit font-black text-base text-slate-100 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
+            <span className="text-[7px] font-bold text-slate-500 tracking-widest uppercase mt-0.5">Corporate Management</span>
           </div>
-          <p className="text-[8px] font-black text-slate-400 tracking-[0.2em] leading-none uppercase text-center">Corporate Management System</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-6 custom-scrollbar scroll-smooth">
@@ -104,7 +104,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
         <div className="p-6 mt-auto border-t border-slate-800">
           <button 
             onClick={onLogout}
-            className="w-full h-12 flex items-center gap-3 px-5 rounded-xl bg-slate-800/40 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-red-500/10 border border-slate-700/30 transition-all active:scale-95 group"
+            className="w-full h-12 flex items-center gap-3 px-5 rounded-xl bg-slate-800/40 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-red-50/5 border border-slate-700/30 transition-all active:scale-95 group"
           >
             <IconPower size={18} className="text-slate-400 group-hover:text-[#E31E24] transition-colors" />
             Sign Out Session
@@ -114,57 +114,58 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-24 bg-[#f0f2f5] flex items-center justify-between px-10 shrink-0 z-10 border-b border-white/30">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3">
-              <h1 className="text-sm font-black text-slate-800 uppercase tracking-widest">{getPageTitle()}</h1>
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-full">
-                <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-[8px] font-black text-green-600 uppercase tracking-widest">System Healthy</span>
+        <header className="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 shrink-0 z-10">
+          <div className="flex flex-col justify-center">
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-bold text-slate-900 tracking-tight leading-none">{getPageTitle()}</h1>
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
+                <div className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span className="text-[9px] font-semibold text-emerald-700 uppercase tracking-wider">System Healthy</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{formatDate(currentTime)}</span>
-              <div className="h-1 w-1 rounded-full bg-slate-300"></div>
-              <span className="text-[9px] font-bold text-[#E31E24] tracking-widest font-mono">{formatTime(currentTime)}</span>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">{formatDate(currentTime)}</span>
+              <span className="text-slate-300 text-[10px]">•</span>
+              <span className="text-[10px] font-mono font-semibold text-[#E31E24]">{formatTime(currentTime)}</span>
             </div>
           </div>
 
-          <div className="flex-1 flex justify-center px-12">
-            <div className="w-full max-w-md relative group">
-              <IconSearch size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#E31E24] transition-colors" />
+          <div className="flex-1 flex justify-center px-10">
+            <div className="w-full max-w-sm relative group">
+              <IconSearch size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#E31E24] transition-colors" />
               <input 
                 type="text" 
                 placeholder="Global System Search..." 
                 value={globalSearch}
                 onChange={(e) => setGlobalSearch(e.target.value)}
-                className="w-full h-11 pl-12 pr-6 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-none rounded-2xl text-[10px] font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
+                className="w-full h-9 pl-9 pr-4 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] font-semibold text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400 uppercase tracking-wider"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] p-1.5 rounded-xl">
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 p-1 rounded-xl">
               <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
-                className="h-9 w-9 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
+                title="AI Diagnostics"
               >
-                <IconBrain size={18} />
-                <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 bg-red-500 rounded-full border border-white"></span>
+                <IconBrain size={16} />
+                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 bg-red-500 rounded-full border border-white"></span>
               </button>
-              <button className="h-9 w-9 flex items-center justify-center rounded-lg text-slate-400 hover:bg-white/50 transition-all">
-                <IconBell size={18} />
+              <button className="h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-all" title="Notifications">
+                <IconBell size={16} />
               </button>
             </div>
             
-            <div className="h-8 w-[1px] bg-slate-200/50 mx-1"></div>
+            <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
             
-            <div className="flex items-center gap-3 pl-1">
+            <div className="flex items-center gap-2.5 pl-1">
               <div className="flex flex-col items-end">
-                <span className="text-[11px] font-black text-slate-800 leading-tight">{user?.full_name || 'Administrator'}</span>
-                <span className="text-[8px] font-black text-[#E31E24] uppercase tracking-widest opacity-80">{user?.role || 'Staff'}</span>
+                <span className="text-xs font-semibold text-slate-700 leading-tight">{user?.full_name || 'Administrator'}</span>
+                <span className="text-[9px] font-bold text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
               </div>
-              <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-2 border-white flex items-center justify-center text-[10px] font-black text-slate-700">
+              <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/85 flex items-center justify-center text-xs font-bold text-slate-700">
                 {user?.full_name?.split(' ').map(n => n[0]).join('') || 'A'}
               </div>
             </div>

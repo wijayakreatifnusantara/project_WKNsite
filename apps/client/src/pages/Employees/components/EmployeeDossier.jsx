@@ -30,48 +30,48 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* 🏆 COMPACT IDENTITY TOP BAR */}
-        <header className="relative h-24 bg-white/40 border-b border-white flex items-center px-10 gap-6 shrink-0">
-          <div className="h-14 w-14 rounded-2xl bg-white shadow-md border-2 border-white flex items-center justify-center text-[#E31E24] overflow-hidden shrink-0">
+        <header className="relative h-16 bg-white border-b border-slate-200/80 flex items-center px-8 gap-4 shrink-0">
+          <div className="h-10 w-10 rounded-lg bg-white border border-slate-200/80 flex items-center justify-center text-[#E31E24] overflow-hidden shrink-0">
             {employee["Photo"] ? (
               <img src={employee["Photo"]} alt={employee["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-xl font-black">{employee["EMPLOYEE NAME"]?.[0]}</span>
+              <span className="text-base font-bold">{employee["EMPLOYEE NAME"]?.[0]}</span>
             )}
           </div>
 
           <div className="flex-1 flex justify-between items-center">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <div>
-                <h1 className="text-xl font-black text-slate-800 tracking-tighter uppercase leading-none mb-1">
+                <h1 className="text-base font-bold text-slate-800 tracking-tight uppercase leading-none mb-1">
                   {employee["EMPLOYEE NAME"]}
                 </h1>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <IconId size={12} className="text-[#E31E24]" />
-                    <span className="text-[9px] font-bold tracking-[0.2em]">{employee["EMPLOYEE ID"]}</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <IconId size={10} className="text-[#E31E24]" />
+                    <span className="text-[9px] font-semibold tracking-wider">{employee["EMPLOYEE ID"]}</span>
                   </div>
-                  <span className={`px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${employee.is_resigned || String(employee["Status *"] || employee.status || "").toUpperCase() === 'RESIGNED' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-semibold uppercase tracking-wider ${employee.is_resigned || String(employee["Status *"] || employee.status || "").toUpperCase() === 'RESIGNED' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'}`}>
                     {employee.is_resigned || String(employee["Status *"] || employee.status || "").toUpperCase() === 'RESIGNED' ? 'Inactive' : 'Active Duty'}
                   </span>
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Button 
                 onClick={() => {
                   onEdit(employee);
                   onClose();
                 }}
-                className="h-9 px-5 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-[0.2em] shadow-md hover:bg-[#C1181E] transition-all active:scale-95"
+                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-semibold text-[10px] uppercase tracking-wider hover:bg-[#C1181E] transition-all active:scale-95 shadow-sm"
               >
                 Edit Dossier
               </Button>
               <button 
                 onClick={onClose}
-                className="h-9 w-9 flex items-center justify-center bg-white shadow-sm border border-slate-100 rounded-lg text-slate-400 hover:text-[#E31E24] transition-all"
+                className="h-8 w-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#E31E24] transition-all"
               >
-                <IconX size={18} />
+                <IconX size={16} />
               </button>
             </div>
           </div>
