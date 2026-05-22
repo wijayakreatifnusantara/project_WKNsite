@@ -121,10 +121,29 @@ const AttendanceCalendar = () => {
   }, [currentDate, selectedEmployee]);
 
   const fetchEmployees = async () => {
-    const { data: empData } = await supabase.from('employees').select('id, name, is_resigned, organization_name, departments(name)').eq('is_resigned', false);
+    const { data: empData } = await supabase.from('employees').select('id, name, is_resigned, organization_name, organization_id, department_id, departments(name)').eq('is_resigned', false);
+    
+    const uniqueOrgIds = [...new Set((empData || []).map(e => e.organization_id).filter(Boolean))];
+    const deptMap = {};
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    
+    await Promise.all(uniqueOrgIds.map(async (orgId) => {
+        try {
+            const res = await fetch(`${apiUrl}/organizations/${orgId}/departments?active_only=true`);
+            const json = await res.json();
+            if (json.status === 'success' && json.data) {
+                json.data.forEach(d => {
+                    deptMap[d.id] = d.name;
+                });
+            }
+        } catch (err) {
+            console.error('Failed to fetch depts for org', orgId, err);
+        }
+    }));
+
     const mapped = (empData || []).map(e => ({
        ...e,
-       department_name: e.departments?.name
+       department_name: deptMap[e.department_id] || e.departments?.name
     }));
     setEmployees(mapped);
   };
