@@ -166,9 +166,9 @@ const AttendanceCalendar = () => {
         </div>
 
         {/* CALENDAR VIEW */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col min-h-[600px]">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col min-h-[450px]">
           {/* Calendar Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
             <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
               {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
               {loading && <IconClock className="animate-spin text-slate-300" size={18} />}
@@ -190,14 +190,14 @@ const AttendanceCalendar = () => {
           <div className="flex-1 grid grid-cols-7 grid-rows-[auto_1fr] bg-slate-100 gap-[1px]">
             {/* Days Header */}
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-              <div key={day} className="bg-white p-3 text-center">
+              <div key={day} className="bg-white p-2 text-center">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{day}</span>
               </div>
             ))}
 
             {/* Empty slots for start of month */}
             {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-              <div key={`empty-${index}`} className="bg-white/50 p-4 min-h-[120px]" />
+              <div key={`empty-${index}`} className="bg-white/50 p-2 min-h-[80px]" />
             ))}
 
             {/* Days slots */}
@@ -211,9 +211,9 @@ const AttendanceCalendar = () => {
                 <div 
                   key={day} 
                   onClick={() => handleDayClick(day)}
-                  className="bg-white p-2 min-h-[120px] cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col"
+                  className="bg-white p-1.5 min-h-[80px] cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col"
                 >
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-1">
                     <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-md' : 'text-slate-600'}`}>
                       {day}
                     </span>
@@ -247,7 +247,7 @@ const AttendanceCalendar = () => {
 
             {/* Empty slots for end of month */}
             {Array.from({ length: 42 - (firstDayOfMonth + daysInMonth) }).map((_, index) => (
-              <div key={`empty-end-${index}`} className="bg-white/50 p-4 min-h-[120px]" />
+              <div key={`empty-end-${index}`} className="bg-white/50 p-2 min-h-[80px]" />
             ))}
           </div>
         </div>
