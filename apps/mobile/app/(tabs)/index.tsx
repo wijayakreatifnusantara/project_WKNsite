@@ -31,7 +31,7 @@ export default function HomeScreen() {
   const { colors, isDark } = useTheme();
   const [showCamera, setShowCamera] = useState(false);
   const [cameraType, setCameraType] = useState<'IN' | 'OUT'>('IN');
-  const [userData, setUserData] = useState<{id: string, name: string, jabatan?: string, is_field_team?: boolean} | null>(null);
+  const [userData, setUserData] = useState<{id: string, name: string, jabatan?: string, is_field_team?: boolean, working_location?: string} | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [refreshing, setRefreshing] = useState(false);
   const [weather, setWeather] = useState<{temp: number, condition: string, city: string} | null>(null);

@@ -114,7 +114,7 @@ export default function LoginScreen() {
     try {
       const { data, error } = await supabase
         .from('employees')
-        .select('id, name, email, mobile_password, status, is_resigned, job_position')
+        .select('id, name, email, mobile_password, status, is_resigned, job_position, is_field_team, working_location')
         .ilike('email', inputEmail.trim())
         .single();
 
@@ -126,7 +126,9 @@ export default function LoginScreen() {
         id: data.id,
         name: data.name,
         email: data.email,
-        jabatan: data.job_position || 'Staff'
+        jabatan: data.job_position || 'Staff',
+        is_field_team: data.is_field_team || false,
+        working_location: data.working_location || 'Head Office'
       }));
 
       if (rememberMe) {

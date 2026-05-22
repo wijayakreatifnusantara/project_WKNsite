@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, ValidationInfo
 from typing import Optional
 from utils.supabase_client import supabase_client
 from utils.geofencing import is_within_radius, calculate_late_minutes
@@ -23,12 +23,14 @@ class LocationConfigRequest(BaseModel):
 
     @field_validator("value")
     @classmethod
-    def validate_location_value(cls, v):
-        if "lat" not in v or "lon" not in v:
-            raise ValueError("value must include 'lat' and 'lon' fields")
-        radius = v.get("radius", 100)
-        if not (50 <= radius <= 5000):
-            raise ValueError("radius must be between 50 and 5000 meters")
+    def validate_location_value(cls, v, info: ValidationInfo):
+        key = info.data.get("key") if info.data else None
+        if key == "hq_location":
+            if "lat" not in v or "lon" not in v:
+                raise ValueError("value must include 'lat' and 'lon' fields")
+            radius = v.get("radius", 100)
+            if not (50 <= radius <= 5000):
+                raise ValueError("radius must be between 50 and 5000 meters")
         return v
 
 
@@ -82,33 +84,54 @@ async def ess_check_in(body: CheckInRequest):
     if not employee:
         raise HTTPException(status_code=404, detail=f"Employee '{employee_id}' not found")
 
-    # Determine target location (T014: field team logic)
+    # Determine target location
     is_field = employee.get("is_field_team", False)
     site_lat = employee.get("assigned_site_lat")
     site_lon = employee.get("assigned_site_long")
     target_name = "Lokasi Lapangan"
+    radius = 100
 
-    if is_field and site_lat is not None and site_lon is not None:
+    # Check if free attendance is globally allowed
+    allow_free_cfg = await supabase_client.get_system_config("allow_free_attendance")
+    allow_free = allow_free_cfg.get("value", False) if allow_free_cfg else False
+
+    if allow_free:
+        target_lat = user_lat
+        target_lon = user_lon
+        target_name = "Bebas Absen (Anywhere)"
+        radius = 9999999
+    elif is_field and site_lat is not None and site_lon is not None:
         target_lat = site_lat
         target_lon = site_lon
         target_name = "Site Proyek"
     else:
-        # Use HQ location from system_configs
-        hq_config = await supabase_client.get_system_config("hq_location")
-        if not hq_config:
-            raise HTTPException(status_code=503, detail="Konfigurasi lokasi HQ tidak ditemukan. Hubungi Admin.")
-        target_lat = hq_config.get("lat")
-        target_lon = hq_config.get("lon")
-        target_name = hq_config.get("name", "WKN HQ")
-        radius = hq_config.get("radius", 100)
-
-    # Geofencing validation
-    radius = 100  # default
-    if not is_field or site_lat is None:
-        hq_config = await supabase_client.get_system_config("hq_location")
-        if hq_config:
+        # Check if employee's working_location matches any configured working locations
+        working_loc_name = employee.get("working_location", "Head Office")
+        locations_cfg = await supabase_client.get_system_config("working_locations")
+        locations_list = locations_cfg.get("locations", []) if locations_cfg else []
+        
+        matched_loc = None
+        for loc in locations_list:
+            if loc.get("name") == working_loc_name:
+                matched_loc = loc
+                break
+        
+        if matched_loc:
+            target_lat = matched_loc.get("lat")
+            target_lon = matched_loc.get("lon")
+            target_name = matched_loc.get("name")
+            radius = matched_loc.get("radius", 100)
+        else:
+            # Use HQ location from system_configs
+            hq_config = await supabase_client.get_system_config("hq_location")
+            if not hq_config:
+                raise HTTPException(status_code=503, detail="Konfigurasi lokasi HQ tidak ditemukan. Hubungi Admin.")
+            target_lat = hq_config.get("lat")
+            target_lon = hq_config.get("lon")
+            target_name = hq_config.get("name", "WKN HQ")
             radius = hq_config.get("radius", 100)
 
+    # Geofencing validation
     within, distance_m = is_within_radius(user_lat, user_lon, target_lat, target_lon, radius)
 
     if not within:
@@ -186,10 +209,18 @@ async def get_attendance_settings():
                 "radius": 100,
                 "name": "WKN HQ Jakarta"
             }
+        allow_free_cfg = await supabase_client.get_system_config("allow_free_attendance")
+        allow_free = allow_free_cfg.get("value", False) if allow_free_cfg else False
+
+        locations_cfg = await supabase_client.get_system_config("working_locations")
+        locations = locations_cfg.get("locations", []) if locations_cfg else []
+
         return {
             "status": "success",
             "data": {
-                "hq_location": hq_config
+                "hq_location": hq_config,
+                "allow_free_attendance": allow_free,
+                "working_locations": locations
             }
         }
     except Exception as e:

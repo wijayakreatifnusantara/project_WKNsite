@@ -22,7 +22,7 @@ function getDistanceFromLatLonInM(lat1: number, lon1: number, lat2: number, lon2
 interface AttendanceCameraProps {
   type?: 'IN' | 'OUT';
   onCaptureComplete?: (uri: string) => void;
-  userData?: { id: string; name: string; jabatan?: string; is_field_team?: boolean } | null;
+  userData?: { id: string; name: string; jabatan?: string; is_field_team?: boolean; working_location?: string } | null;
 }
 
 export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userData }: AttendanceCameraProps) {
@@ -33,7 +33,12 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
   
   // HQ Config from API
   const [hqLocation, setHqLocation] = useState<{latitude: number, longitude: number, radius: number, name: string} | null>(null);
+  const [allowFree, setAllowFree] = useState<boolean>(false);
+  const [workingLocations, setWorkingLocations] = useState<Array<{name: string, lat: number, lon: number, radius: number}>>([]);
   const [loadingSettings, setLoadingSettings] = useState(true);
+
+  // Target Location (resolved based on employee profile and settings)
+  const [targetLocation, setTargetLocation] = useState<{latitude: number, longitude: number, radius: number, name: string} | null>(null);
 
   // Geofencing state
   const [distance, setDistance] = useState<number | null>(null);
@@ -46,37 +51,67 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
   const cameraRef = useRef<CameraView | null>(null);
   const viewShotRef = useRef<ViewShot | null>(null);
 
-  // Fetch HQ settings from API
+  // Fetch settings from API once on mount
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const res = await fetch(`${API_URL}/attendance/settings`);
         const json = await res.json();
-        if (json.status === 'success' && json.data?.hq_location) {
-          const hq = json.data.hq_location;
-          setHqLocation({
+        if (json.status === 'success') {
+          const data = json.data;
+          const hq = data?.hq_location;
+          const hqLoc = hq ? {
             latitude: hq.lat,
             longitude: hq.lon,
             radius: hq.radius || 100,
             name: hq.name || 'HQ'
-          });
+          } : { latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' };
+          
+          setHqLocation(hqLoc);
+          setAllowFree(!!data?.allow_free_attendance);
+          setWorkingLocations(data?.working_locations || []);
         } else {
           // Default fallback
-          setHqLocation({ latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' });
+          const defaultHQ = { latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' };
+          setHqLocation(defaultHQ);
+          setAllowFree(false);
+          setWorkingLocations([]);
         }
       } catch (e) {
         // If API fails, use defaults so user is not blocked
-        setHqLocation({ latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' });
+        const defaultHQ = { latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' };
+        setHqLocation(defaultHQ);
+        setAllowFree(false);
+        setWorkingLocations([]);
       } finally {
         setLoadingSettings(false);
       }
     };
     fetchSettings();
-  }, [hqLocation]);
+  }, []);
+
+  // Resolve target location based on employee profile and configured custom locations
+  useEffect(() => {
+    if (!hqLocation) return;
+    
+    const employeeLocName = userData?.working_location || 'Head Office';
+    const matched = workingLocations.find(loc => loc.name === employeeLocName);
+    
+    if (matched) {
+      setTargetLocation({
+        latitude: matched.lat,
+        longitude: matched.lon,
+        radius: matched.radius || 100,
+        name: matched.name
+      });
+    } else {
+      setTargetLocation(hqLocation);
+    }
+  }, [hqLocation, workingLocations, userData?.working_location]);
 
   // Fetch location and apply geofencing check
   useEffect(() => {
-    if (!hqLocation) return;
+    if (!targetLocation) return;
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       setLocationPerm(status === 'granted');
@@ -84,19 +119,19 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
         const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
         setLocation(loc.coords);
         
-        // Field team bypass
-        if (isFieldTeam) {
+        // Field team or global allow free bypass
+        if (isFieldTeam || allowFree) {
           setIsInArea(true);
           setDistance(0);
         } else {
           const dist = getDistanceFromLatLonInM(
             loc.coords.latitude, 
             loc.coords.longitude, 
-            hqLocation.latitude, 
-            hqLocation.longitude
+            targetLocation.latitude, 
+            targetLocation.longitude
           );
           setDistance(dist);
-          setIsInArea(dist <= hqLocation.radius);
+          setIsInArea(dist <= targetLocation.radius);
         }
         
         const geocode = await Location.reverseGeocodeAsync({
@@ -112,7 +147,7 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
         }
       }
     })();
-  }, [hqLocation]);
+  }, [targetLocation, isFieldTeam, allowFree]);
 
   if (!permission) {
     return (
@@ -150,11 +185,11 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
       return;
     }
     
-    // Skip geofencing check for field team
-    if (!isFieldTeam && !isInArea) {
+    // Skip geofencing check for field team or when free attendance is enabled
+    if (!isFieldTeam && !allowFree && !isInArea) {
       Alert.alert(
         'Di Luar Jangkauan', 
-        `Anda berada ${distance ? Math.round(distance) : '?'} meter dari ${hqLocation?.name || 'kantor'}. Jarak maksimal adalah ${hqLocation?.radius || 100} meter.`
+        `Anda berada ${distance ? Math.round(distance) : '?'} meter dari ${targetLocation?.name || 'kantor'}. Jarak maksimal adalah ${targetLocation?.radius || 100} meter.`
       );
       return;
     }
@@ -218,16 +253,19 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
         <View style={styles.bottomLeft}>
           <Text style={styles.watermarkTextBold}>Lokasi Absen:</Text>
           <Text style={styles.watermarkText}>{address}</Text>
-          {location && distance !== null && !isFieldTeam && (
+          {location && (
             <Text style={styles.watermarkTextSmall}>
               Lat: {location.latitude.toFixed(5)}, Lng: {location.longitude.toFixed(5)}
-              {'\n'}Jarak: {Math.round(distance)}m dari {hqLocation?.name || 'HQ'}
-            </Text>
-          )}
-          {isFieldTeam && location && (
-            <Text style={styles.watermarkTextSmall}>
-              Lat: {location.latitude.toFixed(5)}, Lng: {location.longitude.toFixed(5)}
-              {'\n'}[Field Team - Geofencing Dinonaktifkan]
+              {'\n'}
+              {allowFree ? (
+                '[Bebas Absen - Geofencing Dinonaktifkan]'
+              ) : isFieldTeam ? (
+                '[Field Team - Geofencing Dinonaktifkan]'
+              ) : distance !== null && targetLocation ? (
+                `Jarak: ${Math.round(distance)}m dari ${targetLocation.name}`
+              ) : (
+                ''
+              )}
             </Text>
           )}
         </View>
@@ -248,22 +286,22 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
             {/* Preview Watermark Transparan saat live kamera */}
             <WatermarkOverlay />
             
-            {/* Geofencing warning banner - only for non-field-team */}
-            {!isFieldTeam && !isInArea && distance !== null && (
+            {/* Geofencing warning banner */}
+            {!isFieldTeam && !allowFree && !isInArea && distance !== null && targetLocation && (
               <View style={styles.geoWarningBanner}>
                 <Text style={styles.geoWarningText}>
-                  DI LUAR JANGKAUAN ({Math.round(distance)} meter dari {hqLocation?.name || 'HQ'})
+                  DI LUAR JANGKAUAN ({Math.round(distance)} meter dari {targetLocation.name})
                 </Text>
               </View>
             )}
             
             <View style={styles.cameraControls}>
               <TouchableOpacity 
-                style={[styles.captureButton, (!isFieldTeam && !isInArea) && { backgroundColor: 'rgba(244, 63, 94, 0.5)' }]} 
+                style={[styles.captureButton, (!isFieldTeam && !allowFree && !isInArea) && { backgroundColor: 'rgba(244, 63, 94, 0.5)' }]} 
                 onPress={takePicture}
-                disabled={isProcessing || (!isFieldTeam && !isInArea)}
+                disabled={isProcessing || (!isFieldTeam && !allowFree && !isInArea)}
               >
-                <View style={[styles.captureButtonInner, (!isFieldTeam && !isInArea) && { backgroundColor: '#f43f5e' }]} />
+                <View style={[styles.captureButtonInner, (!isFieldTeam && !allowFree && !isInArea) && { backgroundColor: '#f43f5e' }]} />
               </TouchableOpacity>
             </View>
           </CameraView>

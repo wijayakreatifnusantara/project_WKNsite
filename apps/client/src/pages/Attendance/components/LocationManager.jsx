@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   IconMapPin, IconBuildingSkyscraper, IconClock, IconLoader2,
   IconCircleCheck, IconAlertCircle, IconEdit, IconDeviceFloppy,
-  IconUsers, IconX, IconArrowLeft
+  IconUsers, IconX, IconArrowLeft, IconPlus, IconTrash
 } from '@tabler/icons-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -225,10 +225,275 @@ const FieldTeamTable = () => {
   );
 };
 
+// ─── Free Attendance Toggle ───────────────────────────────────────────────────
+const FreeAttendanceToggle = () => {
+  const [enabled, setEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_URL}/attendance/settings`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success') {
+          setEnabled(!!d.data.allow_free_attendance);
+        }
+      })
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleToggle = async (val) => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/attendance/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'allow_free_attendance', value: { value: val } }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEnabled(val);
+        setMsg({ type: 'success', text: 'Konfigurasi berhasil disimpan.' });
+      } else {
+        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan.' });
+      }
+    } catch {
+      setMsg({ type: 'error', text: 'Gagal menyimpan. Periksa koneksi.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="flex items-center gap-2 text-slate-400 text-xs py-2"><IconLoader2 size={16} className="animate-spin" /> Memuat status kebijakan...</div>;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-2">
+        <IconMapPin size={16} className="text-[#E31E24]" />
+        <h4 className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Kebijakan Absensi Global</h4>
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-[#f8fafc] border border-slate-100 rounded-2xl gap-4">
+        <div className="space-y-0.5">
+          <p className="text-xs font-black text-slate-700 uppercase tracking-tight">Bebas Absen Di Mana Saja</p>
+          <p className="text-[9px] font-bold text-slate-400">
+            Jika diaktifkan, seluruh karyawan dapat check-in/out dari mana saja tanpa divalidasi geofencing (HQ, Site, Lokasi Kerja).
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <label htmlFor="allow-free-attendance-toggle" className="relative inline-flex items-center cursor-pointer">
+            <input
+              id="allow-free-attendance-toggle"
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => handleToggle(e.target.checked)}
+              disabled={saving}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E31E24]"></div>
+          </label>
+          {msg && (
+            <span className={`text-[8px] font-black uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
+              {msg.text}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Working Locations Manager ────────────────────────────────────────────────
+const WorkingLocationsManager = () => {
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  // Form states
+  const [name, setName] = useState('');
+  const [lat, setLat] = useState('');
+  const [lon, setLon] = useState('');
+  const [radius, setRadius] = useState(100);
+
+  const fetchLocations = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/attendance/settings`);
+      const d = await res.json();
+      if (d.status === 'success' && d.data.working_locations) {
+        setLocations(d.data.working_locations);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLocations();
+  }, [fetchLocations]);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!name.trim() || !lat || !lon) {
+      setMsg({ type: 'error', text: 'Nama, Latitude, dan Longitude wajib diisi.' });
+      return;
+    }
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
+    const radNum = parseInt(radius) || 100;
+
+    if (isNaN(latNum) || isNaN(lonNum)) {
+      setMsg({ type: 'error', text: 'Latitude dan Longitude harus berupa angka.' });
+      return;
+    }
+
+    const newLoc = { name: name.trim(), lat: latNum, lon: lonNum, radius: radNum };
+    const updatedList = [...locations, newLoc];
+
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/attendance/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'working_locations', value: { locations: updatedList } }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLocations(updatedList);
+        setName('');
+        setLat('');
+        setLon('');
+        setRadius(100);
+        setMsg({ type: 'success', text: 'Lokasi kerja berhasil ditambahkan.' });
+      } else {
+        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan.' });
+      }
+    } catch {
+      setMsg({ type: 'error', text: 'Gagal menyimpan. Periksa koneksi.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (indexToDelete) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus lokasi kerja ini?')) return;
+    const updatedList = locations.filter((_, idx) => idx !== indexToDelete);
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/attendance/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'working_locations', value: { locations: updatedList } }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLocations(updatedList);
+        setMsg({ type: 'success', text: 'Lokasi kerja berhasil dihapus.' });
+      } else {
+        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menghapus.' });
+      }
+    } catch {
+      setMsg({ type: 'error', text: 'Gagal menghapus. Periksa koneksi.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const Field = ({ label, id, value, onChange, type = 'text', placeholder }) => (
+    <div>
+      <label htmlFor={id} className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</label>
+      <input
+        id={id} type={type} value={value} onChange={onChange} placeholder={placeholder}
+        className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+      />
+    </div>
+  );
+
+  if (loading) return <div className="flex items-center gap-2 text-slate-400 text-xs py-4"><IconLoader2 size={16} className="animate-spin" /> Memuat daftar lokasi kerja...</div>;
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-2 mb-2">
+        <IconBuildingSkyscraper size={16} className="text-[#E31E24]" />
+        <h4 className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Daftar Lokasi Kerja Custom</h4>
+      </div>
+
+      {/* Add New Location Form */}
+      <form onSubmit={handleAdd} className="p-4 bg-[#f8fafc] border border-slate-100 rounded-2xl space-y-4">
+        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tambah Lokasi Kerja Baru</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Field label="Nama Lokasi" id="loc-name" value={name} onChange={e => setName(e.target.value)} placeholder="Schneider Cikarang" />
+          <Field label="Latitude" id="loc-lat" type="number" value={lat} onChange={e => setLat(e.target.value)} placeholder="-6.2891" />
+          <Field label="Longitude" id="loc-lon" type="number" value={lon} onChange={e => setLon(e.target.value)} placeholder="107.1654" />
+          <Field label="Radius (meter)" id="loc-radius" type="number" value={radius} onChange={e => setRadius(e.target.value)} placeholder="100" />
+        </div>
+        <div className="flex items-center gap-3">
+          <button type="submit" disabled={saving} id="add-loc-btn"
+            className="h-9 px-5 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest flex items-center gap-2 shadow-md hover:bg-[#C1181E] transition-all disabled:opacity-50">
+            <IconPlus size={14} /> Tambah Lokasi
+          </button>
+          {msg && (
+            <div className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
+              {msg.type === 'success' ? <IconCircleCheck size={14} /> : <IconAlertCircle size={14} />}
+              {msg.text}
+            </div>
+          )}
+        </div>
+      </form>
+
+      {/* Table of locations */}
+      {locations.length === 0 ? (
+        <div className="text-center py-6 text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+          <p className="text-[9px] font-black uppercase tracking-widest">Belum ada lokasi kerja custom</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-slate-100">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50 border-b border-slate-100">
+              <tr>
+                {['Nama Lokasi', 'Latitude', 'Longitude', 'Radius (m)', 'Aksi'].map(h => (
+                  <th key={h} className="px-3 py-2 text-[8px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {locations.map((loc, idx) => (
+                <tr key={idx} className="hover:bg-slate-50 transition-all">
+                  <td className="px-3 py-2 text-[9px] font-bold text-slate-800">{loc.name}</td>
+                  <td className="px-3 py-2 text-[9px] font-mono text-slate-500">{loc.lat}</td>
+                  <td className="px-3 py-2 text-[9px] font-mono text-slate-500">{loc.lon}</td>
+                  <td className="px-3 py-2 text-[9px] font-mono text-slate-500">{loc.radius}</td>
+                  <td className="px-3 py-2">
+                    <button
+                      id={`delete-loc-${idx}`}
+                      onClick={() => handleDelete(idx)}
+                      disabled={saving}
+                      className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 font-black text-[8px] uppercase tracking-widest flex items-center gap-1 hover:bg-rose-100 transition-all">
+                      <IconTrash size={12} /> Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 /**
- * T018: LocationManager — Admin UI for managing HQ coordinates and field team site assignments
+ * T018: LocationManager — Admin UI for managing HQ coordinates, custom working locations and field team site assignments
  */
 const LocationManager = ({ onBack }) => {
   return (
@@ -251,9 +516,19 @@ const LocationManager = ({ onBack }) => {
          </div>
       </div>
       
+      {/* Policy Toggle */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <FreeAttendanceToggle />
+      </div>
+
       {/* HQ Config */}
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
         <HQConfigForm />
+      </div>
+
+      {/* Working Locations Custom Manager */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <WorkingLocationsManager />
       </div>
 
       {/* Divider */}

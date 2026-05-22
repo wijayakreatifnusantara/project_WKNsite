@@ -63,7 +63,9 @@ class WKNSupabaseClient:
                     "JOIN DATE": e.get("join_date"),
                     "Contract End Date": e.get("contract_end_date"),
                     "Resign Date": e.get("resign_date"),
-                    "is_resigned": e.get("is_resigned")
+                    "is_resigned": e.get("is_resigned"),
+                    "working_location": e.get("working_location"),
+                    "Working Location": e.get("working_location")
                 })
             
             result = {
@@ -496,7 +498,7 @@ class WKNSupabaseClient:
             return None
         try:
             res = self.client.table("employees") \
-                .select("id, name, status, is_field_team, assigned_site_lat, assigned_site_long") \
+                .select("id, name, status, is_field_team, assigned_site_lat, assigned_site_long, working_location") \
                 .eq("id", employee_id) \
                 .execute()
             if res.data:

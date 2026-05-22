@@ -51,6 +51,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
   const [result, setResult] = useState(null);
   const [settings, setSettings] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [employeeDetail, setEmployeeDetail] = useState(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -63,6 +64,20 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
       .then(d => { if (d.status === 'success') setSettings(d.data); })
       .catch(() => setSettings({ hq_location: { name: 'WKN HQ', radius: 100 } }));
   }, []);
+
+  useEffect(() => {
+    if (employeeId) {
+      fetch(`${API_URL}/employees?q=${employeeId}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.status === 'success' && d.data && d.data.length > 0) {
+            const matched = d.data.find(e => e['EMPLOYEE ID'] === employeeId);
+            if (matched) setEmployeeDetail(matched);
+          }
+        })
+        .catch(err => console.error('Gagal memuat data karyawan:', err));
+    }
+  }, [employeeId]);
 
   const { can, PERMISSIONS } = useAuth();
   const hasCheckInPerm = can(PERMISSIONS.CAN_CHECK_IN);
@@ -109,8 +124,23 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
     label: 'TERBATAS', sublabel: 'Akses absen tidak tersedia', color: 'text-slate-400',
   } : (STATUS_CONFIG[status] || STATUS_CONFIG.idle);
 
-  const hqName = settings?.hq_location?.name || 'WKN HQ';
-  const hqRadius = settings?.hq_location?.radius || 100;
+  let hqName = settings?.hq_location?.name || 'WKN HQ';
+  let hqRadius = settings?.hq_location?.radius || 100;
+
+  if (settings?.allow_free_attendance) {
+    hqName = 'Bebas Absen (Anywhere)';
+    hqRadius = 'Tanpa Batas';
+  } else if (!isFieldTeam && employeeDetail && settings?.working_locations) {
+    const matchedLoc = settings.working_locations.find(
+      loc => loc.name === (employeeDetail.working_location || employeeDetail['Working Location'])
+    );
+    if (matchedLoc) {
+      hqName = matchedLoc.name;
+      hqRadius = matchedLoc.radius;
+    }
+  }
+
+  const formattedRadius = typeof hqRadius === 'number' ? `${hqRadius}m` : hqRadius;
   const canCheckIn = hasCheckInPerm && ['idle', 'error', 'out_of_range'].includes(status);
 
   const fmtTime = d => d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -215,7 +245,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
           </div>
           <div className="ml-auto text-right">
             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Radius</p>
-            <p className="text-[11px] font-black text-slate-700">{hqRadius}m</p>
+            <p className="text-[11px] font-black text-slate-700">{formattedRadius}</p>
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2 pt-2 border-t border-slate-100">

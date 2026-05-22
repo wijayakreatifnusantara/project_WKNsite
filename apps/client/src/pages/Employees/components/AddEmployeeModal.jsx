@@ -121,6 +121,20 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const getFieldStyle = (disabled) => 
     `${inputStyle} ${disabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200/60 shadow-none' : ''}`;
 
+  const [workingLocations, setWorkingLocations] = useState(['Head Office']);
+
+  React.useEffect(() => {
+    fetch(`${API_URL}/attendance/settings`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success' && d.data.working_locations) {
+          const locations = d.data.working_locations.map(loc => loc.name);
+          setWorkingLocations(locations);
+        }
+      })
+      .catch(err => console.error('Failed to load working locations:', err));
+  }, []);
+
   React.useEffect(() => {
     fetch(`${API_URL}/organizations?active_only=true`)
       .then(r => r.json())
@@ -833,7 +847,11 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     </select>
                   </InputWrapper>
                   <InputWrapper label="Working Location" icon={IconMapPin}>
-                    <input name="working_location" value={formData.working_location} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                    <select name="working_location" value={formData.working_location} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
+                      {Array.from(new Set(['Head Office', formData.working_location, ...workingLocations].filter(Boolean))).map(locName => (
+                        <option key={locName} value={locName}>{locName}</option>
+                      ))}
+                    </select>
                   </InputWrapper>
                   <InputWrapper label="Join Date" icon={IconCalendar}>
                     <ProfessionalDatePicker 
