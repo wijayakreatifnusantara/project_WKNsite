@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   IconArrowLeft,
   IconCalendarEvent,
@@ -11,12 +11,71 @@ import {
   IconCheck,
   IconBuildingSkyscraper,
   IconHierarchy2,
-  IconChevronDown
+  IconChevronDown,
+  IconX
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import AttendanceEditModal from './components/AttendanceEditModal';
+
+const CustomDropdown = ({ value, onChange, options, placeholder, icon: Icon, disabled, activeColorClass, activeBorderClass, activeRingClass, onClear }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className={`relative flex-1 max-w-[240px] min-w-[120px] ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+      <div 
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm transition-all cursor-pointer ${disabled ? 'bg-slate-50 border-slate-200' : `${activeColorClass} ${activeBorderClass} ${isOpen ? activeRingClass : ''}`}`}
+      >
+        <Icon size={16} className={`shrink-0 ${disabled ? 'text-slate-400' : (value ? (activeColorClass.includes('white') ? 'text-[#E31E24]' : 'text-slate-600') : 'text-slate-500')}`} />
+        <span className={`font-bold text-[10px] lg:text-[11px] uppercase truncate flex-1 ${disabled ? 'text-slate-500' : (value ? 'text-slate-800' : 'text-slate-600')}`}>
+          {value ? (options.find(o => o.value === value)?.label || value) : placeholder}
+        </span>
+        {value && onClear ? (
+          <div 
+            onClick={(e) => { e.stopPropagation(); onClear(); setIsOpen(false); }}
+            className="p-1 rounded-md hover:bg-slate-200/50 text-slate-400 hover:text-[#E31E24] transition-colors flex items-center justify-center shrink-0"
+          >
+            <IconX size={14} />
+          </div>
+        ) : (
+          <IconChevronDown size={14} className={`shrink-0 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        )}
+      </div>
+
+      {isOpen && !disabled && (
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="max-h-[240px] overflow-y-auto custom-scrollbar p-1 flex flex-col gap-0.5">
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                className={`px-3 py-2.5 rounded-lg text-[10px] lg:text-[11px] font-bold uppercase cursor-pointer transition-colors ${value === opt.value ? 'bg-[#E31E24]/10 text-[#E31E24]' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+              >
+                {opt.label}
+              </div>
+            ))}
+            {options.length === 0 && (
+              <div className="px-3 py-3 text-center text-[10px] text-slate-400 font-bold uppercase">No Options</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const AttendanceCalendar = () => {
   const navigate = useNavigate();
@@ -173,54 +232,46 @@ const AttendanceCalendar = () => {
 
           <div className="flex items-center gap-2 lg:gap-3 flex-1 justify-end min-w-0 ml-4">
              {/* Organization Selector */}
-             <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-slate-100 transition-all flex-1 max-w-[240px] min-w-[120px]">
-                <IconBuildingSkyscraper size={16} className="text-slate-400 shrink-0" />
-                <select 
-                  value={selectedOrg}
-                  onChange={(e) => { setSelectedOrg(e.target.value); setSelectedDept(''); }}
-                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] lg:text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-full truncate appearance-none"
-                >
-                  <option value="" disabled>SELECT ORG</option>
-                  {uniqueOrgs.map(org => (
-                    <option key={org} value={org}>{org}</option>
-                  ))}
-                </select>
-                <IconChevronDown size={14} className="text-slate-400 shrink-0 pointer-events-none" />
-             </div>
+             <CustomDropdown
+               value={selectedOrg}
+               onChange={(val) => { setSelectedOrg(val); setSelectedDept(''); }}
+               onClear={() => { setSelectedOrg(''); setSelectedDept(''); setSelectedEmployee(''); }}
+               options={uniqueOrgs.map(o => ({ value: o, label: o }))}
+               placeholder="SELECT ORG"
+               icon={IconBuildingSkyscraper}
+               disabled={false}
+               activeColorClass="bg-slate-50"
+               activeBorderClass="border-slate-200"
+               activeRingClass="border-slate-300 ring-2 ring-slate-100"
+             />
 
              {/* Department Selector */}
-             <div className={`flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-slate-100 transition-all flex-1 max-w-[240px] min-w-[120px] ${!selectedOrg ? 'opacity-50 cursor-not-allowed bg-slate-100/50' : ''}`}>
-                <IconHierarchy2 size={16} className="text-slate-400 shrink-0" />
-                <select 
-                  value={selectedDept}
-                  onChange={(e) => setSelectedDept(e.target.value)}
-                  disabled={!selectedOrg}
-                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] lg:text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-full truncate appearance-none disabled:cursor-not-allowed"
-                >
-                  <option value="" disabled>SELECT DEPT</option>
-                  {uniqueDepts.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
-                <IconChevronDown size={14} className="text-slate-400 shrink-0 pointer-events-none" />
-             </div>
+             <CustomDropdown
+               value={selectedDept}
+               onChange={(val) => setSelectedDept(val)}
+               onClear={() => { setSelectedDept(''); setSelectedEmployee(''); }}
+               options={uniqueDepts.map(d => ({ value: d, label: d }))}
+               placeholder="SELECT DEPT"
+               icon={IconHierarchy2}
+               disabled={!selectedOrg}
+               activeColorClass="bg-slate-50"
+               activeBorderClass="border-slate-200"
+               activeRingClass="border-slate-300 ring-2 ring-slate-100"
+             />
 
              {/* Employee Selector */}
-             <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm focus-within:ring-2 transition-all flex-1 max-w-[260px] min-w-[130px] ${selectedDept ? 'bg-white border-[#E31E24]/30 focus-within:border-[#E31E24] focus-within:ring-[#E31E24]/10' : 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed bg-slate-100/50'}`}>
-                <IconUser size={16} className={`${selectedDept ? 'text-[#E31E24]' : 'text-slate-400'} shrink-0`} />
-                <select 
-                  value={selectedEmployee}
-                  onChange={(e) => setSelectedEmployee(e.target.value)}
-                  disabled={!selectedDept}
-                  className={`bg-transparent border-none font-black text-[10px] lg:text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-full truncate appearance-none disabled:cursor-not-allowed ${selectedDept ? 'text-slate-800' : 'text-slate-700'}`}
-                >
-                  <option value="" disabled>SELECT PERSONNEL</option>
-                  {filteredEmployees.map(emp => (
-                    <option key={emp.id} value={emp.id}>{emp.name}</option>
-                  ))}
-                </select>
-                <IconChevronDown size={14} className={`${selectedDept ? 'text-[#E31E24]/50' : 'text-slate-400'} shrink-0 pointer-events-none`} />
-             </div>
+             <CustomDropdown
+               value={selectedEmployee}
+               onChange={(val) => setSelectedEmployee(val)}
+               onClear={() => setSelectedEmployee('')}
+               options={filteredEmployees.map(e => ({ value: e.id, label: e.name }))}
+               placeholder="SELECT PERSONNEL"
+               icon={IconUser}
+               disabled={!selectedDept}
+               activeColorClass="bg-white"
+               activeBorderClass="border-[#E31E24]/30"
+               activeRingClass="border-[#E31E24] ring-2 ring-[#E31E24]/10"
+             />
           </div>
         </div>
 
@@ -246,7 +297,7 @@ const AttendanceCalendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <div className="flex-1 grid grid-cols-7 grid-rows-[auto_repeat(6,minmax(0,1fr))] bg-slate-100 gap-[1px]">
+          <div className="flex-1 min-h-0 grid grid-cols-7 grid-rows-[auto_repeat(6,minmax(0,1fr))] bg-slate-100 gap-[1px]">
             {/* Days Header */}
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
               <div key={day} className="bg-white p-2 text-center">
@@ -282,7 +333,7 @@ const AttendanceCalendar = () => {
                   </div>
 
                   {record && (
-                    <div className={`mt-auto p-1.5 rounded-lg border flex flex-col shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
+                    <div className={`absolute bottom-1.5 left-1.5 right-1.5 p-1.5 rounded-lg border flex flex-col shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-transform group-hover:scale-[1.02] z-10 bg-white/90 backdrop-blur-sm ${getStatusColor(record.status)}`}>
                       <div className="flex justify-between items-center px-0.5 mb-1">
                         <span className="text-[8.5px] font-black uppercase tracking-wider">{record.status}</span>
                         <IconCheck size={10} className="opacity-70" />
