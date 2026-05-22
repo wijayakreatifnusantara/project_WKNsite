@@ -5,6 +5,9 @@ Jalankan file SQL di **Supabase Dashboard → SQL Editor** (satu file per ekseku
 | File | Deskripsi |
 |------|-----------|
 | `001_create_positions_table.sql` | Tabel `positions`, index, RLS, trigger `updated_at` |
+| `002_update_organizations_pic.sql` | Kolom detail PIC (`pic_name`, `pic_email`, `pic_phone`) di tabel `organizations` |
+| `003_update_employees.sql` | Kolom baru untuk onboarding tingkat lanjut di tabel `employees` |
+| `004_cascade_employee_id.sql` | Pengaturan kekunci asing (foreign keys) dengan CASCADE ON UPDATE/DELETE |
 
 ## Verifikasi & seed data (tanpa SQL Editor)
 

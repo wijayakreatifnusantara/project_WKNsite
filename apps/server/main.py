@@ -70,38 +70,54 @@ def api_root():
     return {"status": "online", "message": "WKNsite API is running"}
 
 # Serve static files (UI) from the client directory
-CLIENT_DIR = os.path.join(os.path.dirname(__file__), "..", "client")
-LEGACY_CLIENT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "client_legacy")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CLIENT_DIST_DIR = os.path.join(BASE_DIR, "apps", "client", "dist")
+LEGACY_CLIENT_DIR = os.path.join(BASE_DIR, "archive", "client_legacy")
 
-def mount_static(app, path, directory):
-    if os.path.exists(directory):
-        app.mount(path, StaticFiles(directory=directory), name=path.strip("/"))
-    else:
-        # Try legacy directory as fallback
-        legacy_dir = os.path.join(LEGACY_CLIENT_DIR, path.strip("/"))
-        if os.path.exists(legacy_dir):
-            app.mount(path, StaticFiles(directory=legacy_dir), name=path.strip("/"))
+# Support for React SPA (Single Page Application) Routing in production
+if os.path.exists(CLIENT_DIST_DIR):
+    assets_dir = os.path.join(CLIENT_DIST_DIR, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
-mount_static(app, "/js", os.path.join(CLIENT_DIR, "js"))
-mount_static(app, "/css", os.path.join(CLIENT_DIR, "css"))
-mount_static(app, "/assets", os.path.join(CLIENT_DIR, "assets"))
-mount_static(app, "/lib", os.path.join(CLIENT_DIR, "lib"))
+    @app.get("/")
+    def read_root():
+        from fastapi.responses import FileResponse
+        return FileResponse(os.path.join(CLIENT_DIST_DIR, "index.html"))
 
-@app.get("/style.css")
-def get_style():
-    from fastapi.responses import FileResponse
-    path = os.path.join(CLIENT_DIR, "css", "style.css")
-    if not os.path.exists(path):
-        path = os.path.join(LEGACY_CLIENT_DIR, "css", "style.css")
-    return FileResponse(path)
+    @app.get("/{catchall:path}")
+    def read_catchall(catchall: str):
+        from fastapi.responses import FileResponse
+        if catchall.startswith("api"):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Not Found")
+        
+        file_path = os.path.join(CLIENT_DIST_DIR, catchall)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+            
+        return FileResponse(os.path.join(CLIENT_DIST_DIR, "index.html"))
+else:
+    # Fallback to legacy client if build does not exist
+    def mount_static(app, path, directory):
+        if os.path.exists(directory):
+            app.mount(path, StaticFiles(directory=directory), name=path.strip("/"))
 
-@app.get("/")
-def read_root():
-    from fastapi.responses import FileResponse
-    path = os.path.join(CLIENT_DIR, "index.html")
-    if not os.path.exists(path):
-        path = os.path.join(LEGACY_CLIENT_DIR, "index.html")
-    return FileResponse(path)
+    if os.path.exists(LEGACY_CLIENT_DIR):
+        mount_static(app, "/js", os.path.join(LEGACY_CLIENT_DIR, "js"))
+        mount_static(app, "/css", os.path.join(LEGACY_CLIENT_DIR, "css"))
+        mount_static(app, "/assets", os.path.join(LEGACY_CLIENT_DIR, "assets"))
+        mount_static(app, "/lib", os.path.join(LEGACY_CLIENT_DIR, "lib"))
+
+        @app.get("/style.css")
+        def get_style():
+            from fastapi.responses import FileResponse
+            return FileResponse(os.path.join(LEGACY_CLIENT_DIR, "css", "style.css"))
+
+        @app.get("/")
+        def read_root():
+            from fastapi.responses import FileResponse
+            return FileResponse(os.path.join(LEGACY_CLIENT_DIR, "index.html"))
 
 if __name__ == "__main__":
     import uvicorn
