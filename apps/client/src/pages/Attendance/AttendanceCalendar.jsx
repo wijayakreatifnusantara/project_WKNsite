@@ -315,7 +315,8 @@ const AttendanceCalendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <div className="flex-1 min-h-0 grid grid-cols-7 grid-rows-[auto_repeat(6,minmax(0,1fr))] bg-slate-100 gap-[1px]">
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar bg-slate-100">
+            <div className="min-h-full grid grid-cols-7 grid-rows-[auto_repeat(6,minmax(85px,1fr))] bg-slate-100 gap-[1px]">
             {/* Days Header */}
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
               <div key={day} className="bg-white p-2 text-center">
@@ -341,7 +342,7 @@ const AttendanceCalendar = () => {
                 <div 
                   key={day} 
                   onClick={() => handleDayClick(day)}
-                  className="bg-white p-1.5 min-h-0 h-full cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col overflow-hidden"
+                  className="bg-white p-1.5 min-h-0 h-full cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col"
                 >
                   <div className="flex justify-between items-start mb-1 shrink-0">
                     <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-md' : (isWeekend ? 'text-[#E31E24]' : 'text-slate-600')}`}>
@@ -379,6 +380,7 @@ const AttendanceCalendar = () => {
             {Array.from({ length: 42 - (firstDayOfMonth + daysInMonth) }).map((_, index) => (
               <div key={`empty-end-${index}`} className="bg-white/50 p-2 min-h-0" />
             ))}
+            </div>
           </div>
         </div>
       </div>
