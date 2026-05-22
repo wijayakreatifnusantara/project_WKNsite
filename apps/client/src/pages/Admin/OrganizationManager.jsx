@@ -57,7 +57,23 @@ const OrganizationManager = () => {
       const response = await fetch(`${API_URL}/organizations?active_only=false`);
       const data = await response.json();
       if (data.status === 'success') {
-        setOrganizations(data.data || []);
+        const orgs = data.data || [];
+        setOrganizations(orgs);
+        // Auto-fetch departments for ALL orgs so DEPT count shows immediately (no click needed)
+        if (orgs.length > 0) {
+          Promise.all(
+            orgs.map(org =>
+              fetch(`${API_URL}/organizations/${org.id}/departments?active_only=false`)
+                .then(r => r.json())
+                .then(d => ({ orgId: org.id, depts: d.status === 'success' ? (d.data || []) : [] }))
+                .catch(() => ({ orgId: org.id, depts: [] }))
+            )
+          ).then(results => {
+            const deptMap = {};
+            results.forEach(({ orgId, depts }) => { deptMap[orgId] = depts; });
+            setDepartments(deptMap);
+          });
+        }
       } else {
         showToast('error', data.detail || 'Gagal memuat organisasi');
       }
@@ -139,9 +155,8 @@ const OrganizationManager = () => {
       setExpandedOrg(null);
     } else {
       setExpandedOrg(orgId);
-      if (!departments[orgId]) {
-        fetchDepartments(orgId);
-      }
+      // Always refresh dept list on expand to ensure data is up to date
+      fetchDepartments(orgId);
     }
   };
 
