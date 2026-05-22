@@ -293,6 +293,73 @@ async def delete_position(pos_id: str):
 
 
 
+@router.post("/organizations/migrate-positions")
+async def migrate_positions_from_employees():
+    """
+    One-time data migration: create positions rows from employees.job_position
+    when a matching active position does not yet exist for that department.
+    """
+    try:
+        if not supabase_client.client:
+            raise HTTPException(status_code=503, detail="Database tidak tersedia")
+
+        emp_res = supabase_client.client.table("employees") \
+            .select("id, job_position, job_level, department_id") \
+            .not_.is_("department_id", "null") \
+            .not_.is_("job_position", "null") \
+            .execute()
+
+        pos_res = supabase_client.client.table("positions") \
+            .select("id, name, department_id, is_active") \
+            .execute()
+
+        lookup = {
+            f"{p['department_id']}::{p['name'].strip().lower()}"
+            for p in (pos_res.data or [])
+            if p.get("is_active") and p.get("name")
+        }
+
+        created = 0
+        skipped = 0
+        seen = set()
+
+        for emp in emp_res.data or []:
+            name = (emp.get("job_position") or "").strip()
+            dept_id = emp.get("department_id")
+            if not name or not dept_id:
+                skipped += 1
+                continue
+
+            key = f"{dept_id}::{name.lower()}"
+            if key in lookup or key in seen:
+                skipped += 1
+                continue
+            seen.add(key)
+
+            insert_data = {
+                "department_id": dept_id,
+                "name": name,
+                "level": emp.get("job_level"),
+                "is_active": True,
+            }
+            result = await supabase_client.create_position(insert_data)
+            if result:
+                lookup.add(key)
+                created += 1
+            else:
+                skipped += 1
+
+        return {
+            "status": "success",
+            "message": f"Migrasi posisi selesai: {created} dibuat, {skipped} dilewati.",
+            "data": {"created": created, "skipped": skipped},
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/organizations/migrate-employees")
 async def migrate_employees_to_org_id():
     """

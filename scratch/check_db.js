@@ -6,12 +6,11 @@ const supabaseAnonKey = "sb_secret_vnet6vBBxmFN9YvAE287RA_UORmiJ0i"; // Using th
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 async function check() {
-  const { data, error } = await supabase.from('employees').select('*').limit(1);
+  const { data, error } = await supabase.from('employees').select('id, name, department_id, departments(name)').not('department_id', 'is', null);
   if (error) {
     console.error('Error:', error);
   } else {
-    console.log('Columns:', Object.keys(data[0] || {}));
-    console.log('Sample data:', data[0]);
+    console.log('Employees with departments:', data);
   }
 }
 

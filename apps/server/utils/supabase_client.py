@@ -1,14 +1,18 @@
 import os
 from typing import List, Dict, Any, Optional
 from supabase import create_client, Client
+from dotenv import load_dotenv
+
+# Memuat environment variables dari file .env
+load_dotenv()
 
 class WKNSupabaseClient:
     """Official Supabase client for WKNsite operations - Direct replacement for Sheets"""
     
     def __init__(self):
-        # Menggunakan kredensial yang Anda berikan
-        self.url = "https://vlpaszzbebgrfppklqml.supabase.co"
-        self.key = "sb_secret_vnet6vBBxmFN9YvAE287RA_UORmiJ0i"
+        # Membaca kredensial dari environment variables
+        self.url = os.getenv("SUPABASE_URL", "https://vlpaszzbebgrfppklqml.supabase.co")
+        self.key = os.getenv("SUPABASE_KEY", "sb_secret_vnet6vBBxmFN9YvAE287RA_UORmiJ0i")
         
         try:
             self.client: Client = create_client(self.url, self.key)
@@ -113,6 +117,7 @@ class WKNSupabaseClient:
         if not self.client: return None
         log_path = "e:/project_WKNsite/apps/server/auth_debug.log"
         try:
+            from utils.security import verify_password
             clean_username = username.strip()
             clean_password = password.strip()
             
@@ -131,7 +136,7 @@ class WKNSupabaseClient:
                 return None
             
             user = response.data[0]
-            if user.get("password") == clean_password:
+            if verify_password(clean_password, user.get("password")):
                 with open(log_path, "a") as f:
                     f.write(f"[SUCCESS] Login OK for {clean_username}\n")
                 
@@ -152,7 +157,6 @@ class WKNSupabaseClient:
 
                 return {
                     "Username": user.get("username"),
-                    "Password": user.get("password"),
                     "Full Name": user.get("full_name"),
                     "Role": user.get("role"),
                     "Status": user.get("status"),

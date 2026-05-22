@@ -7,6 +7,20 @@ const AuthContext = createContext({});
 // Fallback to localhost if env is missing
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Konfigurasi Axios Interceptor Global untuk otomatis menyisipkan JWT Token
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('wkn_auth_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,13 +28,20 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check for saved session in localStorage
     const savedUser = localStorage.getItem('wkn_auth_user');
-    if (savedUser) {
+    const savedToken = localStorage.getItem('wkn_auth_token');
+    
+    if (savedUser && savedToken) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (err) {
         console.error('Failed to restore auth session:', err);
         localStorage.removeItem('wkn_auth_user');
+        localStorage.removeItem('wkn_auth_token');
       }
+    } else {
+      // Bersihkan jika salah satu hilang untuk mencegah desinkronisasi sesi
+      localStorage.removeItem('wkn_auth_user');
+      localStorage.removeItem('wkn_auth_token');
     }
     setLoading(false);
   }, []);
@@ -34,6 +55,8 @@ export const AuthProvider = ({ children }) => {
 
       if (response.data.status === 'success') {
         const rawUser = response.data.user;
+        const token = response.data.token;
+        
         // Map backend Uppercase keys to lowercase for frontend compatibility
         const userData = {
           username: rawUser.Username,
@@ -43,8 +66,11 @@ export const AuthProvider = ({ children }) => {
           employee_id: rawUser.employee_id,
           is_field_team: rawUser.is_field_team
         };
+        
         setUser(userData);
         localStorage.setItem('wkn_auth_user', JSON.stringify(userData));
+        localStorage.setItem('wkn_auth_token', token); // Simpan JWT Token dengan aman
+        
         return userData;
       } else {
         throw new Error(response.data.message || 'Username atau password salah.');
@@ -58,6 +84,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setUser(null);
     localStorage.removeItem('wkn_auth_user');
+    localStorage.removeItem('wkn_auth_token'); // Hapus token saat logout
   };
 
   const can = (permission) => {

@@ -3,11 +3,12 @@ from models.employee import EmployeeCreate, Employee
 from utils.supabase_client import supabase_client
 from utils.ai_error_handler import ai_error_handler
 from typing import Optional, List, Dict, Any
+from utils.jwt_handler import require_admin
 
 router = APIRouter()
 
 @router.post("/employees", response_model=Employee)
-async def create_employee(employee: EmployeeCreate):
+async def create_employee(employee: EmployeeCreate, current_user: dict = Depends(require_admin)):
     try:
         # Map Pydantic model to Spreadsheet Headers
         employee_dict = employee.dict()
@@ -101,7 +102,7 @@ async def create_employee(employee: EmployeeCreate):
         )
 
 @router.get("/employees")
-async def get_employees(q: Optional[str] = None, page: int = 1, size: int = 50):
+async def get_employees(q: Optional[str] = None, page: int = 1, size: int = 50, current_user: dict = Depends(require_admin)):
     try:
         # Optimized: Pagination and Filtering handled at database level
         result = await supabase_client.get_employees(q=q, page=page, page_size=size)
@@ -110,7 +111,7 @@ async def get_employees(q: Optional[str] = None, page: int = 1, size: int = 50):
         raise HTTPException(status_code=500, detail=f"Error fetching employees: {str(e)}")
 
 @router.put("/employees/{employee_id}", response_model=Employee)
-async def update_employee(employee_id: str, employee: EmployeeCreate):
+async def update_employee(employee_id: str, employee: EmployeeCreate, current_user: dict = Depends(require_admin)):
     try:
         employee_dict = employee.dict()
         header_map = {
@@ -182,7 +183,7 @@ async def update_employee(employee_id: str, employee: EmployeeCreate):
         raise HTTPException(status_code=400, detail=f"Error updating employee: {str(e)}")
 
 @router.delete("/employees/{employee_id}")
-async def delete_employee(employee_id: str):
+async def delete_employee(employee_id: str, current_user: dict = Depends(require_admin)):
     try:
         success = await supabase_client.delete_employee(employee_id)
         if not success:

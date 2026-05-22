@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, field_validator, ValidationInfo
 from typing import Optional
 from utils.supabase_client import supabase_client
 from utils.geofencing import is_within_radius, calculate_late_minutes
+from utils.jwt_handler import get_current_user, require_admin
 
 router = APIRouter()
 
@@ -45,7 +46,7 @@ class SiteAssignRequest(BaseModel):
 # ─── Existing Endpoints ────────────────────────────────────────────────────────
 
 @router.get("/attendance/summary/today")
-async def get_today_summary():
+async def get_today_summary(current_user: dict = Depends(get_current_user)):
     """Get today's attendance summary"""
     try:
         summary = await supabase_client.get_attendance_summary_today()
@@ -54,7 +55,7 @@ async def get_today_summary():
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/attendance/analytics/trends")
-async def get_attendance_trends(period: str = "2026-05"):
+async def get_attendance_trends(period: str = "2026-05", current_user: dict = Depends(require_admin)):
     """Get attendance trends for analytics"""
     try:
         trends = await supabase_client.get_attendance_trends(period)
@@ -66,7 +67,7 @@ async def get_attendance_trends(period: str = "2026-05"):
 # ─── New Endpoints: Geofencing & ESS ──────────────────────────────────────────
 
 @router.post("/attendance/check-in")
-async def ess_check_in(body: CheckInRequest):
+async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_current_user)):
     """
     T010, T014: ESS Check-in endpoint with geofencing validation.
     
@@ -79,6 +80,14 @@ async def ess_check_in(body: CheckInRequest):
     employee_id = body.employee_id
     user_lat = body.latitude
     user_lon = body.longitude
+
+    # VALIDASI KEAMANAN: Karyawan biasa HANYA boleh absen untuk dirinya sendiri!
+    user_role = current_user.get("role", "").lower()
+    if user_role not in ["admin", "owner"] and current_user.get("employee_id") != employee_id:
+        raise HTTPException(
+            status_code=403, 
+            detail="Akses ditolak. Anda tidak diperbolehkan melakukan absensi atas nama karyawan lain."
+        )
 
     # Fetch employee data (includes is_field_team and site coordinates)
     employee = await supabase_client.get_employee_by_id(employee_id)
@@ -202,7 +211,7 @@ async def ess_check_in(body: CheckInRequest):
 
 
 @router.get("/attendance/settings")
-async def get_attendance_settings():
+async def get_attendance_settings(current_user: dict = Depends(get_current_user)):
     """
     T013: Get current location configuration (HQ coordinates & radius).
     Used by frontend CheckInCard to display target location info.
@@ -236,7 +245,7 @@ async def get_attendance_settings():
 
 
 @router.put("/attendance/settings")
-async def update_attendance_settings(body: LocationConfigRequest):
+async def update_attendance_settings(body: LocationConfigRequest, current_user: dict = Depends(require_admin)):
     """
     T016: Update location configuration (Admin only).
     Saves new HQ coordinates or other settings to system_configs table.
@@ -256,7 +265,7 @@ async def update_attendance_settings(body: LocationConfigRequest):
 
 
 @router.put("/attendance/employees/{employee_id}/site")
-async def assign_employee_site(employee_id: str, body: SiteAssignRequest):
+async def assign_employee_site(employee_id: str, body: SiteAssignRequest, current_user: dict = Depends(require_admin)):
     """
     T017: Assign site coordinates to a field team member.
     Updates employees.assigned_site_lat, assigned_site_long, is_field_team, and working_location.
@@ -290,7 +299,7 @@ async def assign_employee_site(employee_id: str, body: SiteAssignRequest):
 
 
 @router.get("/attendance/late-alerts")
-async def get_late_alerts(days: int = 30, threshold: int = 3):
+async def get_late_alerts(days: int = 30, threshold: int = 3, current_user: dict = Depends(require_admin)):
     """
     T021: Get employees flagged for excessive late arrivals.
     Returns employees with more than `threshold` late check-ins in the last `days` days.

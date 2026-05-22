@@ -1,14 +1,15 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from utils.supabase_client import supabase_client
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
 from utils.leave_logic import calculate_working_days
+from utils.jwt_handler import get_current_user, require_admin
 
 router = APIRouter()
 
 @router.get("/leave/requests")
-async def get_leave_requests(status: str = None):
-    """Fetch all leave requests"""
+async def get_leave_requests(status: str = None, current_user: dict = Depends(require_admin)):
+    """Fetch all leave requests (Admin only)"""
     try:
         query = supabase_client.client.table("leave_requests").select("*")
         if status:
@@ -20,8 +21,8 @@ async def get_leave_requests(status: str = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/leave/balances")
-async def get_leave_balances():
-    """Fetch leave balances for all employees"""
+async def get_leave_balances(current_user: dict = Depends(require_admin)):
+    """Fetch leave balances for all employees (Admin only)"""
     try:
         res = supabase_client.client.table("employees").select("id, employee_id, name, annual_leave_balance").execute()
         return {"status": "success", "data": res.data}
@@ -29,9 +30,19 @@ async def get_leave_balances():
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/leave/request")
-async def create_leave_request(payload: Dict[str, Any]):
-    """Submit a new leave request"""
+async def create_leave_request(payload: Dict[str, Any], current_user: dict = Depends(get_current_user)):
+    """Submit a new leave request (Employees or Admin)"""
     try:
+        employee_id = payload.get("employee_id")
+        
+        # VALIDASI KEAMANAN: Karyawan biasa HANYA boleh mengajukan cuti untuk dirinya sendiri!
+        user_role = current_user.get("role", "").lower()
+        if user_role not in ["admin", "owner"] and current_user.get("employee_id") != employee_id:
+            raise HTTPException(
+                status_code=403, 
+                detail="Akses ditolak. Anda tidak diperbolehkan mengajukan cuti atas nama karyawan lain."
+            )
+
         start_date = payload.get("start_date")
         end_date = payload.get("end_date")
         
@@ -47,12 +58,14 @@ async def create_leave_request(payload: Dict[str, Any]):
         
         res = supabase_client.client.table("leave_requests").insert(record).execute()
         return {"status": "success", "data": res.data[0]}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.patch("/leave/approve/{request_id}")
-async def approve_leave_request(request_id: str, payload: Dict[str, Any]):
-    """Approve or reject a leave request"""
+async def approve_leave_request(request_id: str, payload: Dict[str, Any], current_user: dict = Depends(require_admin)):
+    """Approve or reject a leave request (Admin only)"""
     try:
         status = payload.get("status") # Approved or Rejected
         admin_id = payload.get("admin_id")

@@ -2,13 +2,14 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Dict, Any
 from utils.supabase_client import supabase_client
 from utils.payroll_calc import calculate_payroll
+from utils.jwt_handler import require_admin
 
 router = APIRouter()
 
 @router.get("/payroll/calculate")
-async def simulate_payroll(period: str):
+async def simulate_payroll(period: str, current_user: dict = Depends(require_admin)):
     """
-    Simulate payroll for all active employees for a given period with Attendance Integration
+    Simulate payroll for all active employees for a given period with Attendance Integration (Admin only)
     """
     try:
         # Fetch all active employees
@@ -50,9 +51,9 @@ async def simulate_payroll(period: str):
 
 
 @router.get("/payroll/history")
-async def get_payroll_history(period: str = None):
+async def get_payroll_history(period: str = None, current_user: dict = Depends(require_admin)):
     """
-    Fetch historical payroll records
+    Fetch historical payroll records (Admin only)
     """
     try:
         query = supabase_client.client.table("payroll_history").select("*, employees(name)")
@@ -66,9 +67,9 @@ async def get_payroll_history(period: str = None):
         return {"status": "error", "message": "Payroll history table not found or error: " + str(e), "data": []}
 
 @router.post("/payroll/finalize")
-async def finalize_payroll(period: str, payroll_data: List[Dict[str, Any]]):
+async def finalize_payroll(period: str, payroll_data: List[Dict[str, Any]], current_user: dict = Depends(require_admin)):
     """
-    Save calculated payroll to history
+    Save calculated payroll to history (Admin only)
     """
     try:
         # Prepare data for bulk insert
