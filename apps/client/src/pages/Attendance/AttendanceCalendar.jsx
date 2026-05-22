@@ -8,7 +8,10 @@ import {
   IconPlus,
   IconUser,
   IconTrash,
-  IconCheck
+  IconCheck,
+  IconBuildingSkyscraper,
+  IconHierarchy2,
+  IconChevronDown
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/lib/supabaseClient';
@@ -174,44 +177,49 @@ const AttendanceCalendar = () => {
 
           <div className="flex items-center gap-3">
              {/* Organization Selector */}
-             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shadow-inner">
+             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-1 focus-within:ring-[#E31E24]/20 transition-all">
+                <IconBuildingSkyscraper size={14} className="text-slate-400" />
                 <select 
                   value={selectedOrg}
                   onChange={(e) => { setSelectedOrg(e.target.value); setSelectedDept('ALL'); }}
-                  className="bg-transparent border-none text-slate-600 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-28"
+                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-28 appearance-none"
                 >
                   {uniqueOrgs.map(org => (
                     <option key={org} value={org}>{org === 'ALL' ? 'ALL ORGS' : org}</option>
                   ))}
                 </select>
+                <IconChevronDown size={12} className="text-slate-300 pointer-events-none" />
              </div>
 
              {/* Department Selector */}
-             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shadow-inner">
+             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-1 focus-within:ring-[#E31E24]/20 transition-all">
+                <IconHierarchy2 size={14} className="text-slate-400" />
                 <select 
                   value={selectedDept}
                   onChange={(e) => setSelectedDept(e.target.value)}
-                  className="bg-transparent border-none text-slate-600 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-32"
+                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-32 appearance-none"
                 >
                   {uniqueDepts.map(dept => (
                     <option key={dept} value={dept}>{dept === 'ALL' ? 'ALL DEPTS' : dept}</option>
                   ))}
                 </select>
+                <IconChevronDown size={12} className="text-slate-300 pointer-events-none" />
              </div>
 
              {/* Employee Selector */}
-             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-[#E31E24]/20 shadow-sm">
-                <IconUser size={12} className="text-[#E31E24]" />
+             <div className="flex items-center gap-2 bg-[#E31E24]/5 px-3 py-1.5 rounded-lg border border-[#E31E24]/20 shadow-sm focus-within:border-[#E31E24]/50 focus-within:ring-1 focus-within:ring-[#E31E24]/30 transition-all">
+                <IconUser size={14} className="text-[#E31E24]" />
                 <select 
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
-                  className="bg-transparent border-none text-slate-800 font-black text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-40"
+                  className="bg-transparent border-none text-slate-800 font-black text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-44 appearance-none"
                 >
                   <option value="" disabled>SELECT PERSONNEL</option>
                   {filteredEmployees.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                   ))}
                 </select>
+                <IconChevronDown size={12} className="text-[#E31E24]/50 pointer-events-none" />
              </div>
           </div>
         </div>
@@ -238,7 +246,7 @@ const AttendanceCalendar = () => {
           </div>
 
           {/* Calendar Grid */}
-          <div className="flex-1 grid grid-cols-7 grid-rows-[auto_1fr] bg-slate-100 gap-[1px]">
+          <div className="flex-1 grid grid-cols-7 grid-rows-[auto_repeat(6,minmax(0,1fr))] bg-slate-100 gap-[1px]">
             {/* Days Header */}
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
               <div key={day} className="bg-white p-2 text-center">
@@ -248,7 +256,7 @@ const AttendanceCalendar = () => {
 
             {/* Empty slots for start of month */}
             {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-              <div key={`empty-${index}`} className="bg-white/50 p-2 min-h-[80px]" />
+              <div key={`empty-${index}`} className="bg-white/50 p-2 min-h-0" />
             ))}
 
             {/* Days slots */}
@@ -262,9 +270,9 @@ const AttendanceCalendar = () => {
                 <div 
                   key={day} 
                   onClick={() => handleDayClick(day)}
-                  className="bg-white p-1.5 min-h-[80px] cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col"
+                  className="bg-white p-1.5 min-h-0 h-full cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col overflow-hidden"
                 >
-                  <div className="flex justify-between items-start mb-1">
+                  <div className="flex justify-between items-start mb-1 shrink-0">
                     <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-md' : 'text-slate-600'}`}>
                       {day}
                     </span>
@@ -298,7 +306,7 @@ const AttendanceCalendar = () => {
 
             {/* Empty slots for end of month */}
             {Array.from({ length: 42 - (firstDayOfMonth + daysInMonth) }).map((_, index) => (
-              <div key={`empty-end-${index}`} className="bg-white/50 p-2 min-h-[80px]" />
+              <div key={`empty-end-${index}`} className="bg-white/50 p-2 min-h-0" />
             ))}
           </div>
         </div>
