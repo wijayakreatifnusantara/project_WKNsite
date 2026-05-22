@@ -24,6 +24,8 @@ const AttendanceCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   
   // Selection State
+  const [selectedOrg, setSelectedOrg] = useState('ALL');
+  const [selectedDept, setSelectedDept] = useState('ALL');
   const [selectedEmployee, setSelectedEmployee] = useState('');
   
   // Data State
@@ -57,12 +59,35 @@ const AttendanceCalendar = () => {
   }, [currentDate, selectedEmployee]);
 
   const fetchEmployees = async () => {
-    const { data: empData } = await supabase.from('employees').select('id, name, is_resigned').eq('is_resigned', false);
-    setEmployees(empData || []);
-    if (empData && empData.length > 0) {
-      setSelectedEmployee(empData[0].id);
+    const { data: empData } = await supabase.from('employees').select('id, name, is_resigned, organization_name, departments(name)').eq('is_resigned', false);
+    const mapped = (empData || []).map(e => ({
+       ...e,
+       department_name: e.departments?.name || ''
+    }));
+    setEmployees(mapped);
+    if (mapped && mapped.length > 0) {
+      setSelectedEmployee(mapped[0].id);
     }
   };
+
+  const uniqueOrgs = ['ALL', ...new Set(employees.map(e => e.organization_name).filter(Boolean))];
+  const filteredForDept = selectedOrg === 'ALL' ? employees : employees.filter(e => e.organization_name === selectedOrg);
+  const uniqueDepts = ['ALL', ...new Set(filteredForDept.map(e => e.department_name).filter(Boolean))];
+
+  const filteredEmployees = employees.filter(e => {
+    if (selectedOrg !== 'ALL' && e.organization_name !== selectedOrg) return false;
+    if (selectedDept !== 'ALL' && e.department_name !== selectedDept) return false;
+    return true;
+  });
+
+  // Auto-select first employee if current is filtered out
+  useEffect(() => {
+    if (filteredEmployees.length > 0 && !filteredEmployees.find(e => e.id === selectedEmployee)) {
+      setSelectedEmployee(filteredEmployees[0].id);
+    } else if (filteredEmployees.length === 0) {
+      setSelectedEmployee('');
+    }
+  }, [selectedOrg, selectedDept, filteredEmployees, selectedEmployee]);
 
   const fetchAttendanceData = async () => {
     try {
@@ -125,8 +150,8 @@ const AttendanceCalendar = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
-      <div className="max-w-[1600px] mx-auto space-y-4">
+    <div className="flex-1 flex flex-col p-4 bg-[#f8fafc] overflow-hidden animate-fade-in">
+      <div className="max-w-[1600px] w-full mx-auto flex flex-col h-full gap-3">
         
         {/* PREMIUM HEADER */}
         <div className="flex items-center justify-between bg-white p-3 px-6 rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] backdrop-blur-md">
@@ -147,17 +172,43 @@ const AttendanceCalendar = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+             {/* Organization Selector */}
+             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shadow-inner">
+                <select 
+                  value={selectedOrg}
+                  onChange={(e) => { setSelectedOrg(e.target.value); setSelectedDept('ALL'); }}
+                  className="bg-transparent border-none text-slate-600 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-28"
+                >
+                  {uniqueOrgs.map(org => (
+                    <option key={org} value={org}>{org === 'ALL' ? 'ALL ORGS' : org}</option>
+                  ))}
+                </select>
+             </div>
+
+             {/* Department Selector */}
+             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shadow-inner">
+                <select 
+                  value={selectedDept}
+                  onChange={(e) => setSelectedDept(e.target.value)}
+                  className="bg-transparent border-none text-slate-600 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-32"
+                >
+                  {uniqueDepts.map(dept => (
+                    <option key={dept} value={dept}>{dept === 'ALL' ? 'ALL DEPTS' : dept}</option>
+                  ))}
+                </select>
+             </div>
+
              {/* Employee Selector */}
-             <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-inner">
-                <IconUser size={14} className="text-slate-400" />
+             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-[#E31E24]/20 shadow-sm">
+                <IconUser size={12} className="text-[#E31E24]" />
                 <select 
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
-                  className="bg-transparent border-none text-slate-800 font-black text-[10px] uppercase focus:outline-none cursor-pointer p-0 min-w-[200px]"
+                  className="bg-transparent border-none text-slate-800 font-black text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-40"
                 >
                   <option value="" disabled>SELECT PERSONNEL</option>
-                  {employees.map(emp => (
+                  {filteredEmployees.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                   ))}
                 </select>
@@ -166,7 +217,7 @@ const AttendanceCalendar = () => {
         </div>
 
         {/* CALENDAR VIEW */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col min-h-[450px]">
+        <div className="flex-1 bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col min-h-0">
           {/* Calendar Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
             <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
