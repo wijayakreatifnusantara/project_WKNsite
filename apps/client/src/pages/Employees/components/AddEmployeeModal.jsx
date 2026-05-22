@@ -15,7 +15,7 @@ import {
   IconCalendar,
   IconWallet,
   IconUser,
-  IconGenderMale,
+  IconGenderBigender,
   IconHeart,
   IconCreditCard,
   IconEdit,
@@ -35,7 +35,7 @@ const InputWrapper = ({ label, icon: Icon, children }) => (
   <div className="space-y-1.5">
     <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider pl-1">{label}</label>
     <div className="relative">
-      <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+      <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
       {children}
     </div>
   </div>
@@ -874,7 +874,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       disabled={isFieldsLocked}
                     />
                   </InputWrapper>
-                  <InputWrapper label="Gender" icon={IconGenderMale}>
+                  <InputWrapper label="Gender" icon={IconGenderBigender}>
                     <select name="gender" value={formData.gender} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
                       <option>Laki-laki</option>
                       <option>Perempuan</option>
