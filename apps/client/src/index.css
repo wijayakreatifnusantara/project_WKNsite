@@ -217,3 +217,100 @@
   font-weight: 800 !important;
   font-size: 12px !important;
 }
+
+/* ==========================================================================
+   ✨ WKNsite Clean & Minimalist Design Overrides
+   Replaces neumorphic styles with flat, clean, professional border layouts.
+   ========================================================================== */
+
+/* Clean modern background overrides */
+.bg-\[\#f0f2f5\] {
+  background-color: #f8fafc !important; /* Soft modern slate bg */
+}
+
+/* Neutralize neumorphic shadow buttons/cards and replace with clean minimalist borders & subtle flat shadows */
+.shadow-\[8px_8px_16px_\#d1d9e6\,-8px_-8px_16px_\#ffffff\],
+.shadow-\[6px_6px_12px_\#d1d9e6\,-6px_-6px_12px_\#ffffff\],
+.shadow-\[5px_5px_10px_\#d1d9e6\,-5px_-5px_10px_\#ffffff\],
+.shadow-\[4px_4px_8px_\#d1d9e6\,-4px_-4px_8px_\#ffffff\],
+.shadow-\[12px_12px_24px_\#d1d9e6\,-12px_-10px_20px_\#ffffff\],
+.shadow-\[20px_20px_60px_\#d1d9e6\,-20px_-20px_60px_\#ffffff\],
+.shadow-\[2px_2px_4px_\#d1d9e6\,-2px_-2px_4px_\#ffffff\] {
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.05) !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* Neutralize inner/inset shadows and make them clean minimalist input fields or containers */
+.shadow-\[inset_4px_4px_8px_\#d1d9e6\,inset_-4px_-4px_8px_\#ffffff\],
+.shadow-\[inset_3px_3px_6px_\#d1d9e6\,inset_-3px_-3px_6px_\#ffffff\],
+.shadow-\[inset_6px_6px_12px_\#d1d9e6\,inset_-6px_-6px_12px_\#ffffff\],
+.shadow-\[inset_2px_2px_4px_\#d1d9e6\,inset_-2px_-2px_4px_\#ffffff\],
+.shadow-\[inset_1px_1px_2px_\#d1d9e6\,inset_-1px_-1px_2px_\#ffffff\] {
+  box-shadow: none !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+/* Force flat borders instead of legacy thick neumorphic frames */
+.border-white.border-\[2px\],
+.border-white.border-\[3px\],
+.border-white.border-\[4px\],
+.border-white.border-\[6px\],
+.border-white.border-2,
+.border-white.border-4 {
+  border-width: 1px !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Make inputs feel modern on focus */
+.shadow-\[inset_3px_3px_6px_\#d1d9e6\,inset_-3px_-3px_6px_\#ffffff\]:focus,
+.shadow-\[inset_4px_4px_8px_\#d1d9e6\,inset_-4px_-4px_8px_\#ffffff\]:focus {
+  border-color: #E31E24 !important;
+  outline: 2px solid rgba(227, 30, 36, 0.1) !important;
+}
+
+/* Active ring border for highlighted elements */
+.ring-2.ring-\[\#E31E24\] {
+  border-color: #E31E24 !important;
+}
+
+/* Make stat icon containers look clean and flat */
+.h-12.w-12.bg-\[\#f0f2f5\] {
+  background-color: #fff1f2 !important; /* soft red background */
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.h-14.w-14.bg-\[\#f0f2f5\] {
+  background-color: #fff1f2 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.h-10.w-10.bg-\[\#f0f2f5\] {
+  background-color: #fff1f2 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.h-20.w-20.bg-\[\#f0f2f5\] {
+  background-color: #fff1f2 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.h-8.w-8.bg-\[\#f0f2f5\] {
+  background-color: #f1f5f9 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Stat trend tags flat styling */
+.text-green-500.bg-\[\#f0f2f5\],
+.text-red-500.bg-\[\#f0f2f5\] {
+  background-color: #f8fafc !important;
+  box-shadow: none !important;
+  border: 1px solid #e2e8f0 !important;
+}
+

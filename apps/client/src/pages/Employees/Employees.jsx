@@ -33,7 +33,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EmployeeDossier from './components/EmployeeDossier';
-import OnboardingManager from './components/OnboardingManager';
 import IDCardGenerator from './components/IDCardGenerator';
 import DigitalSignature from './components/DigitalSignature';
 import OrgChart from './components/OrgChart';
@@ -52,9 +51,7 @@ const Employees = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  // Sync viewMode with URL: /employees/neural or /employees/registry (default)
-  const viewMode = location.pathname.includes('/neural') ? 'neural' : 'registry';
-  const setViewMode = (mode) => navigate(`/employees/${mode}`);
+  const viewMode = 'registry';
 
   const [activeTab, setActiveTab] = useState('active');
   const [employees, setEmployees] = useState([]);
@@ -73,7 +70,6 @@ const Employees = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [idTargetEmployee, setIdTargetEmployee] = useState(null);
   const [isIDGeneratorOpen, setIsIDGeneratorOpen] = useState(false);
   const [eSignTargetEmployee, setESignTargetEmployee] = useState(null);
@@ -106,7 +102,7 @@ const Employees = () => {
 
       let query = supabase
         .from('employees')
-        .select('*', { count: 'exact' });
+        .select('*, departments(name)', { count: 'exact' });
 
       if (debouncedSearch) {
         query = query.or(`name.ilike.%${debouncedSearch}%,id.ilike.%${debouncedSearch}%`);
@@ -124,6 +120,7 @@ const Employees = () => {
         "EMPLOYEE NAME": e.name || "Unnamed",
         "EMAIL": e.email || "-",
         "Organization Name *": e.organization_name || "Unassigned",
+        "Department Name *": e.departments?.name || "",
         "Job Position *": e.job_position || "Staff",
         "Job Level *": e.job_level || "-",
         "Status *": e.status || "Contract",
@@ -152,7 +149,7 @@ const Employees = () => {
       let match = matchesTab;
 
       if (filterDept !== 'ALL DEPARTMENTS') {
-        match = match && emp["Organization Name *"] === filterDept;
+        match = match && (emp["Department Name *"] || emp["Organization Name *"]) === filterDept;
       }
       if (filterPos !== 'ALL POSITIONS') {
         match = match && emp["Job Position *"] === filterPos;
@@ -428,17 +425,10 @@ const Employees = () => {
                 <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">Database Karyawan</h1>
                 <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1.5">Sistem Manajemen & Informasi Karyawan</p>
               </div>
-              <div className="h-6 w-[1px] bg-slate-200 ml-3 hidden md:block"></div>
-              <div className="hidden md:flex bg-slate-100 p-1 rounded-xl">
-                <ViewToggle active={viewMode === 'registry'} onClick={() => setViewMode('registry')} label="TABEL" icon={<IconTable size={14} />} />
-                <ViewToggle active={viewMode === 'neural'} onClick={() => setViewMode('neural')} label="STRUKTUR" icon={<IconHierarchy2 size={14} />} />
-              </div>
+              {/* View toggle removed */}
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={() => setIsOnboardingOpen(true)} className="h-9 px-3 bg-white text-slate-600 shadow-sm border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-[#E31E24] hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5">
-                <IconBolt size={14} className="text-[#E31E24]" /> Lifecycle
-              </Button>
               <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-white text-slate-600 shadow-sm border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-blue-600 hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5">
                 <IconTable size={14} className="text-blue-500" /> Impor Bulk
               </Button>
@@ -456,7 +446,7 @@ const Employees = () => {
               <MiniStat label="Total Karyawan" value={employees.length} color="text-slate-800" icon={<IconUsers size={16} />} />
               <MiniStat label="Aktif" value={employees.filter(e => !(e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date)).length} color="text-emerald-600" icon={<IconUserCheck size={16} />} />
               <MiniStat label="Resigned" value={employees.filter(e => e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date).length} color="text-rose-500" icon={<IconUserX size={16} />} />
-              <MiniStat label="Unit / Departemen" value={new Set(employees.map(e => e?.["Organization Name *"]).filter(Boolean)).size} color="text-blue-600" icon={<IconBuildingSkyscraper size={16} />} />
+              <MiniStat label="Unit / Departemen" value={new Set(employees.map(e => e?.["Department Name *"] || e?.["Organization Name *"]).filter(Boolean)).size} color="text-blue-600" icon={<IconBuildingSkyscraper size={16} />} />
             </div>
             
             <div className="flex-1 w-full relative">
@@ -479,8 +469,8 @@ const Employees = () => {
             </div>
 
             <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg shrink-0">
-              <TabButton active={activeTab === 'active'} onClick={() => { setActiveTab('active'); setViewMode('registry'); }} label="AKTIF" />
-              <TabButton active={activeTab === 'resigned'} onClick={() => { setActiveTab('resigned'); setViewMode('registry'); }} label="RESIGNED" />
+              <TabButton active={activeTab === 'active'} onClick={() => { setActiveTab('active'); }} label="AKTIF" />
+              <TabButton active={activeTab === 'resigned'} onClick={() => { setActiveTab('resigned'); }} label="RESIGNED" />
             </div>
           </div>
 
@@ -490,7 +480,7 @@ const Employees = () => {
               <FilterSelect 
                 label="UNIT" 
                 value={filterDept} 
-                options={['ALL DEPARTMENTS', ...Array.from(new Set(employees.map(e => e["Organization Name *"])))]} 
+                options={['ALL DEPARTMENTS', ...Array.from(new Set(employees.map(e => e["Department Name *"] || e["Organization Name *"])))]} 
                 onChange={setFilterDept} 
               />
               <FilterSelect 
@@ -565,7 +555,7 @@ const Employees = () => {
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[10px]">
                         <div>
                           <span className="text-slate-400 font-bold uppercase block">Departemen</span>
-                          <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Organization Name *"]}</span>
+                          <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Department Name *"] || emp["Organization Name *"]}</span>
                         </div>
                         <div>
                           <span className="text-slate-400 font-bold uppercase block">Jabatan</span>
@@ -717,7 +707,7 @@ const Employees = () => {
                               </div>
                             </td>
                             <td className="w-[15%] px-4 py-2.5">
-                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Organization Name *"]}</span>
+                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Department Name *"] || emp["Organization Name *"]}</span>
                             </td>
                             <td className="w-[15%] px-4 py-2.5">
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Position *"]}</span>
@@ -840,7 +830,6 @@ const Employees = () => {
         }}
       />
       <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => { setIsAddModalOpen(false); setEditingEmployee(null); }} onRefresh={fetchEmployees} editData={editingEmployee} />
-      <OnboardingManager isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} employees={employees} />
       <IDCardGenerator isOpen={isIDGeneratorOpen} onClose={() => setIsIDGeneratorOpen(false)} employee={idTargetEmployee} />
       <DigitalSignature isOpen={isESignOpen} onClose={() => setIsESignOpen(false)} employee={eSignTargetEmployee} />
       <AuditTrail isOpen={isAuditOpen} onClose={() => setIsAuditOpen(false)} employee={auditTargetEmployee} />

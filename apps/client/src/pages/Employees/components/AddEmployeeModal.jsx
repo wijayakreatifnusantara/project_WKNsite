@@ -44,7 +44,7 @@ const InputWrapper = ({ label, icon: Icon, children }) => (
 const inputStyle = "w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
 const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
 
-const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon }) => (
+const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon, disabled }) => (
   <div className="relative w-full">
     {Icon && <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />}
     <DatePicker
@@ -55,9 +55,10 @@ const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon })
       showYearDropdown
       scrollableYearDropdown
       yearDropdownItemNumber={100}
-      className={`${dateInputStyle} !pl-10`}
+      className={`${dateInputStyle} !pl-10 ${disabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200/60 shadow-none' : ''}`}
       popperClassName="premium-calendar-popper"
       calendarClassName="premium-calendar"
+      disabled={disabled}
     />
   </div>
 );
@@ -115,6 +116,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const fileInputRef = React.useRef(null);
   const { user } = useAuth();
   const isOwnerOrSuperAdmin = user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'superadmin';
+  const isFieldsLocked = !formData.organization_id;
+  const getFieldStyle = (disabled) => 
+    `${inputStyle} ${disabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200/60 shadow-none' : ''}`;
 
   React.useEffect(() => {
     fetch(`${API_URL}/organizations?active_only=true`)
@@ -627,8 +631,12 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
             <button 
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={isScanning}
-              className="h-9 px-4 bg-white border border-[#E31E24] rounded-lg text-[9px] font-bold text-[#E31E24] hover:bg-[#E31E24] hover:text-white transition-all flex items-center gap-2 shadow-sm group"
+              disabled={isScanning || isFieldsLocked}
+              className={`h-9 px-4 bg-white border rounded-lg text-[9px] font-bold transition-all flex items-center gap-2 shadow-sm group ${
+                isFieldsLocked 
+                  ? 'border-slate-200 text-slate-400 cursor-not-allowed bg-slate-50' 
+                  : 'border-[#E31E24] text-[#E31E24] hover:bg-[#E31E24] hover:text-white'
+              }`}
             >
               {isScanning ? (
                 <IconLoader2 size={14} className="animate-spin" />
@@ -691,9 +699,13 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       <IconUser size={40} />
                     )}
                   </div>
-                  <label className="absolute -bottom-2 -right-2 h-9 w-9 bg-[#E31E24] text-white rounded-lg flex items-center justify-center shadow-md cursor-pointer hover:bg-[#C1181E] hover:scale-105 active:scale-95 transition-all">
+                  <label className={`absolute -bottom-2 -right-2 h-9 w-9 text-white rounded-lg flex items-center justify-center shadow-md cursor-pointer transition-all ${
+                    isFieldsLocked 
+                      ? 'bg-slate-300 text-slate-400 cursor-not-allowed hover:scale-100' 
+                      : 'bg-[#E31E24] hover:bg-[#C1181E] hover:scale-105 active:scale-95'
+                  }`}>
                     <IconCamera size={18} />
-                    <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
+                    <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={isFieldsLocked} />
                   </label>
                   {formData.photo && (
                     <button 
@@ -707,155 +719,10 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                 </div>
               </div>
 
-              {/* SECTION 1: IDENTITY */}
+              {/* SECTION 1: CAREER & ORGANIZATION (Moved to top) */}
               <div className="space-y-3">
                 <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <span className="w-1 h-3 bg-[#E31E24] rounded-full"></span> Identity Profile
-                </h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <InputWrapper label="Employee ID (System Locked)" icon={IconId}>
-                    <input 
-                      readOnly
-                      name="employee_id" 
-                      placeholder="Generating..." 
-                      value={formData.employee_id} 
-                      className={`${inputStyle} text-slate-400 bg-slate-100 cursor-not-allowed border-l-2 border-l-slate-300 shadow-none font-bold tracking-widest`} 
-                    />
-                  </InputWrapper>
-                  <InputWrapper label="Full Name" icon={IconUser}>
-                    <input required name="name" placeholder="Full Legal Name" value={formData.name} onChange={handleChange} className={inputStyle} />
-                  </InputWrapper>
-                  <InputWrapper label="NIK (ID Number)" icon={IconCreditCard}>
-                    <input required name="nik" placeholder="16 Digit NIK" value={formData.nik} onChange={handleChange} className={inputStyle} />
-                  </InputWrapper>
-                  <InputWrapper label="Mobile App Password" icon={IconId}>
-                    <input name="mobile_password" placeholder="Pass untuk absen (Opsional)" value={formData.mobile_password} onChange={handleChange} className={`${inputStyle} lowercase`} />
-                  </InputWrapper>
-                  <InputWrapper label="Place of Birth" icon={IconMapPin}>
-                    <input name="place_of_birth" placeholder="e.g. Jakarta" value={formData.place_of_birth} onChange={handleChange} className={inputStyle} />
-                  </InputWrapper>
-                  <InputWrapper label="Date of Birth" icon={IconCalendar}>
-                    <ProfessionalDatePicker 
-                      selected={formData.date_of_birth} 
-                      onChange={(date) => setFormData({...formData, date_of_birth: date ? date.toISOString().split('T')[0] : ''})}
-                      placeholder="DD/MM/YYYY"
-                    />
-                  </InputWrapper>
-                  <InputWrapper label="Gender" icon={IconGenderMale}>
-                    <select name="gender" value={formData.gender} onChange={handleChange} className={inputStyle}>
-                      <option>Laki-laki</option>
-                      <option>Perempuan</option>
-                    </select>
-                  </InputWrapper>
-                  <InputWrapper label="Religion" icon={IconSparkles}>
-                    <select name="religion" value={formData.religion} onChange={handleChange} className={inputStyle}>
-                      <option>Islam</option>
-                      <option>Kristen Protestan</option>
-                      <option>Katolik</option>
-                      <option>Hindu</option>
-                      <option>Buddha</option>
-                      <option>Khonghucu</option>
-                    </select>
-                  </InputWrapper>
-                  <InputWrapper label="Marital Status" icon={IconHeart}>
-                    <select name="marital_status" value={formData.marital_status} onChange={handleChange} className={inputStyle}>
-                      <option>Belum Kawin</option>
-                      <option>Kawin</option>
-                      <option>Cerai Hidup</option>
-                      <option>Cerai Mati</option>
-                    </select>
-                  </InputWrapper>
-                </div>
-              </div>
-
-              {/* SECTION 2: CONTACT & LOCALIZATION */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <span className="w-1 h-3 bg-blue-650 rounded-full bg-blue-600"></span> Contact & Localization
-                </h3>
-                
-                {/* Addresses First */}
-                <div className="grid grid-cols-1 gap-4">
-                  <InputWrapper label="Alamat KTP (Sesuai Kartu Identitas)" icon={IconMapPin}>
-                    <input name="ktp_address" placeholder="Masukkan alamat lengkap sesuai KTP..." value={formData.ktp_address} onChange={handleChange} className={inputStyle} />
-                  </InputWrapper>
-                  
-                  <div className="space-y-1 relative">
-                     <div className="flex items-center justify-between px-1">
-                      <label className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Alamat Domisili (Tempat Tinggal Sekarang)</label>
-                      <button 
-                        type="button"
-                        onClick={() => setFormData(prev => ({...prev, domicile_address: prev.ktp_address}))}
-                        className="text-[8px] font-bold text-[#E31E24] uppercase tracking-wider hover:bg-red-50 px-2 py-1 rounded border border-[#E31E24]/20 transition-all flex items-center gap-1"
-                      >
-                        <IconCheck size={10} /> Sama dengan KTP
-                      </button>
-                    </div>
-                    <div className="relative">
-                      <IconMapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                      <input name="domicile_address" placeholder="Masukkan alamat lengkap tempat tinggal saat ini..." value={formData.domicile_address} onChange={handleChange} className={inputStyle} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Email & Phone Below */}
-                <div className="grid grid-cols-2 gap-4 pt-1">
-                  <InputWrapper label="Email Address (Personal/Corp)" icon={IconMail}>
-                    <input required type="email" name="email" placeholder="example@gmail.com" value={formData.email} onChange={handleChange} className={`${inputStyle} lowercase placeholder:normal-case`} />
-                  </InputWrapper>
-                  <InputWrapper label="Nomor Telepon Karyawan" icon={IconPhone}>
-                    <input name="phone" placeholder="+62..." value={formData.phone} onChange={handleChange} className={inputStyle} />
-                  </InputWrapper>
-                </div>
-              </div>
-
-              {/* SECTION 2.5: EMERGENCY CONTACTS */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <span className="w-1 h-3 bg-rose-600 rounded-full"></span> Emergency Contacts
-                </h3>
-                <div className="grid grid-cols-2 gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                  {/* Contact 1 */}
-                  <div className="space-y-3">
-                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider italic">Primary Contact</p>
-                    <div className="grid grid-cols-1 gap-2">
-                      <InputWrapper label="Full Name" icon={IconUser}>
-                        <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name} onChange={handleChange} className={inputStyle} />
-                      </InputWrapper>
-                      <div className="grid grid-cols-2 gap-2">
-                        <InputWrapper label="Relationship" icon={IconHeart}>
-                          <input name="emergency_contact_1_rel" value={formData.emergency_contact_1_rel} onChange={handleChange} className={inputStyle} />
-                        </InputWrapper>
-                        <InputWrapper label="Phone" icon={IconPhone}>
-                          <input name="emergency_contact_1_phone" value={formData.emergency_contact_1_phone} onChange={handleChange} className={inputStyle} />
-                        </InputWrapper>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Contact 2 */}
-                  <div className="space-y-3">
-                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider italic">Secondary Contact</p>
-                    <div className="grid grid-cols-1 gap-2">
-                      <InputWrapper label="Full Name" icon={IconUser}>
-                        <input name="emergency_contact_2_name" value={formData.emergency_contact_2_name} onChange={handleChange} className={inputStyle} />
-                      </InputWrapper>
-                      <div className="grid grid-cols-2 gap-2">
-                        <InputWrapper label="Relationship" icon={IconHeart}>
-                          <input name="emergency_contact_2_rel" value={formData.emergency_contact_2_rel} onChange={handleChange} className={inputStyle} />
-                        </InputWrapper>
-                        <InputWrapper label="Phone" icon={IconPhone}>
-                          <input name="emergency_contact_2_phone" value={formData.emergency_contact_2_phone} onChange={handleChange} className={inputStyle} />
-                        </InputWrapper>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 3: EMPLOYMENT & FINANCE */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <span className="w-1 h-3 bg-emerald-600 rounded-full"></span> Career & Treasury
+                  <span className="w-1 h-3 bg-emerald-600 rounded-full"></span> Career & Organization
                 </h3>
                 <div className="grid grid-cols-4 gap-4">
                   <InputWrapper label={editData && !isOwnerOrSuperAdmin ? "Org Name (Locked)" : "Org Name"} icon={IconBuildingSkyscraper}>
@@ -873,13 +740,25 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       ))}
                     </select>
                   </InputWrapper>
+                  
+                  {/* Relocated from Identity Profile section */}
+                  <InputWrapper label="Employee ID (System Locked)" icon={IconId}>
+                    <input 
+                      readOnly
+                      name="employee_id" 
+                      placeholder="Generating..." 
+                      value={formData.employee_id} 
+                      className={`${inputStyle} text-slate-400 bg-slate-100 cursor-not-allowed border-l-2 border-l-slate-300 shadow-none font-bold tracking-widest`} 
+                    />
+                  </InputWrapper>
+
                   <InputWrapper label="Department" icon={IconBuildingSkyscraper}>
                     <select 
                       name="department_id" 
                       value={formData.department_id || ''} 
                       onChange={handleChange} 
-                      className={inputStyle}
-                      disabled={!formData.organization_id}
+                      className={getFieldStyle(isFieldsLocked)}
+                      disabled={isFieldsLocked}
                     >
                       <option value="">PILIH DEPARTEMEN</option>
                       {departments.map(dept => (
@@ -888,10 +767,10 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     </select>
                   </InputWrapper>
                   <InputWrapper label="Position" icon={IconBriefcase}>
-                    <input name="job_position" placeholder="e.g. Engineer" value={formData.job_position} onChange={handleChange} className={inputStyle} />
+                    <input name="job_position" placeholder="e.g. Engineer" value={formData.job_position} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                   <InputWrapper label="Employment Type" icon={IconCheck}>
-                    <select name="employment_type" value={formData.employment_type} onChange={handleChange} className={inputStyle}>
+                    <select name="employment_type" value={formData.employment_type} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
                       <option>Permanent</option>
                       <option>Contract</option>
                       <option>Probation</option>
@@ -899,13 +778,14 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     </select>
                   </InputWrapper>
                   <InputWrapper label="Working Location" icon={IconMapPin}>
-                    <input name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle} />
+                    <input name="working_location" value={formData.working_location} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                   <InputWrapper label="Join Date" icon={IconCalendar}>
                     <ProfessionalDatePicker 
                       selected={formData.join_date} 
                       onChange={(date) => setFormData({...formData, join_date: date ? date.toISOString().split('T')[0] : ''})}
                       placeholder="DD/MM/YYYY"
+                      disabled={isFieldsLocked}
                     />
                   </InputWrapper>
                   <InputWrapper label="Contract End" icon={IconCalendar}>
@@ -913,35 +793,178 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       selected={formData.contract_end_date} 
                       onChange={(date) => setFormData({...formData, contract_end_date: date ? date.toISOString().split('T')[0] : ''})}
                       placeholder="DD/MM/YYYY"
+                      disabled={isFieldsLocked}
                     />
                   </InputWrapper>
                   <InputWrapper label="Base Salary (Monthly)" icon={IconWallet}>
-                    <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} />
+                    <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                 </div>
               </div>
 
-              {/* SECTION 4: BANKING & TAX INTELLIGENCE */}
+              {/* SECTION 2: IDENTITY (Unlocked only after Org selected) */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-[#E31E24] rounded-full"></span> Identity Profile
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <InputWrapper label="Full Name" icon={IconUser}>
+                    <input required name="name" placeholder="Full Legal Name" value={formData.name} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  <InputWrapper label="NIK (ID Number)" icon={IconCreditCard}>
+                    <input required name="nik" placeholder="16 Digit NIK" value={formData.nik} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  <InputWrapper label="Mobile App Password" icon={IconId}>
+                    <input name="mobile_password" placeholder="Pass untuk absen (Opsional)" value={formData.mobile_password} onChange={handleChange} className={`${getFieldStyle(isFieldsLocked)} lowercase`} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  <InputWrapper label="Place of Birth" icon={IconMapPin}>
+                    <input name="place_of_birth" placeholder="e.g. Jakarta" value={formData.place_of_birth} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  <InputWrapper label="Date of Birth" icon={IconCalendar}>
+                    <ProfessionalDatePicker 
+                      selected={formData.date_of_birth} 
+                      onChange={(date) => setFormData({...formData, date_of_birth: date ? date.toISOString().split('T')[0] : ''})}
+                      placeholder="DD/MM/YYYY"
+                      disabled={isFieldsLocked}
+                    />
+                  </InputWrapper>
+                  <InputWrapper label="Gender" icon={IconGenderMale}>
+                    <select name="gender" value={formData.gender} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
+                      <option>Laki-laki</option>
+                      <option>Perempuan</option>
+                    </select>
+                  </InputWrapper>
+                  <InputWrapper label="Religion" icon={IconSparkles}>
+                    <select name="religion" value={formData.religion} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
+                      <option>Islam</option>
+                      <option>Kristen Protestan</option>
+                      <option>Katolik</option>
+                      <option>Hindu</option>
+                      <option>Buddha</option>
+                      <option>Khonghucu</option>
+                    </select>
+                  </InputWrapper>
+                  <InputWrapper label="Marital Status" icon={IconHeart}>
+                    <select name="marital_status" value={formData.marital_status} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
+                      <option>Belum Kawin</option>
+                      <option>Kawin</option>
+                      <option>Cerai Hidup</option>
+                      <option>Cerai Mati</option>
+                    </select>
+                  </InputWrapper>
+                </div>
+              </div>
+
+              {/* SECTION 3: CONTACT & LOCALIZATION */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-blue-650 rounded-full bg-blue-600"></span> Contact & Localization
+                </h3>
+                
+                {/* Addresses First */}
+                <div className="grid grid-cols-1 gap-4">
+                  <InputWrapper label="Alamat KTP (Sesuai Kartu Identitas)" icon={IconMapPin}>
+                    <input name="ktp_address" placeholder="Masukkan alamat lengkap sesuai KTP..." value={formData.ktp_address} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  
+                  <div className="space-y-1 relative">
+                    <div className="flex items-center justify-between px-1">
+                      <label className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Alamat Domisili (Tempat Tinggal Sekarang)</label>
+                      <button 
+                        type="button"
+                        onClick={() => setFormData(prev => ({...prev, domicile_address: prev.ktp_address}))}
+                        className={`text-[8px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-all flex items-center gap-1 ${
+                          isFieldsLocked 
+                            ? 'border-slate-200 text-slate-400 bg-slate-55/40 cursor-not-allowed' 
+                            : 'text-[#E31E24] hover:bg-red-50 border-[#E31E24]/20'
+                        }`}
+                        disabled={isFieldsLocked}
+                      >
+                        <IconCheck size={10} /> Sama dengan KTP
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <IconMapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                      <input name="domicile_address" placeholder="Masukkan alamat lengkap tempat tinggal saat ini..." value={formData.domicile_address} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email & Phone Below */}
+                <div className="grid grid-cols-2 gap-4 pt-1">
+                  <InputWrapper label="Email Address (Personal/Corp)" icon={IconMail}>
+                    <input required type="email" name="email" placeholder="example@gmail.com" value={formData.email} onChange={handleChange} className={`${getFieldStyle(isFieldsLocked)} lowercase placeholder:normal-case`} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  <InputWrapper label="Nomor Telepon Karyawan" icon={IconPhone}>
+                    <input name="phone" placeholder="+62..." value={formData.phone} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                </div>
+              </div>
+
+              {/* SECTION 4: EMERGENCY CONTACTS */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-1 h-3 bg-rose-600 rounded-full"></span> Emergency Contacts
+                </h3>
+                <div className="grid grid-cols-2 gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                  {/* Contact 1 */}
+                  <div className="space-y-3">
+                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider italic">Primary Contact</p>
+                    <div className="grid grid-cols-1 gap-2">
+                      <InputWrapper label="Full Name" icon={IconUser}>
+                        <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                      </InputWrapper>
+                      <div className="grid grid-cols-2 gap-2">
+                        <InputWrapper label="Relationship" icon={IconHeart}>
+                          <input name="emergency_contact_1_rel" value={formData.emergency_contact_1_rel} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                        </InputWrapper>
+                        <InputWrapper label="Phone" icon={IconPhone}>
+                          <input name="emergency_contact_1_phone" value={formData.emergency_contact_1_phone} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                        </InputWrapper>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Contact 2 */}
+                  <div className="space-y-3">
+                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider italic">Secondary Contact</p>
+                    <div className="grid grid-cols-1 gap-2">
+                      <InputWrapper label="Full Name" icon={IconUser}>
+                        <input name="emergency_contact_2_name" value={formData.emergency_contact_2_name} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                      </InputWrapper>
+                      <div className="grid grid-cols-2 gap-2">
+                        <InputWrapper label="Relationship" icon={IconHeart}>
+                          <input name="emergency_contact_2_rel" value={formData.emergency_contact_2_rel} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                        </InputWrapper>
+                        <InputWrapper label="Phone" icon={IconPhone}>
+                          <input name="emergency_contact_2_phone" value={formData.emergency_contact_2_phone} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                        </InputWrapper>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: BANKING & TAX INTELLIGENCE */}
               <div className="space-y-3">
                 <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                   <span className="w-1 h-3 bg-amber-600 rounded-full"></span> Banking & Tax Intelligence
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <InputWrapper label="Bank Name" icon={IconBuildingSkyscraper}>
-                    <input name="bank_name" placeholder="e.g. BCA" value={formData.bank_name} onChange={handleChange} className={inputStyle} />
+                    <input name="bank_name" placeholder="e.g. BCA" value={formData.bank_name} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                   <InputWrapper label="Account Number" icon={IconCreditCard}>
-                    <input name="bank_account" placeholder="0000000000" value={formData.bank_account} onChange={handleChange} className={inputStyle} />
+                    <input name="bank_account" placeholder="0000000000" value={formData.bank_account} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                   <InputWrapper label="Account Holder" icon={IconUser}>
-                    <input name="bank_account_holder" placeholder="Name in Bank Book" value={formData.bank_account_holder} onChange={handleChange} className={inputStyle} />
+                    <input name="bank_account_holder" placeholder="Name in Bank Book" value={formData.bank_account_holder} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                   
                   <InputWrapper label="NPWP (Tax ID)" icon={IconId}>
-                    <input name="npwp" placeholder="Tax ID" value={formData.npwp} onChange={handleChange} className={inputStyle} />
+                    <input name="npwp" placeholder="Tax ID" value={formData.npwp} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
                   </InputWrapper>
                   <InputWrapper label="PTKP Status" icon={IconAward}>
-                    <select name="ptkp_status" value={formData.ptkp_status} onChange={handleChange} className={inputStyle}>
+                    <select name="ptkp_status" value={formData.ptkp_status} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
                       <option>TK/0</option>
                       <option>TK/1</option>
                       <option>K/0</option>
@@ -951,7 +974,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     </select>
                   </InputWrapper>
                   <InputWrapper label="Tax Method" icon={IconWallet}>
-                    <select name="tax_method" value={formData.tax_method} onChange={handleChange} className={inputStyle}>
+                    <select name="tax_method" value={formData.tax_method} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
                       <option>Gross</option>
                       <option>Gross Up</option>
                       <option>Nett</option>
