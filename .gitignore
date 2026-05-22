@@ -35,3 +35,9 @@ node_modules/
 # Logs
 *.log
 
+# Backups
+apps/server/backups/
+
+# Scratch
+scratch/
+
