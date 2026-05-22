@@ -115,11 +115,11 @@ const AttendanceRecap = () => {
           name: emp.name,
           organization: emp.organization_name,
           position: emp.job_position,
-          present: logs.filter(l => l.status === 'Present').length,
-          late: logs.filter(l => l.status === 'Late').length,
-          sick: logs.filter(l => l.status === 'Sick').length,
-          leave: logs.filter(l => l.status === 'Leave').length,
-          absent: logs.filter(l => l.status === 'Absent').length,
+          present: logs.filter(l => l.status?.toLowerCase() === 'present').length,
+          late: logs.filter(l => l.status?.toLowerCase() === 'late').length,
+          sick: logs.filter(l => l.status?.toLowerCase() === 'sick').length,
+          leave: logs.filter(l => l.status?.toLowerCase() === 'leave').length,
+          absent: logs.filter(l => l.status?.toLowerCase() === 'absent').length,
           total_days: logs.length
         };
       });

@@ -1,19 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import ViewShot from 'react-native-view-shot';
 
-// Konfigurasi Geofencing (Titik Pusat HQ WKNsite)
-const HQ_LOCATION = {
-  latitude: -6.2088,   // Ganti dengan Latitude Asli Kantor Anda
-  longitude: 106.8456, // Ganti dengan Longitude Asli Kantor Anda
-  radius: 100          // Radius toleransi dalam meter
-};
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api';
 
-// Rumus Haversine untuk menghitung jarak akurat
+// Haversine formula to calculate distance in meters
 function getDistanceFromLatLonInM(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371e3; // Radius bumi dalam meter
+  const R = 6371e3;
   const dLat = (lat2 - lat1) * (Math.PI/180);
   const dLon = (lon2 - lon1) * (Math.PI/180); 
   const a = 
@@ -24,26 +19,26 @@ function getDistanceFromLatLonInM(lat1: number, lon1: number, lat2: number, lon2
   return R * c;
 }
 
-// Dummy data untuk contoh. Nantinya diambil dari AuthContext
-const mockUser = {
-  name: "Karyawan",
-  id: "ID"
-};
-
 interface AttendanceCameraProps {
   type?: 'IN' | 'OUT';
   onCaptureComplete?: (uri: string) => void;
+  userData?: { id: string; name: string; jabatan?: string; is_field_team?: boolean } | null;
 }
 
-export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: AttendanceCameraProps) {
+export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userData }: AttendanceCameraProps) {
   const [permission, requestPermission] = useCameraPermissions();
   const [locationPerm, setLocationPerm] = useState<boolean | null>(null);
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [address, setAddress] = useState<string>('Mengambil lokasi...');
   
-  // State Geofencing
+  // HQ Config from API
+  const [hqLocation, setHqLocation] = useState<{latitude: number, longitude: number, radius: number, name: string} | null>(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  // Geofencing state
   const [distance, setDistance] = useState<number | null>(null);
   const [isInArea, setIsInArea] = useState<boolean>(false);
+  const isFieldTeam = userData?.is_field_team ?? false;
   
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -51,7 +46,37 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
   const cameraRef = useRef<CameraView | null>(null);
   const viewShotRef = useRef<ViewShot | null>(null);
 
+  // Fetch HQ settings from API
   useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API_URL}/attendance/settings`);
+        const json = await res.json();
+        if (json.status === 'success' && json.data?.hq_location) {
+          const hq = json.data.hq_location;
+          setHqLocation({
+            latitude: hq.lat,
+            longitude: hq.lon,
+            radius: hq.radius || 100,
+            name: hq.name || 'HQ'
+          });
+        } else {
+          // Default fallback
+          setHqLocation({ latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' });
+        }
+      } catch (e) {
+        // If API fails, use defaults so user is not blocked
+        setHqLocation({ latitude: -6.2088, longitude: 106.8456, radius: 100, name: 'WKN HQ' });
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+    fetchSettings();
+  }, [hqLocation]);
+
+  // Fetch location and apply geofencing check
+  useEffect(() => {
+    if (!hqLocation) return;
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       setLocationPerm(status === 'granted');
@@ -59,17 +84,21 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
         const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
         setLocation(loc.coords);
         
-        // Hitung jarak Geofencing
-        const dist = getDistanceFromLatLonInM(
-          loc.coords.latitude, 
-          loc.coords.longitude, 
-          HQ_LOCATION.latitude, 
-          HQ_LOCATION.longitude
-        );
-        setDistance(dist);
-        setIsInArea(dist <= HQ_LOCATION.radius);
+        // Field team bypass
+        if (isFieldTeam) {
+          setIsInArea(true);
+          setDistance(0);
+        } else {
+          const dist = getDistanceFromLatLonInM(
+            loc.coords.latitude, 
+            loc.coords.longitude, 
+            hqLocation.latitude, 
+            hqLocation.longitude
+          );
+          setDistance(dist);
+          setIsInArea(dist <= hqLocation.radius);
+        }
         
-        // Dapatkan nama jalan/alamat dari koordinat
         const geocode = await Location.reverseGeocodeAsync({
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude
@@ -83,10 +112,24 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
         }
       }
     })();
-  }, []);
+  }, [hqLocation]);
 
   if (!permission) {
-    return <View style={styles.container}><Text>Meminta akses kamera...</Text></View>;
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color="#fff" />
+        <Text style={{color:'#fff', marginTop:8}}>Meminta akses kamera...</Text>
+      </View>
+    );
+  }
+
+  if (loadingSettings) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color="#fff" />
+        <Text style={{color:'#fff', marginTop:8}}>Memuat konfigurasi lokasi...</Text>
+      </View>
+    );
   }
 
   if (!permission.granted) {
@@ -107,10 +150,11 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
       return;
     }
     
-    if (!isInArea) {
+    // Skip geofencing check for field team
+    if (!isFieldTeam && !isInArea) {
       Alert.alert(
         'Di Luar Jangkauan', 
-        `Anda berada ${distance ? Math.round(distance) : '?'} meter dari kantor. Jarak maksimal adalah ${HQ_LOCATION.radius} meter.`
+        `Anda berada ${distance ? Math.round(distance) : '?'} meter dari ${hqLocation?.name || 'kantor'}. Jarak maksimal adalah ${hqLocation?.radius || 100} meter.`
       );
       return;
     }
@@ -151,16 +195,18 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
       day: '2-digit', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
+    const displayName = userData?.name || 'Karyawan';
+    const displayId = userData?.id || '-';
 
     return (
       <View style={StyleSheet.absoluteFill}>
-        {/* Kiri Atas: Nama & ID */}
+        {/* Top Left: Name & ID */}
         <View style={styles.topLeft}>
-          <Text style={styles.watermarkTextBold}>{mockUser.name}</Text>
-          <Text style={styles.watermarkText}>{mockUser.id}</Text>
+          <Text style={styles.watermarkTextBold}>{displayName}</Text>
+          <Text style={styles.watermarkText}>{displayId}</Text>
         </View>
 
-        {/* Kanan Atas: Status In/Out */}
+        {/* Top Right: Status In/Out */}
         <View style={styles.topRight}>
           <Text style={[styles.watermarkTextBold, { color: type === 'IN' ? '#10b981' : '#f43f5e' }]}>
             CLOCK {type}
@@ -168,14 +214,20 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
           <Text style={styles.watermarkText}>{timestamp}</Text>
         </View>
 
-        {/* Kiri Bawah: Lokasi & Kordinat */}
+        {/* Bottom Left: Location & GPS */}
         <View style={styles.bottomLeft}>
           <Text style={styles.watermarkTextBold}>Lokasi Absen:</Text>
           <Text style={styles.watermarkText}>{address}</Text>
-          {location && distance !== null && (
+          {location && distance !== null && !isFieldTeam && (
             <Text style={styles.watermarkTextSmall}>
               Lat: {location.latitude.toFixed(5)}, Lng: {location.longitude.toFixed(5)}
-              {'\n'}Jarak: {Math.round(distance)}m (Maks: {HQ_LOCATION.radius}m)
+              {'\n'}Jarak: {Math.round(distance)}m dari {hqLocation?.name || 'HQ'}
+            </Text>
+          )}
+          {isFieldTeam && location && (
+            <Text style={styles.watermarkTextSmall}>
+              Lat: {location.latitude.toFixed(5)}, Lng: {location.longitude.toFixed(5)}
+              {'\n'}[Field Team - Geofencing Dinonaktifkan]
             </Text>
           )}
         </View>
@@ -196,22 +248,22 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete }: Att
             {/* Preview Watermark Transparan saat live kamera */}
             <WatermarkOverlay />
             
-            {/* Indikator Geofencing Live */}
-            {!isInArea && distance !== null && (
+            {/* Geofencing warning banner - only for non-field-team */}
+            {!isFieldTeam && !isInArea && distance !== null && (
               <View style={styles.geoWarningBanner}>
                 <Text style={styles.geoWarningText}>
-                  DI LUAR JANGKAUAN ({Math.round(distance)} meter)
+                  DI LUAR JANGKAUAN ({Math.round(distance)} meter dari {hqLocation?.name || 'HQ'})
                 </Text>
               </View>
             )}
             
             <View style={styles.cameraControls}>
               <TouchableOpacity 
-                style={[styles.captureButton, !isInArea && { backgroundColor: 'rgba(244, 63, 94, 0.5)' }]} 
+                style={[styles.captureButton, (!isFieldTeam && !isInArea) && { backgroundColor: 'rgba(244, 63, 94, 0.5)' }]} 
                 onPress={takePicture}
-                disabled={isProcessing || !isInArea}
+                disabled={isProcessing || (!isFieldTeam && !isInArea)}
               >
-                <View style={[styles.captureButtonInner, !isInArea && { backgroundColor: '#f43f5e' }]} />
+                <View style={[styles.captureButtonInner, (!isFieldTeam && !isInArea) && { backgroundColor: '#f43f5e' }]} />
               </TouchableOpacity>
             </View>
           </CameraView>

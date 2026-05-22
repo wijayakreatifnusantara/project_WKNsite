@@ -298,8 +298,8 @@ class WKNSupabaseClient:
             emp_res = self.client.table("employees").select("id", count="exact").eq("status", "Active").execute()
             total_active = emp_res.count or 0
             
-            present = len([r for r in data if r.get("status") in ["Present", "Late"]])
-            late = len([r for r in data if r.get("status") == "Late"])
+            present = len([r for r in data if str(r.get("status", "")).lower() in ["present", "late"]])
+            late = len([r for r in data if str(r.get("status", "")).lower() == "late"])
             absent = total_active - present
             
             return {
@@ -339,9 +339,10 @@ class WKNSupabaseClient:
                 d = r.get("date")
                 if d not in trends:
                     trends[d] = {"date": d, "present": 0, "late": 0}
-                if r.get("status") in ["Present", "Late"]:
+                status_lower = str(r.get("status", "")).lower()
+                if status_lower in ["present", "late"]:
                     trends[d]["present"] += 1
-                if r.get("status") == "Late":
+                if status_lower == "late":
                     trends[d]["late"] += 1
             
             return sorted(list(trends.values()), key=lambda x: x["date"])
@@ -377,9 +378,10 @@ class WKNSupabaseClient:
                     summary[eid] = {"late_minutes": 0, "absences": 0, "unpaid_leaves": 0}
                 
                 summary[eid]["late_minutes"] += r.get("late_minutes", 0)
-                if r.get("status") == "Absent":
+                status_lower = str(r.get("status", "")).lower()
+                if status_lower == "absent":
                     summary[eid]["absences"] += 1
-                elif r.get("status") == "Unpaid Leave":
+                elif status_lower == "unpaid leave":
                     summary[eid]["unpaid_leaves"] += 1
             
             return summary

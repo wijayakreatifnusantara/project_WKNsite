@@ -31,7 +31,7 @@ export default function HomeScreen() {
   const { colors, isDark } = useTheme();
   const [showCamera, setShowCamera] = useState(false);
   const [cameraType, setCameraType] = useState<'IN' | 'OUT'>('IN');
-  const [userData, setUserData] = useState<{id: string, name: string, jabatan?: string} | null>(null);
+  const [userData, setUserData] = useState<{id: string, name: string, jabatan?: string, is_field_team?: boolean} | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [refreshing, setRefreshing] = useState(false);
   const [weather, setWeather] = useState<{temp: number, condition: string, city: string} | null>(null);
@@ -41,6 +41,8 @@ export default function HomeScreen() {
   const [showBanner, setShowBanner] = useState(true);
   const [pendingAttendance, setPendingAttendance] = useState<any[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [todayRecord, setTodayRecord] = useState<{id?: string, clock_in?: string, clock_out?: string, status?: string} | null>(null);
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
 
   // Micro-Interaction States
   const inScale = useRef(new Animated.Value(1)).current;
@@ -53,13 +55,20 @@ export default function HomeScreen() {
     getNetworkStatus();
     startPulse();
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    const netTimer = setInterval(() => getNetworkStatus(), 5000); // Update network every 5s
+    const netTimer = setInterval(() => getNetworkStatus(), 5000);
     loadPendingAttendance();
     return () => {
       clearInterval(timer);
       clearInterval(netTimer);
     };
   }, []);
+
+  // Fetch today's attendance whenever userData changes
+  useEffect(() => {
+    if (userData?.id) {
+      fetchTodayAttendance(userData.id);
+    }
+  }, [userData]);
 
   const getNetworkStatus = async () => {
     try {
@@ -139,7 +148,28 @@ export default function HomeScreen() {
     if (!sessionStr) {
       router.replace('/login');
     } else {
-      setUserData(JSON.parse(sessionStr));
+      const user = JSON.parse(sessionStr);
+      setUserData(user);
+    }
+  };
+
+  const fetchTodayAttendance = async (employeeId: string) => {
+    try {
+      setLoadingAttendance(true);
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const { data, error } = await supabase
+        .from('attendance')
+        .select('id, clock_in, clock_out, status, date')
+        .eq('employee_id', employeeId)
+        .eq('date', today)
+        .maybeSingle();
+      if (!error) {
+        setTodayRecord(data || null);
+      }
+    } catch (e) {
+      console.log('fetchTodayAttendance error:', e);
+    } finally {
+      setLoadingAttendance(false);
     }
   };
 
@@ -147,8 +177,9 @@ export default function HomeScreen() {
     setRefreshing(true);
     checkSession();
     getLocationAndWeather();
+    if (userData?.id) fetchTodayAttendance(userData.id);
     setTimeout(() => setRefreshing(false), 1500);
-  }, []);
+  }, [userData]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('userSession');
@@ -230,13 +261,18 @@ export default function HomeScreen() {
 
   const handleCaptureComplete = async (uri: string) => {
     try {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const nowTime = new Date().toTimeString().substring(0, 8); // HH:MM:SS
+
       if (!networkState.isConnected) {
-        // Offline Mode: Queue it
+        // Offline Mode: Queue for later sync
         const newItem = {
           uri,
           employee_id: userData?.id,
-          status: cameraType,
-          location: currentAddress,
+          date: today,
+          clock_type: cameraType,
+          time: nowTime,
+          notes: currentAddress,
           timestamp: Date.now()
         };
         const newQueue = [...pendingAttendance, newItem];
@@ -247,37 +283,86 @@ export default function HomeScreen() {
         return;
       }
 
-      // Online Mode: Proceed as usual
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const fileName = `attendance_${userData?.id}_${Date.now()}.jpg`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('attendance_proofs')
-        .upload(fileName, blob, { contentType: 'image/jpeg' });
-        
-      if (uploadError) throw uploadError;
-      
-      const { data: publicUrlData } = supabase.storage
-        .from('attendance_proofs')
-        .getPublicUrl(fileName);
-        
-      const { error: dbError } = await supabase
+      // --- ONLINE MODE ---
+      // Try to upload selfie proof (non-critical, skip if bucket not ready)
+      let photoUrl: string | null = null;
+      try {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        const fileName = `attendance_${userData?.id}_${Date.now()}.jpg`;
+        const { error: uploadError } = await supabase.storage
+          .from('attendance_proofs')
+          .upload(fileName, blob, { contentType: 'image/jpeg' });
+        if (!uploadError) {
+          const { data: pubData } = supabase.storage
+            .from('attendance_proofs')
+            .getPublicUrl(fileName);
+          photoUrl = pubData?.publicUrl || null;
+        }
+      } catch (_) {}
+
+      // Check if there's already a record for today
+      const { data: existing } = await supabase
         .from('attendance')
-        .insert([{
-          employee_id: userData?.id,
-          status: cameraType,
-          clock_in_time: cameraType === 'IN' ? new Date().toISOString() : null,
-          clock_out_time: cameraType === 'OUT' ? new Date().toISOString() : null,
-          location: currentAddress,
-          proof_url: publicUrlData.publicUrl
-        }]);
-        
-      if (dbError) throw dbError;
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Sukses', `Berhasil absen ${cameraType === 'IN' ? 'masuk' : 'keluar'}`);
+        .select('id, clock_in, clock_out')
+        .eq('employee_id', userData?.id)
+        .eq('date', today)
+        .maybeSingle();
+
+      if (cameraType === 'IN') {
+        if (existing) {
+          Alert.alert('Sudah Absen Masuk', `Anda sudah absen masuk pukul ${existing.clock_in?.substring(0, 5) || '-'} hari ini.`);
+          setShowCamera(false);
+          return;
+        }
+        // INSERT new record
+        const { error: insertError } = await supabase
+          .from('attendance')
+          .insert([{
+            employee_id: userData?.id,
+            date: today,
+            clock_in: nowTime,
+            clock_out: null,
+            status: 'Present',
+            notes: `Mobile check-in | ${currentAddress}`,
+            is_manual: false,
+            photo_url: photoUrl,
+            location_lat: null,
+            location_lng: null,
+          }]);
+        if (insertError) throw insertError;
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert('✅ Absen Masuk Berhasil', `Jam masuk tercatat: ${nowTime.substring(0,5)}`);
+      } else {
+        // CLOCK OUT
+        if (!existing) {
+          Alert.alert('Belum Absen Masuk', 'Anda belum melakukan absen masuk hari ini. Lakukan absen masuk terlebih dahulu.');
+          setShowCamera(false);
+          return;
+        }
+        if (existing.clock_out) {
+          Alert.alert('Sudah Absen Pulang', `Anda sudah absen pulang pukul ${existing.clock_out.substring(0, 5)} hari ini.`);
+          setShowCamera(false);
+          return;
+        }
+        // UPDATE clock_out
+        const { error: updateError } = await supabase
+          .from('attendance')
+          .update({
+            clock_out: nowTime,
+            notes: `Mobile check-out | ${currentAddress}`,
+            photo_url: photoUrl || undefined,
+          })
+          .eq('id', existing.id);
+        if (updateError) throw updateError;
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert('✅ Absen Pulang Berhasil', `Jam pulang tercatat: ${nowTime.substring(0,5)}`);
+      }
+
+      // Refresh today's record
+      if (userData?.id) fetchTodayAttendance(userData.id);
     } catch (error: any) {
-      Alert.alert('Gagal', error.message || 'Terjadi kesalahan');
+      Alert.alert('Gagal', error.message || 'Terjadi kesalahan saat menyimpan absensi');
     } finally {
       setShowCamera(false);
     }
@@ -286,7 +371,7 @@ export default function HomeScreen() {
   if (showCamera) {
     return (
       <View style={styles.cameraContainer}>
-        <AttendanceCamera type={cameraType} onCaptureComplete={handleCaptureComplete} />
+        <AttendanceCamera type={cameraType} onCaptureComplete={handleCaptureComplete} userData={userData} />
         <TouchableOpacity style={styles.closeCameraBtn} onPress={() => setShowCamera(false)}>
           <Ionicons name="close" size={28} color="#fff" />
         </TouchableOpacity>
@@ -428,30 +513,62 @@ export default function HomeScreen() {
         )}
 
 
-        {/* Minimalist Activity List */}
+        {/* Today's Attendance Status - Real Data */}
         <View style={styles.listSection}>
           <View style={styles.listHeader}>
-            <Text style={styles.listTitle}>AKTIVITAS TERAKHIR</Text>
-            <TouchableOpacity><Text style={styles.seeAllCompact}>Semua</Text></TouchableOpacity>
-          </View>
-          
-          <View style={[styles.simpleListItem, { backgroundColor: colors.card }]}>
-            <View style={[styles.itemIconCircle, { backgroundColor: isDark ? '#1F1F1F' : '#ECFDF5' }]}><Ionicons name="log-in" size={14} color="#10b981" /></View>
-            <View style={styles.itemTextContainer}>
-              <Text style={[styles.itemTitle, { color: colors.text }]}>Absen Masuk</Text>
-              <Text style={styles.itemSubText}>Lokasi: {currentAddress}</Text>
-            </View>
-            <Text style={[styles.itemTime, { color: colors.text }]}>07:58</Text>
+            <Text style={styles.listTitle}>ABSENSI HARI INI</Text>
+            <TouchableOpacity onPress={() => userData?.id && fetchTodayAttendance(userData.id)}>
+              <Text style={styles.seeAllCompact}>Refresh</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={[styles.simpleListItem, { backgroundColor: colors.card }]}>
-            <View style={[styles.itemIconCircle, {backgroundColor: isDark ? '#1F1F1F' : '#fff1f2'}]}><Ionicons name="log-out" size={14} color="#f43f5e" /></View>
-            <View style={styles.itemTextContainer}>
-              <Text style={[styles.itemTitle, { color: colors.text }]}>Absen Pulang</Text>
-              <Text style={styles.itemSubText}>Lokasi: {currentAddress}</Text>
+          {loadingAttendance ? (
+            <View style={[styles.simpleListItem, { backgroundColor: colors.card, justifyContent: 'center' }]}>
+              <Text style={{ color: colors.subText, fontSize: 12, fontWeight: '600' }}>Memuat data...</Text>
             </View>
-            <Text style={[styles.itemTime, { color: colors.text }]}>17:05</Text>
-          </View>
+          ) : (
+            <>
+              {/* Clock In Row */}
+              <View style={[styles.simpleListItem, { backgroundColor: colors.card }]}>
+                <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_in ? (isDark ? '#1F1F1F' : '#ECFDF5') : (isDark ? '#2C2C2E' : '#F1F5F9') }]}>
+                  <Ionicons name="log-in" size={14} color={todayRecord?.clock_in ? '#10b981' : '#94A3B8'} />
+                </View>
+                <View style={styles.itemTextContainer}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>Absen Masuk</Text>
+                  <Text style={styles.itemSubText}>
+                    {todayRecord?.clock_in ? `Tercatat pukul ${todayRecord.clock_in.substring(0,5)}` : 'Belum absen masuk'}
+                  </Text>
+                </View>
+                <Text style={[styles.itemTime, { color: todayRecord?.clock_in ? '#10b981' : '#94A3B8' }]}>
+                  {todayRecord?.clock_in ? todayRecord.clock_in.substring(0,5) : '--:--'}
+                </Text>
+              </View>
+
+              {/* Clock Out Row */}
+              <View style={[styles.simpleListItem, { backgroundColor: colors.card }]}>
+                <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_out ? (isDark ? '#1F1F1F' : '#fff1f2') : (isDark ? '#2C2C2E' : '#F1F5F9') }]}>
+                  <Ionicons name="log-out" size={14} color={todayRecord?.clock_out ? '#f43f5e' : '#94A3B8'} />
+                </View>
+                <View style={styles.itemTextContainer}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>Absen Pulang</Text>
+                  <Text style={styles.itemSubText}>
+                    {todayRecord?.clock_out ? `Tercatat pukul ${todayRecord.clock_out.substring(0,5)}` : 'Belum absen pulang'}
+                  </Text>
+                </View>
+                <Text style={[styles.itemTime, { color: todayRecord?.clock_out ? '#f43f5e' : '#94A3B8' }]}>
+                  {todayRecord?.clock_out ? todayRecord.clock_out.substring(0,5) : '--:--'}
+                </Text>
+              </View>
+
+              {/* Status summary badge */}
+              {!todayRecord && (
+                <View style={[styles.simpleListItem, { backgroundColor: '#FFF7ED', borderWidth: 1, borderColor: '#FED7AA' }]}>
+                  <Ionicons name="alert-circle" size={20} color="#F97316" style={{ marginRight: 12 }} />
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#C2410C', flex: 1 }}>Anda belum melakukan absensi hari ini</Text>
+                </View>
+              )}
+            </>
+          )}
         </View>
 
         <View style={styles.footerSpacingSmall} />
