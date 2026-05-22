@@ -282,20 +282,20 @@ const AttendanceCalendar = () => {
                   </div>
 
                   {record && (
-                    <div className={`mt-auto p-2 rounded-xl border flex flex-col gap-1 shadow-sm transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-black uppercase tracking-widest">{record.status}</span>
-                        <IconCheck size={12} className="opacity-70" />
+                    <div className={`mt-auto p-1.5 rounded-lg border flex flex-col shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
+                      <div className="flex justify-between items-center px-0.5 mb-1">
+                        <span className="text-[8.5px] font-black uppercase tracking-wider">{record.status}</span>
+                        <IconCheck size={10} className="opacity-70" />
                       </div>
-                      <div className="flex justify-between items-center bg-white/50 px-2 py-1 rounded-md">
+                      <div className="flex justify-between items-center bg-white/60 px-1.5 py-1 rounded w-full">
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-black opacity-60 uppercase leading-none">IN</span>
-                          <span className="text-[11px] font-bold tracking-tight leading-none mt-0.5">{record.clock_in || '--:--'}</span>
+                          <span className="text-[6.5px] font-black opacity-50 uppercase leading-none mb-[2px]">IN</span>
+                          <span className="text-[9.5px] font-bold tracking-tight leading-none">{record.clock_in ? record.clock_in.substring(0, 5) : '--:--'}</span>
                         </div>
-                        <div className="w-[1px] h-4 bg-black/10 mx-1"></div>
+                        <div className="w-[1px] h-4 bg-black/10 mx-0.5"></div>
                         <div className="flex flex-col text-right">
-                          <span className="text-[8px] font-black opacity-60 uppercase leading-none">OUT</span>
-                          <span className="text-[11px] font-bold tracking-tight leading-none mt-0.5">{record.clock_out || '--:--'}</span>
+                          <span className="text-[6.5px] font-black opacity-50 uppercase leading-none mb-[2px]">OUT</span>
+                          <span className="text-[9.5px] font-bold tracking-tight leading-none">{record.clock_out ? record.clock_out.substring(0, 5) : '--:--'}</span>
                         </div>
                       </div>
                     </div>
