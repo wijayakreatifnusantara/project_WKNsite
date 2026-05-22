@@ -39,6 +39,7 @@ class SiteAssignRequest(BaseModel):
     assigned_site_lat: Optional[float] = None
     assigned_site_long: Optional[float] = None
     is_field_team: bool = True
+    working_location: Optional[str] = None
 
 
 # ─── Existing Endpoints ────────────────────────────────────────────────────────
@@ -100,10 +101,17 @@ async def ess_check_in(body: CheckInRequest):
         target_lon = user_lon
         target_name = "Bebas Absen (Anywhere)"
         radius = 9999999
-    elif is_field and site_lat is not None and site_lon is not None:
-        target_lat = site_lat
-        target_lon = site_lon
-        target_name = "Site Proyek"
+    elif is_field:
+        if site_lat is not None and site_lon is not None:
+            target_lat = site_lat
+            target_lon = site_lon
+            target_name = "Site Proyek"
+            radius = 100
+        else:
+            target_lat = user_lat
+            target_lon = user_lon
+            target_name = "Bebas Absen (Field Team)"
+            radius = 9999999
     else:
         # Check if employee's working_location matches any configured working locations
         working_loc_name = employee.get("working_location", "Head Office")
@@ -251,15 +259,16 @@ async def update_attendance_settings(body: LocationConfigRequest):
 async def assign_employee_site(employee_id: str, body: SiteAssignRequest):
     """
     T017: Assign site coordinates to a field team member.
-    Updates employees.assigned_site_lat, assigned_site_long, and is_field_team.
+    Updates employees.assigned_site_lat, assigned_site_long, is_field_team, and working_location.
     """
     try:
         update_data = {
             "is_field_team": body.is_field_team,
             "assigned_site_lat": body.assigned_site_lat,
-            "assigned_site_long": body.assigned_site_long
+            "assigned_site_long": body.assigned_site_long,
+            "working_location": body.working_location
         }
-        # Remove None values
+        # Remove None values except boolean
         update_data = {k: v for k, v in update_data.items() if v is not None or k == "is_field_team"}
         
         if not supabase_client.client:
@@ -272,7 +281,7 @@ async def assign_employee_site(employee_id: str, body: SiteAssignRequest):
         
         return {
             "status": "success",
-            "message": f"Site assignment untuk karyawan '{employee_id}' berhasil diperbarui."
+            "message": f"Konfigurasi lokasi untuk karyawan '{employee_id}' berhasil diperbarui."
         }
     except HTTPException:
         raise

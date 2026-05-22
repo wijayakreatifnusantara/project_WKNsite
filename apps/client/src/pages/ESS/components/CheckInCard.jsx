@@ -118,6 +118,8 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
     );
   }, [employeeId, hasCheckInPerm]);
 
+  const activeIsFieldTeam = isFieldTeam || employeeDetail?.is_field_team || employeeDetail?.isFieldTeam || false;
+
   const cfg = !hasCheckInPerm ? {
     bg: 'bg-slate-50', shadow: 'border border-slate-200 shadow-sm',
     icon: <IconLock size={48} className="text-slate-300" />,
@@ -127,10 +129,10 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
   let hqName = settings?.hq_location?.name || 'WKN HQ';
   let hqRadius = settings?.hq_location?.radius || 100;
 
-  if (settings?.allow_free_attendance) {
-    hqName = 'Bebas Absen (Anywhere)';
+  if (settings?.allow_free_attendance || activeIsFieldTeam) {
+    hqName = activeIsFieldTeam ? 'Bebas Absen (Field Team)' : 'Bebas Absen (Anywhere)';
     hqRadius = 'Tanpa Batas';
-  } else if (!isFieldTeam && employeeDetail && settings?.working_locations) {
+  } else if (employeeDetail && settings?.working_locations) {
     const matchedLoc = settings.working_locations.find(
       loc => loc.name === (employeeDetail.working_location || employeeDetail['Working Location'])
     );
@@ -163,7 +165,7 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
         </div>
 
         {/* Field Badge */}
-        {isFieldTeam && (
+        {activeIsFieldTeam && (
           <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5">
             <IconUser size={12} className="text-amber-600" />
             <span className="text-[8px] font-black text-amber-700 uppercase tracking-widest">Field Team</span>
@@ -235,12 +237,12 @@ const CheckInCard = ({ employeeId, isFieldTeam = false }) => {
       <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 bg-red-50 rounded-xl flex items-center justify-center text-[#E31E24] flex-shrink-0 border border-red-100">
-            {isFieldTeam ? <IconUser size={16} /> : <IconBuildingSkyscraper size={16} />}
+            {activeIsFieldTeam ? <IconUser size={16} /> : <IconBuildingSkyscraper size={16} />}
           </div>
           <div>
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Lokasi Target</p>
             <p className="text-[11px] font-black text-slate-700 mt-0.5">
-              {isFieldTeam ? 'Site Proyek (Sesuai Assignment)' : hqName}
+              {activeIsFieldTeam ? 'Site Proyek (Sesuai Assignment)' : hqName}
             </p>
           </div>
           <div className="ml-auto text-right">

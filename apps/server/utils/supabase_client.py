@@ -65,7 +65,9 @@ class WKNSupabaseClient:
                     "Resign Date": e.get("resign_date"),
                     "is_resigned": e.get("is_resigned"),
                     "working_location": e.get("working_location"),
-                    "Working Location": e.get("working_location")
+                    "Working Location": e.get("working_location"),
+                    "is_field_team": e.get("is_field_team"),
+                    "isFieldTeam": e.get("is_field_team")
                 })
             
             result = {
