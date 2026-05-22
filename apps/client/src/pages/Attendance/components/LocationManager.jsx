@@ -611,11 +611,6 @@ const LocationManager = ({ onBack }) => {
             <FreeAttendanceToggle />
           </div>
 
-          {/* HQ Location Form */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-            <HQConfigForm onSettingsUpdated={fetchLocations} />
-          </div>
-
           {/* Custom Working Locations list manager */}
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
             <WorkingLocationsManager
