@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: wknsite-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - apps/server/.env
+    # Optional: Keep database volumes if Supabase local is used, not needed for cloud Supabase
+
+  frontend:
+    build:
+      context: apps/client
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: wknsite-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
