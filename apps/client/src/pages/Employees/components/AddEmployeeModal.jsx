@@ -113,6 +113,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [organizations, setOrganizations] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [positions, setPositions] = useState([]);
   const fileInputRef = React.useRef(null);
   const { user } = useAuth();
   const isOwnerOrSuperAdmin = user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'superadmin';
@@ -149,10 +150,33 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       });
   }, []);
 
+  // Helper: fetch positions for a given department id
+  const fetchPositionsForDept = React.useCallback((deptId) => {
+    if (!deptId) { setPositions([]); return; }
+    fetch(`${API_URL}/departments/${deptId}/positions?active_only=true`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success') {
+          setPositions(d.data || []);
+        } else {
+          setPositions([]);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load positions:', err);
+        setPositions([]);
+      });
+  }, []);
+
   // Fetch departments when organization_id changes (new employee flow / org switcher)
   React.useEffect(() => {
     fetchDepartmentsForOrg(formData.organization_id);
   }, [formData.organization_id, fetchDepartmentsForOrg]);
+
+  // Fetch positions when department_id changes
+  React.useEffect(() => {
+    fetchPositionsForDept(formData.department_id);
+  }, [formData.department_id, fetchPositionsForDept]);
 
   // Match organization_id when organizations are loaded or edited organization name is set
   React.useEffect(() => {
@@ -214,15 +238,19 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       });
       
       setFormData(normalizedData);
-      // Immediately fetch departments using editData's org id — avoids race condition with state
+      // Immediately fetch departments and positions using editData's ids — avoids race condition with state
       if (editData.organization_id) {
         fetchDepartmentsForOrg(editData.organization_id);
+      }
+      if (normalizedData.department_id) {
+        fetchPositionsForDept(normalizedData.department_id);
       }
     } else if (isOpen && !editData) {
       setFormData(initialFormData);
       setDepartments([]);
+      setPositions([]);
     }
-  }, [isOpen, editData, fetchDepartmentsForOrg]);
+  }, [isOpen, editData, fetchDepartmentsForOrg, fetchPositionsForDept]);
 
   const handleClose = () => {
     // If editing, we can just close
@@ -774,7 +802,18 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     </select>
                   </InputWrapper>
                   <InputWrapper label="Position" icon={IconBriefcase}>
-                    <input name="job_position" placeholder="e.g. Engineer" value={formData.job_position} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                    <select 
+                      name="job_position" 
+                      value={formData.job_position || ''} 
+                      onChange={handleChange} 
+                      className={getFieldStyle(isFieldsLocked || !formData.department_id)} 
+                      disabled={isFieldsLocked || !formData.department_id}
+                    >
+                      <option value="">PILIH POSISI</option>
+                      {positions.map(pos => (
+                        <option key={pos.id} value={pos.name}>{pos.name.toUpperCase()}</option>
+                      ))}
+                    </select>
                   </InputWrapper>
                   <InputWrapper label="Employment Type" icon={IconCheck}>
                     <select name="employment_type" value={formData.employment_type} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked}>
