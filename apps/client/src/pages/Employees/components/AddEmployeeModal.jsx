@@ -636,9 +636,18 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       }
     }
 
-    setFormData({ 
-      ...formData, 
-      [name]: name === 'base_salary' ? parseFloat(value) || 0 : finalValue 
+    setFormData(prev => {
+      const updated = { 
+        ...prev, 
+        [name]: name === 'base_salary' ? parseFloat(value) || 0 : finalValue 
+      };
+      
+      // Apabila permanen, tgl contract end tdk bisa di isi, maka hapus isinya
+      if (name === 'employment_type' && finalValue === 'Permanent') {
+        updated.contract_end_date = '';
+      }
+      
+      return updated;
     });
   };
 
@@ -839,7 +848,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       selected={formData.contract_end_date} 
                       onChange={(date) => setFormData({...formData, contract_end_date: date ? date.toISOString().split('T')[0] : ''})}
                       placeholder="DD/MM/YYYY"
-                      disabled={isFieldsLocked}
+                      disabled={isFieldsLocked || formData.employment_type === 'Permanent'}
                     />
                   </InputWrapper>
                   <InputWrapper label="Base Salary (Monthly)" icon={IconWallet}>
