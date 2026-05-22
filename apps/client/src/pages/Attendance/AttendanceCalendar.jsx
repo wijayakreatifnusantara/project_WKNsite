@@ -316,6 +316,8 @@ const AttendanceCalendar = () => {
               const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const record = attendanceData.find(r => r.date === dateStr);
               const isToday = new Date().toISOString().split('T')[0] === dateStr;
+              const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), day).getDay();
+              const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
               return (
                 <div 
@@ -324,7 +326,7 @@ const AttendanceCalendar = () => {
                   className="bg-white p-1.5 min-h-0 h-full cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col overflow-hidden"
                 >
                   <div className="flex justify-between items-start mb-1 shrink-0">
-                    <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-md' : 'text-slate-600'}`}>
+                    <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-md' : (isWeekend ? 'text-[#E31E24]' : 'text-slate-600')}`}>
                       {day}
                     </span>
                     {!record && selectedEmployee && (
@@ -333,7 +335,7 @@ const AttendanceCalendar = () => {
                   </div>
 
                   {record && (
-                    <div className={`absolute bottom-1.5 left-1.5 right-1.5 p-1.5 rounded-lg border flex flex-col shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-transform group-hover:scale-[1.02] z-10 bg-white/90 backdrop-blur-sm ${getStatusColor(record.status)}`}>
+                    <div className={`mt-auto p-1.5 rounded-lg border flex flex-col shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
                       <div className="flex justify-between items-center px-0.5 mb-1">
                         <span className="text-[8.5px] font-black uppercase tracking-wider">{record.status}</span>
                         <IconCheck size={10} className="opacity-70" />
