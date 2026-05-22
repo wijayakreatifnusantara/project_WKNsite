@@ -5,6 +5,7 @@ import Employees from './pages/Employees/Employees';
 import AttendanceHub from './pages/Attendance/AttendanceHub';
 import AttendanceReport from './pages/Attendance/AttendanceReport';
 import AttendanceRecap from './pages/Attendance/AttendanceRecap';
+import AttendanceCalendar from './pages/Attendance/AttendanceCalendar';
 import AdminHub from './pages/Admin/AdminHub';
 import Overview from './pages/Overview/Overview';
 import LeaveManagementHub from './pages/Leave/LeaveManagementHub';
@@ -82,6 +83,7 @@ function App() {
             <Route path="/employees" element={<Employees />} />
             <Route path="/employees/onboarding" element={<OnboardingPage />} />
             <Route path="/attendance" element={isMobile ? <MobileHome /> : <AttendanceHub />} />
+            <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
             <Route path="/attendance/report" element={<AttendanceReport />} />
             <Route path="/attendance/recap" element={<AttendanceRecap />} />
             <Route path="/leave" element={<LeaveManagementHub />} />

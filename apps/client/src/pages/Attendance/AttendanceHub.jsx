@@ -109,6 +109,15 @@ const AttendanceHub = () => {
                       Performance
                     </Button>
 
+                    <Button 
+                      variant="ghost"
+                      onClick={() => navigate('/attendance/calendar')}
+                      className="h-8 px-3 rounded-lg text-slate-500 font-black text-[8px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                    >
+                      <IconCalendarEvent size={14} />
+                      Calendar
+                    </Button>
+
                   </>
                 )}
                 
