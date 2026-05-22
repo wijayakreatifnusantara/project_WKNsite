@@ -170,55 +170,55 @@ const AttendanceCalendar = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 lg:gap-3 flex-1 justify-end min-w-0 ml-4">
              {/* Organization Selector */}
-             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-2 focus-within:ring-[#E31E24]/20 transition-all">
-                <IconBuildingSkyscraper size={16} className="text-slate-400" />
+             <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-slate-100 transition-all flex-1 max-w-[240px] min-w-[120px]">
+                <IconBuildingSkyscraper size={16} className="text-slate-400 shrink-0" />
                 <select 
                   value={selectedOrg}
                   onChange={(e) => { setSelectedOrg(e.target.value); setSelectedDept(''); }}
-                  className="bg-transparent border-none text-slate-700 font-bold text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-44 appearance-none"
+                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] lg:text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-full truncate appearance-none"
                 >
-                  <option value="" disabled>SELECT ORGANIZATION</option>
+                  <option value="" disabled>SELECT ORG</option>
                   {uniqueOrgs.map(org => (
                     <option key={org} value={org}>{org}</option>
                   ))}
                 </select>
-                <IconChevronDown size={14} className="text-slate-300 pointer-events-none" />
+                <IconChevronDown size={14} className="text-slate-400 shrink-0 pointer-events-none" />
              </div>
 
              {/* Department Selector */}
-             <div className={`flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-2 focus-within:ring-[#E31E24]/20 transition-all ${!selectedOrg ? 'opacity-50 cursor-not-allowed bg-slate-50' : ''}`}>
-                <IconHierarchy2 size={16} className="text-slate-400" />
+             <div className={`flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-slate-100 transition-all flex-1 max-w-[240px] min-w-[120px] ${!selectedOrg ? 'opacity-50 cursor-not-allowed bg-slate-100/50' : ''}`}>
+                <IconHierarchy2 size={16} className="text-slate-400 shrink-0" />
                 <select 
                   value={selectedDept}
                   onChange={(e) => setSelectedDept(e.target.value)}
                   disabled={!selectedOrg}
-                  className="bg-transparent border-none text-slate-700 font-bold text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-48 appearance-none disabled:cursor-not-allowed"
+                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] lg:text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-full truncate appearance-none disabled:cursor-not-allowed"
                 >
-                  <option value="" disabled>SELECT DEPARTMENT</option>
+                  <option value="" disabled>SELECT DEPT</option>
                   {uniqueDepts.map(dept => (
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
-                <IconChevronDown size={14} className="text-slate-300 pointer-events-none" />
+                <IconChevronDown size={14} className="text-slate-400 shrink-0 pointer-events-none" />
              </div>
 
              {/* Employee Selector */}
-             <div className={`flex items-center gap-2 bg-[#E31E24]/5 px-4 py-2 rounded-xl border border-[#E31E24]/20 shadow-sm focus-within:border-[#E31E24]/50 focus-within:ring-2 focus-within:ring-[#E31E24]/30 transition-all ${!selectedDept ? 'opacity-50 cursor-not-allowed bg-slate-50/50' : ''}`}>
-                <IconUser size={16} className="text-[#E31E24]" />
+             <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm focus-within:ring-2 transition-all flex-1 max-w-[260px] min-w-[130px] ${selectedDept ? 'bg-white border-[#E31E24]/30 focus-within:border-[#E31E24] focus-within:ring-[#E31E24]/10' : 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed bg-slate-100/50'}`}>
+                <IconUser size={16} className={`${selectedDept ? 'text-[#E31E24]' : 'text-slate-400'} shrink-0`} />
                 <select 
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
                   disabled={!selectedDept}
-                  className="bg-transparent border-none text-slate-800 font-black text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-56 appearance-none disabled:cursor-not-allowed"
+                  className={`bg-transparent border-none font-black text-[10px] lg:text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-full truncate appearance-none disabled:cursor-not-allowed ${selectedDept ? 'text-slate-800' : 'text-slate-700'}`}
                 >
                   <option value="" disabled>SELECT PERSONNEL</option>
                   {filteredEmployees.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                   ))}
                 </select>
-                <IconChevronDown size={14} className="text-[#E31E24]/50 pointer-events-none" />
+                <IconChevronDown size={14} className={`${selectedDept ? 'text-[#E31E24]/50' : 'text-slate-400'} shrink-0 pointer-events-none`} />
              </div>
           </div>
         </div>
