@@ -124,15 +124,14 @@ const AttendanceCalendar = () => {
     const { data: empData } = await supabase.from('employees').select('id, name, is_resigned, organization_name, departments(name)').eq('is_resigned', false);
     const mapped = (empData || []).map(e => ({
        ...e,
-       organization_name: e.organization_name || 'UNASSIGNED ORG',
-       department_name: e.departments?.name || 'UNASSIGNED DEPT'
+       department_name: e.departments?.name
     }));
     setEmployees(mapped);
   };
 
-  const uniqueOrgs = [...new Set(employees.map(e => e.organization_name))].sort();
+  const uniqueOrgs = [...new Set(employees.map(e => e.organization_name))].filter(Boolean).sort();
   const filteredForDept = employees.filter(e => e.organization_name === selectedOrg);
-  const uniqueDepts = [...new Set(filteredForDept.map(e => e.department_name))].sort();
+  const uniqueDepts = [...new Set(filteredForDept.map(e => e.department_name))].filter(Boolean).sort();
 
   const filteredEmployees = employees.filter(e => {
     if (!selectedOrg || e.organization_name !== selectedOrg) return false;
