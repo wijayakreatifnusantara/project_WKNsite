@@ -131,26 +131,28 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       .catch(err => console.error('Failed to load organizations:', err));
   }, []);
 
-  // Fetch departments when organization_id changes
-  React.useEffect(() => {
-    if (formData.organization_id) {
-      fetch(`${API_URL}/organizations/${formData.organization_id}/departments?active_only=true`)
-        .then(r => r.json())
-        .then(d => {
-          if (d.status === 'success') {
-            setDepartments(d.data || []);
-          } else {
-            setDepartments([]);
-          }
-        })
-        .catch(err => {
-          console.error('Failed to load departments:', err);
+  // Helper: fetch departments for a given org id
+  const fetchDepartmentsForOrg = React.useCallback((orgId) => {
+    if (!orgId) { setDepartments([]); return; }
+    fetch(`${API_URL}/organizations/${orgId}/departments?active_only=true`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'success') {
+          setDepartments(d.data || []);
+        } else {
           setDepartments([]);
-        });
-    } else {
-      setDepartments([]);
-    }
-  }, [formData.organization_id]);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load departments:', err);
+        setDepartments([]);
+      });
+  }, []);
+
+  // Fetch departments when organization_id changes (new employee flow / org switcher)
+  React.useEffect(() => {
+    fetchDepartmentsForOrg(formData.organization_id);
+  }, [formData.organization_id, fetchDepartmentsForOrg]);
 
   // Match organization_id when organizations are loaded or edited organization name is set
   React.useEffect(() => {
@@ -212,10 +214,15 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       });
       
       setFormData(normalizedData);
+      // Immediately fetch departments using editData's org id — avoids race condition with state
+      if (editData.organization_id) {
+        fetchDepartmentsForOrg(editData.organization_id);
+      }
     } else if (isOpen && !editData) {
       setFormData(initialFormData);
+      setDepartments([]);
     }
-  }, [isOpen, editData]);
+  }, [isOpen, editData, fetchDepartmentsForOrg]);
 
   const handleClose = () => {
     // If editing, we can just close
