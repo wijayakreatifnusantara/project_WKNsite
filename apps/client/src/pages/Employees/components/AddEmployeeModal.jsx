@@ -29,6 +29,7 @@ import Tesseract from 'tesseract.js';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IconScan, IconSparkles } from "@tabler/icons-react";
+import { useAuth } from '@/context/AuthContext';
 
 const InputWrapper = ({ label, icon: Icon, children }) => (
   <div className="space-y-1.5">
@@ -112,6 +113,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const [organizations, setOrganizations] = useState([]);
   const [departments, setDepartments] = useState([]);
   const fileInputRef = React.useRef(null);
+  const { user } = useAuth();
+  const isOwnerOrSuperAdmin = user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'superadmin';
 
   React.useEffect(() => {
     fetch(`${API_URL}/organizations?active_only=true`)
@@ -312,16 +315,67 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         }
       });
 
-      let query;
-      if (editData) {
-        query = supabase.from('employees').update(submissionData).eq('id', editData.id);
+      // Check if organization has changed on edit (Mutation)
+      const originalOrgId = editData?.organization_id;
+      const currentOrgId = formData.organization_id;
+      const isMutation = editData && originalOrgId && currentOrgId && originalOrgId !== currentOrgId;
+
+      if (isMutation) {
+        if (!isOwnerOrSuperAdmin) {
+          alert('Hanya Owner atau Superadmin yang dapat melakukan mutasi lintas organisasi.');
+          setLoading(false);
+          return;
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dateSuffix = todayStr.replace(/-/g, '');
+        const originalEmail = editData.email || '';
+        let mutatedEmail = originalEmail;
+        if (originalEmail.includes('@')) {
+          const [localPart, domain] = originalEmail.split('@');
+          mutatedEmail = `${localPart}_mutated_${dateSuffix}@${domain}`;
+        } else {
+          mutatedEmail = `${originalEmail}_mutated_${dateSuffix}`;
+        }
+
+        // 1. Deactivate the legacy record first (frees up the unique email constraint)
+        const { error: deactivateError } = await supabase
+          .from('employees')
+          .update({
+            is_resigned: true,
+            status: 'MUTASI',
+            resign_date: todayStr,
+            email: mutatedEmail
+          })
+          .eq('id', editData.id);
+
+        if (deactivateError) throw deactivateError;
+
+        // 2. Create the new record under the new organization
+        const newEmployeeData = {
+          ...submissionData,
+          join_date: todayStr,
+          is_resigned: null,
+          resign_date: null
+        };
+
+        const { error: insertError } = await supabase
+          .from('employees')
+          .insert([newEmployeeData]);
+
+        if (insertError) throw insertError;
+
       } else {
-        query = supabase.from('employees').insert([submissionData]);
+        let query;
+        if (editData) {
+          query = supabase.from('employees').update(submissionData).eq('id', editData.id);
+        } else {
+          query = supabase.from('employees').insert([submissionData]);
+        }
+
+        const { error } = await query;
+        if (error) throw error;
       }
-
-      const { error } = await query;
-
-      if (error) throw error;
       
       setSuccess(true);
       setTimeout(() => {
@@ -804,8 +858,15 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   <span className="w-1 h-3 bg-emerald-600 rounded-full"></span> Career & Treasury
                 </h3>
                 <div className="grid grid-cols-4 gap-4">
-                  <InputWrapper label="Org Name" icon={IconBuildingSkyscraper}>
-                    <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle}>
+                  <InputWrapper label={editData && !isOwnerOrSuperAdmin ? "Org Name (Locked)" : "Org Name"} icon={IconBuildingSkyscraper}>
+                    <select 
+                      required 
+                      name="organization_name" 
+                      value={formData.organization_name} 
+                      onChange={handleOrgChange} 
+                      className={`${inputStyle} ${editData && !isOwnerOrSuperAdmin ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : ''}`}
+                      disabled={editData && !isOwnerOrSuperAdmin}
+                    >
                       <option value="">PILIH ORGANISASI</option>
                       {organizations.map(org => (
                         <option key={org.id} value={org.name}>{org.name.toUpperCase()}</option>
