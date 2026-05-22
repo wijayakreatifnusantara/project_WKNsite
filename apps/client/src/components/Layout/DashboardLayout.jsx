@@ -368,22 +368,25 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
               <div className="h-3 w-[1px] bg-slate-200 shrink-0"></div>
 
-              {/* Minimalist Breadcrumbs */}
-              <div className="flex items-start gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pt-0.5">
-                <div className="flex flex-col gap-1.5">
-                  <span className="hover:text-[#E31E24] cursor-pointer transition-colors leading-none">WKNsite</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[6.5px] font-medium text-slate-400 uppercase tracking-widest leading-none">{formatDate(currentTime)}</span>
-                    <span className="text-[6.5px] font-mono font-semibold text-[#E31E24] leading-none">{formatTime(currentTime)}</span>
-                  </div>
+              {/* Breadcrumb & Clock Container */}
+              <div className="flex flex-col gap-1">
+                {/* Minimalist Breadcrumbs */}
+                <div className="flex items-center gap-1.5 text-[9.5px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  <span className="hover:text-[#E31E24] cursor-pointer transition-colors text-slate-700">WKNsite</span>
+                  <span className="text-slate-300">/</span>
+                  {getBreadcrumbs().map((part, index, arr) => (
+                    <React.Fragment key={index}>
+                      <span className={index === arr.length - 1 ? 'text-slate-800 font-bold' : ''}>{part}</span>
+                      {index < arr.length - 1 && <span className="text-slate-300">/</span>}
+                    </React.Fragment>
+                  ))}
                 </div>
-                <span className="text-slate-300 leading-none">/</span>
-                {getBreadcrumbs().map((part, index, arr) => (
-                  <React.Fragment key={index}>
-                    <span className={`${index === arr.length - 1 ? 'text-slate-800 font-bold' : ''} leading-none`}>{part}</span>
-                    {index < arr.length - 1 && <span className="text-slate-300 leading-none">/</span>}
-                  </React.Fragment>
-                ))}
+                {/* Clock directly under WKNsite */}
+                <div className="flex items-center gap-1.5 pl-0.5">
+                  <span className="text-[8.5px] font-semibold text-slate-400 uppercase tracking-widest">{formatDate(currentTime)}</span>
+                  <span className="text-slate-300 text-[8.5px]">•</span>
+                  <span className="text-[8.5px] font-mono font-bold text-[#E31E24]">{formatTime(currentTime)}</span>
+                </div>
               </div>
 
               <div className="h-3 w-[1px] bg-slate-200"></div>
