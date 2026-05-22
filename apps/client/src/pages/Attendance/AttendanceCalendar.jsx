@@ -27,8 +27,8 @@ const AttendanceCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   
   // Selection State
-  const [selectedOrg, setSelectedOrg] = useState('ALL');
-  const [selectedDept, setSelectedDept] = useState('ALL');
+  const [selectedOrg, setSelectedOrg] = useState('');
+  const [selectedDept, setSelectedDept] = useState('');
   const [selectedEmployee, setSelectedEmployee] = useState('');
   
   // Data State
@@ -68,29 +68,24 @@ const AttendanceCalendar = () => {
        department_name: e.departments?.name || ''
     }));
     setEmployees(mapped);
-    if (mapped && mapped.length > 0) {
-      setSelectedEmployee(mapped[0].id);
-    }
   };
 
-  const uniqueOrgs = ['ALL', ...new Set(employees.map(e => e.organization_name).filter(Boolean))];
-  const filteredForDept = selectedOrg === 'ALL' ? employees : employees.filter(e => e.organization_name === selectedOrg);
-  const uniqueDepts = ['ALL', ...new Set(filteredForDept.map(e => e.department_name).filter(Boolean))];
+  const uniqueOrgs = [...new Set(employees.map(e => e.organization_name).filter(Boolean))];
+  const filteredForDept = employees.filter(e => e.organization_name === selectedOrg);
+  const uniqueDepts = [...new Set(filteredForDept.map(e => e.department_name).filter(Boolean))];
 
   const filteredEmployees = employees.filter(e => {
-    if (selectedOrg !== 'ALL' && e.organization_name !== selectedOrg) return false;
-    if (selectedDept !== 'ALL' && e.department_name !== selectedDept) return false;
+    if (!selectedOrg || e.organization_name !== selectedOrg) return false;
+    if (!selectedDept || e.department_name !== selectedDept) return false;
     return true;
   });
 
-  // Auto-select first employee if current is filtered out
+  // Auto-reset employee if it's filtered out
   useEffect(() => {
-    if (filteredEmployees.length > 0 && !filteredEmployees.find(e => e.id === selectedEmployee)) {
-      setSelectedEmployee(filteredEmployees[0].id);
-    } else if (filteredEmployees.length === 0) {
+    if (filteredEmployees.length === 0 || !filteredEmployees.find(e => e.id === selectedEmployee)) {
       setSelectedEmployee('');
     }
-  }, [selectedOrg, selectedDept, filteredEmployees, selectedEmployee]);
+  }, [selectedOrg, selectedDept, filteredEmployees]);
 
   const fetchAttendanceData = async () => {
     try {
@@ -177,49 +172,53 @@ const AttendanceCalendar = () => {
 
           <div className="flex items-center gap-3">
              {/* Organization Selector */}
-             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-1 focus-within:ring-[#E31E24]/20 transition-all">
-                <IconBuildingSkyscraper size={14} className="text-slate-400" />
+             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-2 focus-within:ring-[#E31E24]/20 transition-all">
+                <IconBuildingSkyscraper size={16} className="text-slate-400" />
                 <select 
                   value={selectedOrg}
-                  onChange={(e) => { setSelectedOrg(e.target.value); setSelectedDept('ALL'); }}
-                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-28 appearance-none"
+                  onChange={(e) => { setSelectedOrg(e.target.value); setSelectedDept(''); }}
+                  className="bg-transparent border-none text-slate-700 font-bold text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-44 appearance-none"
                 >
+                  <option value="" disabled>SELECT ORGANIZATION</option>
                   {uniqueOrgs.map(org => (
-                    <option key={org} value={org}>{org === 'ALL' ? 'ALL ORGS' : org}</option>
+                    <option key={org} value={org}>{org}</option>
                   ))}
                 </select>
-                <IconChevronDown size={12} className="text-slate-300 pointer-events-none" />
+                <IconChevronDown size={14} className="text-slate-300 pointer-events-none" />
              </div>
 
              {/* Department Selector */}
-             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-1 focus-within:ring-[#E31E24]/20 transition-all">
-                <IconHierarchy2 size={14} className="text-slate-400" />
+             <div className={`flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm focus-within:border-[#E31E24]/40 focus-within:ring-2 focus-within:ring-[#E31E24]/20 transition-all ${!selectedOrg ? 'opacity-50 cursor-not-allowed bg-slate-50' : ''}`}>
+                <IconHierarchy2 size={16} className="text-slate-400" />
                 <select 
                   value={selectedDept}
                   onChange={(e) => setSelectedDept(e.target.value)}
-                  className="bg-transparent border-none text-slate-700 font-bold text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-32 appearance-none"
+                  disabled={!selectedOrg}
+                  className="bg-transparent border-none text-slate-700 font-bold text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-48 appearance-none disabled:cursor-not-allowed"
                 >
+                  <option value="" disabled>SELECT DEPARTMENT</option>
                   {uniqueDepts.map(dept => (
-                    <option key={dept} value={dept}>{dept === 'ALL' ? 'ALL DEPTS' : dept}</option>
+                    <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
-                <IconChevronDown size={12} className="text-slate-300 pointer-events-none" />
+                <IconChevronDown size={14} className="text-slate-300 pointer-events-none" />
              </div>
 
              {/* Employee Selector */}
-             <div className="flex items-center gap-2 bg-[#E31E24]/5 px-3 py-1.5 rounded-lg border border-[#E31E24]/20 shadow-sm focus-within:border-[#E31E24]/50 focus-within:ring-1 focus-within:ring-[#E31E24]/30 transition-all">
-                <IconUser size={14} className="text-[#E31E24]" />
+             <div className={`flex items-center gap-2 bg-[#E31E24]/5 px-4 py-2 rounded-xl border border-[#E31E24]/20 shadow-sm focus-within:border-[#E31E24]/50 focus-within:ring-2 focus-within:ring-[#E31E24]/30 transition-all ${!selectedDept ? 'opacity-50 cursor-not-allowed bg-slate-50/50' : ''}`}>
+                <IconUser size={16} className="text-[#E31E24]" />
                 <select 
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
-                  className="bg-transparent border-none text-slate-800 font-black text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-44 appearance-none"
+                  disabled={!selectedDept}
+                  className="bg-transparent border-none text-slate-800 font-black text-[11px] uppercase focus:outline-none cursor-pointer p-0 w-56 appearance-none disabled:cursor-not-allowed"
                 >
                   <option value="" disabled>SELECT PERSONNEL</option>
                   {filteredEmployees.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                   ))}
                 </select>
-                <IconChevronDown size={12} className="text-[#E31E24]/50 pointer-events-none" />
+                <IconChevronDown size={14} className="text-[#E31E24]/50 pointer-events-none" />
              </div>
           </div>
         </div>
