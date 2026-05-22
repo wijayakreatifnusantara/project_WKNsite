@@ -16,6 +16,22 @@ from api.organizations import router as organizations_router
 from api.database import router as database_router
 from fastapi.staticfiles import StaticFiles
 import os
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from dotenv import load_dotenv
+
+# Load local environment files
+load_dotenv()
+
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[FastApiIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True
+    )
+    print("Successfully connected to Sentry Real-Time Error Monitoring")
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
 IS_PROD = ENVIRONMENT == "production"

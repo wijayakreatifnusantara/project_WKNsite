@@ -179,6 +179,21 @@ class AIErrorHandler:
             # Log error
             await self._log_error(error_analysis)
             
+            # Forward to Sentry real-time dashboard if initialized
+            try:
+                import sentry_sdk
+                if sentry_sdk.Hub.current.client:
+                    with sentry_sdk.push_scope() as scope:
+                        scope.set_tag("error_id", error_analysis["error_id"])
+                        scope.set_tag("category", error_analysis["category"].value)
+                        scope.set_tag("severity", error_analysis["severity"].value)
+                        if context:
+                            for key, val in context.items():
+                                scope.set_extra(f"ctx_{key}", val)
+                        sentry_sdk.capture_exception(error)
+            except Exception as sentry_err:
+                self.logger.warning(f"Sentry capture failed: {sentry_err}")
+            
             # Attempt auto-recovery
             recovery_result = await self._attempt_recovery(error_analysis)
             
@@ -192,12 +207,12 @@ class AIErrorHandler:
             return {
                 "error_id": error_analysis["error_id"],
                 "handled": True,
-                "auto_recovered": recovery_result["success"],
+                "auto_recovered": recovery_result.get("success", False),
                 "user_message": user_message,
                 "severity": error_analysis["severity"].value,
                 "category": error_analysis["category"].value,
-                "recovery_action": recovery_result["action"],
-                "recommendations": recovery_result["recommendations"]
+                "recovery_action": recovery_result.get("action", "none"),
+                "recommendations": recovery_result.get("recommendations", [])
             }
             
         except Exception as e:
@@ -277,11 +292,11 @@ class AIErrorHandler:
     async def _attempt_recovery(self, error_analysis: Dict[str, Any]) -> Dict[str, Any]:
         """AI-powered auto-recovery"""
         if not self.auto_recovery_enabled:
-            return {"success": False, "action": "auto_recovery_disabled"}
+            return {"success": False, "action": "auto_recovery_disabled", "recommendations": []}
         
         pattern = error_analysis.get("pattern")
         if not pattern or not pattern.auto_recovery:
-            return {"success": False, "action": "no_auto_recovery_available"}
+            return {"success": False, "action": "no_auto_recovery_available", "recommendations": []}
         
         recovery_action = pattern.recovery_action
         success = False
