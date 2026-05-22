@@ -25,3 +25,14 @@ services:
       - "80:80"
     depends_on:
       - backend
+
+  # Cloudflare Tunnel Service
+  # - Quick Tunnel (Free & No Account): Defaults to printing a public trycloudflare.com URL in container logs.
+  # - Custom Domain: Replace the command with: tunnel --no-autoupdate run --token YOUR_CLOUDFLARE_TUNNEL_TOKEN
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: wknsite-tunnel
+    restart: unless-stopped
+    command: tunnel --url http://frontend:80
+    depends_on:
+      - frontend
