@@ -20,7 +20,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
     date: '',
     clock_in: '',
     clock_out: '',
-    status: 'PRESENT',
+    status: 'Present',
     notes: ''
   });
 
@@ -31,7 +31,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
           date: record.date || '',
           clock_in: record.clock_in ? record.clock_in.substring(0, 5) : '',
           clock_out: record.clock_out ? record.clock_out.substring(0, 5) : '',
-          status: record.status || 'PRESENT',
+          status: record.status || 'Present',
           notes: record.notes || ''
         });
       } else {
@@ -39,7 +39,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
           date: defaultDate || new Date().toISOString().split('T')[0],
           clock_in: '08:00',
           clock_out: '17:00',
-          status: 'PRESENT',
+          status: 'Present',
           notes: ''
         });
       }
@@ -209,11 +209,11 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 onChange={handleChange}
                 className="w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase appearance-none"
               >
-                <option value="PRESENT">PRESENT</option>
-                <option value="LATE">LATE</option>
-                <option value="SICK">SICK</option>
-                <option value="LEAVE">LEAVE</option>
-                <option value="ABSENT">ABSENT</option>
+                <option value="Present">PRESENT</option>
+                <option value="Late">LATE</option>
+                <option value="Sick">SICK</option>
+                <option value="Leave">LEAVE</option>
+                <option value="Absent">ABSENT</option>
               </select>
             </div>
           </div>
