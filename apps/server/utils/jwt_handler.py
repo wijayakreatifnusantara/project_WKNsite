@@ -13,6 +13,15 @@ SECRET_KEY = os.getenv("JWT_SECRET", "default_secure_secret_key_wkn_2026")
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "480"))
 
+# CRITICAL SAFETY CHECK: Assert strong secret in production
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+if ENVIRONMENT == "production" and SECRET_KEY == "default_secure_secret_key_wkn_2026":
+    import logging
+    logging.warning(
+        "CRITICAL SECURITY WARNING: Running in production with the default fallback JWT_SECRET! "
+        "Please configure a strong, unique JWT_SECRET in your environment immediately."
+    )
+
 # Lokasi endpoint untuk login guna otorisasi Swagger UI
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login", auto_error=False)
 

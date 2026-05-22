@@ -113,16 +113,14 @@ class WKNSupabaseClient:
             return []
 
     async def authenticate_user(self, username: str, password: str) -> Optional[Dict[str, Any]]:
-        """Authenticate user against profiles table (with Absolute Path Logging)"""
+        """Authenticate user against profiles table (with stdout console logging)"""
         if not self.client: return None
-        log_path = "e:/project_WKNsite/apps/server/auth_debug.log"
         try:
             from utils.security import verify_password
             clean_username = username.strip()
             clean_password = password.strip()
             
-            with open(log_path, "a") as f:
-                f.write(f"\n[DEBUG] Login attempt at {clean_username}\n")
+            print(f"[DEBUG] Login attempt at {clean_username}")
 
             # Mencari di tabel profiles (plural)
             response = self.client.table("profiles") \
@@ -131,14 +129,12 @@ class WKNSupabaseClient:
                 .execute()
             
             if not response.data:
-                with open(log_path, "a") as f:
-                    f.write(f"[ERROR] User {clean_username} NOT FOUND in 'profiles' table.\n")
+                print(f"[ERROR] User {clean_username} NOT FOUND in 'profiles' table.")
                 return None
             
             user = response.data[0]
             if verify_password(clean_password, user.get("password")):
-                with open(log_path, "a") as f:
-                    f.write(f"[SUCCESS] Login OK for {clean_username}\n")
+                print(f"[SUCCESS] Login OK for {clean_username}")
                 
                 # Fetch employee ID and is_field_team status
                 employee_id = None
@@ -152,8 +148,7 @@ class WKNSupabaseClient:
                         employee_id = emp_res.data[0].get("id")
                         is_field_team = emp_res.data[0].get("is_field_team", False)
                 except Exception as ex:
-                    with open(log_path, "a") as f:
-                        f.write(f"[WARN] Failed to fetch employee detail: {str(ex)}\n")
+                    print(f"[WARN] Failed to fetch employee detail: {str(ex)}")
 
                 return {
                     "Username": user.get("username"),
@@ -164,12 +159,10 @@ class WKNSupabaseClient:
                     "is_field_team": is_field_team
                 }
             else:
-                with open(log_path, "a") as f:
-                    f.write(f"[ERROR] Password mismatch for {clean_username}\n")
+                print(f"[ERROR] Password mismatch for {clean_username}")
                 return None
         except Exception as e:
-            with open(log_path, "a") as f:
-                f.write(f"[CRITICAL] System Error: {str(e)}\n")
+            print(f"[CRITICAL] System Error: {str(e)}")
             return None
 
     async def add_employee(self, employee_data: Dict[str, Any]) -> bool:

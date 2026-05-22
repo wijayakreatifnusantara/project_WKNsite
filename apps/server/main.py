@@ -16,15 +16,30 @@ from api.organizations import router as organizations_router
 from fastapi.staticfiles import StaticFiles
 import os
 
-app = FastAPI(title="WKNsite API")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+IS_PROD = ENVIRONMENT == "production"
+
+# Disable FastAPI documentation in production for security hardening
+app = FastAPI(
+    title="WKNsite API",
+    docs_url=None if IS_PROD else "/docs",
+    redoc_url=None if IS_PROD else "/redoc",
+    openapi_url=None if IS_PROD else "/openapi.json"
+)
 
 # Allow CORS for safe development and production domains
-ALLOWED_ORIGINS = [
+default_origins = [
     "http://localhost:5173",    # React Vite Dev
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+env_origins = os.getenv("ALLOWED_ORIGINS")
+if env_origins:
+    ALLOWED_ORIGINS = [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+else:
+    ALLOWED_ORIGINS = default_origins
 
 app.add_middleware(
     CORSMiddleware,
