@@ -3,14 +3,14 @@
 
 CREATE TABLE IF NOT EXISTS overtime_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    employee_id UUID NOT NULL REFERENCES employees(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    employee_id TEXT NOT NULL REFERENCES employees(id) ON UPDATE CASCADE ON DELETE CASCADE,
     date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     duration_hours NUMERIC(4,2) NOT NULL,
     reason TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
-    approved_by UUID REFERENCES employees(id) ON DELETE SET NULL,
+    approved_by TEXT REFERENCES employees(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
