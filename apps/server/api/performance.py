@@ -72,3 +72,34 @@ async def get_burnout_risk(employee_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/performance/pending-reviews")
+async def get_pending_reviews(period: str = None):
+    """Get list of employees who haven't been reviewed in the current period (T020)"""
+    try:
+        # Default to current quarter if not specified
+        if not period:
+            from datetime import datetime
+            current_month = datetime.now().month
+            quarter = (current_month - 1) // 3 + 1
+            period = f"{datetime.now().year}-Q{quarter}"
+        
+        # Get all active employees
+        employees_res = supabase_client.client.table("employees").select("id, name, employee_id").eq("is_active", True).execute()
+        all_employees = employees_res.data
+        
+        # Get reviews for the period
+        reviews_res = supabase_client.client.table("performance_reviews").select("employee_id").eq("period", period).execute()
+        reviewed_ids = set(r["employee_id"] for r in reviews_res.data)
+        
+        # Filter employees without reviews
+        pending = [e for e in all_employees if e["id"] not in reviewed_ids and e["employee_id"] not in reviewed_ids]
+        
+        return {
+            "status": "success", 
+            "data": pending,
+            "period": period,
+            "total_pending": len(pending)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

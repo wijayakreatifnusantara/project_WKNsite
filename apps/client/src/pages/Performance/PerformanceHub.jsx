@@ -9,28 +9,34 @@ import {
   IconArrowUpRight,
   IconCalendarStats,
   IconUserCircle,
-  IconTargetArrow
+  IconTargetArrow,
+  IconDownload,
+  IconBell,
+  IconAlertCircle,
+  IconClock
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { usePerformance } from './hooks/usePerformance';
+import { usePerformance, getPerformanceBadge, exportToPDF } from './hooks/usePerformance';
 import ReviewFormModal from './components/ReviewFormModal';
 import PerformanceRadarChart from './components/PerformanceRadarChart';
 import RiskGauge from './components/RiskGauge';
 
 const PerformanceHub = () => {
-  const { reviews, fetchReviews, metrics, fetchMetrics, fetchBurnoutRisk, loading } = usePerformance();
+  const { reviews, fetchReviews, metrics, fetchMetrics, fetchBurnoutRisk, fetchPendingReviews, pendingReviews, loading } = usePerformance();
   const [searchQuery, setSearchQuery] = useState('');
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [burnoutData, setBurnoutData] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
 
 
 
   useEffect(() => {
     fetchReviews();
     fetchMetrics();
-  }, [fetchReviews, fetchMetrics]);
+    fetchPendingReviews();
+  }, [fetchReviews, fetchMetrics, fetchPendingReviews]);
 
   useEffect(() => {
     if (selectedReview) {
@@ -52,6 +58,11 @@ const PerformanceHub = () => {
     rev.employee_id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleExportPDF = (review) => {
+    const employeeName = review.employees?.name || 'Unknown';
+    exportToPDF(review, employeeName, metrics);
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -62,13 +73,69 @@ const PerformanceHub = () => {
             </h2>
             <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Human Capital Excellence & Appraisals</p>
           </div>
-          <Button 
-            onClick={() => setIsReviewModalOpen(true)}
-            className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center"
-          >
-            <IconPlus size={16} />
-            New Appraisal
-          </Button>
+          <div className="flex items-center gap-4">
+            {/* Notification Bell (T020) */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all relative"
+              >
+                <IconBell size={20} />
+                {pendingReviews.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#E31E24] text-white text-[10px] font-black flex items-center justify-center shadow-lg">
+                    {pendingReviews.length}
+                  </span>
+                )}
+              </button>
+              
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 top-16 w-80 bg-[#f0f2f5] rounded-2xl shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] border-white border-3 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="p-4 border-b border-white/50">
+                    <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                      <IconAlertCircle size={14} className="text-[#E31E24]" />
+                      Pending Reviews
+                    </h4>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                    {pendingReviews.length === 0 ? (
+                      <div className="p-6 text-center">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">All reviews completed!</p>
+                      </div>
+                    ) : (
+                      pendingReviews.map((employee, idx) => (
+                        <div key={idx} className="p-4 flex items-center gap-3 border-b border-white/30 last:border-0 hover:bg-white/30 transition-colors">
+                          <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center">
+                            <IconUserCircle size={20} className="text-[#E31E24]" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-[10px] font-black text-slate-700 uppercase tracking-tight">{employee.name}</p>
+                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{employee.id}</p>
+                          </div>
+                          <IconClock size={14} className="text-amber-500" />
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {pendingReviews.length > 0 && (
+                    <div className="p-3 border-t border-white/50 bg-white/30">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">
+                        {pendingReviews.length} employee(s) awaiting review
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <Button 
+              onClick={() => setIsReviewModalOpen(true)}
+              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center"
+            >
+              <IconPlus size={16} />
+              New Appraisal
+            </Button>
+          </div>
         </header>
 
         {/* Stats Row */}
@@ -114,6 +181,7 @@ const PerformanceHub = () => {
                   review={rev} 
                   onClick={() => setSelectedReview(rev)}
                   isActive={selectedReview?.id === rev.id}
+                  onExport={handleExportPDF}
                 />
               ))}
             </div>
@@ -131,7 +199,17 @@ const PerformanceHub = () => {
                     </h3>
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{selectedReview.employees?.name}</p>
                   </div>
-                  <button onClick={() => setSelectedReview(null)} className="text-[8px] font-black text-[#E31E24] uppercase tracking-widest hover:underline">Reset</button>
+                  <div className="flex items-center gap-2">
+                    {/* Export PDF Button (T019) */}
+                    <button 
+                      onClick={() => handleExportPDF(selectedReview)}
+                      className="h-10 px-4 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center gap-2 text-[8px] font-black text-[#E31E24] uppercase tracking-widest hover:text-[#C1181E] transition-all"
+                    >
+                      <IconDownload size={14} />
+                      Export PDF
+                    </button>
+                    <button onClick={() => setSelectedReview(null)} className="text-[8px] font-black text-slate-400 uppercase tracking-widest hover:text-[#E31E24] transition-colors">Reset</button>
+                  </div>
                 </div>
                 
                 <PerformanceRadarChart 
@@ -267,12 +345,8 @@ const PerformanceHub = () => {
   );
 };
 
-const ReviewCard = ({ review, onClick, isActive }) => {
-  const getScoreColor = (score) => {
-    if (score >= 4.5) return 'text-emerald-600 bg-emerald-50';
-    if (score >= 3.5) return 'text-amber-600 bg-amber-50';
-    return 'text-rose-600 bg-rose-50';
-  };
+const ReviewCard = ({ review, onClick, isActive, onExport }) => {
+  const badge = getPerformanceBadge(review.total_score);
 
   return (
     <Card 
@@ -294,13 +368,30 @@ const ReviewCard = ({ review, onClick, isActive }) => {
           </div>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          {/* Performance Badge (T018) */}
+          <div className={`px-3 py-2 rounded-xl ${badge.bgColor} ${badge.borderColor} border-2 text-center min-w-[60px]`}>
+            <span className={`text-lg font-black ${badge.textColor}`}>{badge.grade}</span>
+          </div>
+          
           <div className="flex flex-col items-end">
-            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Final Score</span>
-            <div className={`px-3 py-1 rounded-full text-xs font-black shadow-sm ${getScoreColor(review.total_score)}`}>
+            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Score</span>
+            <div className={`px-3 py-1 rounded-full text-xs font-black shadow-sm ${badge.bgColor} ${badge.textColor}`}>
               {review.total_score} / 5.0
             </div>
           </div>
+          
+          {/* Export Button */}
+          {onExport && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); onExport(review); }}
+              className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
+              title="Export to PDF"
+            >
+              <IconDownload size={18} />
+            </button>
+          )}
+          
           <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center justify-center text-slate-400 group-hover:text-[#E31E24] transition-all">
             <IconChevronRight size={18} />
           </div>

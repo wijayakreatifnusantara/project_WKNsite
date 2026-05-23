@@ -58,7 +58,7 @@
 
 ## Phase 6: Polish & UI Excellence
 
-- [ ] T017 Apply "Red Embossed" Neumorphic styling to all review and metric cards
-- [ ] T018 Add "Performance Badge" logic (A, B, C, D) based on total score
-- [ ] T019 Implement export to PDF for individual performance reports
-- [ ] T020 Add notification alerts for pending reviews
+- [x] T017 Apply "Red Embossed" Neumorphic styling to all review and metric cards
+- [x] T018 Add "Performance Badge" logic (A, B, C, D) based on total score
+- [x] T019 Implement export to PDF for individual performance reports
+- [x] T020 Add notification alerts for pending reviews
