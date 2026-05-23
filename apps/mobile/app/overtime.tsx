@@ -10,7 +10,8 @@ import {
   Alert, 
   Dimensions, 
   ActivityIndicator,
-  StatusBar
+  StatusBar,
+  Linking
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -310,6 +311,20 @@ export default function OvertimeScreen() {
                 <View style={styles.cardBody}>
                   <Text style={[styles.reasonLabel, { color: colors.subText }]}>Alasan Kerja Lembur:</Text>
                   <Text style={[styles.reasonValue, { color: colors.text }]}>{item.reason}</Text>
+                  {item.pdf_url && (
+                    <View style={styles.pdfRow}>
+                      <TouchableOpacity 
+                        style={styles.pdfBtn} 
+                        onPress={() => {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          Linking.openURL(item.pdf_url);
+                        }}
+                      >
+                        <Ionicons name="document-text-outline" size={14} color="#E31E24" style={{ marginRight: 4 }} />
+                        <Text style={styles.pdfBtnText}>Unduh PDF TTD Resmi</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               </View>
             ))
@@ -505,5 +520,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     lineHeight: 16,
+  },
+  pdfRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  pdfBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+  },
+  pdfBtnText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#E31E24',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   }
 });

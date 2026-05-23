@@ -109,6 +109,30 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
         if not res.data:
             raise HTTPException(status_code=500, detail="Gagal menyimpan data pengajuan lembur.")
             
+        # 1b. Fetch employee details and generate PDF
+        if res.data:
+            request_data = res.data[0]
+            request_id = request_data.get("id")
+            try:
+                emp_res = supabase_client.client.table("employees").select("*").eq("id", employee_id).execute()
+                if not emp_res.data:
+                    emp_res = supabase_client.client.table("employees").select("*").eq("employee_id", employee_id).execute()
+                employee_data = emp_res.data[0] if emp_res.data else {}
+                
+                from utils.pdf_generator import RequestPDFGenerator
+                pdf_url = await RequestPDFGenerator.generate_overtime_pdf(
+                    request_id=str(request_id),
+                    employee_data=employee_data,
+                    request_data=request_data,
+                    manager_signature_url=None
+                )
+                
+                # Save pdf_url back to db
+                supabase_client.client.table("overtime_requests").update({"pdf_url": pdf_url}).eq("id", request_id).execute()
+                res.data[0]["pdf_url"] = pdf_url
+            except Exception as pdf_err:
+                print(f"[PDF Generator] Error during overtime PDF creation: {pdf_err}")
+                
         return {"status": "success", "data": res.data[0]}
     except HTTPException:
         raise
@@ -133,6 +157,39 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
 
         if not res.data:
             raise HTTPException(status_code=404, detail="Pengajuan lembur tidak ditemukan.")
+
+        request_data = res.data[0]
+
+        # 1b. Fetch approver signature and employee details to regenerate PDF
+        try:
+            manager_sig_url = None
+            if status == "Approved" and admin_id:
+                mgr_res = supabase_client.client.table("employees").select("signature_url").eq("id", admin_id).execute()
+                if not mgr_res.data:
+                    mgr_res = supabase_client.client.table("employees").select("signature_url").eq("employee_id", admin_id).execute()
+                if mgr_res.data:
+                    manager_sig_url = mgr_res.data[0].get("signature_url")
+            
+            # Fetch employee
+            employee_id = request_data.get("employee_id")
+            emp_res = supabase_client.client.table("employees").select("*").eq("id", employee_id).execute()
+            if not emp_res.data:
+                emp_res = supabase_client.client.table("employees").select("*").eq("employee_id", employee_id).execute()
+            employee_data = emp_res.data[0] if emp_res.data else {}
+            
+            from utils.pdf_generator import RequestPDFGenerator
+            pdf_url = await RequestPDFGenerator.generate_overtime_pdf(
+                request_id=str(request_id),
+                employee_data=employee_data,
+                request_data=request_data,
+                manager_signature_url=manager_sig_url
+            )
+            
+            # Save pdf_url back to db
+            supabase_client.client.table("overtime_requests").update({"pdf_url": pdf_url}).eq("id", request_id).execute()
+            res.data[0]["pdf_url"] = pdf_url
+        except Exception as pdf_err:
+            print(f"[PDF Generator] Error during overtime approval PDF regeneration: {pdf_err}")
 
         return {"status": "success", "data": res.data[0]}
     except HTTPException:

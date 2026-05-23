@@ -295,28 +295,41 @@ const LeaveManagementHub = () => {
                         </span>
                       </td>
                       <td className="px-5 py-2 text-right">
-                        {row.status === 'Pending' && isAdmin() ? (
-                          <div className="flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
-                            <button 
-                              onClick={() => handleApprove(row, 'Approved')}
-                              className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                        <div className="flex justify-end items-center gap-3">
+                          {row.pdf_url && (
+                            <a 
+                              href={row.pdf_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-white transition-all active:scale-95 shrink-0"
+                              title="Unduh PDF TTD Resmi"
                             >
-                              <IconCheck size={12} />
-                              Approve
-                            </button>
-                            <button 
-                              onClick={() => handleApprove(row, 'Rejected')}
-                              className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
-                            >
-                              <IconX size={12} />
-                              Reject
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">
-                            {row.status !== 'Pending' ? `Processed by ${row.approved_by || 'System'}` : 'Waiting Approval'}
-                          </span>
-                        )}
+                              <IconFileText size={14} className="text-[#E31E24]" />
+                            </a>
+                          )}
+                          {row.status === 'Pending' && isAdmin() ? (
+                            <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                              <button 
+                                onClick={() => handleApprove(row, 'Approved')}
+                                className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                              >
+                                <IconCheck size={12} />
+                                Approve
+                              </button>
+                              <button 
+                                onClick={() => handleApprove(row, 'Rejected')}
+                                className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                              >
+                                <IconX size={12} />
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">
+                              {row.status !== 'Pending' ? `Processed by ${row.approved_by || 'System'}` : 'Waiting Approval'}
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
