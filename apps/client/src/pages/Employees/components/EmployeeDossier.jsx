@@ -20,7 +20,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 
-const EmployeeDossier = ({ employee, isOpen, onClose, onEdit }) => {
+const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
   if (!isOpen || !employee) return null;
 
   return (
@@ -116,6 +116,31 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit }) => {
                 <button className="w-full h-12 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 uppercase tracking-widest hover:border-[#E31E24] hover:text-[#E31E24] transition-all">
                   + Add Document
                 </button>
+              </div>
+
+              {/* Tanda Tangan Elektronik Section */}
+              <div className="pt-6 border-t border-slate-200/50 space-y-4">
+                <div className="flex justify-between items-center px-1">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Electronic Signature</p>
+                  <button 
+                    onClick={() => {
+                      onSign(employee);
+                      onClose();
+                    }}
+                    className="text-[9px] font-black text-[#E31E24] uppercase tracking-widest hover:underline"
+                  >
+                    {employee.signature_url ? 'Update TTD' : '+ Buat TTD'}
+                  </button>
+                </div>
+                {employee.signature_url ? (
+                  <div className="bg-white p-3 border border-slate-200 rounded-2xl flex items-center justify-center h-28 relative group">
+                    <img src={employee.signature_url} alt="Signature" className="h-20 object-contain animate-fade-in" />
+                  </div>
+                ) : (
+                  <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 h-28">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">Belum ada tanda tangan</p>
+                  </div>
+                )}
               </div>
             </div>
 

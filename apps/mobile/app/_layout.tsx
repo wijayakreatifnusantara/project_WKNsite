@@ -23,6 +23,7 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="overtime" options={{ headerShown: false }} />
         <Stack.Screen name="leave" options={{ headerShown: false }} />
+        <Stack.Screen name="signature" options={{ headerShown: false }} />
         <Stack.Screen name="payslip" options={{ headerShown: false }} />
         <Stack.Screen name="directory" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

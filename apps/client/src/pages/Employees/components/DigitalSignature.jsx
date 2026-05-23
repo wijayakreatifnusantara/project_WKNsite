@@ -1,20 +1,28 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { 
   IconSignature, 
   IconX, 
   IconCircleCheck, 
   IconEraser, 
-  IconFileText, 
   IconShieldLock,
-  IconDownload,
-  IconFingerprint
+  IconFingerprint,
+  IconLoader2
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from '@/lib/supabaseClient';
+import { toast } from 'sonner';
 
-const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employment Contract 2024" }) => {
+const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employment Contract 2024", onSuccess }) => {
   const canvasRef = useRef(null);
   const [isSigned, setIsSigned] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && canvasRef.current) {
+      clearCanvas();
+    }
+  }, [isOpen]);
 
   if (!isOpen || !employee) return null;
 
@@ -38,10 +46,44 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#1e293b';
     ctx.lineTo(x, y);
+    ctx.stroke();
+    setIsSigned(true);
+  };
+
+  const getTouchPos = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    return {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+  };
+
+  const startDrawingTouch = (e) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getTouchPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    setIsDrawing(true);
+  };
+
+  const drawTouch = (e) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getTouchPos(e);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
     setIsSigned(true);
   };
@@ -52,9 +94,61 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setIsSigned(false);
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setIsSigned(false);
+    }
+  };
+
+  const handleFinalize = async () => {
+    if (!isSigned) return;
+    try {
+      setLoading(true);
+      const canvas = canvasRef.current;
+      const dataUrl = canvas.toDataURL('image/png');
+      
+      // Convert DataURL to Blob
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      
+      // Upload to Supabase Storage
+      const empId = employee.id || employee["EMPLOYEE ID"];
+      const fileName = `signatures/sig_${empId}_${Date.now()}.png`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('employees')
+        .upload(fileName, blob, { contentType: 'image/png', upsert: true });
+        
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('employees')
+        .getPublicUrl(fileName);
+        
+      // Update database
+      const { error: updateError } = await supabase
+        .from('employees')
+        .update({ signature_url: publicUrl })
+        .eq('id', empId);
+        
+      if (updateError) {
+        const { error: updateError2 } = await supabase
+          .from('employees')
+          .update({ signature_url: publicUrl })
+          .eq('employee_id', empId);
+        if (updateError2) throw updateError2;
+      }
+      
+      toast.success("Tanda tangan elektronik berhasil disimpan!");
+      onSuccess?.();
+      onClose();
+    } catch (err) {
+      console.error("Error saving signature:", err);
+      toast.error("Gagal menyimpan tanda tangan: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -152,6 +246,9 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
                   onMouseMove={draw}
                   onMouseUp={endDrawing}
                   onMouseLeave={endDrawing}
+                  onTouchStart={startDrawingTouch}
+                  onTouchMove={drawTouch}
+                  onTouchEnd={endDrawing}
                   className="cursor-crosshair w-full h-48"
                 />
                 {!isSigned && (
@@ -187,11 +284,12 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
               </div>
 
               <Button 
-                className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex gap-3 ${isSigned ? 'bg-[#E31E24] text-white shadow-[8px_8px_20px_rgba(227,30,36,0.3)] hover:bg-[#C1181E]' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
-                disabled={!isSigned}
+                onClick={handleFinalize}
+                className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex gap-3 ${isSigned && !loading ? 'bg-[#E31E24] text-white shadow-[8px_8px_20px_rgba(227,30,36,0.3)] hover:bg-[#C1181E]' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
+                disabled={!isSigned || loading}
               >
-                <IconCircleCheck size={20} />
-                Finalize & Sign
+                {loading ? <IconLoader2 size={20} className="animate-spin" /> : <IconCircleCheck size={20} />}
+                {loading ? 'Saving...' : 'Finalize & Sign'}
               </Button>
             </div>
           </div>

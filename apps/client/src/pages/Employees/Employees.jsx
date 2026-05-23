@@ -576,6 +576,12 @@ const Employees = () => {
                         >
                           Edit
                         </button>
+                        <button 
+                          onClick={() => {setESignTargetEmployee(emp); setIsESignOpen(true);}} 
+                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                        >
+                          TTD
+                        </button>
                         {isAdmin() && (
                           <>
                             {emp.is_resigned || String(emp["Status *"] || emp.status || "").toUpperCase() === 'RESIGNED' ? (
@@ -727,6 +733,7 @@ const Employees = () => {
                               <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 <ActionButton onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} icon={<IconEye size={14} />} hover="hover:text-blue-600 hover:bg-blue-50" label="LIHAT" />
                                 <ActionButton onClick={() => {setEditingEmployee(emp); setIsAddModalOpen(true);}} icon={<IconEdit size={14} />} hover="hover:text-green-600 hover:bg-green-50" label="EDIT" />
+                                <ActionButton onClick={() => {setESignTargetEmployee(emp); setIsESignOpen(true);}} icon={<IconSignature size={14} />} hover="hover:text-amber-600 hover:bg-amber-50" label="TANDA TANGAN" />
                                 {isAdmin() && (
                                   <>
                                     {emp.is_resigned || String(emp["Status *"] || emp.status || "").toUpperCase() === 'RESIGNED' ? (
@@ -828,10 +835,14 @@ const Employees = () => {
           setEditingEmployee(emp);
           setIsAddModalOpen(true);
         }}
+        onSign={(emp) => {
+          setESignTargetEmployee(emp);
+          setIsESignOpen(true);
+        }}
       />
       <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => { setIsAddModalOpen(false); setEditingEmployee(null); }} onRefresh={fetchEmployees} editData={editingEmployee} />
       <IDCardGenerator isOpen={isIDGeneratorOpen} onClose={() => setIsIDGeneratorOpen(false)} employee={idTargetEmployee} />
-      <DigitalSignature isOpen={isESignOpen} onClose={() => setIsESignOpen(false)} employee={eSignTargetEmployee} />
+      <DigitalSignature isOpen={isESignOpen} onClose={() => setIsESignOpen(false)} employee={eSignTargetEmployee} onSuccess={fetchEmployees} />
       <AuditTrail isOpen={isAuditOpen} onClose={() => setIsAuditOpen(false)} employee={auditTargetEmployee} />
       <SalarySimulator isOpen={isSalarySimulatorOpen} onClose={() => setIsSalarySimulatorOpen(false)} employees={employees} />
       <BulkUploadModal isOpen={isBulkModalOpen} onClose={() => setIsBulkModalOpen(false)} onRefresh={fetchEmployees} />

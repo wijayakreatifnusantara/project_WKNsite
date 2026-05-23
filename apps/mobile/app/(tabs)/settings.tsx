@@ -187,6 +187,10 @@ export default function SettingsScreen() {
             setShowDetail(!showDetail);
           }} />
           <SettingItem icon="finger-print-outline" title="Biometric Login" type="switch" value={isBiometric} onPress={() => setIsBiometric(!isBiometric)} color="#10b981" />
+          <SettingItem icon="create-outline" title="Tanda Tangan Elektronik" color="#E31E24" onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/signature' as any);
+          }} />
           <SettingItem icon="lock-closed-outline" title="Ubah Kata Sandi" color="#f59e0b" />
         </View>
 
