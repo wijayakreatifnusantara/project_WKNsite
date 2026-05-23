@@ -1,8 +1,12 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const url = 'https://vlpaszzbebgrfppklqml.supabase.co';
-const key = 'sb_secret_vnet6vBBxmFN9YvAE287RA_UORmiJ0i';
-const supabase = createClient(url, key);
+require('dotenv').config();
+const url = process.env.SUPABASE_URL || 'https://vlpaszzbebgrfppklqml.supabase.co';
+const key = process.env.SUPABASE_KEY;
+if (!key) {
+  console.error("ERROR: SUPABASE_KEY environment variable is not defined.");
+}
+const supabase = createClient(url, key || '');
 
 async function check() {
   const { data, error } = await supabase.from('profiles').select('username, password, role');

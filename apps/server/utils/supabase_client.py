@@ -12,7 +12,9 @@ class WKNSupabaseClient:
     def __init__(self):
         # Membaca kredensial dari environment variables
         self.url = os.getenv("SUPABASE_URL", "https://vlpaszzbebgrfppklqml.supabase.co")
-        self.key = os.getenv("SUPABASE_KEY", "sb_secret_vnet6vBBxmFN9YvAE287RA_UORmiJ0i")
+        self.key = os.getenv("SUPABASE_KEY")
+        if not self.key:
+            print("WARNING: SUPABASE_KEY environment variable is missing.")
         
         try:
             self.client: Client = create_client(self.url, self.key)
