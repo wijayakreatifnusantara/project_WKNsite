@@ -56,7 +56,7 @@ const AttendanceHub = () => {
       <div className="max-w-[1600px] mx-auto space-y-3">
         
         {/* 🚀 ULTRA-COMPACT HEADER & NAV BAR */}
-        <div className="flex items-center justify-between bg-white p-2 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
           <div className="flex items-center gap-4">
              <div className="h-8 w-8 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
                 <IconClock size={18} />
@@ -72,7 +72,7 @@ const AttendanceHub = () => {
              </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
              {/* Period Selector */}
              <div className="h-8 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 transition-all focus-within:border-[#E31E24]/20">
                 <IconCalendarEvent size={12} className="text-[#E31E24]" />
@@ -84,10 +84,10 @@ const AttendanceHub = () => {
                 />
               </div>
 
-              <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
+              <div className="hidden sm:block h-6 w-[1px] bg-slate-200 mx-1"></div>
 
               {/* Module Navigators */}
-              <div className="flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-1">
                 {can(PERMISSIONS.VIEW_ATTENDANCE_REPORTS) && (
                   <>
                     <Button 
@@ -131,11 +131,11 @@ const AttendanceHub = () => {
                 )}
               </div>
 
-              <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
+              <div className="hidden sm:block h-6 w-[1px] bg-slate-200 mx-1"></div>
 
               {/* Action Buttons */}
               {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
-                <>
+                <div className="flex items-center gap-1.5">
                   <Button 
                     onClick={() => setIsBulkModalOpen(true)}
                     className="h-8 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50 shadow-sm flex gap-2 items-center"
@@ -151,7 +151,7 @@ const AttendanceHub = () => {
                     <IconPlus size={14} />
                     Entry
                   </Button>
-                </>
+                </div>
               )}
           </div>
         </div>

@@ -57,16 +57,26 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   const user = profile || legacyUser;
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    const isMobileViewport = window.innerWidth < 1024;
+    if (isMobileViewport) return true;
     return localStorage.getItem('sidebar_collapsed') === 'true';
   });
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => {
       const next = !prev;
-      localStorage.setItem('sidebar_collapsed', String(next));
+      if (window.innerWidth >= 1024) {
+        localStorage.setItem('sidebar_collapsed', String(next));
+      }
       return next;
     });
   };
+
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setIsSidebarCollapsed(true);
+    }
+  }, [location.pathname]);
 
   const [organizations, setOrganizations] = useState([]);
   const [selectedOrg, setSelectedOrg] = useState(null);
@@ -237,8 +247,20 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden font-inter animate-fade-in text-[11px]">
+      {/* Sidebar Backdrop on Mobile */}
+      {!isSidebarCollapsed && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+
       {/* Clean White Sidebar */}
-      <aside className={`bg-white flex flex-col hidden lg:flex shrink-0 relative z-20 border-r border-slate-200/80 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
+      <aside className={`bg-white flex flex-col shrink-0 border-r border-slate-200/80 transition-all duration-300 fixed lg:relative inset-y-0 left-0 z-50 shadow-2xl lg:shadow-none lg:translate-x-0 lg:flex ${
+        isSidebarCollapsed 
+          ? '-translate-x-full lg:w-20' 
+          : 'translate-x-0 w-72'
+      }`}>
         <div className={`h-16 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-6 gap-2.5'}`}>
           <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
           {!isSidebarCollapsed && (
@@ -248,6 +270,43 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             </div>
           )}
         </div>
+
+        {/* Organization Switcher inside Sidebar (only visible on mobile/collapsed screens) */}
+        {!isSidebarCollapsed && (
+          <div className="px-4 py-2 border-b border-slate-100 lg:hidden shrink-0 bg-white">
+            <div className="relative group/sidebar-org w-full">
+              <button className="w-full h-8 px-2.5 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg text-[9px] font-black uppercase tracking-wider text-slate-700 hover:border-slate-350 transition-all select-none">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <IconBuildingSkyscraper size={12} className="text-[#E31E24]" />
+                  <span className="truncate">{selectedOrg?.name || 'Loading Org...'}</span>
+                </div>
+                <IconChevronRight size={10} className="text-slate-400 transition-transform group-hover/sidebar-org:rotate-90" />
+              </button>
+              
+              <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover/sidebar-org:opacity-100 group-hover/sidebar-org:visible transition-all duration-200 z-50 p-1">
+                <div className="px-3 py-1 border-b border-slate-100 mb-1">
+                  <span className="text-[7px] font-bold text-slate-400 tracking-wider uppercase block">Switch Organization</span>
+                </div>
+                <div className="max-h-40 overflow-y-auto custom-scrollbar space-y-0.5">
+                  {organizations.map(org => (
+                    <button
+                      key={org.id}
+                      onClick={() => handleOrgChange(org)}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider text-left transition-all ${
+                        selectedOrg?.id === org.id 
+                          ? 'bg-red-50 text-[#E31E24]' 
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                      }`}
+                    >
+                      <span className="truncate">{org.name}</span>
+                      {selectedOrg?.id === org.id && <span className="h-1 w-1 bg-[#E31E24] rounded-full shrink-0"></span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <nav className={`flex-1 space-y-1 overflow-y-auto py-6 custom-scrollbar scroll-smooth transition-all duration-300 ${isSidebarCollapsed ? 'px-2' : 'px-4'}`}>
           {/* Main/General Section */}
@@ -360,8 +419,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 shrink-0 z-10">
-          <div className="flex flex-col justify-center">
+        <header className="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10">
+          <div className="flex flex-col justify-center min-w-0">
             <div className="flex items-center gap-3">
               {/* Toggle Sidebar Button */}
               <button 
@@ -372,10 +431,15 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                 <IconMenu2 size={16} />
               </button>
 
-              <div className="h-3 w-[1px] bg-slate-200 shrink-0"></div>
+              {/* On mobile, show current page title. On desktop, show breadcrumbs */}
+              <div className="md:hidden flex items-center min-w-0">
+                <span className="text-xs font-black text-slate-800 uppercase tracking-wider font-outfit truncate">{getPageTitle()}</span>
+              </div>
+
+              <div className="hidden md:block h-3 w-[1px] bg-slate-200 shrink-0"></div>
 
               {/* Breadcrumb & Clock Container */}
-              <div className="flex flex-col gap-1">
+              <div className="hidden md:flex flex-col gap-1">
                 {/* Minimalist Breadcrumbs */}
                 <div className="flex items-center gap-1.5 text-[9.5px] font-black uppercase tracking-[0.2em] text-slate-400">
                   <span className="hover:text-[#E31E24] cursor-pointer transition-colors text-slate-700">WKNsite</span>
@@ -395,10 +459,10 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                 </div>
               </div>
 
-              <div className="h-3 w-[1px] bg-slate-200"></div>
+              <div className="hidden md:block h-3 w-[1px] bg-slate-200"></div>
 
               {/* Premium Organization Switcher Dropdown */}
-              <div className="relative group">
+              <div className="hidden md:block relative group">
                 <button className="h-7 px-2.5 flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-lg text-[9px] font-black uppercase tracking-wider text-slate-700 hover:border-slate-300 hover:bg-slate-100 transition-all select-none">
                   <IconBuildingSkyscraper size={12} className="text-slate-400 group-hover:text-[#E31E24]" />
                   <span className="max-w-[200px] truncate">{selectedOrg?.name || 'Loading Org...'}</span>
@@ -428,9 +492,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                 </div>
               </div>
 
-              <div className="h-3 w-[1px] bg-slate-200"></div>
+              <div className="hidden md:block h-3 w-[1px] bg-slate-200"></div>
 
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
+              <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
                 <div className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span className="text-[8px] font-semibold text-emerald-700 uppercase tracking-wider">System Healthy</span>
               </div>
@@ -457,7 +521,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
             
             <div className="flex items-center gap-2.5 pl-1">
-              <div className="flex flex-col items-end">
+              <div className="hidden md:flex flex-col items-end">
                 <span className="text-xs font-semibold text-slate-700 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
                 <span className="text-[9px] font-bold text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
               </div>

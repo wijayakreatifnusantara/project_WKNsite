@@ -45,7 +45,7 @@ const AnalyticsGrid = ({ employees }) => {
     <div className="grid grid-cols-12 gap-4">
       
       {/* 1. Headcount Distribution by Department */}
-      <Card className="col-span-4 border-white border-[4px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
+      <Card className="col-span-12 md:col-span-4 border-white border-[4px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
         <CardHeader className="px-6 py-4 border-b border-white/50 flex flex-row items-center gap-3">
           <div className="h-10 w-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
             <IconChartPie size={20} />
@@ -88,7 +88,7 @@ const AnalyticsGrid = ({ employees }) => {
       </Card>
 
       {/* 2. Workforce Mutation Trends */}
-      <Card className="col-span-8 border-white border-[4px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
+      <Card className="col-span-12 md:col-span-8 border-white border-[4px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
         <CardHeader className="px-6 py-4 border-b border-white/50 flex flex-row items-center gap-3">
           <div className="h-10 w-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
             <IconChartAreaLine size={20} />

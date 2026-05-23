@@ -416,7 +416,7 @@ const Employees = () => {
         <div className="max-w-[1400px] mx-auto p-4 space-y-3">
           
           {/* HEADER ROW */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 bg-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24]">
                 <IconUsers size={22} stroke={2} />

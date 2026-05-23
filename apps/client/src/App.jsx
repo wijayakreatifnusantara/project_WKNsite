@@ -28,24 +28,12 @@ import Offboarding from './pages/Company/Offboarding';
 import OnboardingPage from './pages/Employees/OnboardingPage';
 import LocationManagerPage from './pages/Attendance/LocationManagerPage';
 import DashboardLayout from './components/Layout/DashboardLayout';
-import MobileLayout from './components/Layout/MobileLayout';
-import MobileHome from './pages/ESS/MobileHome';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { useIsMobile } from './hooks/useIsMobile';
 import { Toaster } from 'sonner';
 
 const AuthenticatedApp = () => {
   const { logout, user } = useAuth();
-  const isMobile = useIsMobile();
-  
-  if (isMobile) {
-    return (
-      <MobileLayout onLogout={logout} user={user}>
-        <Outlet />
-      </MobileLayout>
-    );
-  }
   
   return (
     <DashboardLayout onLogout={logout} user={user}>
@@ -56,15 +44,12 @@ const AuthenticatedApp = () => {
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const isMobile = useIsMobile();
   if (loading) return null;
-  if (user) return <Navigate to={isMobile ? "/attendance" : "/overview"} replace />;
+  if (user) return <Navigate to="/overview" replace />;
   return children;
 };
 
 function App() {
-  const isMobile = useIsMobile();
-  
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -78,12 +63,12 @@ function App() {
               <AuthenticatedApp />
             </ProtectedRoute>
           }>
-            <Route path="/" element={<Navigate to={isMobile ? "/attendance" : "/overview"} replace />} />
-            <Route path="/dashboard" element={<Navigate to={isMobile ? "/attendance" : "/overview"} replace />} />
+            <Route path="/" element={<Navigate to="/overview" replace />} />
+            <Route path="/dashboard" element={<Navigate to="/overview" replace />} />
             <Route path="/overview" element={<Overview />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/employees/onboarding" element={<OnboardingPage />} />
-            <Route path="/attendance" element={isMobile ? <MobileHome /> : <AttendanceHub />} />
+            <Route path="/attendance" element={<AttendanceHub />} />
             <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
             <Route path="/attendance/location" element={<LocationManagerPage />} />
             <Route path="/attendance/report" element={<AttendanceReport />} />
@@ -119,7 +104,7 @@ function App() {
           </Route>
 
           {/* Catch all */}
-          <Route path="*" element={<Navigate to={isMobile ? "/attendance" : "/overview"} replace />} />
+          <Route path="*" element={<Navigate to="/overview" replace />} />
         </Routes>
         <Toaster position="top-right" expand={true} richColors />
       </BrowserRouter>

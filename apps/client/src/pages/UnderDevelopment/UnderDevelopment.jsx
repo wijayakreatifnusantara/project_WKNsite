@@ -16,8 +16,8 @@ const UnderDevelopment = ({ moduleName }) => {
     <div className="flex-1 h-full flex flex-col items-center justify-center p-10 bg-[#f0f2f5] animate-fade-in">
       <div className="relative">
         {/* Animated Radar Effect */}
-        <div className="absolute inset-0 bg-[#E31E24]/5 rounded-full animate-ping duration-[3000ms]"></div>
-        <div className="absolute inset-[-20px] bg-[#E31E24]/3 rounded-full animate-ping duration-[4000ms]"></div>
+        <div className="absolute inset-0 bg-[#E31E24]/5 rounded-full animate-ping" style={{ animationDuration: '3000ms' }}></div>
+        <div className="absolute inset-[-20px] bg-[#E31E24]/3 rounded-full animate-ping" style={{ animationDuration: '4000ms' }}></div>
         
         {/* Core Icon Container */}
         <div className="relative h-40 w-40 bg-[#f0f2f5] shadow-[15px_15px_30px_#d1d9e6,-15px_-15px_30px_#ffffff] rounded-[3rem] flex items-center justify-center border-4 border-white group overflow-hidden">

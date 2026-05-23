@@ -5,6 +5,7 @@ import {
   IconUsers, IconX, IconArrowLeft, IconPlus, IconTrash,
   IconSearch, IconUser, IconSettings, IconCompass
 } from '@tabler/icons-react';
+import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -17,8 +18,8 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
 
   const fetchSettings = useCallback(async () => {
     try {
-      const r = await fetch(`${API_URL}/attendance/settings`);
-      const d = await r.json();
+      const r = await axios.get(`${API_URL}/attendance/settings`);
+      const d = r.data;
       if (d.status === 'success' && d.data.hq_location) {
         setConfig(d.data.hq_location);
       }
@@ -36,20 +37,20 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
   const handleSave = async () => {
     setSaving(true); setMsg(null);
     try {
-      const res = await fetch(`${API_URL}/attendance/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'hq_location', value: { ...config, lat: parseFloat(config.lat), lon: parseFloat(config.lon), radius: parseInt(config.radius) } }),
+      const res = await axios.put(`${API_URL}/attendance/settings`, {
+        key: 'hq_location',
+        value: { ...config, lat: parseFloat(config.lat), lon: parseFloat(config.lon), radius: parseInt(config.radius) }
       });
-      const data = await res.json();
-      if (res.ok) {
+      const data = res.data;
+      if (res.status === 200 || data.status === 'success') {
         setMsg({ type: 'success', text: 'HQ berhasil disimpan.' });
         if (onSettingsUpdated) onSettingsUpdated();
       } else {
         setMsg({ type: 'error', text: data.message || data.detail || 'Error' });
       }
-    } catch {
-      setMsg({ type: 'error', text: 'Gagal menyimpan. Periksa koneksi.' });
+    } catch (err) {
+      const data = err.response?.data || {};
+      setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan. Periksa koneksi.' });
     } finally {
       setSaving(false);
     }
@@ -106,9 +107,9 @@ const FreeAttendanceToggle = () => {
   const [msg, setMsg] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/attendance/settings`)
-      .then(r => r.json())
-      .then(d => {
+    axios.get(`${API_URL}/attendance/settings`)
+      .then(res => {
+        const d = res.data;
         if (d.status === 'success') {
           setEnabled(!!d.data.allow_free_attendance);
         }
@@ -121,20 +122,15 @@ const FreeAttendanceToggle = () => {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`${API_URL}/attendance/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'allow_free_attendance', value: { value: val } }),
+      const res = await axios.put(`${API_URL}/attendance/settings`, {
+        key: 'allow_free_attendance',
+        value: { value: val }
       });
-      const data = await res.json();
-      if (res.ok) {
-        setEnabled(val);
-        setMsg({ type: 'success', text: 'Konfigurasi berhasil disimpan.' });
-      } else {
-        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan.' });
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Gagal menyimpan. Periksa koneksi.' });
+      setEnabled(val);
+      setMsg({ type: 'success', text: 'Konfigurasi berhasil disimpan.' });
+    } catch (err) {
+      const data = err.response?.data || {};
+      setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan.' });
     } finally {
       setSaving(false);
     }
@@ -502,8 +498,8 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/employees?page_size=200`);
-      const data = await res.json();
+      const res = await axios.get(`${API_URL}/employees?page_size=200`);
+      const data = res.data;
       setEmployees(data.data || []);
     } catch {
       setEmployees([]);
@@ -519,30 +515,22 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
   const updateEmployeeSettings = async (empId, isField, workLoc) => {
     setRowStatus(prev => ({ ...prev, [empId]: 'loading' }));
     try {
-      const res = await fetch(`${API_URL}/attendance/employees/${empId}/site`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          is_field_team: isField,
-          working_location: workLoc
-        }),
+      const res = await axios.put(`${API_URL}/attendance/employees/${empId}/site`, {
+        is_field_team: isField,
+        working_location: workLoc
       });
-      if (res.ok) {
-        setRowStatus(prev => ({ ...prev, [empId]: 'success' }));
-        // Refresh local employee state
-        setEmployees(prev =>
-          prev.map(emp =>
-            emp['EMPLOYEE ID'] === empId
-              ? { ...emp, is_field_team: isField, working_location: workLoc, 'Working Location': workLoc }
-              : emp
-          )
-        );
-        setTimeout(() => {
-          setRowStatus(prev => ({ ...prev, [empId]: null }));
-        }, 1500);
-      } else {
-        setRowStatus(prev => ({ ...prev, [empId]: 'error' }));
-      }
+      setRowStatus(prev => ({ ...prev, [empId]: 'success' }));
+      // Refresh local employee state
+      setEmployees(prev =>
+        prev.map(emp =>
+          emp['EMPLOYEE ID'] === empId
+            ? { ...emp, is_field_team: isField, working_location: workLoc, 'Working Location': workLoc }
+            : emp
+        )
+      );
+      setTimeout(() => {
+        setRowStatus(prev => ({ ...prev, [empId]: null }));
+      }, 1500);
     } catch {
       setRowStatus(prev => ({ ...prev, [empId]: 'error' }));
     }
@@ -691,8 +679,8 @@ const LocationManager = ({ onBack }) => {
 
   const fetchLocations = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/attendance/settings`);
-      const d = await res.json();
+      const res = await axios.get(`${API_URL}/attendance/settings`);
+      const d = res.data;
       if (d.status === 'success') {
         setLocations(d.data.working_locations || []);
         setHqLocation(d.data.hq_location);
@@ -713,21 +701,16 @@ const LocationManager = ({ onBack }) => {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`${API_URL}/attendance/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'working_locations', value: { locations: updatedList } }),
+      const res = await axios.put(`${API_URL}/attendance/settings`, {
+        key: 'working_locations',
+        value: { locations: updatedList }
       });
-      const data = await res.json();
-      if (res.ok) {
-        setLocations(updatedList);
-        setMsg({ type: 'success', text: 'Lokasi kerja berhasil ditambahkan.' });
-        setTimeout(() => setMsg(null), 3000);
-      } else {
-        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan.' });
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Gagal menyimpan. Periksa koneksi.' });
+      setLocations(updatedList);
+      setMsg({ type: 'success', text: 'Lokasi kerja berhasil ditambahkan.' });
+      setTimeout(() => setMsg(null), 3000);
+    } catch (err) {
+      const data = err.response?.data || {};
+      setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menyimpan.' });
     } finally {
       setSaving(false);
     }
@@ -738,21 +721,16 @@ const LocationManager = ({ onBack }) => {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`${API_URL}/attendance/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'working_locations', value: { locations: updatedList } }),
+      const res = await axios.put(`${API_URL}/attendance/settings`, {
+        key: 'working_locations',
+        value: { locations: updatedList }
       });
-      const data = await res.json();
-      if (res.ok) {
-        setLocations(updatedList);
-        setMsg({ type: 'success', text: 'Lokasi kerja berhasil diperbarui.' });
-        setTimeout(() => setMsg(null), 3000);
-      } else {
-        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal memperbarui.' });
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Gagal memperbarui. Periksa koneksi.' });
+      setLocations(updatedList);
+      setMsg({ type: 'success', text: 'Lokasi kerja berhasil diperbarui.' });
+      setTimeout(() => setMsg(null), 3000);
+    } catch (err) {
+      const data = err.response?.data || {};
+      setMsg({ type: 'error', text: data.message || data.detail || 'Gagal memperbarui.' });
     } finally {
       setSaving(false);
     }
@@ -764,21 +742,16 @@ const LocationManager = ({ onBack }) => {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`${API_URL}/attendance/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'working_locations', value: { locations: updatedList } }),
+      const res = await axios.put(`${API_URL}/attendance/settings`, {
+        key: 'working_locations',
+        value: { locations: updatedList }
       });
-      const data = await res.json();
-      if (res.ok) {
-        setLocations(updatedList);
-        setMsg({ type: 'success', text: 'Lokasi kerja berhasil dihapus.' });
-        setTimeout(() => setMsg(null), 3000);
-      } else {
-        setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menghapus.' });
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Gagal menghapus. Periksa koneksi.' });
+      setLocations(updatedList);
+      setMsg({ type: 'success', text: 'Lokasi kerja berhasil dihapus.' });
+      setTimeout(() => setMsg(null), 3000);
+    } catch (err) {
+      const data = err.response?.data || {};
+      setMsg({ type: 'error', text: data.message || data.detail || 'Gagal menghapus.' });
     } finally {
       setSaving(false);
     }

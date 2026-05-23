@@ -30,6 +30,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IconScan, IconSparkles } from "@tabler/icons-react";
 import { useAuth } from '@/context/AuthContext';
+import axios from 'axios';
 
 const InputWrapper = ({ label, icon: Icon, children }) => (
   <div className="space-y-1.5">
@@ -124,9 +125,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const [workingLocations, setWorkingLocations] = useState(['Head Office']);
 
   React.useEffect(() => {
-    fetch(`${API_URL}/attendance/settings`)
-      .then(r => r.json())
-      .then(d => {
+    axios.get(`${API_URL}/attendance/settings`)
+      .then(res => {
+        const d = res.data;
         if (d.status === 'success' && d.data.working_locations) {
           const locations = d.data.working_locations.map(loc => loc.name);
           setWorkingLocations(locations);
@@ -136,9 +137,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   }, []);
 
   React.useEffect(() => {
-    fetch(`${API_URL}/organizations?active_only=true`)
-      .then(r => r.json())
-      .then(d => {
+    axios.get(`${API_URL}/organizations?active_only=true`)
+      .then(res => {
+        const d = res.data;
         if (d.status === 'success') {
           setOrganizations(d.data || []);
         }
@@ -149,9 +150,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   // Helper: fetch departments for a given org id
   const fetchDepartmentsForOrg = React.useCallback((orgId) => {
     if (!orgId) { setDepartments([]); return; }
-    fetch(`${API_URL}/organizations/${orgId}/departments?active_only=true`)
-      .then(r => r.json())
-      .then(d => {
+    axios.get(`${API_URL}/organizations/${orgId}/departments?active_only=true`)
+      .then(res => {
+        const d = res.data;
         if (d.status === 'success') {
           setDepartments(d.data || []);
         } else {
@@ -167,9 +168,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   // Helper: fetch positions for a given department id
   const fetchPositionsForDept = React.useCallback((deptId) => {
     if (!deptId) { setPositions([]); return; }
-    fetch(`${API_URL}/departments/${deptId}/positions?active_only=true`)
-      .then(r => r.json())
-      .then(d => {
+    axios.get(`${API_URL}/departments/${deptId}/positions?active_only=true`)
+      .then(res => {
+        const d = res.data;
         if (d.status === 'success') {
           setPositions(d.data || []);
         } else {

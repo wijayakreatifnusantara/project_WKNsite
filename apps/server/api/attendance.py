@@ -211,7 +211,7 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
 
 
 @router.get("/attendance/settings")
-async def get_attendance_settings(current_user: dict = Depends(get_current_user)):
+async def get_attendance_settings():
     """
     T013: Get current location configuration (HQ coordinates & radius).
     Used by frontend CheckInCard to display target location info.
