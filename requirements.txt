@@ -197,8 +197,7 @@ python-jose==3.5.0
     # via project-website-database-gaji (pyproject.toml)
 python-multipart==0.0.29
     # via mcp
-pywin32==311
-    # via mcp
+
 realtime==2.30.0
     # via supabase
 referencing==0.37.0
