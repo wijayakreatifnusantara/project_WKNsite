@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from utils.supabase_client import supabase_client
 from typing import List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils.jwt_handler import get_current_user, require_admin
 
 router = APIRouter()
@@ -10,7 +10,7 @@ router = APIRouter()
 async def get_overtime_requests(status: str = None, current_user: dict = Depends(require_admin)):
     """Fetch all overtime requests (Admin only)"""
     try:
-        query = supabase_client.client.table("overtime_requests").select(`
+        query = supabase_client.client.table("overtime_requests").select("""
             *,
             employees (
                 id,
@@ -19,7 +19,7 @@ async def get_overtime_requests(status: str = None, current_user: dict = Depends
                 job_position,
                 organization_name
             )
-        `).order("created_at", { "ascending": False })
+        """).order("created_at", { "ascending": False })
         
         if status:
             query = query.eq("status", status)
