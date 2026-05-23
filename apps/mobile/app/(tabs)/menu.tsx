@@ -28,7 +28,7 @@ export default function MenuScreen() {
 
   const essItems = [
     { id: '1', title: 'Izin & Cuti', icon: 'calendar', color: '#E31E24', bg: '#FEF2F2', badge: '2', route: '/development?title=Izin & Cuti' },
-    { id: '2', title: 'Lembur', icon: 'time', color: '#f97316', bg: '#FFF7ED', route: '/development?title=Lembur' },
+    { id: '2', title: 'Lembur', icon: 'time', color: '#f97316', bg: '#FFF7ED', route: '/overtime' },
     { id: '3', title: 'Slip Gaji', icon: 'receipt', color: '#8b5cf6', bg: '#F5F3FF', route: '/payslip' },
     { id: '9', title: 'Direktori', icon: 'people', color: '#10b981', bg: '#F0FDF4', route: '/directory' },
     { id: '7', title: 'Asset', icon: 'briefcase', color: '#06b6d4', bg: '#ECFEFF', route: '/development?title=Asset' },

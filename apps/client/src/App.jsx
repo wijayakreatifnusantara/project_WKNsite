@@ -27,6 +27,7 @@ import Succession from './pages/Company/Succession';
 import Offboarding from './pages/Company/Offboarding';
 import OnboardingPage from './pages/Employees/OnboardingPage';
 import LocationManagerPage from './pages/Attendance/LocationManagerPage';
+import OvertimeManagementPage from './pages/Attendance/OvertimeManagementPage';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -73,6 +74,7 @@ function App() {
             <Route path="/attendance/location" element={<LocationManagerPage />} />
             <Route path="/attendance/report" element={<AttendanceReport />} />
             <Route path="/attendance/recap" element={<AttendanceRecap />} />
+            <Route path="/attendance/overtime" element={<OvertimeManagementPage />} />
             <Route path="/leave" element={<LeaveManagementHub />} />
             <Route path="/payroll" element={<Payroll />} />
             <Route path="/performance" element={<PerformanceHub />} />

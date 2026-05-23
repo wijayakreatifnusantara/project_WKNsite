@@ -225,17 +225,68 @@ export default function HomeScreen() {
         const { data: publicUrlData } = supabase.storage
           .from('attendance_proofs')
           .getPublicUrl(fileName);
-          
-        const { error: dbError } = await supabase
+        
+        const photoUrl = publicUrlData.publicUrl;
+
+        // Check if there is an existing record for that employee on that date
+        const { data: existing } = await supabase
           .from('attendance')
-          .insert([{
-            employee_id: item.employee_id,
-            status: item.status,
-            clock_in_time: item.status === 'IN' ? new Date(item.timestamp).toISOString() : null,
-            clock_out_time: item.status === 'OUT' ? new Date(item.timestamp).toISOString() : null,
-            location: item.location,
-            proof_url: publicUrlData.publicUrl
-          }]);
+          .select('id, clock_in, clock_out')
+          .eq('employee_id', item.employee_id)
+          .eq('date', item.date)
+          .maybeSingle();
+
+        let dbError;
+        if (item.clock_type === 'IN') {
+          if (!existing) {
+            const { error } = await supabase
+              .from('attendance')
+              .insert([{
+                employee_id: item.employee_id,
+                date: item.date,
+                clock_in: item.time,
+                clock_out: null,
+                status: 'Present',
+                notes: item.notes,
+                is_manual: false,
+                photo_url: photoUrl,
+                location_lat: item.location_lat,
+                location_lng: item.location_lng,
+              }]);
+            dbError = error;
+          }
+        } else {
+          // Clock Out
+          if (existing) {
+            const { error } = await supabase
+              .from('attendance')
+              .update({
+                clock_out: item.time,
+                notes: item.notes,
+                photo_url: photoUrl || undefined,
+                location_lat: item.location_lat,
+                location_lng: item.location_lng,
+              })
+              .eq('id', existing.id);
+            dbError = error;
+          } else {
+            const { error } = await supabase
+              .from('attendance')
+              .insert([{
+                employee_id: item.employee_id,
+                date: item.date,
+                clock_in: null,
+                clock_out: item.time,
+                status: 'Present',
+                notes: item.notes,
+                is_manual: false,
+                photo_url: photoUrl,
+                location_lat: item.location_lat,
+                location_lng: item.location_lng,
+              }]);
+            dbError = error;
+          }
+        }
           
         if (dbError) throw dbError;
       } catch (error) {
@@ -250,6 +301,7 @@ export default function HomeScreen() {
     if (failed.length === 0) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Sinkronisasi Berhasil', 'Semua data absensi offline telah diunggah.');
+      if (userData?.id) fetchTodayAttendance(userData.id);
     }
   };
 
@@ -264,6 +316,33 @@ export default function HomeScreen() {
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       const nowTime = new Date().toTimeString().substring(0, 8); // HH:MM:SS
 
+      // Anti-Cheating check: Fetch high-accuracy location and check for Mock GPS
+      let location: Location.LocationObject | null = null;
+      try {
+        let { status } = await Location.getForegroundPermissionsAsync();
+        if (status === 'granted') {
+          location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High
+          });
+          
+          if (location && (location as any).mocked) {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            Alert.alert(
+              '⚠️ Presensi Ditolak (Anti-Cheating)',
+              'Sistem mendeteksi penggunaan Fake GPS / Lokasi Palsu pada perangkat Anda. Silakan matikan aplikasi lokasi palsu Anda untuk melakukan absensi.'
+            );
+            setShowCamera(false);
+            return;
+          }
+        } else {
+          Alert.alert('Izin Lokasi Diperlukan', 'Presensi memerlukan akses lokasi presisi Anda.');
+          setShowCamera(false);
+          return;
+        }
+      } catch (err) {
+        console.log('Error verifying location:', err);
+      }
+
       if (!networkState.isConnected) {
         // Offline Mode: Queue for later sync
         const newItem = {
@@ -272,8 +351,10 @@ export default function HomeScreen() {
           date: today,
           clock_type: cameraType,
           time: nowTime,
-          notes: currentAddress,
-          timestamp: Date.now()
+          notes: `Mobile check-${cameraType.toLowerCase()} (Offline) | ${currentAddress}`,
+          timestamp: Date.now(),
+          location_lat: location?.coords.latitude || null,
+          location_lng: location?.coords.longitude || null,
         };
         const newQueue = [...pendingAttendance, newItem];
         setPendingAttendance(newQueue);
@@ -327,8 +408,8 @@ export default function HomeScreen() {
             notes: `Mobile check-in | ${currentAddress}`,
             is_manual: false,
             photo_url: photoUrl,
-            location_lat: null,
-            location_lng: null,
+            location_lat: location?.coords.latitude || null,
+            location_lng: location?.coords.longitude || null,
           }]);
         if (insertError) throw insertError;
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -352,6 +433,8 @@ export default function HomeScreen() {
             clock_out: nowTime,
             notes: `Mobile check-out | ${currentAddress}`,
             photo_url: photoUrl || undefined,
+            location_lat: location?.coords.latitude || null,
+            location_lng: location?.coords.longitude || null,
           })
           .eq('id', existing.id);
         if (updateError) throw updateError;
