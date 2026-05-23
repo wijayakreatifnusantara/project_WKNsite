@@ -52,9 +52,9 @@ export default function SettingsScreen() {
   const handleClearCache = async () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      // We keep user_session, but clear everything else
+      // We keep userSession, but clear everything else
       const keys = await AsyncStorage.getAllKeys();
-      const keysToRemove = keys.filter(k => k !== 'user_session');
+      const keysToRemove = keys.filter(k => k !== 'userSession');
       await AsyncStorage.multiRemove(keysToRemove);
       alert('Cache berhasil dibersihkan!');
     } catch (e) {
@@ -64,7 +64,7 @@ export default function SettingsScreen() {
 
   const checkSession = async () => {
     try {
-      const sessionData = await AsyncStorage.getItem('user_session');
+      const sessionData = await AsyncStorage.getItem('userSession');
       if (sessionData) {
         const localUser = JSON.parse(sessionData);
         setUserData(localUser);
@@ -87,7 +87,7 @@ export default function SettingsScreen() {
             department: data.departments?.name || 'Wijaya KN'
           };
           setUserData(updatedUser);
-          await AsyncStorage.setItem('user_session', JSON.stringify(updatedUser));
+          await AsyncStorage.setItem('userSession', JSON.stringify(updatedUser));
         }
       }
     } catch (e) {
@@ -97,7 +97,7 @@ export default function SettingsScreen() {
 
   const handleLogout = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await AsyncStorage.removeItem('user_session');
+    await AsyncStorage.removeItem('userSession');
     router.replace('/login');
   };
 
