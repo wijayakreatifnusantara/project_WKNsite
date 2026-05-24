@@ -25,6 +25,7 @@ export default function RootLayout() {
         <Stack.Screen name="leave" options={{ headerShown: false }} />
         <Stack.Screen name="signature" options={{ headerShown: false }} />
         <Stack.Screen name="payslip" options={{ headerShown: false }} />
+        <Stack.Screen name="salary-details" options={{ title: 'Rincian Gaji' }} />
         <Stack.Screen name="directory" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>

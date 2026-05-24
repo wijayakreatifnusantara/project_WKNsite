@@ -30,7 +30,8 @@ export default function MenuScreen() {
     { id: '1', title: 'Izin & Cuti', icon: 'calendar', color: '#E31E24', bg: '#FEF2F2', badge: '2', route: '/leave' },
     { id: '2', title: 'Lembur', icon: 'time', color: '#f97316', bg: '#FFF7ED', route: '/overtime' },
     { id: '3', title: 'Slip Gaji', icon: 'receipt', color: '#8b5cf6', bg: '#F5F3FF', route: '/payslip' },
-    { id: '9', title: 'Direktori', icon: 'people', color: '#10b981', bg: '#F0FDF4', route: '/directory' },
+    { id: '10', title: 'Reimburse', icon: 'cash', color: '#10b981', bg: '#ECFDF5', route: '/development?title=Reimburse' },
+    { id: '9', title: 'Direktori', icon: 'people', color: '#3b82f6', bg: '#EFF6FF', route: '/directory' },
     { id: '7', title: 'Asset', icon: 'briefcase', color: '#06b6d4', bg: '#ECFEFF', route: '/development?title=Asset' },
   ];
 
@@ -38,6 +39,7 @@ export default function MenuScreen() {
     { id: '5', title: 'Wiki WKN', icon: 'book', color: '#3b82f6', bg: '#F0F9FF', route: '/development?title=Wiki WKN' },
     { id: '6', title: 'Academy', icon: 'school', color: '#f59e0b', bg: '#FFFBEB', route: '/development?title=Academy' },
     { id: '4', title: 'Laporan', icon: 'bar-chart', color: '#10b981', bg: '#F0FDF4', route: '/development?title=Laporan' },
+    { id: '11', title: 'Laporan WO', icon: 'document-text', color: '#e11d48', bg: '#FFF1F2', route: '/development?title=Laporan WO' },
     { id: '8', title: 'Helpdesk', icon: 'help-circle', color: '#6366f1', bg: '#EEF2FF', route: '/development?title=Helpdesk' },
   ];
 
@@ -46,7 +48,7 @@ export default function MenuScreen() {
       {items.map((item) => (
         <TouchableOpacity 
           key={item.id} 
-          style={[styles.menuCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}
+          style={[styles.menuCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0' }]}
           activeOpacity={0.7}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -71,15 +73,17 @@ export default function MenuScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
       
-      {/* Sleek, professional header */}
+      {/* Sleek, professional header with Left Accent Border */}
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Menu Fitur</Text>
-        <Text style={styles.headerSubtitle}>Kelola pekerjaan dan informasi perusahaan</Text>
+        <View style={{ borderLeftWidth: 4, borderLeftColor: '#E31E24', paddingLeft: 12 }}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Menu Fitur</Text>
+          <Text style={styles.headerSubtitle}>Kelola pekerjaan dan informasi perusahaan</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Quick Stats Panel Widget */}
-        <View style={[styles.statsContainer, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+        {/* Quick Stats Panel Widget with Red Left Border */}
+        <View style={[styles.statsContainer, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0', borderLeftColor: '#E31E24' }]}>
           <View style={styles.statItem}>
             <Text style={styles.statVal}>12</Text>
             <Text style={styles.statLbl}>Sisa Cuti</Text>
@@ -151,16 +155,17 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    borderRadius: 16,
-    paddingVertical: 14,
+    borderRadius: 20,
+    paddingVertical: 16,
     paddingHorizontal: 10,
     borderWidth: 1,
-    marginBottom: 20,
+    borderLeftWidth: 4,
+    marginBottom: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.02,
-    shadowRadius: 6,
-    elevation: 1,
+    shadowRadius: 10,
+    elevation: 2,
   },
   statItem: {
     flex: 1,
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
   },
   statVal: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '900',
     color: '#E31E24',
   },
   statLbl: {
@@ -181,17 +186,17 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 24,
-    backgroundColor: '#CBD5E1',
+    backgroundColor: '#E2E8F0',
     alignSelf: 'center',
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 1,
-    marginBottom: 12,
+    letterSpacing: 1.2,
+    marginBottom: 14,
     paddingLeft: 4,
   },
   grid: {
@@ -201,24 +206,29 @@ const styles = StyleSheet.create({
   },
   menuCard: {
     width: (width - 52) / 3, // 3-column layout
-    borderRadius: 16,
-    paddingVertical: 14,
+    borderRadius: 20,
+    paddingVertical: 16,
     paddingHorizontal: 8,
     alignItems: 'center',
     borderWidth: 1,
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.01,
+    shadowRadius: 8,
+    elevation: 1,
   },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 46,
+    height: 46,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   menuLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     textAlign: 'center',
     lineHeight: 14,
   },
@@ -240,12 +250,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   promoBanner: {
-    backgroundColor: '#E31E24', // Match WKN Brand Color
-    borderRadius: 16,
-    padding: 18,
+    backgroundColor: '#E31E24', // WKN Corporate Brand Color
+    borderRadius: 20,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    shadowColor: '#E31E24',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    elevation: 4,
   },
   promoText: {
     flex: 1,

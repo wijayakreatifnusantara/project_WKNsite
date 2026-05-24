@@ -47,8 +47,11 @@ export default function PayslipScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Slip Gaji Digital</Text>
-        <TouchableOpacity style={styles.historyBtn}>
-          <Ionicons name="calendar-outline" size={22} color={colors.text} />
+        <TouchableOpacity 
+          style={styles.historyBtn}
+          onPress={() => router.push('/salary-details')}
+        >
+          <Ionicons name="document-text-outline" size={22} color={colors.text} />
         </TouchableOpacity>
       </View>
 

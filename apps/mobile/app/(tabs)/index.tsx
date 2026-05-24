@@ -464,23 +464,27 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
+      <StatusBar barStyle={isDark ? "light-content" : "light-content"} />
       
-      {/* New Header Structure - Based on Reference Image */}
-      <View style={[styles.headerWrapper, { backgroundColor: colors.card }]}>
+      {/* Branded Red Header Banner */}
+      <View style={[styles.headerWrapper, { backgroundColor: isDark ? '#1C1C1E' : '#E31E24' }]}>
         <View style={styles.headerTopRow}>
           <View style={styles.headerTopLeft}>
-            <Text style={styles.dateLabelImage}>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}</Text>
+            <Text style={[styles.dateLabelImage, { color: isDark ? '#8E8E93' : 'rgba(255, 255, 255, 0.75)' }]}>
+              {currentTime.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
+            </Text>
             <View style={styles.clockRowImage}>
-              <Text style={[styles.clockTextImage, { color: colors.text }]}>{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</Text>
-              <View style={[styles.liveBadge, { backgroundColor: isDark ? '#1F1F1F' : '#F2F2F7' }]}>
+              <Text style={[styles.clockTextImage, { color: '#FFFFFF' }]}>
+                {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </Text>
+              <View style={[styles.liveBadge, { backgroundColor: isDark ? '#2C2C2E' : 'rgba(255, 255, 255, 0.15)' }]}>
                 <Ionicons 
                   name={networkState.type === 'WIFI' ? "wifi" : "cellular"} 
                   size={10} 
                   color={networkState.isConnected ? "#10B981" : "#EF4444"} 
                 />
                 <View style={[styles.liveDot, { backgroundColor: networkState.isConnected ? '#10B981' : '#EF4444' }]} />
-                <Text style={[styles.liveText, { color: networkState.isConnected ? "#10B981" : "#EF4444" }]}>
+                <Text style={[styles.liveText, { color: networkState.isConnected ? "#10B981" : "#F87171" }]}>
                   {networkState.isConnected ? 'LIVE' : 'OFFLINE'}
                 </Text>
               </View>
@@ -489,30 +493,43 @@ export default function HomeScreen() {
             {/* Weather Sync Row */}
             {weather && (
               <View style={styles.weatherSyncRow}>
-                <Ionicons name="sunny" size={12} color="#D97706" />
-                <Text style={styles.weatherTextHeader}>{weather.temp}°C • {weather.condition}</Text>
-                <View style={styles.syncDot} />
-                <Text style={styles.weatherCityText}>{weather.city}</Text>
+                <Ionicons name="cloudy-night" size={12} color={isDark ? '#F59E0B' : '#FEF3C7'} />
+                <Text style={[styles.weatherTextHeader, { color: isDark ? '#F59E0B' : '#FEF3C7' }]}>
+                  {weather.temp}°C • {weather.condition}
+                </Text>
+                <View style={[styles.syncDot, { backgroundColor: isDark ? '#475569' : 'rgba(255,255,255,0.3)' }]} />
+                <Text style={[styles.weatherCityText, { color: isDark ? '#8E8E93' : 'rgba(255,255,255,0.7)' }]}>
+                  {weather.city}
+                </Text>
               </View>
             )}
           </View>
           
           <View style={styles.headerActionBtns}>
-            <TouchableOpacity style={[styles.squareBtn, { backgroundColor: isDark ? '#1F1F1F' : '#F2F2F7' }]} onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
-              <Ionicons name="notifications" size={20} color={colors.text} />
+            <TouchableOpacity 
+              style={[styles.squareBtn, { backgroundColor: isDark ? '#2C2C2E' : 'rgba(255, 255, 255, 0.15)', borderColor: isDark ? '#3A3A3C' : 'rgba(255, 255, 255, 0.2)' }]} 
+              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+            >
+              <Ionicons name="notifications" size={20} color="#FFFFFF" />
               {notificationCount > 0 && <View style={styles.btnDotBadge} />}
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.profileSectionImage}>
-          <View style={[styles.avatarCircleImage, { backgroundColor: isDark ? '#2C2C2E' : '#EEF2FF' }]}>
-            <Text style={[styles.avatarTextImage, { color: isDark ? '#FFF' : '#4F46E5' }]}>{userData?.name ? userData.name.substring(0, 1) : 'A'}</Text>
+          <View style={[styles.avatarCircleImage, { backgroundColor: isDark ? '#2C2C2E' : '#FFFFFF' }]}>
+            <Text style={[styles.avatarTextImage, { color: isDark ? '#FFFFFF' : '#E31E24' }]}>
+              {userData?.name ? userData.name.substring(0, 1).toUpperCase() : 'A'}
+            </Text>
           </View>
           <View style={styles.profileInfoImage}>
-            <Text style={[styles.profileNameImage, { color: colors.text }]}>{userData?.name || 'User Name'}</Text>
-            <Text style={styles.profileRoleImage}>{userData?.jabatan || 'Staff'} • Wijaya KN</Text>
-            <Text style={styles.profileIdImage}>ID: {userData?.id || 'WKN-0000'}</Text>
+            <Text style={[styles.profileNameImage, { color: '#FFFFFF' }]}>{userData?.name || 'User Name'}</Text>
+            <Text style={[styles.profileRoleImage, { color: isDark ? '#8E8E93' : 'rgba(255, 255, 255, 0.8)' }]}>
+              {userData?.jabatan || 'Staff'} • PT Wijaya Kreatif Nusantara
+            </Text>
+            <Text style={[styles.profileIdImage, { color: isDark ? '#3B82F6' : '#FDE047' }]}>
+              ID: {userData?.id || 'WKN-0000'}
+            </Text>
           </View>
         </View>
       </View>
@@ -520,10 +537,38 @@ export default function HomeScreen() {
       <ScrollView 
         contentContainerStyle={[styles.scrollContentCompact, { backgroundColor: colors.background }]}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.tint} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E31E24" />}
       >
-        {/* Compact Attendance Action Bar */}
-        <View style={[styles.attendanceBar, { backgroundColor: colors.card }]}>
+        {/* Redesigned Attendance Control Card */}
+        <View style={[styles.attendanceBar, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0' }]}>
+          <View style={styles.controlHeader}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="finger-print" size={16} color="#E31E24" />
+              <Text style={[styles.controlTitle, { color: colors.text }]}>KONTROL KEHADIRAN</Text>
+            </View>
+            <View style={[styles.indicatorPill, { backgroundColor: todayRecord?.clock_in ? '#ECFDF5' : '#FEF3C7' }]}>
+              <Text style={[styles.indicatorText, { color: todayRecord?.clock_in ? '#059669' : '#D97706' }]}>
+                {todayRecord?.clock_in ? 'SUDAH ABSEN MASUK' : 'BELUM PRESENSI'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.quickStatusRow}>
+            <View style={styles.quickStatusCol}>
+              <Text style={styles.quickStatusLabel}>MASUK</Text>
+              <Text style={[styles.quickStatusTime, { color: todayRecord?.clock_in ? '#10b981' : colors.subText }]}>
+                {todayRecord?.clock_in ? todayRecord.clock_in.substring(0, 5) : '--:--'}
+              </Text>
+            </View>
+            <View style={styles.verticalDivider} />
+            <View style={styles.quickStatusCol}>
+              <Text style={styles.quickStatusLabel}>PULANG</Text>
+              <Text style={[styles.quickStatusTime, { color: todayRecord?.clock_out ? '#f43f5e' : colors.subText }]}>
+                {todayRecord?.clock_out ? todayRecord.clock_out.substring(0, 5) : '--:--'}
+              </Text>
+            </View>
+          </View>
+
           <View style={styles.actionRowCompact}>
             <TouchableOpacity onPress={handleClockIn} onPressIn={() => onPressIn(inScale)} onPressOut={() => onPressOut(inScale)} style={styles.flex1} activeOpacity={1}>
               <Animated.View style={[styles.btnCompact, {backgroundColor: '#10b981', transform: [{scale: inScale}], flexDirection: 'row', gap: 8}]}>
@@ -541,11 +586,11 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Work Schedule Preview Card */}
-        <View style={[styles.scheduleCard, { backgroundColor: colors.card }]}>
+        {/* Work Schedule Preview Card - Enhanced */}
+        <View style={[styles.scheduleCard, { backgroundColor: colors.card, borderLeftColor: '#E31E24' }]}>
           <View style={styles.scheduleHeader}>
-            <View style={styles.shiftBadge}>
-              <Text style={styles.shiftBadgeText}>SHIFT NORMAL</Text>
+            <View style={[styles.shiftBadge, { backgroundColor: isDark ? '#2C2C2E' : '#FEE2E2' }]}>
+              <Text style={[styles.shiftBadgeText, { color: '#E31E24' }]}>SHIFT NORMAL</Text>
             </View>
             <Text style={styles.scheduleDate}>Hari Ini</Text>
           </View>
@@ -561,7 +606,7 @@ export default function HomeScreen() {
             </View>
           </View>
           <View style={styles.scheduleFooter}>
-            <Ionicons name="information-circle" size={14} color="#8E8E93" />
+            <Ionicons name="information-circle-outline" size={14} color="#8E8E93" />
             <Text style={styles.scheduleFooterText}>Toleransi keterlambatan: 15 Menit</Text>
           </View>
         </View>
@@ -580,8 +625,9 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
+        {/* Office Announcement Banner - Enhanced */}
         {showBanner && (
-          <View style={[styles.infoBanner, { backgroundColor: colors.card }]}>
+          <View style={[styles.infoBanner, { backgroundColor: colors.card, borderLeftColor: '#4F46E5' }]}>
             <View style={[styles.iconCircle, { backgroundColor: isDark ? '#1F1F1F' : '#EEF2FF', width: 40, height: 40, borderRadius: 12, marginBottom: 0 }]}>
               <Ionicons name="megaphone" size={20} color={isDark ? '#FFF' : '#4F46E5'} />
             </View>
@@ -594,7 +640,6 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         )}
-
 
         {/* Today's Attendance Status - Real Data */}
         <View style={styles.listSection}>
@@ -612,7 +657,7 @@ export default function HomeScreen() {
           ) : (
             <>
               {/* Clock In Row */}
-              <View style={[styles.simpleListItem, { backgroundColor: colors.card }]}>
+              <View style={[styles.simpleListItem, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F1F5F9' }]}>
                 <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_in ? (isDark ? '#1F1F1F' : '#ECFDF5') : (isDark ? '#2C2C2E' : '#F1F5F9') }]}>
                   <Ionicons name="log-in" size={14} color={todayRecord?.clock_in ? '#10b981' : '#94A3B8'} />
                 </View>
@@ -628,7 +673,7 @@ export default function HomeScreen() {
               </View>
 
               {/* Clock Out Row */}
-              <View style={[styles.simpleListItem, { backgroundColor: colors.card }]}>
+              <View style={[styles.simpleListItem, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F1F5F9' }]}>
                 <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_out ? (isDark ? '#1F1F1F' : '#fff1f2') : (isDark ? '#2C2C2E' : '#F1F5F9') }]}>
                   <Ionicons name="log-out" size={14} color={todayRecord?.clock_out ? '#f43f5e' : '#94A3B8'} />
                 </View>
@@ -659,6 +704,7 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -669,17 +715,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   headerWrapper: {
-    backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 25,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    elevation: 5,
     zIndex: 10,
   },
   headerTopRow: {
@@ -694,7 +739,6 @@ const styles = StyleSheet.create({
   dateLabelImage: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#A0A0A0',
     letterSpacing: 0.5,
     marginBottom: 4,
   },
@@ -704,15 +748,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   clockTextImage: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#1C1C1E',
+    fontSize: 26,
+    fontWeight: '900',
     letterSpacing: -0.5,
   },
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 20,
@@ -722,12 +764,10 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#10B981',
   },
   liveText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#059669',
     letterSpacing: 0.5,
   },
   weatherSyncRow: {
@@ -739,18 +779,15 @@ const styles = StyleSheet.create({
   weatherTextHeader: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#D97706',
   },
   syncDot: {
     width: 3,
     height: 3,
     borderRadius: 1.5,
-    backgroundColor: '#CBD5E1',
   },
   weatherCityText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#8E8E93',
   },
   headerActionBtns: {
     flexDirection: 'row',
@@ -760,11 +797,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#F8F9FB',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#F2F2F7',
     position: 'relative',
   },
   btnDotBadge: {
@@ -774,7 +809,9 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E31E24',
+    backgroundColor: '#FFF',
+    borderWidth: 1.5,
+    borderColor: '#E31E24',
   },
   profileSectionImage: {
     flexDirection: 'row',
@@ -785,14 +822,17 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
   },
   avatarTextImage: {
     fontSize: 22,
-    fontWeight: '800',
-    color: '#4F46E5',
+    fontWeight: '900',
   },
   profileInfoImage: {
     flex: 1,
@@ -800,19 +840,16 @@ const styles = StyleSheet.create({
   profileNameImage: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#1C1C1E',
     marginBottom: 2,
   },
   profileRoleImage: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#8E8E93',
     marginBottom: 4,
   },
   profileIdImage: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#0056D2',
     letterSpacing: 0.5,
   },
   scrollContentCompact: {
@@ -820,50 +857,86 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   attendanceBar: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 12,
+    borderRadius: 24,
+    padding: 18,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.04,
     shadowRadius: 12,
-    elevation: 2,
-    marginBottom: 5,
+    elevation: 3,
+    marginBottom: 20,
+    borderWidth: 1,
   },
-  clockInfoCol: {
-    alignItems: 'flex-end',
+  controlHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  weatherRowSmall: {
+  controlTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  indicatorPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  indicatorText: {
+    fontSize: 8,
+    fontWeight: '850',
+    letterSpacing: 0.5,
+  },
+  quickStatusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
+    justifyContent: 'space-around',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    paddingVertical: 12,
+    marginBottom: 18,
   },
-  weatherTextSmall: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#D97706',
+  quickStatusCol: {
+    alignItems: 'center',
+    flex: 1,
   },
-  workHoursSmall: {
-    fontSize: 11,
-    color: '#8E8E93',
-    fontWeight: '600',
+  quickStatusLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#94A3B8',
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  quickStatusTime: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  verticalDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#E2E8F0',
   },
   actionRowCompact: {
     flexDirection: 'row',
     gap: 12,
   },
   btnCompact: {
-    height: 48,
-    borderRadius: 14,
+    height: 50,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   btnTextCompact: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '900',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
   },
   flex1: {
     flex: 1,
@@ -876,30 +949,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
-  bentoBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    backgroundColor: '#EF4444',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 10,
-    zIndex: 10,
-  },
-  badgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '900',
-  },
   scheduleCard: {
     borderRadius: 24,
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 10,
-    elevation: 3,
+    elevation: 2,
+    borderLeftWidth: 4,
   },
   scheduleHeader: {
     flexDirection: 'row',
@@ -908,7 +967,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   shiftBadge: {
-    backgroundColor: '#EEF2FF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -916,7 +974,6 @@ const styles = StyleSheet.create({
   shiftBadgeText: {
     fontSize: 10,
     fontWeight: '900',
-    color: '#4F46E5',
     letterSpacing: 0.5,
   },
   scheduleDate: {
@@ -985,13 +1042,13 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EEF2FF',
     padding: 15,
     borderRadius: 20,
     marginTop: 20,
     gap: 15,
     borderWidth: 1,
     borderColor: '#E0E7FF',
+    borderLeftWidth: 4,
   },
   bannerText: {
     flex: 1,
@@ -1008,7 +1065,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   listSection: {
-    marginTop: 30,
+    marginTop: 25,
   },
   listHeader: {
     flexDirection: 'row',
@@ -1030,16 +1087,15 @@ const styles = StyleSheet.create({
   simpleListItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 20,
     marginBottom: 10,
+    borderWidth: 1,
   },
   itemIconCircle: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#ECFDF5',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
@@ -1050,7 +1106,6 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   itemSubText: {
     fontSize: 12,
@@ -1059,7 +1114,6 @@ const styles = StyleSheet.create({
   itemTime: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   footerSpacingSmall: {
     height: 100,
