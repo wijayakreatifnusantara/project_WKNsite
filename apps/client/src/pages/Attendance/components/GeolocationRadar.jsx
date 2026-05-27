@@ -80,8 +80,8 @@ const GeolocationRadar = () => {
             key={blip.id}
             className="absolute rounded-full bg-emerald-400 ping"
             style={{
-              left: \`\${blip.x}%\`,
-              top: \`\${blip.y}%\`,
+              left: `${blip.x}%`,
+              top: `${blip.y}%`,
               width: blip.size,
               height: blip.size
             }}
