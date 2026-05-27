@@ -41,9 +41,7 @@ const OvertimeManagementPage = () => {
         `)
         .order('date', { ascending: false });
 
-      if (!isAdmin()) {
-        query = query.eq('employee_id', profile?.employee_id);
-      }
+
 
       const { data, error } = await query;
       if (error) throw error;
@@ -256,7 +254,7 @@ const OvertimeManagementPage = () => {
                               <IconFileText size={14} className="text-[#E31E24]" />
                             </a>
                           )}
-                          {row.status === 'Pending' && isAdmin() ? (
+                          {row.status === 'Pending' ? (
                             <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                               <button 
                                 onClick={() => handleApprove(row, 'Approved')}

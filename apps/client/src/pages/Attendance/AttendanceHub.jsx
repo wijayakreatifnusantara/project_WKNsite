@@ -23,7 +23,11 @@ import DeptLateChart from './components/DeptLateChart';
 import LiveFeed from './components/LiveFeed';
 import ManualAttendanceModal from './components/ManualAttendanceModal';
 import BulkAttendanceUploadModal from './components/BulkAttendanceUploadModal';
+import GeolocationRadar from './components/GeolocationRadar';
+import AnomalyAlerts from './components/AnomalyAlerts';
+import { exportDailyAttendance } from './utils/exportAttendance';
 import { Card } from "@/components/ui/card";
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/context/AuthContext';
@@ -145,6 +149,16 @@ const AttendanceHub = () => {
               {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
                 <div className="flex items-center gap-1.5">
                   <Button 
+                    onClick={async () => {
+                      const success = await exportDailyAttendance();
+                      if (success) toast.success("Daily report downloaded.");
+                    }}
+                    className="h-8 px-4 rounded-lg bg-[#f0f2f5] border-2 border-white text-slate-700 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50 shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex gap-2 items-center transition-all"
+                  >
+                    <IconDownload size={14} className="text-slate-500" />
+                    Export
+                  </Button>
+                  <Button 
                     onClick={() => setIsBulkModalOpen(true)}
                     className="h-8 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50 shadow-sm flex gap-2 items-center"
                   >
@@ -218,23 +232,9 @@ const AttendanceHub = () => {
                    </h3>
                    <DeptLateChart loading={loading} height={180} />
                 </div>
-                <div className="bg-[#1e293b] rounded-2xl p-4 shadow-xl flex flex-col justify-center items-center text-center relative overflow-hidden border border-slate-800">
-                    <IconWorld className="absolute -right-8 -bottom-8 text-white opacity-5" size={160} />
-                    <div className="h-10 w-10 bg-white/10 rounded-xl flex items-center justify-center text-white mb-3">
-                       <IconWorld size={20} />
-                    </div>
-                    <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-1">Global Dashboard</h4>
-                    <p className="text-[8px] text-slate-400 uppercase tracking-widest mb-4">Real-time HQ Connectivity</p>
-                    <div className="flex gap-2">
-                       <div className="px-3 py-1 bg-white/5 rounded-lg border border-white/10">
-                          <p className="text-[12px] font-black text-white">100%</p>
-                          <p className="text-[6px] text-slate-500 uppercase font-bold">Uptime</p>
-                       </div>
-                       <div className="px-3 py-1 bg-white/5 rounded-lg border border-white/10">
-                          <p className="text-[12px] font-black text-emerald-400">Stable</p>
-                          <p className="text-[6px] text-slate-500 uppercase font-bold">Sync</p>
-                       </div>
-                    </div>
+                <div className="grid grid-cols-2 gap-3 h-full">
+                   <GeolocationRadar />
+                   <AnomalyAlerts />
                 </div>
              </div>
           </div>

@@ -5,7 +5,7 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#E31E24'; // WKN Red
+const tintColorLight = '#F97316'; // WKN Red
 const tintColorDark = '#FF4545';
 
 export const Colors = {
@@ -21,15 +21,15 @@ export const Colors = {
     subText: '#8E8E93',
   },
   dark: {
-    text: '#FFFFFF',
-    background: '#000000',
+    text: '#F8FAFC',
+    background: '#0B1120',
     tint: tintColorDark,
-    icon: '#8E8E93',
-    tabIconDefault: '#8E8E93',
+    icon: '#94A3B8',
+    tabIconDefault: '#64748B',
     tabIconSelected: tintColorDark,
-    card: '#1C1C1E',
-    border: '#2C2C2E',
-    subText: '#8E8E93',
+    card: '#1E293B',
+    border: '#334155',
+    subText: '#94A3B8',
   },
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TextInput, TouchableOpacity, Image, ActivityIndicator, Linking, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Image, ActivityIndicator, Linking, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -56,7 +57,7 @@ export default function DirectoryScreen() {
     <View style={[styles.employeeCard, { backgroundColor: colors.card }]}>
       <View style={styles.cardMain}>
         <View style={[styles.avatarCircle, { backgroundColor: isDark ? '#1F1F1F' : '#F1F5F9' }]}>
-          <Text style={[styles.avatarText, { color: '#E31E24' }]}>
+          <Text style={[styles.avatarText, { color: '#F97316' }]}>
             {item.name.charAt(0).toUpperCase()}
           </Text>
         </View>
@@ -124,7 +125,7 @@ export default function DirectoryScreen() {
 
       {loading && !refreshing ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#E31E24" />
+          <ActivityIndicator size="large" color="#F97316" />
         </View>
       ) : (
         <FlatList
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
   empPosition: {
     fontSize: 12,
-    color: '#E31E24',
+    color: '#F97316',
     fontWeight: '700',
     marginBottom: 4,
   },

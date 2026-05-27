@@ -3,6 +3,9 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Global cache for zero-latency rendering
+const payrollCache = new Map();
+
 export const usePayroll = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,11 +47,13 @@ export const usePayroll = () => {
 
   const fetchHistory = useCallback(async (period) => {
     try {
-      setLoading(true);
+      const cacheKey = `history_${period}`;
+      if (!payrollCache.has(cacheKey)) setLoading(true);
       setError(null);
       const response = await axios.get(`${API_URL}/payroll/history`, {
         params: { period }
       });
+      payrollCache.set(cacheKey, response.data.data);
       setHistory(response.data.data);
       return response.data.data;
     } catch (err) {

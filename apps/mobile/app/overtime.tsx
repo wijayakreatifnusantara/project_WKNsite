@@ -3,7 +3,6 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  SafeAreaView, 
   ScrollView, 
   TouchableOpacity, 
   TextInput, 
@@ -11,20 +10,26 @@ import {
   Dimensions, 
   ActivityIndicator,
   StatusBar,
-  Linking
+  Linking,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabaseClient';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import SkeletonLoader from '../components/SkeletonLoader';
 
 const { width } = Dimensions.get('window');
 
 export default function OvertimeScreen() {
   const { colors, isDark } = useTheme();
-  const [userData, setUserData] = useState<any>(null);
+  const { userData, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [requests, setRequests] = useState<any[]>([]);
@@ -35,27 +40,48 @@ export default function OvertimeScreen() {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [reason, setReason] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (userData?.id) {
+      await fetchOvertimeRequests(userData.id);
+    }
+    setRefreshing(false);
+  };
 
   useEffect(() => {
-    initScreen();
-  }, []);
+    if (userData && !authLoading) {
+      initScreen(userData);
+    } else if (!userData && !authLoading) {
+      router.replace('/login');
+    }
+  }, [userData, authLoading]);
 
-  const initScreen = async () => {
+  const initScreen = async (user: any) => {
     setLoading(true);
     try {
-      const sessionStr = await AsyncStorage.getItem('userSession');
-      if (sessionStr) {
-        const user = JSON.parse(sessionStr);
-        setUserData(user);
-        await fetchOvertimeRequests(user.id);
-      } else {
-        router.replace('/login');
-      }
+      await fetchOvertimeRequests(user.id);
+      setupRealtimeSubscription(user.id);
     } catch (e) {
       console.log('Error initializing screen:', e);
     } finally {
       setLoading(false);
     }
+  };
+
+  const setupRealtimeSubscription = (userId: string) => {
+    supabase
+      .channel('public:overtime_requests')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'overtime_requests', filter: `employee_id=eq.${userId}` },
+        (payload) => {
+          console.log('Real-time overtime update received!', payload);
+          fetchOvertimeRequests(userId);
+        }
+      )
+      .subscribe();
   };
 
   const fetchOvertimeRequests = async (employeeId: string) => {
@@ -74,6 +100,11 @@ export default function OvertimeScreen() {
   };
 
   const handleCreateRequest = async () => {
+    if (!userData) {
+      Alert.alert('Sesi Berakhir', 'Silakan login kembali.');
+      return;
+    }
+
     if (!date || !startTime || !endTime || !reason) {
       Alert.alert('Form Belum Lengkap', 'Silakan isi seluruh kolom input pengajuan.');
       return;
@@ -194,17 +225,33 @@ export default function OvertimeScreen() {
           <Ionicons 
             name={showForm ? "list-outline" : "add-circle-outline"} 
             size={24} 
-            color="#E31E24" 
+            color="#F97316" 
           />
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#E31E24" />
-          <Text style={{ color: colors.subText, marginTop: 10 }}>Sinkronisasi data lembur...</Text>
-        </View>
-      ) : showForm ? (
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        {loading || authLoading ? (
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={[styles.historyCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7', paddingVertical: 14 }]}>
+              <SkeletonLoader width="40%" height={16} isDark={isDark} style={{ marginBottom: 10 }} />
+              <SkeletonLoader width="70%" height={12} isDark={isDark} style={{ marginBottom: 12 }} />
+              <SkeletonLoader width="100%" height={1} isDark={isDark} style={{ marginBottom: 15 }} />
+              <SkeletonLoader width="30%" height={10} isDark={isDark} style={{ marginBottom: 8 }} />
+              <SkeletonLoader width="90%" height={14} isDark={isDark} />
+            </View>
+            <View style={[styles.historyCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7', paddingVertical: 14 }]}>
+              <SkeletonLoader width="50%" height={16} isDark={isDark} style={{ marginBottom: 10 }} />
+              <SkeletonLoader width="60%" height={12} isDark={isDark} style={{ marginBottom: 12 }} />
+              <SkeletonLoader width="100%" height={1} isDark={isDark} style={{ marginBottom: 15 }} />
+              <SkeletonLoader width="40%" height={10} isDark={isDark} style={{ marginBottom: 8 }} />
+              <SkeletonLoader width="85%" height={14} isDark={isDark} />
+            </View>
+          </ScrollView>
+        ) : showForm ? (
         /* Overtime Application Form */
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
@@ -276,7 +323,12 @@ export default function OvertimeScreen() {
         </ScrollView>
       ) : (
         /* Overtime History List */
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           <Text style={[styles.sectionTitle, { color: colors.subText }]}>RIWAYAT PENGAJUAN LEMBUR</Text>
           
           {requests.length === 0 ? (
@@ -320,7 +372,7 @@ export default function OvertimeScreen() {
                           Linking.openURL(item.pdf_url);
                         }}
                       >
-                        <Ionicons name="document-text-outline" size={14} color="#E31E24" style={{ marginRight: 4 }} />
+                        <Ionicons name="document-text-outline" size={14} color="#F97316" style={{ marginRight: 4 }} />
                         <Text style={styles.pdfBtnText}>Unduh PDF TTD Resmi</Text>
                       </TouchableOpacity>
                     </View>
@@ -332,6 +384,7 @@ export default function OvertimeScreen() {
           <View style={{ height: 100 }} />
         </ScrollView>
       )}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -344,7 +397,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 16,
     borderBottomWidth: 1,
@@ -376,7 +429,7 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
   },
   emptyContainer: {
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 40,
     alignItems: 'center',
@@ -387,11 +440,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginTop: 15,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   emptyAddBtn: {
-    backgroundColor: '#E31E24',
-    paddingHorizontal: 20,
+    backgroundColor: '#F97316',
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
   },
@@ -401,9 +454,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   formCard: {
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1,
-    padding: 20,
+    padding: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.02,
@@ -413,7 +466,7 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: 16,
     fontWeight: '800',
-    marginBottom: 20,
+    marginBottom: 12,
     letterSpacing: -0.5,
   },
   inputGroup: {
@@ -447,14 +500,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   submitBtn: {
-    backgroundColor: '#E31E24',
+    backgroundColor: '#F97316',
     height: 48,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -467,7 +520,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   historyCard: {
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 16,
     marginBottom: 12,
@@ -539,7 +592,7 @@ const styles = StyleSheet.create({
   pdfBtnText: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#E31E24',
+    color: '#F97316',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   }

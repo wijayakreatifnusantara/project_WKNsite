@@ -1,73 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  TextInput,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Alert,
+  RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../context/ThemeContext';
-
-interface SalaryItem {
-  id: string;
-  label: string;
-  value: string;
-}
-
-interface SalarySection {
-  title: string;
-  items: SalaryItem[];
-}
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 export default function SalaryDetailsScreen() {
   const { colors, isDark } = useTheme();
+  const { userData } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   
-  // Grade
-  const [grade, setGrade] = useState('');
-  
-  // Fixed Allowance
-  const [basicSalary, setBasicSalary] = useState('');
-  const [positionAllowance, setPositionAllowance] = useState('');
-  const [skillAllowance, setSkillAllowance] = useState('');
-  const [communicationAllowance, setCommunicationAllowance] = useState('');
-  const [bpjsTkJkk, setBpjsTkJkk] = useState('');
-  const [bpjsTkJkm, setBpjsTkJkm] = useState('');
-  const [bpjsTkJht, setBpjsTkJht] = useState('');
-  const [bpjsTkPensiun, setBpjsTkPensiun] = useState('');
-  const [bpjsKesehatan, setBpjsKesehatan] = useState('');
-  const [taxAllowance, setTaxAllowance] = useState('');
-  
-  // Variable Allowance
-  const [workOrderAllowance, setWorkOrderAllowance] = useState('');
-  const [mealsAllowance, setMealsAllowance] = useState('');
-  const [transportAllowance, setTransportAllowance] = useState('');
-  const [overtimeAllowance, setOvertimeAllowance] = useState('');
-  
-  // Non-Wage Income
-  const [thr, setThr] = useState('');
-  const [bonus, setBonus] = useState('');
-  const [incentive, setIncentive] = useState('');
-  const [miscellaneousEarnings, setMiscellaneousEarnings] = useState('');
-  
-  // Deductions
-  const [pph21, setPph21] = useState('');
-  const [deductionBpjsTkJht, setDeductionBpjsTkJht] = useState('');
-  const [deductionBpjsTkPensiun, setDeductionBpjsTkPensiun] = useState('');
-  const [deductionBpjsKesehatan, setDeductionBpjsKesehatan] = useState('');
-  const [loan, setLoan] = useState('');
-  const [miscellaneousDeductions, setMiscellaneousDeductions] = useState('');
+  // Salary Data State
+  const [salaryData, setSalaryData] = useState<any>(null);
 
-  const formatCurrency = (amount: string) => {
-    const num = parseFloat(amount) || 0;
+  const fetchData = async () => {
+    try {
+      if (!userData?.id) return;
+      const { data, error } = await supabase
+        .from('employee_salaries')
+        .select('*')
+        .eq('employee_id', userData.id)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') { // PGRST116 is no rows returned
+        throw error;
+      } else if (data) {
+        setSalaryData(data);
+        await AsyncStorage.setItem('cached_salary', JSON.stringify(data));
+      }
+    } catch (e) {
+      console.error('Network error, loading from cache:', e);
+      try {
+        const cached = await AsyncStorage.getItem('cached_salary');
+        if (cached) {
+          setSalaryData(JSON.parse(cached));
+          Alert.alert('Mode Offline', 'Menampilkan data gaji yang tersimpan terakhir kali.');
+        }
+      } catch (cacheErr) {}
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+  };
+
+  const formatCurrency = (amount: number | string | undefined) => {
+    const num = parseFloat(String(amount)) || 0;
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
@@ -75,102 +77,94 @@ export default function SalaryDetailsScreen() {
     }).format(num);
   };
 
-  const parseInput = (value: string) => parseFloat(value.replace(/[^0-9]/g, '')) || 0;
-
   const calculateTotals = () => {
-    // Fixed Allowance Total
+    if (!salaryData) return { fixedTotal: 0, variableTotal: 0, nonWageTotal: 0, totalEarnings: 0, totalDeductions: 0, netSalary: 0 };
+
     const fixedTotal = 
-      parseInput(basicSalary) +
-      parseInput(positionAllowance) +
-      parseInput(skillAllowance) +
-      parseInput(communicationAllowance) +
-      parseInput(bpjsTkJkk) +
-      parseInput(bpjsTkJkm) +
-      parseInput(bpjsTkJht) +
-      parseInput(bpjsTkPensiun) +
-      parseInput(bpjsKesehatan) +
-      parseInput(taxAllowance);
+      (Number(salaryData.basic_salary) || 0) +
+      (Number(salaryData.position_allowance) || 0) +
+      (Number(salaryData.skill_allowance) || 0) +
+      (Number(salaryData.communication_allowance) || 0) +
+      (Number(salaryData.bpjs_tk_jkk) || 0) +
+      (Number(salaryData.bpjs_tk_jkm) || 0) +
+      (Number(salaryData.bpjs_tk_jht) || 0) +
+      (Number(salaryData.bpjs_tk_pensiun) || 0) +
+      (Number(salaryData.bpjs_kesehatan) || 0) +
+      (Number(salaryData.tax_allowance) || 0);
 
-    // Variable Allowance Total
     const variableTotal =
-      parseInput(workOrderAllowance) +
-      parseInput(mealsAllowance) +
-      parseInput(transportAllowance) +
-      parseInput(overtimeAllowance);
+      (Number(salaryData.work_order_allowance) || 0) +
+      (Number(salaryData.meals_allowance) || 0) +
+      (Number(salaryData.transport_allowance) || 0) +
+      (Number(salaryData.overtime_allowance) || 0);
 
-    // Non-Wage Income Total
     const nonWageTotal =
-      parseInput(thr) +
-      parseInput(bonus) +
-      parseInput(incentive) +
-      parseInput(miscellaneousEarnings);
+      (Number(salaryData.thr) || 0) +
+      (Number(salaryData.bonus) || 0) +
+      (Number(salaryData.incentive) || 0) +
+      (Number(salaryData.misc_earnings) || 0);
 
-    // Total Earnings (Gross)
     const totalEarnings = fixedTotal + variableTotal + nonWageTotal;
 
-    // Deductions Total
     const totalDeductions =
-      parseInput(pph21) +
-      parseInput(deductionBpjsTkJht) +
-      parseInput(deductionBpjsTkPensiun) +
-      parseInput(deductionBpjsKesehatan) +
-      parseInput(loan) +
-      parseInput(miscellaneousDeductions);
+      (Number(salaryData.pph21) || 0) +
+      (Number(salaryData.deduction_jht) || 0) +
+      (Number(salaryData.deduction_pensiun) || 0) +
+      (Number(salaryData.deduction_kesehatan) || 0) +
+      (Number(salaryData.loan) || 0) +
+      (Number(salaryData.misc_deductions) || 0);
 
-    // Net Salary (Take Home Pay)
     const netSalary = totalEarnings - totalDeductions;
 
-    return {
-      fixedTotal,
-      variableTotal,
-      nonWageTotal,
-      totalEarnings,
-      totalDeductions,
-      netSalary,
-    };
+    return { fixedTotal, variableTotal, nonWageTotal, totalEarnings, totalDeductions, netSalary };
   };
 
   const totals = calculateTotals();
 
-  const handleSave = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Berhasil', 'Data rincian gaji berhasil disimpan');
-  };
-
-  const InputField = ({ 
-    label, 
-    value, 
-    onChange, 
-    placeholder = '0' 
-  }: { 
-    label: string; 
-    value: string; 
-    onChange: (text: string) => void; 
-    placeholder?: string;
-  }) => (
+  const InputField = ({ label, value }: { label: string; value: string | number }) => (
     <View style={styles.inputRow}>
       <Text style={[styles.inputLabel, { color: colors.text }]}>{label}</Text>
-      <TextInput
-        style={[styles.input, { 
-          backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC',
-          color: colors.text,
-          borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
-        }]}
-        value={value}
-        onChangeText={onChange}
-        placeholder={placeholder}
-        placeholderTextColor={isDark ? 'rgba(255,255,255,0.3)' : '#94A3B8'}
-        keyboardType="numeric"
-      />
+      <View style={[styles.inputContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]}>
+        <Text style={[styles.inputValueText, { color: colors.text }]}>
+          {value ? (typeof value === 'string' && isNaN(Number(value)) ? value : formatCurrency(value)) : 'Rp 0'}
+        </Text>
+      </View>
     </View>
   );
 
   const SectionTitle = ({ title, icon }: { title: string; icon: string }) => (
     <View style={styles.sectionTitleContainer}>
-      <Ionicons name={icon as any} size={18} color="#E31E24" />
+      <Ionicons name={icon as any} size={18} color="#F97316" />
       <Text style={styles.sectionTitleText}>{title}</Text>
     </View>
   );
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#F97316" />
+      </View>
+    );
+  }
+
+  if (!salaryData) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card }]}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Rincian Gaji</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 14 }}>
+          <Ionicons name="document-text-outline" size={64} color="#CBD5E1" />
+          <Text style={{ marginTop: 14, fontSize: 16, color: colors.text, textAlign: 'center', fontWeight: 'bold' }}>Data Gaji Belum Tersedia</Text>
+          <Text style={{ marginTop: 10, fontSize: 14, color: '#64748B', textAlign: 'center' }}>Admin belum menginput data gaji Anda ke dalam sistem.</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -178,40 +172,32 @@ export default function SalaryDetailsScreen() {
       
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.card }]}>
-        <TouchableOpacity 
-          style={styles.backBtn} 
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Rincian Gaji</Text>
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-          <Ionicons name="save-outline" size={22} color="#E31E24" />
-        </TouchableOpacity>
+        <View style={{ width: 40 }} />
       </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboardView}>
         <ScrollView 
           contentContainerStyle={styles.scrollContent} 
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />}
         >
           {/* Summary Card */}
-          <View style={[styles.summaryCard, { backgroundColor: '#E31E24' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: '#F97316' }]}>
             <Text style={styles.summaryLabel}>Take Home Pay (THP)</Text>
-            <Text style={styles.summaryValue}>{formatCurrency(totals.netSalary.toString())}</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(totals.netSalary)}</Text>
             <View style={styles.summaryRow}>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryItemLabel}>Total Penerimaan</Text>
-                <Text style={styles.summaryItemValue}>{formatCurrency(totals.totalEarnings.toString())}</Text>
+                <Text style={styles.summaryItemValue}>{formatCurrency(totals.totalEarnings)}</Text>
               </View>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryItemLabel}>Total Potongan</Text>
                 <Text style={[styles.summaryItemValue, { color: '#FCA5A5' }]}>
-                  {formatCurrency(totals.totalDeductions.toString())}
+                  {formatCurrency(totals.totalDeductions)}
                 </Text>
               </View>
             </View>
@@ -219,89 +205,84 @@ export default function SalaryDetailsScreen() {
 
           {/* Grade */}
           <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <InputField
-              label="Grade / Golongan"
-              value={grade}
-              onChange={setGrade}
-              placeholder="Contoh: III/A"
-            />
+            <InputField label="Grade / Golongan" value={salaryData.grade || '-'} />
           </View>
 
           {/* Fixed Allowance */}
           <SectionTitle title="FIXED ALLOWANCE" icon="wallet-outline" />
           <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <InputField label="1. Gaji Pokok (Basic Salary)" value={basicSalary} onChange={setBasicSalary} />
-            <InputField label="2. Tunjangan Posisi" value={positionAllowance} onChange={setPositionAllowance} />
-            <InputField label="3. Tunjangan Keahlian (Skill)" value={skillAllowance} onChange={setSkillAllowance} />
-            <InputField label="4. Tunjangan Komunikasi" value={communicationAllowance} onChange={setCommunicationAllowance} />
-            <InputField label="5. BPJS TK JKK" value={bpjsTkJkk} onChange={setBpjsTkJkk} />
-            <InputField label="6. BPJS TK JKM" value={bpjsTkJkm} onChange={setBpjsTkJkm} />
-            <InputField label="7. BPJS TK JHT" value={bpjsTkJht} onChange={setBpjsTkJht} />
-            <InputField label="8. BPJS TK Pensiun" value={bpjsTkPensiun} onChange={setBpjsTkPensiun} />
-            <InputField label="9. BPJS Kesehatan" value={bpjsKesehatan} onChange={setBpjsKesehatan} />
-            <InputField label="10. Tunjangan Pajak" value={taxAllowance} onChange={setTaxAllowance} />
+            <InputField label="1. Gaji Pokok (Basic Salary)" value={salaryData.basic_salary} />
+            <InputField label="2. Tunjangan Posisi" value={salaryData.position_allowance} />
+            <InputField label="3. Tunjangan Keahlian (Skill)" value={salaryData.skill_allowance} />
+            <InputField label="4. Tunjangan Komunikasi" value={salaryData.communication_allowance} />
+            <InputField label="5. BPJS TK JKK" value={salaryData.bpjs_tk_jkk} />
+            <InputField label="6. BPJS TK JKM" value={salaryData.bpjs_tk_jkm} />
+            <InputField label="7. BPJS TK JHT" value={salaryData.bpjs_tk_jht} />
+            <InputField label="8. BPJS TK Pensiun" value={salaryData.bpjs_tk_pensiun} />
+            <InputField label="9. BPJS Kesehatan" value={salaryData.bpjs_kesehatan} />
+            <InputField label="10. Tunjangan Pajak" value={salaryData.tax_allowance} />
             
             <View style={styles.totalRow}>
               <Text style={[styles.totalLabel, { color: colors.text }]}>Total Fixed Allowance</Text>
-              <Text style={styles.totalValue}>{formatCurrency(totals.fixedTotal.toString())}</Text>
+              <Text style={styles.totalValue}>{formatCurrency(totals.fixedTotal)}</Text>
             </View>
           </View>
 
           {/* Variable Allowance */}
           <SectionTitle title="VARIABLE ALLOWANCE" icon="trending-up-outline" />
           <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <InputField label="1. Tunjangan Work Order" value={workOrderAllowance} onChange={setWorkOrderAllowance} />
-            <InputField label="2. Tunjangan Makan" value={mealsAllowance} onChange={setMealsAllowance} />
-            <InputField label="3. Tunjangan Transport" value={transportAllowance} onChange={setTransportAllowance} />
-            <InputField label="4. Tunjangan Lembur" value={overtimeAllowance} onChange={setOvertimeAllowance} />
+            <InputField label="1. Tunjangan Work Order" value={salaryData.work_order_allowance} />
+            <InputField label="2. Tunjangan Makan" value={salaryData.meals_allowance} />
+            <InputField label="3. Tunjangan Transport" value={salaryData.transport_allowance} />
+            <InputField label="4. Tunjangan Lembur" value={salaryData.overtime_allowance} />
             
             <View style={styles.totalRow}>
               <Text style={[styles.totalLabel, { color: colors.text }]}>Total Variable Allowance</Text>
-              <Text style={styles.totalValue}>{formatCurrency(totals.variableTotal.toString())}</Text>
+              <Text style={styles.totalValue}>{formatCurrency(totals.variableTotal)}</Text>
             </View>
           </View>
 
           {/* Non-Wage Income */}
           <SectionTitle title="NON-WAGE INCOME" icon="gift-outline" />
           <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <InputField label="1. THR" value={thr} onChange={setThr} />
-            <InputField label="2. Bonus" value={bonus} onChange={setBonus} />
-            <InputField label="3. Insentif" value={incentive} onChange={setIncentive} />
-            <InputField label="4. Penerimaan Lain-lain" value={miscellaneousEarnings} onChange={setMiscellaneousEarnings} />
+            <InputField label="1. THR" value={salaryData.thr} />
+            <InputField label="2. Bonus" value={salaryData.bonus} />
+            <InputField label="3. Insentif" value={salaryData.incentive} />
+            <InputField label="4. Penerimaan Lain-lain" value={salaryData.misc_earnings} />
             
             <View style={styles.totalRow}>
               <Text style={[styles.totalLabel, { color: colors.text }]}>Total Non-Wage Income</Text>
-              <Text style={styles.totalValue}>{formatCurrency(totals.nonWageTotal.toString())}</Text>
+              <Text style={styles.totalValue}>{formatCurrency(totals.nonWageTotal)}</Text>
             </View>
           </View>
 
           {/* Deductions */}
           <SectionTitle title="DEDUCTIONS / POTONGAN" icon="remove-circle-outline" />
           <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <InputField label="1. PPh 21" value={pph21} onChange={setPph21} />
-            <InputField label="2. BPJS TK JHT" value={deductionBpjsTkJht} onChange={setDeductionBpjsTkJht} />
-            <InputField label="3. BPJS TK Pensiun" value={deductionBpjsTkPensiun} onChange={setDeductionBpjsTkPensiun} />
-            <InputField label="4. BPJS Kesehatan" value={deductionBpjsKesehatan} onChange={setDeductionBpjsKesehatan} />
-            <InputField label="5. Pinjaman / Loan" value={loan} onChange={setLoan} />
-            <InputField label="6. Potongan Lain-lain" value={miscellaneousDeductions} onChange={setMiscellaneousDeductions} />
+            <InputField label="1. PPh 21" value={salaryData.pph21} />
+            <InputField label="2. BPJS TK JHT" value={salaryData.deduction_jht} />
+            <InputField label="3. BPJS TK Pensiun" value={salaryData.deduction_pensiun} />
+            <InputField label="4. BPJS Kesehatan" value={salaryData.deduction_kesehatan} />
+            <InputField label="5. Pinjaman / Loan" value={salaryData.loan} />
+            <InputField label="6. Potongan Lain-lain" value={salaryData.misc_deductions} />
             
             <View style={[styles.totalRow, styles.deductionTotal]}>
               <Text style={[styles.totalLabel, { color: colors.text }]}>Total Potongan</Text>
-              <Text style={styles.totalValueRed}>{formatCurrency(totals.totalDeductions.toString())}</Text>
+              <Text style={styles.totalValueRed}>{formatCurrency(totals.totalDeductions)}</Text>
             </View>
           </View>
 
-          {/* Save Button */}
+          {/* Correction Button */}
           <TouchableOpacity 
-            style={styles.saveButton}
-            onPress={handleSave}
+            style={[styles.saveButton, { backgroundColor: '#EF4444', shadowColor: '#EF4444' }]}
+            onPress={() => router.push('/salary-correction' as any)}
           >
-            <Ionicons name="save-outline" size={20} color="#fff" />
-            <Text style={styles.saveButtonText}>SIMPAN RINCIAN GAJI</Text>
+            <Ionicons name="warning-outline" size={20} color="#fff" />
+            <Text style={styles.saveButtonText}>AJUKAN KOREKSI GAJI</Text>
           </TouchableOpacity>
 
           <Text style={styles.disclaimerText}>
-            Pastikan semua data yang diisi sudah benar sebelum menyimpan.
+            Ini adalah rincian gaji resmi Anda yang diinput oleh HR/Admin. Karyawan tidak dapat mengubah rincian ini. Jika ada ketidaksesuaian nominal, segera ajukan form koreksi gaji.
           </Text>
           
           <View style={{ height: 50 }} />
@@ -312,176 +293,32 @@ export default function SalaryDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  backBtn: {
-    padding: 8,
-  },
-  saveBtn: {
-    padding: 8,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  summaryCard: {
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    overflow: 'hidden',
-    shadowColor: '#E31E24',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  summaryLabel: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  summaryValue: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '900',
-    letterSpacing: -1,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.2)',
-  },
-  summaryItem: {
-    flex: 1,
-  },
-  summaryItemLabel: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 11,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  summaryItemValue: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  card: {
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  sectionTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    marginLeft: 4,
-  },
-  sectionTitleText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#E31E24',
-    letterSpacing: 1,
-    marginLeft: 8,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.03)',
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    flex: 1,
-    paddingRight: 12,
-  },
-  input: {
-    width: 140,
-    padding: 10,
-    borderRadius: 12,
-    fontSize: 14,
-    fontWeight: '700',
-    textAlign: 'right',
-    borderWidth: 1,
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    marginTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: 'rgba(0,0,0,0.06)',
-  },
-  deductionTotal: {
-    borderTopColor: 'rgba(239, 68, 68, 0.2)',
-  },
-  totalLabel: {
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  totalValue: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#10B981',
-  },
-  totalValueRed: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#EF4444',
-  },
-  saveButton: {
-    backgroundColor: '#E31E24',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 18,
-    borderRadius: 20,
-    gap: 12,
-    marginTop: 10,
-    shadowColor: '#E31E24',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  disclaimerText: {
-    fontSize: 11,
-    color: '#94A3B8',
-    textAlign: 'center',
-    marginTop: 16,
-    lineHeight: 16,
-    paddingHorizontal: 20,
-  },
+  container: { flex: 1 },
+  keyboardView: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 10, paddingBottom: 20 },
+  headerTitle: { fontSize: 18, fontWeight: '800' },
+  backBtn: { width: 40, height: 40, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.05)', justifyContent: 'center', alignItems: 'center' },
+  scrollContent: { padding: 14 },
+  summaryCard: { borderRadius: 12, padding: 16, marginBottom: 16, shadowColor: '#F97316', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 16, elevation: 8 },
+  summaryLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '700', marginBottom: 8 },
+  summaryValue: { color: '#fff', fontSize: 20, fontWeight: '900', letterSpacing: -1 },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.2)' },
+  summaryItem: { flex: 1 },
+  summaryItemLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '600', marginBottom: 4 },
+  summaryItemValue: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  card: { borderRadius: 14, padding: 14, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
+  sectionTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, marginLeft: 4 },
+  sectionTitleText: { fontSize: 13, fontWeight: '800', color: '#F97316', letterSpacing: 1, marginLeft: 8 },
+  inputRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.03)' },
+  inputLabel: { fontSize: 13, fontWeight: '600', flex: 1, paddingRight: 12 },
+  inputContainer: { padding: 10, borderRadius: 12, borderWidth: 1, minWidth: 120, alignItems: 'flex-end' },
+  inputValueText: { fontSize: 14, fontWeight: '700' },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16, marginTop: 8, borderTopWidth: 2, borderTopColor: 'rgba(0,0,0,0.06)' },
+  deductionTotal: { borderTopColor: 'rgba(239, 68, 68, 0.2)' },
+  totalLabel: { fontSize: 15, fontWeight: '800' },
+  totalValue: { fontSize: 16, fontWeight: '900', color: '#10B981' },
+  totalValueRed: { fontSize: 16, fontWeight: '900', color: '#EF4444' },
+  saveButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 18, borderRadius: 14, gap: 12, marginTop: 10, elevation: 5 },
+  saveButtonText: { color: '#fff', fontSize: 14, fontWeight: '900', letterSpacing: 1 },
+  disclaimerText: { fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 16, lineHeight: 16, paddingHorizontal: 16 },
 });

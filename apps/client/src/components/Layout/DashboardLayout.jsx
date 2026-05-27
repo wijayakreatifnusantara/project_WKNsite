@@ -156,6 +156,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       '/assets': ['Operations', 'Inventaris Aset'],
       '/assets/consumables': ['Operations', 'Consumables'],
       '/company/org-chart': ['Hub Perusahaan', 'Struktur Org'],
+      '/company/announcements': ['Hub Perusahaan', 'Pengumuman / Broadcast'],
       '/company/timesheet': ['Hub Perusahaan', 'Timesheet'],
       '/company/wellness': ['Hub Perusahaan', 'Wellness & Sehat'],
       '/company/surveys': ['Hub Perusahaan', 'Survei Feedback'],
@@ -328,13 +329,13 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
               <NavItem icon={<IconMapPin size={15} />} label="Lokasi Kerja" to="/attendance/location" />
             )}
-            {can(PERMISSIONS.CAN_CHECK_IN) && (
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
               <NavItem icon={<IconClipboardCheck size={15} />} label="Manajemen Cuti" to="/leave" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconTrophy size={15} />} label="Kinerja Karyawan" to="/performance" />
             )}
-            {can(PERMISSIONS.CAN_CHECK_IN) && (
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconFileText size={15} />} label="Dokumen Hub" to="/documents" />
             )}
           </NavGroup>
@@ -371,18 +372,21 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               <NavItem icon={<IconHierarchy2 size={15} />} label="Struktur Org" to="/company/org-chart" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
+              <NavItem icon={<IconBell size={15} />} label="Pengumuman / Broadcast" to="/company/announcements" />
+            )}
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconHistory size={15} />} label="Timesheet" to="/company/timesheet" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconHeartbeat size={15} />} label="Wellness & Sehat" to="/company/wellness" />
             )}
-            {can(PERMISSIONS.CAN_CHECK_IN) && (
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconClipboardList size={15} />} label="Survei Feedback" to="/company/surveys" />
             )}
-            {can(PERMISSIONS.CAN_CHECK_IN) && (
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconShieldSearch size={15} />} label="Grievance Portal" to="/company/grievance" />
             )}
-            {can(PERMISSIONS.CAN_CHECK_IN) && (
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconBook size={15} />} label="Wiki Kebijakan" to="/company/wiki" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (

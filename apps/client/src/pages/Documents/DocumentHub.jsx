@@ -101,6 +101,24 @@ const DocumentHub = () => {
           </div>
         </header>
 
+        {/* 🚨 Document Expiry Alerts Banner */}
+        <div className="px-8 pb-4">
+          <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-rose-100 rounded-xl flex items-center justify-center text-rose-500">
+                <IconLock size={20} />
+              </div>
+              <div>
+                <h3 className="text-[10px] font-black text-rose-800 uppercase tracking-widest">Action Required: Expiring Documents</h3>
+                <p className="text-[9px] font-bold text-rose-600 mt-1">2 employee contracts and 1 ID card are expiring within 30 days.</p>
+              </div>
+            </div>
+            <Button className="h-8 px-4 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest shadow-md transition-all">
+              Review Now
+            </Button>
+          </div>
+        </div>
+
         {/* File Grid */}
         <div className="flex-1 overflow-y-auto p-8 pt-4 custom-scrollbar">
           {loading ? (

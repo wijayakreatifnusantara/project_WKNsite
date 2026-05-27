@@ -10,6 +10,7 @@ import AdminHub from './pages/Admin/AdminHub';
 import Overview from './pages/Overview/Overview';
 import LeaveManagementHub from './pages/Leave/LeaveManagementHub';
 import Payroll from './pages/Payroll/Payroll';
+import Expenses from './pages/Finance/Expenses';
 import PerformanceHub from './pages/Performance/PerformanceHub';
 import AssetInventory from './pages/Assets/AssetInventory';
 import Consumables from './pages/Assets/Consumables';
@@ -22,6 +23,7 @@ import Timesheet from './pages/Company/Timesheet';
 import Wellness from './pages/Company/Wellness';
 import Surveys from './pages/Company/Surveys';
 import Grievance from './pages/Company/Grievance';
+import Announcements from './pages/Company/Announcements';
 import Wiki from './pages/Company/Wiki';
 import Succession from './pages/Company/Succession';
 import Offboarding from './pages/Company/Offboarding';
@@ -32,6 +34,7 @@ import DashboardLayout from './components/Layout/DashboardLayout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'sonner';
+import CareerPortal from './pages/Careers/CareerPortal';
 
 const AuthenticatedApp = () => {
   const { logout, user } = useAuth();
@@ -57,6 +60,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/careers" element={<CareerPortal />} />
           
           {/* Protected Routes with Dashboard Layout */}
           <Route element={
@@ -77,6 +81,7 @@ function App() {
             <Route path="/attendance/overtime" element={<OvertimeManagementPage />} />
             <Route path="/leave" element={<LeaveManagementHub />} />
             <Route path="/payroll" element={<Payroll />} />
+            <Route path="/finance/reimburse" element={<Expenses />} />
             <Route path="/performance" element={<PerformanceHub />} />
             <Route path="/documents" element={<DocumentHub />} />
             <Route path="/assets" element={<AssetInventory />} />
@@ -88,6 +93,7 @@ function App() {
             <Route path="/company/timesheet" element={<Timesheet />} />
             <Route path="/company/wellness" element={<Wellness />} />
             <Route path="/company/surveys" element={<Surveys />} />
+            <Route path="/company/announcements" element={<Announcements />} />
             <Route path="/company/grievance" element={<Grievance />} />
             <Route path="/company/wiki" element={<Wiki />} />
             <Route path="/company/succession" element={<Succession />} />

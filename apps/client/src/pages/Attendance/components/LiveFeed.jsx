@@ -21,7 +21,7 @@ const LiveFeed = ({ loading: parentLoading }) => {
           )
         `)
         .order('created_at', { ascending: false })
-        .limit(15);
+        .limit(100);
 
       if (error) throw error;
 
@@ -74,9 +74,9 @@ const LiveFeed = ({ loading: parentLoading }) => {
             <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">No activity recorded</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-slate-50" style={{ contentVisibility: 'auto' }}>
             {activities.map((item, idx) => (
-              <div key={idx} className="px-4 py-2 hover:bg-slate-50 transition-all cursor-pointer group flex items-center justify-between">
+              <div key={idx} className="px-4 py-2 hover:bg-slate-50 transition-all cursor-pointer group flex items-center justify-between" style={{ contentVisibility: 'auto' }}>
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 font-black text-[9px] group-hover:bg-white group-hover:text-[#E31E24] transition-all border border-transparent group-hover:border-slate-100">
                     {item.name.charAt(0)}

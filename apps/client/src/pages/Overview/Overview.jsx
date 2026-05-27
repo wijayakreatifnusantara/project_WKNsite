@@ -14,6 +14,8 @@ import { Zap, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import AnalyticsGrid from './components/AnalyticsGrid';
+import { generateExecutiveReport } from './utils/exportReport';
+import { toast } from 'sonner';
 
 const Overview = () => {
   const { profile, isAdmin } = useAuth();
@@ -64,7 +66,15 @@ const Overview = () => {
           </div>
           {isAdmin() && (
             <div className="flex gap-4 animate-in slide-in-from-right-4 duration-500">
-              <Button variant="outline" className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all flex gap-3 items-center">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  const success = generateExecutiveReport(employees);
+                  if (success) toast.success("Executive Report successfully generated and downloaded.");
+                  else toast.error("Failed to generate report.");
+                }}
+                className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all flex gap-3 items-center"
+              >
                 <IconChartBar size={16} />
                 Export Intelligence
               </Button>

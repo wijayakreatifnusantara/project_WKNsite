@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Switch, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,18 +15,38 @@ export default function SettingsScreen() {
   const [userData, setUserData] = useState<any>(null);
   const [isBiometric, setIsBiometric] = useState(true);
   const [isNotification, setIsNotification] = useState(true);
-  const [showDetail, setShowDetail] = useState(false);
   const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
   const [latency, setLatency] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await checkSession();
+    runDiagnostics();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     checkSession();
     runDiagnostics();
+    loadBiometricSetting();
   }, []);
 
   const runDiagnostics = () => {
     measureLatency();
     getGpsAccuracy();
+  };
+
+  const loadBiometricSetting = async () => {
+    try {
+      const lockEnabled = await AsyncStorage.getItem('appLockEnabled');
+      setIsBiometric(lockEnabled === 'true');
+    } catch (e) {}
+  };
+
+  const toggleBiometricSetting = async (value: boolean) => {
+    setIsBiometric(value);
+    await AsyncStorage.setItem('appLockEnabled', value ? 'true' : 'false');
   };
 
   const measureLatency = async () => {
@@ -84,7 +105,8 @@ export default function SettingsScreen() {
             email: data.email,
             phone: data.phone || '-',
             join_date: data.join_date || '-',
-            department: data.departments?.name || 'Wijaya KN'
+            department: data.departments?.name || 'Wijaya KN',
+            last_device_model: data.last_device_model
           };
           setUserData(updatedUser);
           await AsyncStorage.setItem('userSession', JSON.stringify(updatedUser));
@@ -131,7 +153,13 @@ export default function SettingsScreen() {
         <Text style={[styles.headerTitle, { color: colors.text }]}>Pengaturan</Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.scrollContent, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={[styles.scrollContent, { backgroundColor: colors.background }]} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+        }
+      >
         {/* Professional ID Card - Compact Horizontal */}
         <View style={[styles.idCardModern, { backgroundColor: colors.card }]}>
           <View style={styles.idCardHeader}>
@@ -163,35 +191,24 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {showDetail && (
-          <View style={[styles.detailSection, { backgroundColor: colors.background, borderColor: colors.border }]}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Email</Text>
-              <Text style={[styles.detailValue, { color: colors.text }]}>{userData?.email || '-'}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>WhatsApp</Text>
-              <Text style={[styles.detailValue, { color: colors.text }]}>{userData?.phone || '-'}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Tgl Bergabung</Text>
-              <Text style={[styles.detailValue, { color: colors.text }]}>{userData?.join_date || '-'}</Text>
-            </View>
-          </View>
-        )}
+        {/* Personal Data has been removed to a secure auth screen */}
 
         <Text style={[styles.sectionTitleCompact, { color: colors.subText }]}>AKUN & KEAMANAN</Text>
         <View style={[styles.sectionCardCompact, { backgroundColor: colors.card }]}>
-          <SettingItem icon="person-outline" title="Detail Profil" color="#3b82f6" onPress={() => {
+          <SettingItem icon="person-outline" title="Data Pribadi & Rekening" color="#3b82f6" onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setShowDetail(!showDetail);
+            router.push('/personal-data-auth' as any);
           }} />
-          <SettingItem icon="finger-print-outline" title="Biometric Login" type="switch" value={isBiometric} onPress={() => setIsBiometric(!isBiometric)} color="#10b981" />
-          <SettingItem icon="create-outline" title="Tanda Tangan Elektronik" color="#E31E24" onPress={() => {
+          <SettingItem icon="finger-print-outline" title="Biometric Login" type="switch" value={isBiometric} onPress={toggleBiometricSetting} color="#10b981" />
+          <SettingItem icon="create-outline" title="Tanda Tangan Elektronik" color="#F97316" onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push('/signature' as any);
           }} />
-          <SettingItem icon="lock-closed-outline" title="Ubah Kata Sandi" color="#f59e0b" />
+          <SettingItem icon="lock-closed-outline" title="Ubah Kata Sandi" color="#f59e0b" onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/change-password' as any);
+          }} />
+          <SettingItem icon="phone-portrait-outline" title="Perangkat Aktif" type="text" value={userData?.last_device_model || 'Memuat...'} color="#8b5cf6" onPress={() => {}} />
         </View>
 
         <Text style={[styles.sectionTitleCompact, { color: colors.subText }]}>PREFERENSI</Text>
@@ -230,37 +247,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '800',
     color: '#1C1C1E',
   },
   scrollContent: {
-    padding: 20,
+    padding: 14,
   },
   idCardModern: {
     backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 15,
     elevation: 4,
     borderLeftWidth: 6,
-    borderLeftColor: '#E31E24',
+    borderLeftColor: '#F97316',
   },
   idCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
     gap: 10,
   },
   logoCircleSmall: {
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: '#E31E24',
+    borderRadius: 12,
+    backgroundColor: '#F97316',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -277,7 +294,7 @@ const styles = StyleSheet.create({
   },
   idCardBody: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 12,
   },
   idCardLeft: {
     alignItems: 'center',
@@ -293,7 +310,7 @@ const styles = StyleSheet.create({
     borderColor: '#F2F2F7',
   },
   avatarTextId: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: '800',
     color: '#1C1C1E',
   },
@@ -334,8 +351,8 @@ const styles = StyleSheet.create({
   },
   detailSection: {
     backgroundColor: '#F8F9FB',
-    padding: 20,
-    borderRadius: 20,
+    padding: 14,
+    borderRadius: 14,
     marginBottom: 25,
     gap: 12,
     borderWidth: 1,
@@ -368,7 +385,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 18,
     paddingHorizontal: 15,
-    marginBottom: 20,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
@@ -407,7 +424,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FEF2F2',
     padding: 14,
-    borderRadius: 16,
+    borderRadius: 12,
     gap: 10,
     marginTop: 5,
   },

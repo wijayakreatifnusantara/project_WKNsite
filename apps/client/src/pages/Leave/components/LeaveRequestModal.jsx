@@ -21,7 +21,9 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
     start_date: '',
     end_date: '',
     reason: '',
-    employee_id: profile?.employee_id || ''
+    employee_id: profile?.employee_id || '',
+    start_time: '',
+    end_time: ''
   });
 
   const [daysCount, setDaysCount] = useState(0);
@@ -43,17 +45,29 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.leave_type === 'Emergency' && (!formData.start_time || !formData.end_time)) {
+      toast.error("Please fill in start and end times for Early Leave");
+      return;
+    }
+    
     try {
       setLoading(true);
       
+      const record = {
+        ...formData,
+        days_count: daysCount,
+        status: 'Pending',
+        created_at: new Date().toISOString()
+      };
+      
+      if (formData.leave_type !== 'Emergency') {
+        delete record.start_time;
+        delete record.end_time;
+      }
+      
       const { error } = await supabase
         .from('leave_requests')
-        .insert([{
-          ...formData,
-          days_count: daysCount,
-          status: 'Pending',
-          created_at: new Date().toISOString()
-        }]);
+        .insert([record]);
 
       if (error) throw error;
 
@@ -97,7 +111,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
                   >
                     <option value="Annual">Annual Leave</option>
                     <option value="Sick">Sick Leave</option>
-                    <option value="Emergency">Emergency</option>
+                    <option value="Emergency">Izin Pulang Cepat</option>
                     <option value="Unpaid">Unpaid Leave</option>
                   </select>
                 </div>
@@ -139,6 +153,37 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
               </div>
             </div>
+
+            {formData.leave_type === 'Emergency' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Time</label>
+                  <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                    <IconClock size={14} className="text-[#E31E24]" />
+                    <input 
+                      type="time" 
+                      required
+                      value={formData.start_time || ''}
+                      onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                      className="bg-transparent border-none text-slate-800 font-black text-[9px] w-full focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">End Time</label>
+                  <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                    <IconClock size={14} className="text-[#E31E24]" />
+                    <input 
+                      type="time" 
+                      required
+                      value={formData.end_time || ''}
+                      onChange={(e) => setFormData({...formData, end_time: e.target.value})}
+                      className="bg-transparent border-none text-slate-800 font-black text-[9px] w-full focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Reason / Justification</label>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../context/ThemeContext';
@@ -20,11 +21,11 @@ export default function DevelopmentScreen() {
 
       <View style={styles.content}>
         <View style={[styles.iconCircle, { backgroundColor: isDark ? '#1F1F1F' : '#F1F5F9' }]}>
-          <Ionicons name="construct-outline" size={60} color="#E31E24" />
+          <Ionicons name="construct-outline" size={60} color="#F97316" />
         </View>
         <Text style={[styles.title, { color: colors.text }]}>Fitur Sedang Dikembangkan</Text>
         <Text style={styles.subtitle}>
-          Kami sedang menyiapkan modul <Text style={{fontWeight: '800', color: '#E31E24'}}>{title || 'ini'}</Text> untuk memberikan pengalaman terbaik bagi Anda. Silakan cek kembali dalam waktu dekat!
+          Kami sedang menyiapkan modul <Text style={{fontWeight: '800', color: '#F97316'}}>{title || 'ini'}</Text> untuk memberikan pengalaman terbaik bagi Anda. Silakan cek kembali dalam waktu dekat!
         </Text>
         
         <View style={styles.progressContainer}>
@@ -35,7 +36,7 @@ export default function DevelopmentScreen() {
         </View>
 
         <TouchableOpacity 
-          style={[styles.homeBtn, { backgroundColor: '#E31E24' }]}
+          style={[styles.homeBtn, { backgroundColor: '#F97316' }]}
           onPress={() => router.back()}
         >
           <Text style={styles.homeBtnText}>KEMBALI KE MENU</Text>
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 30,
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 16,
     borderRadius: 20,
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 15,

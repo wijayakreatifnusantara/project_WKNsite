@@ -83,7 +83,7 @@ class RequestPDFGenerator:
         leave_type_labels = {
             "Annual": "Cuti Tahunan (Annual Leave)",
             "Sick": "Sakit (Sick Leave)",
-            "Emergency": "Izin Darurat (Emergency)",
+            "Emergency": "Izin Pulang Cepat (Early Leave)",
             "Unpaid": "Izin Tanpa Upah (Unpaid Leave)"
         }
         
@@ -93,6 +93,8 @@ class RequestPDFGenerator:
         draw_row("Jenis Pengajuan", leave_label)
         draw_row("Tanggal Mulai", request_data.get("start_date"))
         draw_row("Tanggal Selesai", request_data.get("end_date"))
+        if request_data.get("start_time") and request_data.get("end_time"):
+            draw_row("Jam Izin", f"{request_data.get('start_time')} s.d. {request_data.get('end_time')}")
         draw_row("Total Hari Kerja", f"{request_data.get('days_count', 0)} Hari")
         
         # Reason block

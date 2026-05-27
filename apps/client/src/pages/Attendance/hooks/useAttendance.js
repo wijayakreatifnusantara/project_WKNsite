@@ -3,17 +3,21 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Global cache for zero-latency rendering
+const attendanceCache = new Map();
+
 export const useAttendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [todaySummary, setTodaySummary] = useState(null);
-  const [trends, setTrends] = useState([]);
+  const [todaySummary, setTodaySummary] = useState(attendanceCache.get('todaySummary') || null);
+  const [trends, setTrends] = useState(attendanceCache.get('trends') || []);
 
   const fetchTodaySummary = useCallback(async () => {
     try {
-      setLoading(true);
+      if (!attendanceCache.has('todaySummary')) setLoading(true);
       setError(null);
       const response = await axios.get(`${API_URL}/attendance/summary/today`);
+      attendanceCache.set('todaySummary', response.data.data);
       setTodaySummary(response.data.data);
       return response.data.data;
     } catch (err) {
@@ -26,11 +30,13 @@ export const useAttendance = () => {
 
   const fetchTrends = useCallback(async (period) => {
     try {
-      setLoading(true);
+      const cacheKey = `trends_${period}`;
+      if (!attendanceCache.has(cacheKey)) setLoading(true);
       setError(null);
       const response = await axios.get(`${API_URL}/attendance/analytics/trends`, {
         params: { period }
       });
+      attendanceCache.set(cacheKey, response.data.data);
       setTrends(response.data.data);
       return response.data.data;
     } catch (err) {

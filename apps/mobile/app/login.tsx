@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform, ActivityIndicator, StatusBar, ScrollView, Image, Alert, Animated, Easing, RefreshControl } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, StatusBar, ScrollView, Image, Alert, Animated, Easing, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as Device from 'expo-device';
 import { supabase } from '../lib/supabaseClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
+  const { setUserData } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +36,15 @@ export default function LoginScreen() {
     checkBiometricStatus();
     loadRememberMe();
     startEntranceAnimation();
+    
+    // Auto-trigger Biometric Auth if enabled
+    setTimeout(async () => {
+      const lockEnabled = await AsyncStorage.getItem('appLockEnabled');
+      const saved = await AsyncStorage.getItem('savedCredentials');
+      if (lockEnabled === 'true' && saved) {
+        handleBiometricAuth();
+      }
+    }, 1000); // Small delay to allow entrance animation to start
   }, []);
 
   const onRefresh = useCallback(() => {
@@ -122,14 +135,35 @@ export default function LoginScreen() {
       if (data.is_resigned || data.status === 'RESIGNED') throw new Error('Akun dinonaktifkan');
       if (data.mobile_password !== inputPass) throw new Error('Password salah');
 
-      await AsyncStorage.setItem('userSession', JSON.stringify({
+      const userSessionData = {
         id: data.id,
         name: data.name,
         email: data.email,
         jabatan: data.job_position || 'Staff',
         is_field_team: data.is_field_team || false,
         working_location: data.working_location || 'Head Office'
-      }));
+      };
+      
+      await AsyncStorage.setItem('userSession', JSON.stringify(userSessionData));
+      setUserData(userSessionData);
+
+      // Track Device Info for Advanced Security
+      try {
+        const deviceBrand = Device.brand || Device.manufacturer || 'Unknown';
+        const deviceModel = Device.modelName || 'Unknown';
+        const deviceOs = `${Platform.OS} ${Platform.Version}`;
+        
+        await supabase
+          .from('employees')
+          .update({
+            last_device_brand: deviceBrand,
+            last_device_model: deviceModel,
+            last_device_os: deviceOs
+          })
+          .eq('id', data.id);
+      } catch (deviceError) {
+        console.log('Failed to track device info', deviceError);
+      }
 
       if (rememberMe) {
         await AsyncStorage.setItem('rememberedEmail', inputEmail);
@@ -186,7 +220,7 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
       >
         <ScrollView 
@@ -197,8 +231,8 @@ export default function LoginScreen() {
             <RefreshControl 
               refreshing={refreshing} 
               onRefresh={onRefresh} 
-              colors={['#E31E24']} 
-              tintColor={'#E31E24'} 
+              colors={['#F97316']} 
+              tintColor={'#F97316'} 
             />
           }
         >
@@ -226,7 +260,7 @@ export default function LoginScreen() {
                     <Ionicons name="shield-checkmark" size={16} color="#ffffff" />
                   </View>
                 </View>
-                <Text style={styles.titleText}>WKNsite<Text style={{color: '#E31E24'}}>.mobile</Text></Text>
+                <Text style={styles.titleText}>WKNsite<Text style={{color: '#F97316'}}>.mobile</Text></Text>
                 <Text style={styles.subtitleText}>Enterprise Personnel Gateway</Text>
               </Animated.View>
 
@@ -250,9 +284,9 @@ export default function LoginScreen() {
 
                 {/* Email Input */}
                 <View style={styles.inputGroup}>
-                  <Text style={[styles.label, isEmailFocused && { color: '#E31E24' }]}>EMAIL PERUSAHAAN</Text>
+                  <Text style={[styles.label, isEmailFocused && { color: '#F97316' }]}>EMAIL PERUSAHAAN</Text>
                   <View style={[styles.inputWrapper, isEmailFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="mail" size={18} color={isEmailFocused ? "#E31E24" : "#94a3b8"} style={styles.inputIcon} />
+                    <Ionicons name="mail" size={18} color={isEmailFocused ? "#F97316" : "#94a3b8"} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       placeholder="nama@wijayakn.com"
@@ -270,9 +304,9 @@ export default function LoginScreen() {
 
                 {/* Password Input */}
                 <View style={styles.inputGroup}>
-                  <Text style={[styles.label, isPasswordFocused && { color: '#E31E24' }]}>PASSWORD</Text>
+                  <Text style={[styles.label, isPasswordFocused && { color: '#F97316' }]}>PASSWORD</Text>
                   <View style={[styles.inputWrapper, isPasswordFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="lock-closed" size={18} color={isPasswordFocused ? "#E31E24" : "#94a3b8"} style={styles.inputIcon} />
+                    <Ionicons name="lock-closed" size={18} color={isPasswordFocused ? "#F97316" : "#94a3b8"} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
                       placeholder="••••••••"
@@ -329,7 +363,7 @@ export default function LoginScreen() {
                       <>
                         <Text style={styles.loginBtnText}>MASUK KE SISTEM</Text>
                         <View style={styles.btnIconContainer}>
-                          <Ionicons name="arrow-forward" size={18} color="#E31E24" />
+                          <Ionicons name="arrow-forward" size={18} color="#F97316" />
                         </View>
                       </>
                     )}
@@ -341,7 +375,7 @@ export default function LoginScreen() {
                       style={styles.biometricQuickBtn}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name="finger-print" size={32} color="#E31E24" />
+                      <Ionicons name="finger-print" size={32} color="#F97316" />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -390,7 +424,7 @@ const styles = StyleSheet.create({
   },
   innerContent: {
     flex: 1,
-    padding: 24,
+    padding: 16,
     backgroundColor: '#f8fafc',
   },
   centerGroup: {
@@ -433,7 +467,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
@@ -476,7 +510,7 @@ const styles = StyleSheet.create({
   formCard: {
     backgroundColor: '#ffffff',
     borderRadius: 30,
-    padding: 24,
+    padding: 16,
     shadowColor: '#0f172a',
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.08,
@@ -489,7 +523,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   loginActionRow: {
     flexDirection: 'row',
@@ -549,14 +583,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f8fafc',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: '#f1f5f9',
     height: 56,
     paddingHorizontal: 16,
   },
   inputWrapperFocused: {
-    borderColor: '#E31E24',
+    borderColor: '#F97316',
     backgroundColor: '#ffffff',
   },
   inputIcon: {
@@ -575,7 +609,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
     paddingHorizontal: 4,
   },
   rememberMeContainer: {
@@ -594,8 +628,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   checkboxChecked: {
-    backgroundColor: '#E31E24',
-    borderColor: '#E31E24',
+    backgroundColor: '#F97316',
+    borderColor: '#F97316',
   },
   rememberMeText: {
     fontSize: 12,
@@ -605,17 +639,17 @@ const styles = StyleSheet.create({
   forgotPassText: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#E31E24',
+    color: '#F97316',
   },
   loginBtn: {
     flex: 1,
-    backgroundColor: '#E31E24',
+    backgroundColor: '#F97316',
     height: 60,
     borderRadius: 18,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
@@ -635,7 +669,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#94a3b8',
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 14,
     lineHeight: 15,
     paddingHorizontal: 10,
   },
@@ -661,7 +695,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(241, 245, 249, 0.5)',
     paddingVertical: 4,
     paddingHorizontal: 12,
-    borderRadius: 20,
+    borderRadius: 14,
   },
   securityItem: {
     flexDirection: 'row',

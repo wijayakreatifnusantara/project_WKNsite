@@ -48,9 +48,6 @@ const LeaveManagementHub = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (!isAdmin()) {
-        query = query.eq('employee_id', profile?.employee_id);
-      }
 
       const { data, error } = await query;
       if (error) throw error;
@@ -229,10 +226,10 @@ const LeaveManagementHub = () => {
              color="indigo"
            />
            <StatCard 
-             title="My Leave Balance" 
-             value={balances.find(b => b.employee_id === profile?.employee_id)?.annual_leave_balance || 0} 
-             unit="Days"
-             icon={<IconCalendarStats size={16} />} 
+             title="Total Requests Processed" 
+             value={requests.filter(r => r.status !== 'Pending').length} 
+             unit="Docs"
+             icon={<IconFileText size={16} />} 
              color="rose"
            />
         </div>
@@ -278,7 +275,14 @@ const LeaveManagementHub = () => {
                       </td>
                       <td className="px-5 py-2">
                         <div className="flex flex-col">
-                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{row.leave_type}</span>
+                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">
+                             {row.leave_type === 'Emergency' ? 'Izin Pulang Cepat' : row.leave_type}
+                           </span>
+                           {row.leave_type === 'Emergency' && row.start_time && row.end_time && (
+                             <span className="text-[8px] font-bold text-slate-400 mt-0.5 uppercase tracking-wide">
+                               Jam: {row.start_time} - {row.end_time}
+                             </span>
+                           )}
                            <span className="text-[8px] font-bold text-[#E31E24] uppercase mt-0.5">{row.days_count} Working Days</span>
                         </div>
                       </td>

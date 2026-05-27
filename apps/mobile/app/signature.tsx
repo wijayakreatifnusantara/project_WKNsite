@@ -3,7 +3,6 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  SafeAreaView, 
   TouchableOpacity, 
   Alert, 
   Dimensions, 
@@ -12,8 +11,10 @@ import {
   Image,
   PanResponder,
   GestureResponderEvent,
-  ScrollView
+  ScrollView,
+  RefreshControl
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -35,6 +36,15 @@ export default function SignatureScreen() {
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [currentSignature, setCurrentSignature] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (userData?.id) {
+      await fetchCurrentSignature(userData.id);
+    }
+    setRefreshing(false);
+  };
 
   // Drawing States
   const [paths, setPaths] = useState<Point[][]>([]);
@@ -215,11 +225,17 @@ export default function SignatureScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#E31E24" />
+          <ActivityIndicator size="large" color="#F97316" />
           <Text style={{ color: colors.subText, marginTop: 10 }}>Memuat profil tanda tangan...</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           
           {/* Current Signature Display */}
           <Text style={[styles.sectionTitle, { color: colors.subText }]}>TANDA TANGAN SAAT INI</Text>
@@ -421,11 +437,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 14,
-    backgroundColor: '#E31E24',
+    backgroundColor: '#F97316',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 10,

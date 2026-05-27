@@ -3,7 +3,6 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  SafeAreaView, 
   ScrollView, 
   TouchableOpacity, 
   TextInput, 
@@ -11,20 +10,26 @@ import {
   Dimensions, 
   ActivityIndicator,
   StatusBar,
-  Linking
+  Linking,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabaseClient';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import * as Haptics from 'expo-haptics';
+import SkeletonLoader from '../components/SkeletonLoader';
 
 const { width } = Dimensions.get('window');
 
 export default function LeaveScreen() {
   const { colors, isDark } = useTheme();
-  const [userData, setUserData] = useState<any>(null);
+  const { userData, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [requests, setRequests] = useState<any[]>([]);
@@ -36,10 +41,25 @@ export default function LeaveScreen() {
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
   const [computedDays, setComputedDays] = useState(0);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (userData?.id) {
+      await fetchLeaveRequests(userData.id);
+    }
+    setRefreshing(false);
+  };
 
   useEffect(() => {
-    initScreen();
-  }, []);
+    if (userData && !authLoading) {
+      initScreen(userData);
+    } else if (!userData && !authLoading) {
+      router.replace('/login');
+    }
+  }, [userData, authLoading]);
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -49,22 +69,30 @@ export default function LeaveScreen() {
     }
   }, [startDate, endDate]);
 
-  const initScreen = async () => {
+  const initScreen = async (user: any) => {
     setLoading(true);
     try {
-      const sessionStr = await AsyncStorage.getItem('userSession');
-      if (sessionStr) {
-        const user = JSON.parse(sessionStr);
-        setUserData(user);
-        await fetchLeaveRequests(user.id);
-      } else {
-        router.replace('/login');
-      }
+      await fetchLeaveRequests(user.id);
+      setupRealtimeSubscription(user.id);
     } catch (e) {
       console.log('Error initializing screen:', e);
     } finally {
       setLoading(false);
     }
+  };
+
+  const setupRealtimeSubscription = (userId: string) => {
+    supabase
+      .channel('public:leave_requests')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'leave_requests', filter: `employee_id=eq.${userId}` },
+        (payload) => {
+          console.log('Real-time leave update received!', payload);
+          fetchLeaveRequests(userId);
+        }
+      )
+      .subscribe();
   };
 
   const fetchLeaveRequests = async (employeeId: string) => {
@@ -77,8 +105,15 @@ export default function LeaveScreen() {
 
       if (error) throw error;
       setRequests(data || []);
+      await AsyncStorage.setItem('cached_leaves', JSON.stringify(data || []));
     } catch (e: any) {
-      console.log('Error fetching leave requests:', e.message);
+      console.log('Network error, loading leave requests from cache:', e.message);
+      try {
+        const cached = await AsyncStorage.getItem('cached_leaves');
+        if (cached) {
+          setRequests(JSON.parse(cached));
+        }
+      } catch (cacheErr) {}
     }
   };
 
@@ -112,6 +147,11 @@ export default function LeaveScreen() {
   };
 
   const handleCreateRequest = async () => {
+    if (!userData) {
+      Alert.alert('Sesi Berakhir', 'Silakan login kembali.');
+      return;
+    }
+    
     if (!startDate || !endDate || !reason) {
       Alert.alert('Form Belum Lengkap', 'Silakan isi seluruh kolom input pengajuan.');
       return;
@@ -138,11 +178,16 @@ export default function LeaveScreen() {
       return;
     }
 
+    if (leaveType === 'Emergency' && (!startTime || !endTime)) {
+      Alert.alert('Form Belum Lengkap', 'Silakan isi jam mulai dan selesai izin pulang cepat.');
+      return;
+    }
+
     setSubmitLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const record = {
+      const record: any = {
         employee_id: userData.id,
         leave_type: leaveType,
         start_date: startDate,
@@ -152,6 +197,11 @@ export default function LeaveScreen() {
         status: 'Pending',
         applied_at: new Date().toISOString()
       };
+
+      if (leaveType === 'Emergency') {
+        record.start_time = startTime.trim();
+        record.end_time = endTime.trim();
+      }
 
       const { error } = await supabase
         .from('leave_requests')
@@ -167,6 +217,8 @@ export default function LeaveScreen() {
       setEndDate('');
       setReason('');
       setLeaveType('Annual');
+      setStartTime('');
+      setEndTime('');
       setShowForm(false);
 
       // Refresh list
@@ -198,7 +250,7 @@ export default function LeaveScreen() {
     switch (type) {
       case 'Annual': return 'Cuti Tahunan';
       case 'Sick': return 'Sakit';
-      case 'Emergency': return 'Izin Darurat';
+      case 'Emergency': return 'Izin Pulang Cepat';
       case 'Unpaid': return 'Izin Tanpa Upah';
       default: return type;
     }
@@ -206,7 +258,7 @@ export default function LeaveScreen() {
 
   const getLeaveTypeColor = (type: string) => {
     switch (type) {
-      case 'Annual': return '#E31E24';
+      case 'Annual': return '#F97316';
       case 'Sick': return '#3B82F6';
       case 'Emergency': return '#EF4444';
       default: return '#8E8E93';
@@ -246,17 +298,33 @@ export default function LeaveScreen() {
           <Ionicons 
             name={showForm ? "list-outline" : "add-circle-outline"} 
             size={24} 
-            color="#E31E24" 
+            color="#F97316" 
           />
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#E31E24" />
-          <Text style={{ color: colors.subText, marginTop: 10 }}>Sinkronisasi data izin & cuti...</Text>
-        </View>
-      ) : showForm ? (
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        {loading || authLoading ? (
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={[styles.historyCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7', paddingVertical: 14 }]}>
+              <SkeletonLoader width="40%" height={16} isDark={isDark} style={{ marginBottom: 10 }} />
+              <SkeletonLoader width="70%" height={12} isDark={isDark} style={{ marginBottom: 12 }} />
+              <SkeletonLoader width="100%" height={1} isDark={isDark} style={{ marginBottom: 15 }} />
+              <SkeletonLoader width="30%" height={10} isDark={isDark} style={{ marginBottom: 8 }} />
+              <SkeletonLoader width="90%" height={14} isDark={isDark} />
+            </View>
+            <View style={[styles.historyCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7', paddingVertical: 14 }]}>
+              <SkeletonLoader width="50%" height={16} isDark={isDark} style={{ marginBottom: 10 }} />
+              <SkeletonLoader width="60%" height={12} isDark={isDark} style={{ marginBottom: 12 }} />
+              <SkeletonLoader width="100%" height={1} isDark={isDark} style={{ marginBottom: 15 }} />
+              <SkeletonLoader width="40%" height={10} isDark={isDark} style={{ marginBottom: 8 }} />
+              <SkeletonLoader width="85%" height={14} isDark={isDark} />
+            </View>
+          </ScrollView>
+        ) : showForm ? (
         /* Leave Application Form */
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
@@ -268,7 +336,7 @@ export default function LeaveScreen() {
                 {[
                   { key: 'Annual', label: 'Cuti' },
                   { key: 'Sick', label: 'Sakit' },
-                  { key: 'Emergency', label: 'Darurat' },
+                  { key: 'Emergency', label: 'Pulang Cepat' },
                   { key: 'Unpaid', label: 'Izin' }
                 ].map((type) => (
                   <TouchableOpacity
@@ -276,7 +344,7 @@ export default function LeaveScreen() {
                     style={[
                       styles.typeBadge,
                       { borderColor: isDark ? '#2C2C2E' : '#E2E8F0' },
-                      leaveType === type.key && { backgroundColor: '#E31E24', borderColor: '#E31E24' }
+                      leaveType === type.key && { backgroundColor: '#F97316', borderColor: '#F97316' }
                     ]}
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -320,11 +388,36 @@ export default function LeaveScreen() {
               </View>
             </View>
 
+            {leaveType === 'Emergency' && (
+              <View style={styles.dateRow}>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={[styles.inputLabel, { color: colors.subText }]}>JAM MULAI (DARI)</Text>
+                  <TextInput 
+                    style={[styles.textInput, { color: colors.text, borderColor: isDark ? '#2C2C2E' : '#E2E8F0', backgroundColor: isDark ? '#1F1F1F' : '#F8FAFC' }]}
+                    value={startTime}
+                    onChangeText={setStartTime}
+                    placeholder="HH:MM"
+                    placeholderTextColor="#94A3B8"
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={[styles.inputLabel, { color: colors.subText }]}>JAM SELESAI (SAMPAI)</Text>
+                  <TextInput 
+                    style={[styles.textInput, { color: colors.text, borderColor: isDark ? '#2C2C2E' : '#E2E8F0', backgroundColor: isDark ? '#1F1F1F' : '#F8FAFC' }]}
+                    value={endTime}
+                    onChangeText={setEndTime}
+                    placeholder="HH:MM"
+                    placeholderTextColor="#94A3B8"
+                  />
+                </View>
+              </View>
+            )}
+
             {computedDays > 0 && (
               <View style={styles.durationCard}>
-                <Ionicons name="calendar-outline" size={16} color="#E31E24" />
+                <Ionicons name="calendar-outline" size={16} color="#F97316" />
                 <Text style={styles.durationText}>
-                  Durasi Pengajuan: <Text style={{ fontWeight: '900', color: '#E31E24' }}>{computedDays} Hari Kerja</Text> (Sabtu & Minggu tidak dihitung)
+                  Durasi Pengajuan: <Text style={{ fontWeight: '900', color: '#F97316' }}>{computedDays} Hari Kerja</Text> (Sabtu & Minggu tidak dihitung)
                 </Text>
               </View>
             )}
@@ -361,7 +454,12 @@ export default function LeaveScreen() {
         </ScrollView>
       ) : (
         /* Leave History List */
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           <Text style={[styles.sectionTitle, { color: colors.subText }]}>RIWAYAT IZIN & CUTI</Text>
           
           {requests.length === 0 ? (
@@ -392,6 +490,11 @@ export default function LeaveScreen() {
                     <Text style={styles.cardTime}>
                       {new Date(item.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} - {new Date(item.end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </Text>
+                    {item.leave_type === 'Emergency' && item.start_time && item.end_time && (
+                      <Text style={[styles.cardTime, { marginTop: 2, fontWeight: '700', color: colors.subText }]}>
+                        Jam: {item.start_time} - {item.end_time}
+                      </Text>
+                    )}
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '15', borderColor: getStatusColor(item.status) }]}>
                     <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>{getStatusLabel(item.status)}</Text>
@@ -403,7 +506,7 @@ export default function LeaveScreen() {
                 <View style={styles.cardBody}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={[styles.reasonLabel, { color: colors.subText }]}>Keperluan / Keterangan:</Text>
-                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#E31E24' }}>{item.days_count} Hari Kerja</Text>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#F97316' }}>{item.days_count} Hari Kerja</Text>
                   </View>
                   <Text style={[styles.reasonValue, { color: colors.text }]}>{item.reason}</Text>
                   {item.pdf_url && (
@@ -415,7 +518,7 @@ export default function LeaveScreen() {
                           Linking.openURL(item.pdf_url);
                         }}
                       >
-                        <Ionicons name="document-text-outline" size={14} color="#E31E24" style={{ marginRight: 4 }} />
+                        <Ionicons name="document-text-outline" size={14} color="#F97316" style={{ marginRight: 4 }} />
                         <Text style={styles.pdfBtnText}>Unduh PDF TTD Resmi</Text>
                       </TouchableOpacity>
                     </View>
@@ -427,6 +530,7 @@ export default function LeaveScreen() {
           <View style={{ height: 100 }} />
         </ScrollView>
       )}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -439,7 +543,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 16,
     borderBottomWidth: 1,
@@ -471,7 +575,7 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
   },
   emptyContainer: {
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 40,
     alignItems: 'center',
@@ -482,11 +586,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginTop: 15,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   emptyAddBtn: {
-    backgroundColor: '#E31E24',
-    paddingHorizontal: 20,
+    backgroundColor: '#F97316',
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
   },
@@ -496,9 +600,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   formCard: {
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1,
-    padding: 20,
+    padding: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.02,
@@ -508,7 +612,7 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: 16,
     fontWeight: '800',
-    marginBottom: 20,
+    marginBottom: 12,
     letterSpacing: -0.5,
   },
   inputGroup: {
@@ -576,14 +680,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   submitBtn: {
-    backgroundColor: '#E31E24',
+    backgroundColor: '#F97316',
     height: 48,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -596,7 +700,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   historyCard: {
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 16,
     marginBottom: 12,
@@ -673,7 +777,7 @@ const styles = StyleSheet.create({
   pdfBtnText: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#E31E24',
+    color: '#F97316',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   }

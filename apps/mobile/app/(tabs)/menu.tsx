@@ -1,46 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Dimensions, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 export default function MenuScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const [userData, setUserData] = useState<any>(null);
+  const { userData } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    checkSession();
-  }, []);
-
-  const checkSession = async () => {
-    try {
-      const sessionData = await AsyncStorage.getItem('userSession');
-      if (sessionData) setUserData(JSON.parse(sessionData));
-    } catch (e) {
-      console.log('Error checking session:', e);
-    }
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Simulate refresh for UI feedback
+    setTimeout(() => setRefreshing(false), 800);
   };
 
   const essItems = [
-    { id: '1', title: 'Izin & Cuti', icon: 'calendar', color: '#E31E24', bg: '#FEF2F2', badge: '2', route: '/leave' },
+    { id: '1', title: 'Izin & Cuti', icon: 'calendar', color: '#F97316', bg: '#FEF2F2', badge: '2', route: '/leave' },
     { id: '2', title: 'Lembur', icon: 'time', color: '#f97316', bg: '#FFF7ED', route: '/overtime' },
     { id: '3', title: 'Slip Gaji', icon: 'receipt', color: '#8b5cf6', bg: '#F5F3FF', route: '/payslip' },
-    { id: '10', title: 'Reimburse', icon: 'cash', color: '#10b981', bg: '#ECFDF5', route: '/development?title=Reimburse' },
+    { id: '10', title: 'Reimburse', icon: 'cash', color: '#10b981', bg: '#ECFDF5', route: '/reimburse' },
+    { id: '12', title: 'Dokumen', icon: 'document-attach', color: '#ec4899', bg: '#FDF2F8', route: '/documents' },
     { id: '9', title: 'Direktori', icon: 'people', color: '#3b82f6', bg: '#EFF6FF', route: '/directory' },
     { id: '7', title: 'Asset', icon: 'briefcase', color: '#06b6d4', bg: '#ECFEFF', route: '/development?title=Asset' },
   ];
 
-  const infoItems = [
+  const reportItems = [
+    { id: '4', title: 'Laporan', icon: 'bar-chart', color: '#10b981', bg: '#F0FDF4', route: '/development?title=Laporan' },
+    { id: '13', title: 'Timesheet', icon: 'time-outline', color: '#8b5cf6', bg: '#F5F3FF', route: '/timesheet' },
+    { id: '11', title: 'Laporan WO', icon: 'document-text', color: '#e11d48', bg: '#FFF1F2', route: '/development?title=Laporan WO' },
+  ];
+
+  const supportItems = [
     { id: '5', title: 'Wiki WKN', icon: 'book', color: '#3b82f6', bg: '#F0F9FF', route: '/development?title=Wiki WKN' },
     { id: '6', title: 'Academy', icon: 'school', color: '#f59e0b', bg: '#FFFBEB', route: '/development?title=Academy' },
-    { id: '4', title: 'Laporan', icon: 'bar-chart', color: '#10b981', bg: '#F0FDF4', route: '/development?title=Laporan' },
-    { id: '11', title: 'Laporan WO', icon: 'document-text', color: '#e11d48', bg: '#FFF1F2', route: '/development?title=Laporan WO' },
-    { id: '8', title: 'Helpdesk', icon: 'help-circle', color: '#6366f1', bg: '#EEF2FF', route: '/development?title=Helpdesk' },
+    { id: '8', title: 'Helpdesk', icon: 'help-circle', color: '#6366f1', bg: '#EEF2FF', route: '/helpdesk' },
   ];
 
   const renderGrid = (items: typeof essItems) => (
@@ -55,7 +55,7 @@ export default function MenuScreen() {
             if (item.route) router.push(item.route as any);
           }}
         >
-          <View style={[styles.iconCircle, { backgroundColor: isDark ? '#1F1F1F' : item.bg }]}>
+          <View style={[styles.iconCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : item.bg }]}>
             <Ionicons name={item.icon as any} size={22} color={item.color} />
           </View>
           <Text numberOfLines={2} style={[styles.menuLabel, { color: colors.text }]}>{item.title}</Text>
@@ -75,15 +75,21 @@ export default function MenuScreen() {
       
       {/* Sleek, professional header with Left Accent Border */}
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-        <View style={{ borderLeftWidth: 4, borderLeftColor: '#E31E24', paddingLeft: 12 }}>
+        <View style={{ borderLeftWidth: 4, borderLeftColor: '#F97316', paddingLeft: 12 }}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Menu Fitur</Text>
           <Text style={styles.headerSubtitle}>Kelola pekerjaan dan informasi perusahaan</Text>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+        }
+      >
         {/* Quick Stats Panel Widget with Red Left Border */}
-        <View style={[styles.statsContainer, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0', borderLeftColor: '#E31E24' }]}>
+        <View style={[styles.statsContainer, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0', borderLeftColor: '#F97316' }]}>
           <View style={styles.statItem}>
             <Text style={styles.statVal}>12</Text>
             <Text style={styles.statLbl}>Sisa Cuti</Text>
@@ -106,10 +112,16 @@ export default function MenuScreen() {
           {renderGrid(essItems)}
         </View>
 
-        {/* Section 2: Informasi & Pengembangan */}
+        {/* Section 2: Laporan */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.subText || '#8E8E93' }]}>LAPORAN & MONITORING</Text>
+          {renderGrid(reportItems)}
+        </View>
+
+        {/* Section 3: Pengembangan & Dukungan */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.subText || '#8E8E93' }]}>PENGEMBANGAN & DUKUNGAN</Text>
-          {renderGrid(infoItems)}
+          {renderGrid(supportItems)}
         </View>
 
         {/* Dynamic promo banner */}
@@ -134,13 +146,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 60,
     paddingBottom: 20,
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '800',
     letterSpacing: -0.5,
   },
@@ -155,12 +167,12 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    borderRadius: 20,
+    borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 10,
     borderWidth: 1,
     borderLeftWidth: 4,
-    marginBottom: 24,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.02,
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
   statVal: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#E31E24',
+    color: '#F97316',
   },
   statLbl: {
     fontSize: 10,
@@ -206,7 +218,7 @@ const styles = StyleSheet.create({
   },
   menuCard: {
     width: (width - 52) / 3, // 3-column layout
-    borderRadius: 20,
+    borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 8,
     alignItems: 'center',
@@ -221,7 +233,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 46,
     height: 46,
-    borderRadius: 16,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -236,10 +248,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#E31E24',
+    backgroundColor: '#F97316',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)'
   },
   badgeText: {
     color: '#fff',
@@ -250,13 +264,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   promoBanner: {
-    backgroundColor: '#E31E24', // WKN Corporate Brand Color
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#F97316', // WKN Corporate Brand Color
+    borderRadius: 14,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: '#E31E24',
+    shadowColor: '#F97316',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 15,

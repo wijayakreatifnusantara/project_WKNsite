@@ -88,6 +88,7 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                 <SimpleInfo label="Corporate Email" value={employee["EMAIL"]} icon={<IconMail />} />
                 <SimpleInfo label="Primary Contact" value={employee["PHONE NUMBER"]} icon={<IconPhone />} />
                 <SimpleInfo label="Residential" value={employee["Address"] || 'N/A'} icon={<IconMapPin />} />
+                <SimpleInfo label="Active Device" value={`${employee.last_device_brand || 'Unknown'} ${employee.last_device_model || ''}`} icon={<IconShieldCheck />} />
                 <SimpleInfo label="Joining Date" value={employee["Join Date"] || 'Jan 12, 2024'} icon={<IconCalendar />} />
               </div>
             </div>

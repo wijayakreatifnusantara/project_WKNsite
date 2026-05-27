@@ -4,7 +4,6 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  SafeAreaView, 
   Image, 
   ScrollView, 
   Platform, 
@@ -12,8 +11,10 @@ import {
   RefreshControl,
   Dimensions,
   Animated,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,7 +37,7 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [weather, setWeather] = useState<{temp: number, condition: string, city: string} | null>(null);
   const [currentAddress, setCurrentAddress] = useState<string>('Mencari lokasi...');
-  const [notificationCount, setNotificationCount] = useState(3);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [networkState, setNetworkState] = useState<{type: string, isConnected: boolean}>({ type: 'NONE', isConnected: false });
   const [showBanner, setShowBanner] = useState(true);
   const [pendingAttendance, setPendingAttendance] = useState<any[]>([]);
@@ -63,10 +64,36 @@ export default function HomeScreen() {
     };
   }, []);
 
-  // Fetch today's attendance whenever userData changes
+  const fetchUnreadCount = async () => {
+    if (!userData?.id) return;
+    try {
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('employee_id', userData.id)
+        .eq('is_read', false);
+      if (!error && count !== null) {
+        setNotificationCount(count);
+      }
+    } catch (e) {}
+  };
+
   useEffect(() => {
-    if (userData?.id) {
+    if (userData) {
       fetchTodayAttendance(userData.id);
+      fetchUnreadCount();
+
+      // Realtime for notifications
+      const notifSub = supabase
+        .channel('public:notifications_count')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `employee_id=eq.${userData.id}` }, () => {
+          fetchUnreadCount();
+        })
+        .subscribe();
+        
+      return () => {
+        notifSub.unsubscribe();
+      };
     }
   }, [userData]);
 
@@ -113,6 +140,34 @@ export default function HomeScreen() {
   };
 
   const dynamic = getDynamicStyles();
+
+  const attendancePhase = todayRecord?.clock_out
+    ? 'SELESAI'
+    : todayRecord?.clock_in
+      ? 'SEDANG BEKERJA'
+      : 'PERSIAPAN ABSENSI';
+
+  const attendancePhaseColor = todayRecord?.clock_out
+    ? '#059669'
+    : todayRecord?.clock_in
+      ? '#2563EB'
+      : '#D97706';
+
+  const attendancePhaseBg = todayRecord?.clock_out
+    ? '#ECFDF5'
+    : todayRecord?.clock_in
+      ? '#EFF6FF'
+      : '#FEF3C7';
+
+  const attendanceHint = todayRecord?.clock_out
+    ? 'Hari kerja sudah selesai. Terima kasih telah bekerja hari ini.'
+    : todayRecord?.clock_in
+      ? 'Absen masuk sudah tercatat. Saat selesai bekerja, lakukan absen pulang untuk menutup hari kerja.'
+      : 'Lakukan absen masuk terlebih dahulu untuk mulai aktivitas kerja.';
+
+  const isClockInDone = !!todayRecord?.clock_in;
+  const isClockOutDone = !!todayRecord?.clock_out;
+  const isClockOutBlocked = !todayRecord?.clock_in || isClockOutDone;
 
   const getLocationAndWeather = async () => {
     try {
@@ -453,12 +508,14 @@ export default function HomeScreen() {
 
   if (showCamera) {
     return (
-      <View style={styles.cameraContainer}>
-        <AttendanceCamera type={cameraType} onCaptureComplete={handleCaptureComplete} userData={userData} />
-        <TouchableOpacity style={styles.closeCameraBtn} onPress={() => setShowCamera(false)}>
-          <Ionicons name="close" size={28} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      <Modal visible={showCamera} animationType="slide" transparent={false} onRequestClose={() => setShowCamera(false)}>
+        <AttendanceCamera 
+          type={cameraType} 
+          onCaptureComplete={handleCaptureComplete} 
+          userData={userData} 
+          onClose={() => setShowCamera(false)} 
+        />
+      </Modal>
     );
   }
 
@@ -467,7 +524,7 @@ export default function HomeScreen() {
       <StatusBar barStyle={isDark ? "light-content" : "light-content"} />
       
       {/* Branded Red Header Banner */}
-      <View style={[styles.headerWrapper, { backgroundColor: isDark ? '#1C1C1E' : '#E31E24' }]}>
+      <View style={[styles.headerWrapper, { backgroundColor: isDark ? '#1E293B' : '#F97316', borderBottomColor: isDark ? '#334155' : 'transparent', borderBottomWidth: isDark ? 1 : 0 }]}>
         <View style={styles.headerTopRow}>
           <View style={styles.headerTopLeft}>
             <Text style={[styles.dateLabelImage, { color: isDark ? '#8E8E93' : 'rgba(255, 255, 255, 0.75)' }]}>
@@ -508,7 +565,10 @@ export default function HomeScreen() {
           <View style={styles.headerActionBtns}>
             <TouchableOpacity 
               style={[styles.squareBtn, { backgroundColor: isDark ? '#2C2C2E' : 'rgba(255, 255, 255, 0.15)', borderColor: isDark ? '#3A3A3C' : 'rgba(255, 255, 255, 0.2)' }]} 
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/inbox');
+              }}
             >
               <Ionicons name="notifications" size={20} color="#FFFFFF" />
               {notificationCount > 0 && <View style={styles.btnDotBadge} />}
@@ -517,11 +577,18 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.profileSectionImage}>
-          <View style={[styles.avatarCircleImage, { backgroundColor: isDark ? '#2C2C2E' : '#FFFFFF' }]}>
-            <Text style={[styles.avatarTextImage, { color: isDark ? '#FFFFFF' : '#E31E24' }]}>
+          <TouchableOpacity 
+            style={[styles.avatarCircleImage, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push('/id-card');
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.avatarTextImage, { color: isDark ? '#F8FAFC' : '#F97316' }]}>
               {userData?.name ? userData.name.substring(0, 1).toUpperCase() : 'A'}
             </Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.profileInfoImage}>
             <Text style={[styles.profileNameImage, { color: '#FFFFFF' }]}>{userData?.name || 'User Name'}</Text>
             <Text style={[styles.profileRoleImage, { color: isDark ? '#8E8E93' : 'rgba(255, 255, 255, 0.8)' }]}>
@@ -537,62 +604,100 @@ export default function HomeScreen() {
       <ScrollView 
         contentContainerStyle={[styles.scrollContentCompact, { backgroundColor: colors.background }]}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E31E24" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F97316" />}
       >
         {/* Redesigned Attendance Control Card */}
         <View style={[styles.attendanceBar, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0' }]}>
           <View style={styles.controlHeader}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="finger-print" size={16} color="#E31E24" />
-              <Text style={[styles.controlTitle, { color: colors.text }]}>KONTROL KEHADIRAN</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.controlTitle, { color: colors.subText }]}>KONTROL KEHADIRAN</Text>
+              <Text style={[styles.controlHeadline, { color: colors.text }]}>Absen masuk & pulang</Text>
+              <Text style={[styles.controlCopy, { color: colors.subText }]}>{attendanceHint}</Text>
             </View>
-            <View style={[styles.indicatorPill, { backgroundColor: todayRecord?.clock_in ? '#ECFDF5' : '#FEF3C7' }]}>
-              <Text style={[styles.indicatorText, { color: todayRecord?.clock_in ? '#059669' : '#D97706' }]}>
-                {todayRecord?.clock_in ? 'SUDAH ABSEN MASUK' : 'BELUM PRESENSI'}
+            <View style={[styles.indicatorPill, { backgroundColor: attendancePhaseBg }]}>
+              <Text style={[styles.indicatorText, { color: attendancePhaseColor }]}>
+                {attendancePhase}
               </Text>
             </View>
           </View>
 
-          <View style={styles.quickStatusRow}>
-            <View style={styles.quickStatusCol}>
-              <Text style={styles.quickStatusLabel}>MASUK</Text>
-              <Text style={[styles.quickStatusTime, { color: todayRecord?.clock_in ? '#10b981' : colors.subText }]}>
-                {todayRecord?.clock_in ? todayRecord.clock_in.substring(0, 5) : '--:--'}
-              </Text>
+          <View style={[styles.locationCard, { backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC' }]}> 
+            <Ionicons name="location" size={16} color="#F97316" />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.locationLabel, { color: colors.subText }]}>Lokasi terkini</Text>
+              <Text style={[styles.locationValue, { color: colors.text }]} numberOfLines={2}>{currentAddress}</Text>
             </View>
-            <View style={styles.verticalDivider} />
-            <View style={styles.quickStatusCol}>
-              <Text style={styles.quickStatusLabel}>PULANG</Text>
-              <Text style={[styles.quickStatusTime, { color: todayRecord?.clock_out ? '#f43f5e' : colors.subText }]}>
-                {todayRecord?.clock_out ? todayRecord.clock_out.substring(0, 5) : '--:--'}
-              </Text>
+          </View>
+
+          <View style={styles.timelineCard}>
+            <View style={[styles.timelineStep, { opacity: isClockInDone ? 1 : 0.8 }]}> 
+              <View style={[styles.timelineDot, { backgroundColor: isClockInDone ? '#10B981' : '#CBD5E1' }]} />
+              <View style={styles.timelineContent}>
+                <Text style={[styles.timelineTitle, { color: colors.text }]}>Absen Masuk</Text>
+                <Text style={[styles.timelineMeta, { color: colors.subText }]}> 
+                  {isClockInDone ? `Tercatat pukul ${todayRecord?.clock_in?.substring(0, 5)}` : 'Belum tercatat'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.timelineLine} />
+            <View style={[styles.timelineStep, { opacity: isClockOutDone ? 1 : isClockInDone ? 0.95 : 0.5 }]}> 
+              <View style={[styles.timelineDot, { backgroundColor: isClockOutDone ? '#F43F5E' : isClockInDone ? '#F59E0B' : '#E2E8F0' }]} />
+              <View style={styles.timelineContent}>
+                <Text style={[styles.timelineTitle, { color: colors.text }]}>Absen Pulang</Text>
+                <Text style={[styles.timelineMeta, { color: colors.subText }]}> 
+                  {isClockOutDone ? `Tercatat pukul ${todayRecord?.clock_out?.substring(0, 5)}` : isClockInDone ? 'Siap untuk dicatat' : 'Tunggu absen masuk'}
+                </Text>
+              </View>
             </View>
           </View>
 
           <View style={styles.actionRowCompact}>
-            <TouchableOpacity onPress={handleClockIn} onPressIn={() => onPressIn(inScale)} onPressOut={() => onPressOut(inScale)} style={styles.flex1} activeOpacity={1}>
-              <Animated.View style={[styles.btnCompact, {backgroundColor: '#10b981', transform: [{scale: inScale}], flexDirection: 'row', gap: 8}]}>
+            <TouchableOpacity 
+              onPress={isClockInDone ? undefined : handleClockIn}
+              onPressIn={() => onPressIn(inScale)}
+              onPressOut={() => onPressOut(inScale)}
+              style={styles.flex1}
+              activeOpacity={1}
+              disabled={isClockInDone}
+            >
+              <Animated.View style={[styles.btnCompact, { backgroundColor: isClockInDone ? '#94A3B8' : '#10b981', transform: [{ scale: inScale }], opacity: isClockInDone ? 0.85 : 1 }]}> 
                 <Ionicons name="log-in" size={18} color="#fff" />
-                <Text style={styles.btnTextCompact}>ABSEN MASUK</Text>
+                <View style={styles.btnCopyWrap}>
+                  <Text style={styles.btnTextCompact}>ABSEN MASUK</Text>
+                  <Text style={styles.btnSubText}>{isClockInDone ? 'Sudah tercatat' : 'Mulai hari kerja'}</Text>
+                </View>
               </Animated.View>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClockOut} onPressIn={() => onPressIn(outScale)} onPressOut={() => onPressOut(outScale)} style={styles.flex1} activeOpacity={1}>
-              <Animated.View style={[styles.btnCompact, {backgroundColor: '#f43f5e', transform: [{scale: outScale}], flexDirection: 'row', gap: 8}]}>
+            <TouchableOpacity 
+              onPress={isClockOutBlocked ? undefined : handleClockOut}
+              onPressIn={() => onPressIn(outScale)}
+              onPressOut={() => onPressOut(outScale)}
+              style={styles.flex1}
+              activeOpacity={1}
+              disabled={isClockOutBlocked}
+            >
+              <Animated.View style={[styles.btnCompact, { backgroundColor: isClockOutBlocked ? '#94A3B8' : '#f43f5e', transform: [{ scale: outScale }], opacity: isClockOutBlocked ? 0.85 : 1 }]}> 
                 <Ionicons name="log-out" size={18} color="#fff" />
-                <Text style={styles.btnTextCompact}>ABSEN PULANG</Text>
+                <View style={styles.btnCopyWrap}>
+                  <Text style={styles.btnTextCompact}>ABSEN PULANG</Text>
+                  <Text style={styles.btnSubText}>{isClockOutDone ? 'Sudah tercatat' : isClockInDone ? 'Selesaikan hari kerja' : 'Tunggu absen masuk'}</Text>
+                </View>
               </Animated.View>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Work Schedule Preview Card - Enhanced */}
-        <View style={[styles.scheduleCard, { backgroundColor: colors.card, borderLeftColor: '#E31E24' }]}>
+        <View style={[styles.scheduleCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0' }]}> 
           <View style={styles.scheduleHeader}>
-            <View style={[styles.shiftBadge, { backgroundColor: isDark ? '#2C2C2E' : '#FEE2E2' }]}>
-              <Text style={[styles.shiftBadgeText, { color: '#E31E24' }]}>SHIFT NORMAL</Text>
+            <View>
+              <Text style={[styles.scheduleTitle, { color: colors.text }]}>Ringkasan Shift</Text>
+              <Text style={[styles.scheduleSubtitle, { color: colors.subText }]}>Saat ini, jam kerja berjalan sesuai jadwal office.</Text>
             </View>
-            <Text style={styles.scheduleDate}>Hari Ini</Text>
+            <View style={[styles.shiftBadge, { backgroundColor: isDark ? 'rgba(227,30,36,0.15)' : '#FEE2E2' }]}> 
+              <Text style={[styles.shiftBadgeText, { color: '#F97316' }]}>SHIFT NORMAL</Text>
+            </View>
           </View>
           <View style={styles.scheduleTimeRow}>
             <View style={styles.timeItem}>
@@ -605,9 +710,15 @@ export default function HomeScreen() {
               <Text style={[styles.timeValue, { color: colors.text }]}>17:00</Text>
             </View>
           </View>
-          <View style={styles.scheduleFooter}>
-            <Ionicons name="information-circle-outline" size={14} color="#8E8E93" />
-            <Text style={styles.scheduleFooterText}>Toleransi keterlambatan: 15 Menit</Text>
+          <View style={styles.scheduleMetaRow}>
+            <View style={[styles.metaPill, { backgroundColor: isDark ? '#1F2937' : '#F8FAFC' }]}> 
+              <Ionicons name="time-outline" size={12} color="#F97316" />
+              <Text style={[styles.metaPillText, { color: colors.text }]}>Toleransi 15 menit</Text>
+            </View>
+            <View style={[styles.metaPill, { backgroundColor: isDark ? '#1F2937' : '#F8FAFC' }]}> 
+              <Ionicons name="shield-checkmark-outline" size={12} color="#10B981" />
+              <Text style={[styles.metaPillText, { color: colors.text }]}>Geofencing aktif</Text>
+            </View>
           </View>
         </View>
 
@@ -624,6 +735,53 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         )}
+
+        {/* SOS Emergency Button */}
+        <TouchableOpacity 
+          style={[styles.sosButton, { backgroundColor: '#EF4444', borderColor: '#DC2626' }]}
+          onPress={() => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            Alert.alert(
+              '🚨 PANIC BUTTON',
+              'Apakah Anda sedang dalam keadaan darurat? Koordinat Anda akan dikirim ke Tim HR/Keamanan sekarang.',
+              [
+                { text: 'BATAL', style: 'cancel' },
+                { text: 'KIRIM SOS', style: 'destructive', onPress: () => Alert.alert('Terkirim', 'Tim bantuan segera menghubungi Anda.') }
+              ]
+            );
+          }}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="warning" size={24} color="#FFF" />
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={styles.sosTitle}>Panggilan Darurat (SOS)</Text>
+            <Text style={styles.sosDesc}>Ketuk jika terjadi kecelakaan / bahaya</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.5)" />
+        </TouchableOpacity>
+
+        {/* Gamification / Leaderboard */}
+        <View style={[styles.leaderboardCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#E2E8F0' }]}>
+          <View style={styles.leaderboardHeader}>
+            <Ionicons name="trophy" size={18} color="#F59E0B" />
+            <Text style={[styles.leaderboardTitle, { color: colors.text }]}>Kedisiplinan Bulan Ini</Text>
+          </View>
+          <View style={styles.leaderboardRow}>
+            <Text style={[styles.lbRank, { color: '#F59E0B' }]}>#1</Text>
+            <Text style={[styles.lbName, { color: colors.text }]}>Budi Santoso</Text>
+            <Text style={styles.lbScore}>100 Pts</Text>
+          </View>
+          <View style={styles.leaderboardRow}>
+            <Text style={[styles.lbRank, { color: '#94A3B8' }]}>#2</Text>
+            <Text style={[styles.lbName, { color: colors.text }]}>Andi Wijaya</Text>
+            <Text style={styles.lbScore}>98 Pts</Text>
+          </View>
+          <View style={[styles.leaderboardRow, { backgroundColor: isDark ? '#1F1F1F' : '#FEF2F2', borderColor: '#FCA5A5', borderWidth: 1 }]}>
+            <Text style={[styles.lbRank, { color: '#F97316' }]}>#14</Text>
+            <Text style={[styles.lbName, { color: '#F97316', fontWeight: '800' }]}>Anda</Text>
+            <Text style={[styles.lbScore, { color: '#F97316' }]}>85 Pts</Text>
+          </View>
+        </View>
 
         {/* Office Announcement Banner - Enhanced */}
         {showBanner && (
@@ -657,8 +815,8 @@ export default function HomeScreen() {
           ) : (
             <>
               {/* Clock In Row */}
-              <View style={[styles.simpleListItem, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F1F5F9' }]}>
-                <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_in ? (isDark ? '#1F1F1F' : '#ECFDF5') : (isDark ? '#2C2C2E' : '#F1F5F9') }]}>
+              <View style={[styles.simpleListItem, { backgroundColor: colors.card, borderColor: isDark ? '#334155' : '#F1F5F9' }]}>
+                <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_in ? (isDark ? 'rgba(16,185,129,0.15)' : '#ECFDF5') : (isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9') }]}>
                   <Ionicons name="log-in" size={14} color={todayRecord?.clock_in ? '#10b981' : '#94A3B8'} />
                 </View>
                 <View style={styles.itemTextContainer}>
@@ -673,8 +831,8 @@ export default function HomeScreen() {
               </View>
 
               {/* Clock Out Row */}
-              <View style={[styles.simpleListItem, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F1F5F9' }]}>
-                <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_out ? (isDark ? '#1F1F1F' : '#fff1f2') : (isDark ? '#2C2C2E' : '#F1F5F9') }]}>
+              <View style={[styles.simpleListItem, { backgroundColor: colors.card, borderColor: isDark ? '#334155' : '#F1F5F9' }]}>
+                <View style={[styles.itemIconCircle, { backgroundColor: todayRecord?.clock_out ? (isDark ? 'rgba(244,63,94,0.15)' : '#fff1f2') : (isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9') }]}>
                   <Ionicons name="log-out" size={14} color={todayRecord?.clock_out ? '#f43f5e' : '#94A3B8'} />
                 </View>
                 <View style={styles.itemTextContainer}>
@@ -701,6 +859,19 @@ export default function HomeScreen() {
 
         <View style={styles.footerSpacingSmall} />
       </ScrollView>
+
+      {/* Floating AI Assistant Button */}
+      <TouchableOpacity 
+        style={styles.fabContainer}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          router.push('/assistant');
+        }}
+      >
+        <View style={styles.fabGradient}>
+          <Ionicons name="sparkles" size={24} color="#FFF" />
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -715,7 +886,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   headerWrapper: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 60,
     paddingBottom: 25,
     borderBottomLeftRadius: 30,
@@ -731,7 +902,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   headerTopLeft: {
     flex: 1,
@@ -757,7 +928,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
     paddingHorizontal: 10,
-    borderRadius: 20,
+    borderRadius: 14,
     gap: 6,
   },
   liveDot: {
@@ -811,7 +982,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#FFF',
     borderWidth: 1.5,
-    borderColor: '#E31E24',
+    borderColor: '#F97316',
   },
   profileSectionImage: {
     flexDirection: 'row',
@@ -853,90 +1024,142 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   scrollContentCompact: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 20,
   },
   attendanceBar: {
-    borderRadius: 24,
-    padding: 18,
+    borderRadius: 28,
+    padding: 14,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 3,
-    marginBottom: 20,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 18,
+    elevation: 4,
+    marginBottom: 12,
     borderWidth: 1,
   },
   controlHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    alignItems: 'flex-start',
+    marginBottom: 18,
+    gap: 12,
   },
   controlTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  controlHeadline: {
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+    marginBottom: 6,
+  },
+  controlCopy: {
+    fontSize: 12,
+    lineHeight: 18,
   },
   indicatorPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
   },
   indicatorText: {
-    fontSize: 8,
-    fontWeight: '850',
+    fontSize: 10,
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
-  quickStatusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 16,
+  locationCard: {
+    borderRadius: 18,
+    paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 18,
-  },
-  quickStatusCol: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+  },
+  locationLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 2,
+  },
+  locationValue: {
+    fontSize: 12,
+    fontWeight: '700',
+    lineHeight: 18,
+  },
+  timelineCard: {
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 18,
+    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+  },
+  timelineStep: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  timelineContent: {
     flex: 1,
+    paddingVertical: 6,
   },
-  quickStatusLabel: {
-    fontSize: 9,
+  timelineTitle: {
+    fontSize: 13,
     fontWeight: '800',
-    color: '#94A3B8',
-    marginBottom: 4,
-    letterSpacing: 0.5,
+    marginBottom: 2,
   },
-  quickStatusTime: {
-    fontSize: 16,
-    fontWeight: '800',
+  timelineMeta: {
+    fontSize: 11,
+    fontWeight: '600',
   },
-  verticalDivider: {
-    width: 1,
-    height: 24,
+  timelineLine: {
+    width: 2,
+    height: 22,
     backgroundColor: '#E2E8F0',
+    marginLeft: 5,
+    marginVertical: 2,
   },
   actionRowCompact: {
     flexDirection: 'row',
     gap: 12,
   },
   btnCompact: {
-    height: 50,
-    borderRadius: 16,
+    minHeight: 76,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
+  btnCopyWrap: {
+    marginTop: 6,
+    alignItems: 'flex-start',
+  },
   btnTextCompact: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 0.8,
+  },
+  btnSubText: {
+    color: 'rgba(255,255,255,0.88)',
+    fontSize: 11,
+    fontWeight: '700',
+    marginTop: 3,
   },
   flex1: {
     flex: 1,
@@ -950,36 +1173,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   scheduleCard: {
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 28,
+    padding: 14,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
     shadowRadius: 10,
     elevation: 2,
-    borderLeftWidth: 4,
+    borderWidth: 1,
   },
   scheduleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 15,
+    gap: 12,
+  },
+  scheduleTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+  scheduleSubtitle: {
+    fontSize: 12,
+    lineHeight: 18,
   },
   shiftBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 999,
   },
   shiftBadgeText: {
     fontSize: 10,
     fontWeight: '900',
     letterSpacing: 0.5,
-  },
-  scheduleDate: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#8E8E93',
   },
   scheduleTimeRow: {
     flexDirection: 'row',
@@ -1007,25 +1235,29 @@ const styles = StyleSheet.create({
     height: 30,
     backgroundColor: '#F1F5F9',
   },
-  scheduleFooter: {
+  scheduleMetaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 12,
+  },
+  metaPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     gap: 6,
-    marginTop: 15,
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#F8FAFC',
   },
-  scheduleFooterText: {
+  metaPillText: {
     fontSize: 11,
-    color: '#8E8E93',
-    fontWeight: '600',
+    fontWeight: '800',
   },
   syncBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    borderRadius: 16,
+    borderRadius: 12,
     marginBottom: 15,
     gap: 10,
     shadowColor: '#000',
@@ -1043,8 +1275,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    borderRadius: 20,
-    marginTop: 20,
+    borderRadius: 14,
+    marginTop: 14,
     gap: 15,
     borderWidth: 1,
     borderColor: '#E0E7FF',
@@ -1082,38 +1314,97 @@ const styles = StyleSheet.create({
   seeAllCompact: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#E31E24',
+    color: '#F97316',
   },
   simpleListItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 20,
-    marginBottom: 10,
+    padding: 14,
+    borderRadius: 12,
     borderWidth: 1,
+    marginBottom: 10,
   },
   itemIconCircle: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 12,
   },
   itemTextContainer: {
     flex: 1,
   },
   itemTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 2,
   },
   itemSubText: {
-    fontSize: 12,
-    color: '#8E8E93',
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '500',
   },
   itemTime: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '900',
+  },
+  sosButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sosTitle: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 0.5 },
+  sosDesc: { color: 'rgba(255,255,255,0.9)', fontSize: 11, fontWeight: '600' },
+  leaderboardCard: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 1,
+  },
+  leaderboardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
+  leaderboardTitle: { fontSize: 14, fontWeight: '800', letterSpacing: -0.2 },
+  leaderboardRow: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: 12, marginBottom: 6 },
+  lbRank: { width: 30, fontSize: 14, fontWeight: '900' },
+  lbName: { flex: 1, fontSize: 13, fontWeight: '600' },
+  lbScore: { fontSize: 12, fontWeight: '800', color: '#94A3B8' },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    shadowColor: '#F97316',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  fabGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 28,
+    backgroundColor: '#F97316',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#FFF',
   },
   footerSpacingSmall: {
     height: 100,
