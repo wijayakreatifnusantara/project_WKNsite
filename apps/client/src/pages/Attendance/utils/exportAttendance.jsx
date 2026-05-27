@@ -10,8 +10,8 @@ export const exportDailyAttendance = async () => {
     const { data, error } = await supabase
       .from('attendance')
       .select('*, employees(name, organization_name, job_position)')
-      .gte('created_at', \`\${today}T00:00:00Z\`)
-      .lte('created_at', \`\${today}T23:59:59Z\`)
+      .gte('created_at', `${today}T00:00:00Z`)
+      .lte('created_at', `${today}T23:59:59Z`)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -42,7 +42,7 @@ export const exportDailyAttendance = async () => {
 
     XLSX.utils.book_append_sheet(wb, ws, "Daily Log");
 
-    const fileName = \`WKN_Daily_Attendance_\${dayjs().format('YYYYMMDD')}.xlsx\`;
+    const fileName = `WKN_Daily_Attendance_${dayjs().format('YYYYMMDD')}.xlsx`;
     XLSX.writeFile(wb, fileName);
     
     return true;
