@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   IconSignature, 
   IconPlus, 
@@ -7,56 +7,86 @@ import {
   IconPrinter, 
   IconSend,
   IconChevronDown,
-  IconFileInvoice,
-  IconBuilding
+  IconBuilding,
+  IconSettings,
+  IconPhoto,
+  IconLoader2
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { useQuotations } from './hooks/useQuotations';
 
 const QuotationBuilder = () => {
+  const { clients, loading, fetchClients, saveQuotation } = useQuotations();
+  
   const [items, setItems] = useState([
-    { id: 1, description: 'Creative Design Service', qty: 1, rate: 5000000, tax: 11 },
-    { id: 2, description: 'Web Development Phase 1', qty: 1, rate: 12500000, tax: 11 }
+    { id: 1, description: 'Creative Design Service', qty: 1, rate: 5000000 },
   ]);
+  
+  const [selectedClient, setSelectedClient] = useState('');
+  const [taxRate, setTaxRate] = useState(0); // Default 0% (Non-PKP)
+  const [isSaving, setIsSaving] = useState(false);
+  const [refNumber] = useState(`QTN-${new Date().getFullYear()}-${Math.floor(Math.random()*10000).toString().padStart(4, '0')}`);
 
-  const [clientInfo, setClientInfo] = useState({
-    name: 'PT. Wijaya Kusuma',
-    address: 'Jl. Sudirman No. 45, Jakarta Selatan',
-    email: 'finance@wijayakusuma.co.id'
+  // Editable Letterhead Settings
+  const [letterhead, setLetterhead] = useState({
+    logoUrl: '/assets/wkn_logo.png', // Default
+    companyName: 'Wijaya Kreatif Nusantara',
+    address: 'Gedung WKN Lt. 5, Kuningan\nJakarta Selatan, 12940'
   });
+  const [showSettings, setShowSettings] = useState(false);
 
-  const addItem = () => {
-    setItems([...items, { id: Date.now(), description: '', qty: 1, rate: 0, tax: 11 }]);
-  };
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
-  const removeItem = (id) => {
-    setItems(items.filter(item => item.id !== id));
-  };
+  const activeClient = clients.find(c => c.id === selectedClient) || { name: 'Select Client...', address: '', email: '' };
 
-  const updateItem = (id, field, value) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ));
-  };
+  const addItem = () => setItems([...items, { id: Date.now(), description: '', qty: 1, rate: 0 }]);
+  const removeItem = (id) => setItems(items.filter(item => item.id !== id));
+  const updateItem = (id, field, value) => setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
 
   const totals = useMemo(() => {
     const subtotal = items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
-    const taxTotal = items.reduce((sum, item) => sum + (item.qty * item.rate * (item.tax / 100)), 0);
-    return {
-      subtotal,
-      taxTotal,
-      grandTotal: subtotal + taxTotal
-    };
-  }, [items]);
+    const taxTotal = subtotal * (taxRate / 100);
+    return { subtotal, taxTotal, grandTotal: subtotal + taxTotal };
+  }, [items, taxRate]);
 
   const formatCurrency = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
 
+  const handleSave = async () => {
+    if (!selectedClient) return alert('Silakan pilih klien terlebih dahulu!');
+    if (items.length === 0) return alert('Item penawaran tidak boleh kosong!');
+    
+    setIsSaving(true);
+    const result = await saveQuotation({
+      reference_number: refNumber,
+      client_id: selectedClient,
+      subtotal: totals.subtotal,
+      tax_rate: taxRate,
+      tax_total: totals.taxTotal,
+      grand_total: totals.grandTotal
+    }, items);
+    
+    setIsSaving(false);
+    
+    if (result.success) {
+      alert('Quotation berhasil disimpan sebagai Draft!');
+    } else {
+      alert('Gagal menyimpan: ' + result.error);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
-      <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-4">
+    <div className="flex-1 overflow-y-auto p-4 bg-[#f0f2f5] custom-scrollbar animate-fade-in print:bg-white print:p-0">
+      <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-4 print:block print:max-w-none">
         
-        {/* Editor Side */}
-        <div className="flex-1 space-y-4">
+        {/* Editor Side (Hidden during print) */}
+        <div className="flex-1 space-y-4 print:hidden">
           <header className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 bg-white shadow-md rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
@@ -64,48 +94,89 @@ const QuotationBuilder = () => {
               </div>
               <div>
                 <h1 className="text-lg font-black text-slate-800 font-outfit tracking-tight leading-none uppercase">Quotation Builder</h1>
-                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mt-1 opacity-70">Revenue Generation Engine v1.0</p>
+                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mt-1 opacity-70">Revenue Generation Engine</p>
               </div>
             </div>
+            <Button 
+              onClick={() => setShowSettings(!showSettings)}
+              variant="outline" 
+              className="h-8 rounded-lg bg-white shadow-sm border-slate-200 text-slate-500 font-black text-[9px] uppercase tracking-widest flex gap-2"
+            >
+              <IconSettings size={14} /> Letterhead
+            </Button>
           </header>
+
+          {/* Settings Panel */}
+          {showSettings && (
+            <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-5 animate-in slide-in-from-top-4 duration-300">
+              <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <IconPhoto size={14} className="text-[#E31E24]"/> Edit Letterhead
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[9px] font-bold text-slate-400 uppercase">Logo URL (Kosongkan untuk pakai teks)</label>
+                  <input type="text" value={letterhead.logoUrl} onChange={e => setLetterhead({...letterhead, logoUrl: e.target.value})} className="w-full h-8 bg-slate-50 border border-slate-200 rounded-md px-2 text-xs" />
+                </div>
+                <div>
+                  <label className="text-[9px] font-bold text-slate-400 uppercase">Company Name</label>
+                  <input type="text" value={letterhead.companyName} onChange={e => setLetterhead({...letterhead, companyName: e.target.value})} className="w-full h-8 bg-slate-50 border border-slate-200 rounded-md px-2 text-xs" />
+                </div>
+                <div>
+                  <label className="text-[9px] font-bold text-slate-400 uppercase">Address / Contact Info</label>
+                  <textarea value={letterhead.address} onChange={e => setLetterhead({...letterhead, address: e.target.value})} className="w-full h-16 bg-slate-50 border border-slate-200 rounded-md p-2 text-xs" />
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Client Selection Card */}
           <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Select Client Portfolio</label>
-                <div className="relative group">
-                  <div className="w-full h-10 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl flex items-center px-4 text-slate-700 font-bold cursor-pointer group-hover:text-[#E31E24] transition-all text-[11px]">
-                    <IconBuilding size={16} className="mr-2 text-slate-400" />
-                    {clientInfo.name}
-                    <IconChevronDown size={14} className="ml-auto text-slate-300" />
-                  </div>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Select Client</label>
+                <div className="relative">
+                  <select 
+                    value={selectedClient} 
+                    onChange={e => setSelectedClient(e.target.value)}
+                    className="w-full h-10 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-slate-700 font-bold cursor-pointer transition-all text-[11px] appearance-none focus:outline-none"
+                  >
+                    <option value="">-- Choose Client --</option>
+                    {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  <IconChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
               </div>
+              
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Quotation Reference</label>
-                <div className="w-full h-10 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl flex items-center px-4 text-slate-400 font-black tracking-widest text-[10px]">
-                  QTN-2026-0502-001
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Tax Rate (PPN)</label>
+                <div className="relative">
+                  <select 
+                    value={taxRate} 
+                    onChange={e => setTaxRate(Number(e.target.value))}
+                    className="w-full h-10 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-[#E31E24] font-black cursor-pointer transition-all text-[11px] appearance-none focus:outline-none"
+                  >
+                    <option value={0}>0% (Non-PKP Default)</option>
+                    <option value={11}>11% (Standar Lama)</option>
+                    <option value={12}>12% (Standar Baru)</option>
+                  </select>
+                  <IconChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
               </div>
             </div>
           </Card>
 
           {/* Line Items Card */}
-          <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl p-5 flex flex-col max-h-[500px]">
+          <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl p-5 flex flex-col max-h-[400px]">
             <div className="space-y-4 flex flex-col h-full">
               <div className="flex justify-between items-center px-1 shrink-0">
                 <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Service Line Items</h3>
-                <Button 
-                  onClick={addItem}
-                  className="h-8 px-4 rounded-lg bg-green-500 text-white font-black text-[8px] uppercase tracking-widest shadow-md hover:bg-green-600 transition-all flex gap-1.5"
-                >
+                <Button onClick={addItem} className="h-8 px-4 rounded-lg bg-green-500 text-white font-black text-[8px] uppercase tracking-widest shadow-md hover:bg-green-600 transition-all flex gap-1.5">
                   <IconPlus size={12} /> Add Item
                 </Button>
               </div>
 
-              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
-                {items.map((item, idx) => (
+              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3 pb-2">
+                {items.map((item) => (
                   <div key={item.id} className="flex gap-3 items-end animate-in slide-in-from-left duration-300">
                     <div className="flex-1 space-y-1">
                       <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label>
@@ -118,8 +189,7 @@ const QuotationBuilder = () => {
                     <div className="w-16 space-y-1">
                       <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest pl-1">Qty</label>
                       <input 
-                        type="number"
-                        value={item.qty}
+                        type="number" value={item.qty}
                         onChange={(e) => updateItem(item.id, 'qty', parseFloat(e.target.value) || 0)}
                         className="w-full h-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg px-2 text-[11px] font-bold text-slate-700 text-center focus:outline-none"
                       />
@@ -127,16 +197,12 @@ const QuotationBuilder = () => {
                     <div className="w-32 space-y-1">
                       <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest pl-1">Rate (IDR)</label>
                       <input 
-                        type="number"
-                        value={item.rate}
+                        type="number" value={item.rate}
                         onChange={(e) => updateItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
                         className="w-full h-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
                       />
                     </div>
-                    <button 
-                      onClick={() => removeItem(item.id)}
-                      className="h-10 w-10 flex items-center justify-center text-red-300 hover:text-red-500 transition-colors"
-                    >
+                    <button onClick={() => removeItem(item.id)} className="h-10 w-10 flex items-center justify-center text-red-300 hover:text-red-500 transition-colors">
                       <IconTrash size={16} />
                     </button>
                   </div>
@@ -147,60 +213,63 @@ const QuotationBuilder = () => {
         </div>
 
         {/* Preview Side */}
-        <div className="w-full lg:w-[380px] space-y-4">
-          <header className="flex justify-between items-center h-10 px-1">
+        <div className="w-full lg:w-[450px] space-y-4 print:w-full print:block">
+          <header className="flex justify-between items-center h-10 px-1 print:hidden">
             <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Document Preview</h3>
             <div className="flex gap-2">
-              <button className="h-8 w-8 flex items-center justify-center bg-white shadow-sm rounded-lg text-slate-400 hover:text-blue-500 transition-all"><IconDownload size={14} /></button>
-              <button className="h-8 w-8 flex items-center justify-center bg-white shadow-sm rounded-lg text-slate-400 hover:text-slate-800 transition-all"><IconPrinter size={14} /></button>
+              <button onClick={handlePrint} className="h-8 w-8 flex items-center justify-center bg-white shadow-sm rounded-lg text-slate-400 hover:text-slate-800 transition-all"><IconPrinter size={14} /></button>
             </div>
           </header>
 
-          <div className="bg-white shadow-xl rounded-xl p-6 min-h-[500px] flex flex-col border-[4px] border-[#f8f9fa] relative overflow-hidden ring-1 ring-slate-200">
-            {/* Watermark Decoration */}
-            <div className="absolute -right-20 -top-20 h-40 w-40 bg-red-50 rounded-full blur-3xl opacity-50"></div>
+          <div className="bg-white shadow-xl rounded-xl p-8 min-h-[600px] flex flex-col border-[4px] border-[#f8f9fa] relative overflow-hidden ring-1 ring-slate-200 print:shadow-none print:border-none print:ring-0 print:p-0 print:min-h-0">
+            {/* Watermark Decoration - Hidden in print usually, but kept for style */}
+            <div className="absolute -right-20 -top-20 h-40 w-40 bg-red-50 rounded-full blur-3xl opacity-50 print:hidden"></div>
             
             <div className="relative z-10 flex flex-col h-full">
-              {/* Header */}
-              <div className="flex justify-between items-start mb-6">
-                <img src="/assets/wkn_logo.png" alt="WKN" className="h-8 w-auto grayscale opacity-80" />
+              {/* Header / Letterhead */}
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  {letterhead.logoUrl ? (
+                    <img src={letterhead.logoUrl} alt="Logo" className="h-12 w-auto object-contain mb-2" onError={(e) => e.target.style.display='none'} />
+                  ) : null}
+                  <h1 className="text-sm font-black text-slate-800 uppercase tracking-tight">{letterhead.companyName}</h1>
+                  <p className="text-[9px] text-slate-500 whitespace-pre-line mt-1 leading-relaxed">{letterhead.address}</p>
+                </div>
                 <div className="text-right leading-none">
-                  <h2 className="text-lg font-black text-slate-800 font-outfit uppercase">Quotation</h2>
-                  <p className="text-[6px] font-black text-slate-300 tracking-[0.3em] uppercase mt-1">Private & Confidential</p>
+                  <h2 className="text-2xl font-black text-slate-800 font-outfit uppercase">Quotation</h2>
+                  <p className="text-[8px] font-black text-slate-400 tracking-widest uppercase mt-2">Ref: {refNumber}</p>
+                  <p className="text-[8px] font-bold text-slate-400 mt-1">Date: {new Date().toLocaleDateString('id-ID')}</p>
                 </div>
               </div>
 
               {/* Addresses */}
-              <div className="grid grid-cols-2 gap-4 mb-6 border-b border-slate-50 pb-6">
-                <div>
-                  <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest mb-1">From</p>
-                  <p className="text-[9px] font-black text-slate-800">Wijaya Kreatif Nusantara</p>
-                  <p className="text-[8px] text-slate-400 font-medium leading-tight mt-0.5">Gedung WKN Lt. 5, Kuningan<br/>Jakarta Selatan, 12940</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest mb-1">To</p>
-                  <p className="text-[9px] font-black text-slate-800">{clientInfo.name}</p>
-                  <p className="text-[8px] text-slate-400 font-medium leading-tight mt-0.5">{clientInfo.address}</p>
-                </div>
+              <div className="mb-8 border-t border-slate-100 pt-6">
+                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Prepared For</p>
+                <p className="text-sm font-black text-slate-800">{activeClient.name}</p>
+                {activeClient.address && <p className="text-[10px] text-slate-500 mt-1">{activeClient.address}</p>}
+                {activeClient.email && <p className="text-[10px] text-slate-500">{activeClient.email}</p>}
               </div>
 
               {/* Table */}
-              <div className="flex-1">
+              <div className="flex-1 mb-8">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-100">
-                      <th className="py-2 text-[7px] font-black text-slate-400 uppercase tracking-widest">Description</th>
-                      <th className="py-2 text-[7px] font-black text-slate-400 uppercase tracking-widest text-right">Total</th>
+                    <tr className="border-b-2 border-slate-200">
+                      <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">Description</th>
+                      <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center w-16">Qty</th>
+                      <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Price</th>
+                      <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50">
+                  <tbody className="divide-y divide-slate-100">
                     {items.map(item => (
                       <tr key={item.id}>
-                        <td className="py-3">
-                          <p className="text-[9px] font-black text-slate-700 leading-tight">{item.description || 'New Service'}</p>
-                          <p className="text-[7px] text-slate-400 font-bold mt-0.5">{item.qty} x {formatCurrency(item.rate)}</p>
+                        <td className="py-3 pr-2">
+                          <p className="text-[11px] font-bold text-slate-700 leading-tight">{item.description || '-'}</p>
                         </td>
-                        <td className="py-3 text-right text-[9px] font-black text-slate-700">
+                        <td className="py-3 text-center text-[10px] text-slate-600">{item.qty}</td>
+                        <td className="py-3 text-right text-[10px] text-slate-600">{formatCurrency(item.rate)}</td>
+                        <td className="py-3 text-right text-[11px] font-black text-slate-800">
                           {formatCurrency(item.qty * item.rate)}
                         </td>
                       </tr>
@@ -210,26 +279,31 @@ const QuotationBuilder = () => {
               </div>
 
               {/* Totals */}
-              <div className="mt-6 space-y-2 pt-4 border-t-2 border-slate-50">
+              <div className="w-2/3 ml-auto space-y-2 border-t-2 border-slate-200 pt-4">
                 <div className="flex justify-between items-center px-2">
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Subtotal</span>
-                  <span className="text-[10px] font-black text-slate-600">{formatCurrency(totals.subtotal)}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subtotal</span>
+                  <span className="text-xs font-bold text-slate-700">{formatCurrency(totals.subtotal)}</span>
                 </div>
-                <div className="flex justify-between items-center px-2">
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">PPN (11%)</span>
-                  <span className="text-[10px] font-black text-slate-600">{formatCurrency(totals.taxTotal)}</span>
-                </div>
-                <div className="flex justify-between items-center bg-slate-900 text-white rounded-xl p-3 mt-2 shadow-lg">
-                  <span className="text-[8px] font-black uppercase tracking-[0.2em]">Grand Total</span>
-                  <span className="text-sm font-black">{formatCurrency(totals.grandTotal)}</span>
+                {taxRate > 0 && (
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tax ({taxRate}%)</span>
+                    <span className="text-xs font-bold text-slate-700">{formatCurrency(totals.taxTotal)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center bg-slate-900 text-white rounded-xl p-4 mt-3 print:bg-slate-100 print:text-slate-900 print:border-2 print:border-slate-900">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Grand Total</span>
+                  <span className="text-lg font-black">{formatCurrency(totals.grandTotal)}</span>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="mt-6 text-center">
-                <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest mb-3">Digitally Signed & Validated</p>
-                <Button className="w-full h-10 bg-[#E31E24] text-white rounded-lg font-black text-[9px] uppercase tracking-widest flex gap-2">
-                  <IconSend size={14} /> Finalize & Send
+              <div className="mt-12 text-center print:hidden">
+                <Button 
+                  onClick={handleSave} 
+                  disabled={isSaving}
+                  className="w-full h-12 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex gap-2 shadow-lg"
+                >
+                  {isSaving ? <IconLoader2 className="animate-spin" size={16} /> : <><IconSend size={16} /> Save to Database</>}
                 </Button>
               </div>
             </div>
