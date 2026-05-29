@@ -26,8 +26,9 @@ const Overview = () => {
     try {
       setLoading(true);
       const response = await apiClient.get('/api/employees?size=500');
-      // Data is already mapped by backend
-      setEmployees(response.data || []);
+      // Fix: The new backend returns { data: [...], total: ... } instead of a direct array
+      const employeeData = response.data?.data || (Array.isArray(response.data) ? response.data : []);
+      setEmployees(employeeData);
     } catch (error) {
       console.error('Error fetching analytics data:', error);
     } finally {

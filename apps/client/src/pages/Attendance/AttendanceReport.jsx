@@ -62,7 +62,7 @@ const AttendanceReport = () => {
   const fetchEmployees = async () => {
     try {
       const response = await apiClient.get('/api/employees?size=500');
-      const empData = response.data || [];
+      const empData = response.data?.data || (Array.isArray(response.data) ? response.data : []);
       setEmployees(empData.map(e => ({ id: e['EMPLOYEE ID'], name: e['EMPLOYEE NAME'] })));
     } catch (err) {
       console.error('Error fetching employees:', err);

@@ -120,7 +120,7 @@ const AttendanceCalendar = () => {
   const fetchEmployees = async () => {
     try {
       const response = await apiClient.get('/api/employees?size=500');
-      const rawData = response.data || [];
+      const rawData = response.data?.data || (Array.isArray(response.data) ? response.data : []);
       
       const empData = rawData.map(e => ({
         id: e['EMPLOYEE ID'],
