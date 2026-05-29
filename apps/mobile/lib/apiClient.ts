@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 const getApiUrl = () => {
-  return process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:8000/api';
+  return process.env.EXPO_PUBLIC_API_URL || 'https://wknsite-backend.onrender.com/api';
 };
 
 export const apiClient = {
