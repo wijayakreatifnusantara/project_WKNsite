@@ -13,7 +13,7 @@ import {
   IconLoader2,
   IconDeviceAnalytics
 } from "@tabler/icons-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { PERMISSIONS, ROLES } from '@/lib/permissions';
 
 const RBACManager = () => {
@@ -69,16 +69,13 @@ const RBACManager = () => {
   const fetchPermissionsForRole = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('role_permissions')
-        .select('permission_name')
-        .eq('role_name', selectedRole);
+      const { data: res } = await apiClient.get(`/api/rbac/permissions/${selectedRole}`);
+      const data = res.data;
 
-      if (error) throw error;
       setRolePermissions(data.map(p => p.permission_name));
     } catch (err) {
       console.error('Error fetching RBAC:', err);
-      setMessage({ type: 'error', text: 'Failed to sync with Supabase.' });
+      setMessage({ type: 'error', text: 'Failed to sync with Backend.' });
     } finally {
       setIsLoading(false);
     }
@@ -95,24 +92,15 @@ const RBACManager = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      // 1. Delete all current permissions for this role
-      await supabase.from('role_permissions').delete().eq('role_name', selectedRole);
-
-      // 2. Insert new set of permissions
-      if (rolePermissions.length > 0) {
-        const insertData = rolePermissions.map(p => ({
-          role_name: selectedRole,
-          permission_name: p
-        }));
-        const { error } = await supabase.from('role_permissions').insert(insertData);
-        if (error) throw error;
-      }
+      await apiClient.post(`/api/rbac/permissions/${selectedRole}`, {
+        permissions: rolePermissions
+      });
 
       setMessage({ type: 'success', text: `Permissions for ${selectedRole.toUpperCase()} updated successfully!` });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (err) {
       console.error('Save Error:', err);
-      setMessage({ type: 'error', text: 'Error saving to Supabase. Check RLS policies.' });
+      setMessage({ type: 'error', text: 'Error saving to Backend.' });
     } finally {
       setIsSaving(false);
     }

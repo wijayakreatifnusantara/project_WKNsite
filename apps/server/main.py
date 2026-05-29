@@ -15,6 +15,11 @@ from api.performance import router as performance_router
 from api.organizations import router as organizations_router
 from api.database import router as database_router
 from api.overtime import router as overtime_router
+from api.submissions import router as submissions_router
+from api.rbac import router as rbac_router
+from api.crm import router as crm_router
+from api.recruitment import router as recruitment_router
+from api.announcements import router as announcements_router
 from fastapi.staticfiles import StaticFiles
 import os
 import sentry_sdk
@@ -81,8 +86,13 @@ app.include_router(documents_router, prefix="/api")
 app.include_router(assets_router, prefix="/api")
 app.include_router(performance_router, prefix="/api")
 app.include_router(organizations_router, prefix="/api")
-app.include_router(database_router, prefix="/api")
-app.include_router(overtime_router, prefix="/api")
+app.include_router(database_router, prefix="/api", tags=["database"])
+app.include_router(overtime_router, prefix="/api", tags=["overtime"])
+app.include_router(submissions_router, prefix="/api", tags=["submissions"])
+app.include_router(rbac_router, prefix="/api", tags=["rbac"])
+app.include_router(crm_router, prefix="/api", tags=["crm"])
+app.include_router(recruitment_router, prefix="/api", tags=["recruitment"])
+app.include_router(announcements_router, prefix="/api", tags=["announcements"])
 
 @app.on_event("startup")
 async def startup_event():

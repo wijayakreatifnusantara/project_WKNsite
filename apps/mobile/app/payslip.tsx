@@ -8,7 +8,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { supabase } from '../lib/supabaseClient';
+import { apiClient } from '../lib/apiClient';
 
 export default function PayslipScreen() {
   const { colors, isDark } = useTheme();
@@ -25,13 +25,11 @@ export default function PayslipScreen() {
     try {
       if (!userData?.id) return;
       
-      const [salaryRes, templateRes] = await Promise.all([
-        supabase.from('employee_salaries').select('*').eq('employee_id', userData.id).single(),
-        supabase.from('payslip_templates').select('*').eq('is_active', true).limit(1).single()
-      ]);
-
-      if (salaryRes.data) setSalaryData(salaryRes.data);
-      if (templateRes.data) setTemplate(templateRes.data);
+      const res = await apiClient.get('/payroll/my-salary');
+      if (res.status === 'success' && res.data) {
+        setSalaryData(res.data.salary);
+        setTemplate(res.data.template);
+      }
 
     } catch (e) {
       console.log('Error fetching data:', e);

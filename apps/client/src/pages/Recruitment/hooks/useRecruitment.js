@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export const useRecruitment = () => {
   const [jobs, setJobs] = useState([]);
@@ -19,19 +19,8 @@ export const useRecruitment = () => {
       setError(null);
       
       // Fetch job postings and count applicants per job
-      const { data: jobData, error: jobError } = await supabase
-        .from('job_postings')
-        .select(`
-          id, 
-          title, 
-          department, 
-          status, 
-          created_at,
-          job_applicants ( id, status )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (jobError) throw jobError;
+      const { data: res } = await apiClient.get('/api/recruitment/jobs');
+      const jobData = res.data;
       
       // Transform data to include applicant counts
       let totalApps = 0;
@@ -75,15 +64,11 @@ export const useRecruitment = () => {
 
   const createJob = async (jobData) => {
     try {
-      const { error } = await supabase
-        .from('job_postings')
-        .insert([{
-          title: jobData.title,
-          department: jobData.dept,
-          status: jobData.status || 'Active'
-        }]);
-
-      if (error) throw error;
+      await apiClient.post('/api/recruitment/jobs', {
+        title: jobData.title,
+        department: jobData.dept,
+        status: jobData.status || 'Active'
+      });
       fetchJobs(); // Refresh the list
       return { success: true };
     } catch (err) {

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabaseClient';
+import { apiClient } from '../lib/apiClient';
+import Toast from 'react-native-toast-message';
 
 export default function SalaryCorrectionScreen() {
   const { colors, isDark } = useTheme();
@@ -14,6 +15,12 @@ export default function SalaryCorrectionScreen() {
   const [period, setPeriod] = useState('April 2026');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
 
   const handleSubmit = async () => {
     if (!message.trim()) {
@@ -24,21 +31,16 @@ export default function SalaryCorrectionScreen() {
     setSubmitting(true);
     
     try {
-      const { error } = await supabase.from('salary_corrections').insert({
-        employee_id: userData?.id,
+      const res = await apiClient.post('/submissions/salary-correction', {
         period: period,
-        correction_message: message,
-        status: 'PENDING'
+        reason: message
       });
 
-      if (error) throw error;
+      if (res.status !== 'success') throw new Error(res.message);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(
-        'Koreksi Diajukan', 
-        'Pengajuan koreksi gaji Anda telah dikirim ke Tim HR/Finance WKN. Anda akan menerima notifikasi jika sudah diproses.',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Pengajuan koreksi gaji terkirim.' });
+      router.back();
     } catch (err: any) {
       Alert.alert('Gagal', 'Terjadi kesalahan saat mengirim pengajuan: ' + err.message);
     } finally {
@@ -57,7 +59,12 @@ export default function SalaryCorrectionScreen() {
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView 
+          contentContainerStyle={styles.content}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           <View style={styles.warningBox}>
             <Ionicons name="information-circle" size={24} color="#EF4444" />
             <Text style={styles.warningText}>

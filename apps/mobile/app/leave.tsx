@@ -19,11 +19,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../lib/supabaseClient';
+import { apiClient } from '../lib/apiClient';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import * as Haptics from 'expo-haptics';
+import Toast from 'react-native-toast-message';
 import SkeletonLoader from '../components/SkeletonLoader';
+import EmptyState from '../components/EmptyState';
 
 const { width } = Dimensions.get('window');
 
@@ -73,7 +75,6 @@ export default function LeaveScreen() {
     setLoading(true);
     try {
       await fetchLeaveRequests(user.id);
-      setupRealtimeSubscription(user.id);
     } catch (e) {
       console.log('Error initializing screen:', e);
     } finally {
@@ -81,31 +82,12 @@ export default function LeaveScreen() {
     }
   };
 
-  const setupRealtimeSubscription = (userId: string) => {
-    supabase
-      .channel('public:leave_requests')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'leave_requests', filter: `employee_id=eq.${userId}` },
-        (payload) => {
-          console.log('Real-time leave update received!', payload);
-          fetchLeaveRequests(userId);
-        }
-      )
-      .subscribe();
-  };
-
   const fetchLeaveRequests = async (employeeId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('leave_requests')
-        .select('*')
-        .eq('employee_id', employeeId)
-        .order('applied_at', { ascending: false });
-
-      if (error) throw error;
-      setRequests(data || []);
-      await AsyncStorage.setItem('cached_leaves', JSON.stringify(data || []));
+      const res = await apiClient.get(`/leave/my-requests`);
+      const data = res.data || [];
+      setRequests(data);
+      await AsyncStorage.setItem('cached_leaves', JSON.stringify(data));
     } catch (e: any) {
       console.log('Network error, loading leave requests from cache:', e.message);
       try {
@@ -173,11 +155,6 @@ export default function LeaveScreen() {
       return;
     }
 
-    if (computedDays === 0) {
-      Alert.alert('Pengajuan Ditolak', 'Pengajuan cuti/izin tidak dapat diajukan hanya untuk hari libur (Sabtu & Minggu).');
-      return;
-    }
-
     if (leaveType === 'Emergency' && (!startTime || !endTime)) {
       Alert.alert('Form Belum Lengkap', 'Silakan isi jam mulai dan selesai izin pulang cepat.');
       return;
@@ -187,30 +164,23 @@ export default function LeaveScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const record: any = {
+      const payload: any = {
         employee_id: userData.id,
         leave_type: leaveType,
         start_date: startDate,
         end_date: endDate,
-        days_count: computedDays,
-        reason: reason.trim(),
-        status: 'Pending',
-        applied_at: new Date().toISOString()
+        reason: reason.trim()
       };
 
       if (leaveType === 'Emergency') {
-        record.start_time = startTime.trim();
-        record.end_time = endTime.trim();
+        payload.start_time = startTime.trim();
+        payload.end_time = endTime.trim();
       }
 
-      const { error } = await supabase
-        .from('leave_requests')
-        .insert([record]);
-
-      if (error) throw error;
+      await apiClient.post('/leave/request', payload);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('✅ Berhasil', 'Pengajuan izin/cuti Anda telah dikirim dan menunggu persetujuan.');
+      Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Pengajuan izin/cuti Anda telah dikirim.' });
       
       // Reset Form
       setStartDate('');
@@ -463,19 +433,10 @@ export default function LeaveScreen() {
           <Text style={[styles.sectionTitle, { color: colors.subText }]}>RIWAYAT IZIN & CUTI</Text>
           
           {requests.length === 0 ? (
-            <View style={[styles.emptyContainer, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-              <Ionicons name="calendar-outline" size={48} color="#94A3B8" />
-              <Text style={[styles.emptyText, { color: colors.subText }]}>Belum ada riwayat pengajuan cuti atau izin.</Text>
-              <TouchableOpacity 
-                style={styles.emptyAddBtn} 
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setFormDefaults();
-                }}
-              >
-                <Text style={styles.emptyAddBtnText}>Ajukan Izin Baru</Text>
-              </TouchableOpacity>
-            </View>
+            <EmptyState 
+              title="Belum Ada Riwayat" 
+              message="Anda belum pernah mengajukan cuti atau izin. Riwayat pengajuan Anda akan muncul di sini." 
+            />
           ) : (
             requests.map((item) => (
               <View key={item.id} style={[styles.historyCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
@@ -644,7 +605,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   textInput: {
-    height: 48,
+    minHeight: 48,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 14,
@@ -681,7 +642,7 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     backgroundColor: '#F97316',
-    height: 48,
+    minHeight: 48,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',

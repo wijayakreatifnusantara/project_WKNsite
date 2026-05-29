@@ -8,7 +8,7 @@ import {
   IconNote
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 
 const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
@@ -30,25 +30,28 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
   }, [isOpen]);
 
   const fetchEmployees = async () => {
-    // Only fetch active employees for attendance
-    const { data } = await supabase
-      .from('employees')
-      .select('id, name')
-      .eq('is_resigned', false);
-    setEmployees(data || []);
+    // We can fetch via our apiClient employees endpoint, or directly use the generic one if available
+    try {
+      const response = await apiClient.get('/api/employees');
+      // map only active employees if needed or assume backend filters
+      const data = response.data.data.filter(e => !e.is_resigned && e["Status *"] !== "RESIGNED");
+      setEmployees(data || []);
+    } catch (e) {
+      console.error(e);
+      setEmployees([]);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.from('attendance').insert([{
+      await apiClient.post('/api/attendance/direct', {
         ...formData,
         is_manual: true,
         created_at: new Date().toISOString()
-      }]);
+      });
 
-      if (error) throw error;
       onSuccess();
       onClose();
     } catch (err) {
@@ -94,7 +97,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
             >
               <option value="">Choose Employee...</option>
               {employees.map(emp => (
-                <option key={emp.id} value={emp.id}>{emp.name} ({emp.id})</option>
+                <option key={emp.id || emp["EMPLOYEE ID"]} value={emp.id || emp["EMPLOYEE ID"]}>{emp.name || emp["EMPLOYEE NAME"]} ({emp.id || emp["EMPLOYEE ID"]})</option>
               ))}
             </select>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, StatusBar, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, StatusBar, KeyboardAvoidingView, Platform, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -11,6 +11,7 @@ export default function HelpdeskScreen() {
   const { colors, isDark } = useTheme();
   const { userData } = useAuth();
   
+  const [refreshing, setRefreshing] = useState(false);
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('IT_SUPPORT');
@@ -20,6 +21,11 @@ export default function HelpdeskScreen() {
     { id: 'HR', label: 'HR & Kepegawaian' },
     { id: 'GA', label: 'General Affairs' },
   ];
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
 
   const handleSubmit = () => {
     if (!subject || !description) {
@@ -61,7 +67,13 @@ export default function HelpdeskScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
             <Text style={[styles.formTitle, { color: colors.text }]}>Buat Tiket Baru</Text>
             <Text style={{ fontSize: 11, color: colors.subText, marginBottom: 20 }}>Sampaikan kendala IT, masalah perangkat, atau pertanyaan HRD Anda di sini.</Text>
@@ -147,7 +159,7 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 16 },
   inputLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 0.5, marginBottom: 8 },
   textInput: {
-    height: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, fontSize: 14, fontWeight: '600',
+    minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, fontSize: 14, fontWeight: '600',
   },
   textArea: {
     height: 100, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, fontWeight: '600',
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   submitBtn: {
-    backgroundColor: '#F97316', height: 48, borderRadius: 12, flexDirection: 'row',
+    backgroundColor: '#F97316', minHeight: 48, borderRadius: 12, flexDirection: 'row',
     alignItems: 'center', justifyContent: 'center', marginTop: 10,
     shadowColor: '#F97316', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 4,
   },

@@ -38,10 +38,9 @@ import DigitalSignature from './components/DigitalSignature';
 import OrgChart from './components/OrgChart';
 import AuditTrail from './components/AuditTrail';
 import SalarySimulator from './components/SalarySimulator';
-import TrainingTracker from './components/TrainingTracker';
 import AddEmployeeModal from './components/AddEmployeeModal';
 import BulkUploadModal from './components/BulkUploadModal';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
@@ -97,38 +96,30 @@ const Employees = () => {
     try {
       setLoading(true);
       const fetchSize = viewMode === 'neural' ? 1000 : pageSize;
-      const start = (currentPage - 1) * pageSize;
-      const end = start + fetchSize - 1;
-
-      let query = supabase
-        .from('employees')
-        .select('*, departments(name)', { count: 'exact' });
-
+      let url = `/api/employees?page=${currentPage}&size=${fetchSize}`;
       if (debouncedSearch) {
-        query = query.or(`name.ilike.%${debouncedSearch}%,id.ilike.%${debouncedSearch}%`);
+        url += `&q=${encodeURIComponent(debouncedSearch)}`;
       }
-
-      const { data, count, error } = await query
-        .order('id', { ascending: true })
-        .range(start, end);
-
-      if (error) throw error;
+      
+      const response = await apiClient.get(url);
+      const data = response.data.data || [];
+      const count = response.data.total || 0;
 
       const mappedData = data.map(e => ({
         ...e,
-        "EMPLOYEE ID": e.id || "N/A",
-        "EMPLOYEE NAME": e.name || "Unnamed",
-        "EMAIL": e.email || "-",
-        "Organization Name *": e.organization_name || "Unassigned",
-        "Department Name *": e.departments?.name || "",
-        "Job Position *": e.job_position || "Staff",
-        "Job Level *": e.job_level || "-",
-        "Status *": e.status || "Contract",
-        "Photo": e.photo || null
+        "EMPLOYEE ID": e["EMPLOYEE ID"] || e.id || "N/A",
+        "EMPLOYEE NAME": e["EMPLOYEE NAME"] || e.name || "Unnamed",
+        "EMAIL": e["EMAIL"] || e.email || "-",
+        "Organization Name *": e["Organization Name *"] || e.organization_name || "Unassigned",
+        "Department Name *": e["Department Name *"] || e.departments?.name || "",
+        "Job Position *": e["Job Position *"] || e.job_position || "Staff",
+        "Job Level *": e["Job Level *"] || e.job_level || "-",
+        "Status *": e["Status *"] || e.status || "Contract",
+        "Photo": e["Photo"] || e.photo || null
       }));
 
       setEmployees(mappedData);
-      setTotalEmployees(count || 0);
+      setTotalEmployees(count);
     } catch (error) {
       console.error('Error fetching employees:', error);
     } finally {
@@ -187,14 +178,13 @@ const Employees = () => {
   const handleResignEmployee = async (id) => {
     const resignDate = new Date().toISOString().split('T')[0];
     if (window.confirm('MARK EMPLOYEE AS RESIGNED?')) {
-      // OPTIMISTIC UPDATE: Update local state immediately for zero-latency feel
       const previousEmployees = [...employees];
       setEmployees(prev => prev.map(emp => {
         if (emp.id === id || emp["EMPLOYEE ID"] === id) {
           return { 
             ...emp, 
             status: 'RESIGNED', 
-            "Status *": 'RESIGNED', // Update the specific column used for filtering
+            "Status *": 'RESIGNED',
             is_resigned: true, 
             resign_date: resignDate 
           };
@@ -203,26 +193,10 @@ const Employees = () => {
       }));
 
       try {
-        const updateData = { 
-          status: 'RESIGNED',
-          resign_date: resignDate,
-          is_resigned: true
-        };
-
-        const { error } = await supabase
-          .from('employees')
-          .update(updateData)
-          .eq('id', id);
-          
-        if (error) {
-          const { error: error2 } = await supabase.from('employees').update(updateData).eq('employee_id', id);
-          if (error2) throw error2;
-        }
-        
+        await apiClient.put(`/api/employees/bulk-resign`, { ids: [id] });
         fetchEmployees();
         alert('Employee marked as RESIGNED');
       } catch (error) {
-        // Rollback on error
         setEmployees(previousEmployees);
         console.error('ERROR UPDATING RESIGN STATUS:', error);
         alert('Update failed: ' + error.message);
@@ -237,7 +211,6 @@ const Employees = () => {
       const previousEmployees = [...employees];
       const resignDate = new Date().toISOString().split('T')[0];
 
-      // Optimistic update
       setEmployees(prev => prev.map(emp => {
         if (idArray.includes(emp.id) || idArray.includes(emp["EMPLOYEE ID"])) {
           return { 
@@ -252,22 +225,7 @@ const Employees = () => {
       }));
 
       try {
-        const updateData = { 
-          status: 'RESIGNED',
-          resign_date: resignDate,
-          is_resigned: true
-        };
-        
-        const { error } = await supabase
-          .from('employees')
-          .update(updateData)
-          .in('id', idArray);
-          
-        if (error) {
-          const { error: error2 } = await supabase.from('employees').update(updateData).in('employee_id', idArray);
-          if (error2) throw error2;
-        }
-
+        await apiClient.put(`/api/employees/bulk-resign`, { ids: idArray });
         setSelectedIds(new Set());
         fetchEmployees();
         alert('Bulk Resign completed');
@@ -285,20 +243,10 @@ const Employees = () => {
       const idArray = Array.from(selectedIds);
       const previousEmployees = [...employees];
 
-      // Optimistic update: Remove them from local state
       setEmployees(prev => prev.filter(emp => !idArray.includes(emp.id) && !idArray.includes(emp["EMPLOYEE ID"])));
 
       try {
-        const { error } = await supabase
-          .from('employees')
-          .delete()
-          .in('id', idArray);
-
-        if (error) {
-          const { error: error2 } = await supabase.from('employees').delete().in('employee_id', idArray);
-          if (error2) throw error2;
-        }
-
+        await apiClient.delete(`/api/employees/bulk-delete`, { data: { ids: idArray } });
         setSelectedIds(new Set());
         fetchEmployees();
       } catch (error) {
@@ -326,22 +274,7 @@ const Employees = () => {
       }));
 
       try {
-        const updateData = { 
-          status: 'Permanent',
-          is_resigned: false,
-          resign_date: null
-        };
-
-        const { error } = await supabase
-          .from('employees')
-          .update(updateData)
-          .eq('id', id);
-          
-        if (error) {
-          const { error: error2 } = await supabase.from('employees').update(updateData).eq('employee_id', id);
-          if (error2) throw error2;
-        }
-        
+        await apiClient.put(`/api/employees/bulk-activate`, { ids: [id] });
         fetchEmployees();
         alert('Employee restored to ACTIVE status');
       } catch (error) {
@@ -358,16 +291,7 @@ const Employees = () => {
       setEmployees(prev => prev.filter(emp => emp.id !== id && emp["EMPLOYEE ID"] !== id));
 
       try {
-        const { error } = await supabase
-          .from('employees')
-          .delete()
-          .eq('id', id);
-
-        if (error) {
-          const { error: error2 } = await supabase.from('employees').delete().eq('employee_id', id);
-          if (error2) throw error2;
-        }
-
+        await apiClient.delete(`/api/employees/bulk-delete`, { data: { ids: [id] } });
         fetchEmployees();
         alert('Employee record deleted permanently');
       } catch (error) {

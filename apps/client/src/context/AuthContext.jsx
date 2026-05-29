@@ -1,25 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { apiClient } from '@/lib/apiClient';
 import { hasPermission, PERMISSIONS } from '@/lib/permissions';
 
 const AuthContext = createContext({});
 
-// Fallback to localhost if env is missing
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-
-// Konfigurasi Axios Interceptor Global untuk otomatis menyisipkan JWT Token
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('wkn_auth_token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Konfigurasi API tersentralisasi di apiClient.js
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -48,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const response = await apiClient.post(`/api/auth/login`, {
         username: email,
         password: password
       });
@@ -62,6 +47,7 @@ export const AuthProvider = ({ children }) => {
           username: rawUser.Username,
           fullName: rawUser['Full Name'],
           role: rawUser.Role,
+          permissions: rawUser.permissions || [],
           status: rawUser.Status,
           employee_id: rawUser.employee_id,
           is_field_team: rawUser.is_field_team
@@ -90,7 +76,7 @@ export const AuthProvider = ({ children }) => {
   const can = (permission) => {
     if (!user) return false;
     if (user.role?.toLowerCase() === 'owner') return true;
-    return hasPermission(user.role, permission);
+    return hasPermission(user, permission);
   };
 
   const hasRole = (roles) => {

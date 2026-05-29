@@ -4,9 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../lib/supabaseClient';
+import { apiClient } from '../../lib/apiClient';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function SettingsScreen() {
@@ -52,7 +53,7 @@ export default function SettingsScreen() {
   const measureLatency = async () => {
     const start = Date.now();
     try {
-      await supabase.from('employees').select('id').limit(1);
+      await apiClient.get(''); // Hitting root /api to check latency
       setLatency(Date.now() - start);
     } catch (e) {
       setLatency(null);
@@ -90,36 +91,40 @@ export default function SettingsScreen() {
         const localUser = JSON.parse(sessionData);
         setUserData(localUser);
 
-        // Sync with Supabase for latest data
-        const { data, error } = await supabase
-          .from('employees')
-          .select('*, departments(name)')
-          .eq('id', localUser.id)
-          .single();
-
-        if (data && !error) {
-          const updatedUser = {
-            ...localUser,
-            name: data.name,
-            jabatan: data.job_position,
-            email: data.email,
-            phone: data.phone || '-',
-            join_date: data.join_date || '-',
-            department: data.departments?.name || 'Wijaya KN',
-            last_device_model: data.last_device_model
-          };
-          setUserData(updatedUser);
-          await AsyncStorage.setItem('userSession', JSON.stringify(updatedUser));
+        // Sync with FastAPI for latest data
+        try {
+          const res = await apiClient.get('/employees/me');
+          if (res.status === 'success' && res.data) {
+            const data = res.data;
+            const updatedUser = {
+              ...localUser,
+              name: data.name,
+              jabatan: data.job_position,
+              email: data.email,
+              phone: data.phone || '-',
+              join_date: data.join_date || '-',
+              department: data.departments?.name || 'Wijaya KN',
+              last_device_model: data.last_device_model
+            };
+            setUserData(updatedUser);
+            await AsyncStorage.setItem('userSession', JSON.stringify(updatedUser));
+          }
+        } catch (apiError) {
+          console.log('Error syncing session with API:', apiError);
         }
       }
     } catch (e) {
-      console.log('Error syncing session with Supabase:', e);
+      console.log('Error checking session:', e);
     }
   };
 
   const handleLogout = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await AsyncStorage.removeItem('userSession');
+    try {
+      await SecureStore.deleteItemAsync('authToken');
+      // Intentionally not deleting savedCredentials so biometric login still works
+    } catch (e) {}
     router.replace('/login');
   };
 

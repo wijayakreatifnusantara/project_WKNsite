@@ -5,9 +5,12 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Device from 'expo-device';
-import { supabase } from '../lib/supabaseClient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { useAuth } from '../context/AuthContext';
+import CryptoJS from 'crypto-js';
 
 export default function LoginScreen() {
   const { setUserData } = useAuth();
@@ -40,7 +43,7 @@ export default function LoginScreen() {
     // Auto-trigger Biometric Auth if enabled
     setTimeout(async () => {
       const lockEnabled = await AsyncStorage.getItem('appLockEnabled');
-      const saved = await AsyncStorage.getItem('savedCredentials');
+      const saved = await SecureStore.getItemAsync('savedCredentials');
       if (lockEnabled === 'true' && saved) {
         handleBiometricAuth();
       }
@@ -103,7 +106,7 @@ export default function LoginScreen() {
   };
 
   const handleBiometricAuth = async () => {
-    const saved = await AsyncStorage.getItem('savedCredentials');
+    const saved = await SecureStore.getItemAsync('savedCredentials');
     if (!saved) {
       Alert.alert('Aktivasi Diperlukan', 'Silakan login manual sekali untuk mengaktifkan fitur ini.');
       return;
@@ -120,50 +123,41 @@ export default function LoginScreen() {
     }
   };
 
-  const performManualLogin = async (inputEmail: string, inputPass: string) => {
+  const performManualLogin = async (inputEmail: string, hashedPass: string) => {
     setLoading(true);
     setErrorMsg('');
 
     try {
-      const { data, error } = await supabase
-        .from('employees')
-        .select('id, name, email, mobile_password, status, is_resigned, job_position, is_field_team, working_location')
-        .ilike('email', inputEmail.trim())
-        .single();
-
-      if (error || !data) throw new Error('Email tidak terdaftar');
-      if (data.is_resigned || data.status === 'RESIGNED') throw new Error('Akun dinonaktifkan');
-      if (data.mobile_password !== inputPass) throw new Error('Password salah');
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:8000/api';
+      const response = await fetch(`${apiUrl}/auth/employee/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inputEmail.trim(), password: hashedPass }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok || result.status === 'error') {
+        throw new Error(result.message || 'Gagal login');
+      }
+      
+      const employee = result.employee;
+      const token = result.token;
 
       const userSessionData = {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        jabatan: data.job_position || 'Staff',
-        is_field_team: data.is_field_team || false,
-        working_location: data.working_location || 'Head Office'
+        id: employee.id,
+        name: employee.name,
+        email: employee.email,
+        jabatan: employee.job_position || 'Staff',
+        is_field_team: employee.is_field_team || false,
+        working_location: employee.working_location || 'Head Office'
       };
       
       await AsyncStorage.setItem('userSession', JSON.stringify(userSessionData));
+      await SecureStore.setItemAsync('authToken', token);
       setUserData(userSessionData);
 
-      // Track Device Info for Advanced Security
-      try {
-        const deviceBrand = Device.brand || Device.manufacturer || 'Unknown';
-        const deviceModel = Device.modelName || 'Unknown';
-        const deviceOs = `${Platform.OS} ${Platform.Version}`;
-        
-        await supabase
-          .from('employees')
-          .update({
-            last_device_brand: deviceBrand,
-            last_device_model: deviceModel,
-            last_device_os: deviceOs
-          })
-          .eq('id', data.id);
-      } catch (deviceError) {
-        console.log('Failed to track device info', deviceError);
-      }
+      // Removed direct supabase call for device tracking to ensure no direct DB access
 
       if (rememberMe) {
         await AsyncStorage.setItem('rememberedEmail', inputEmail);
@@ -173,9 +167,9 @@ export default function LoginScreen() {
         await AsyncStorage.setItem('rememberMe', 'false');
       }
 
-      await AsyncStorage.setItem('savedCredentials', JSON.stringify({
+      await SecureStore.setItemAsync('savedCredentials', JSON.stringify({
         email: inputEmail,
-        password: inputPass
+        password: hashedPass
       }));
 
       router.replace('/(tabs)');
@@ -213,7 +207,8 @@ export default function LoginScreen() {
       setErrorMsg('Harap lengkapi semua data');
       return;
     }
-    performManualLogin(email, password);
+    const hashedPass = CryptoJS.SHA256(password).toString();
+    performManualLogin(email, hashedPass);
   };
 
   return (

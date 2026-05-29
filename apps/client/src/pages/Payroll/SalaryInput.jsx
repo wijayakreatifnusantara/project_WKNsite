@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IconDeviceFloppy, IconSearch, IconUser, IconAlertCircle } from "@tabler/icons-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export default function SalaryInput() {
   const [employees, setEmployees] = useState([]);
@@ -47,26 +47,21 @@ export default function SalaryInput() {
   }, []);
 
   const fetchEmployees = async () => {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('id, name, email, job_position')
-      .order('name');
-    if (data) setEmployees(data);
+    const response = await apiClient.get('/api/employees');
+    if (response.data.data) setEmployees(response.data.data);
   };
 
   const handleSelectEmployee = async (emp) => {
     setSelectedEmployee(emp);
     setLoading(true);
     // Fetch their current salary data
-    const { data, error } = await supabase
-      .from('employee_salaries')
-      .select('*')
-      .eq('employee_id', emp.id)
-      .single();
+    try {
+      const { data: res } = await apiClient.get(`/api/payroll/salaries/${emp.id}`);
+      const data = res.data;
 
     if (data) {
       setSalaryData(data);
-    } else {
+    } catch (e) {
       setSalaryData(defaultSalaryData);
     }
     setLoading(false);
@@ -106,16 +101,18 @@ export default function SalaryInput() {
       };
 
       // Check if exists
-      const { data: existing } = await supabase
-        .from('employee_salaries')
-        .select('id')
-        .eq('employee_id', selectedEmployee.id)
-        .single();
+      let existing = null;
+      try {
+        const { data: res } = await apiClient.get(`/api/payroll/salaries/${selectedEmployee.id}`);
+        existing = res.data;
+      } catch (e) {
+        // Not found
+      }
 
-      if (existing) {
-        await supabase.from('employee_salaries').update(payload).eq('id', existing.id);
+      if (existing && existing.id) {
+        await apiClient.put(`/api/payroll/salaries/${existing.id}`, payload);
       } else {
-        await supabase.from('employee_salaries').insert(payload);
+        await apiClient.post('/api/payroll/salaries', payload);
       }
 
       alert('Data Gaji Induk berhasil disimpan ke database!');

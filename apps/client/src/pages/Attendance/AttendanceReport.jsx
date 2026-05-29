@@ -16,7 +16,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 
 const AttendanceReport = () => {
@@ -60,35 +60,25 @@ const AttendanceReport = () => {
   };
 
   const fetchEmployees = async () => {
-    const { data: empData } = await supabase.from('employees').select('id, name').eq('is_resigned', false);
-    setEmployees(empData || []);
+    try {
+      const response = await apiClient.get('/api/employees?size=500');
+      const empData = response.data || [];
+      setEmployees(empData.map(e => ({ id: e['EMPLOYEE ID'], name: e['EMPLOYEE NAME'] })));
+    } catch (err) {
+      console.error('Error fetching employees:', err);
+    }
   };
 
   const fetchReport = async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('attendance')
-        .select(`
-          *,
-          employees (
-            name,
-            id,
-            organization_name,
-            job_position
-          )
-        `)
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date', { ascending: false });
-
+      let url = `/api/attendance/report?start_date=${startDate}&end_date=${endDate}`;
       if (selectedEmployee !== 'ALL') {
-        query = query.eq('employee_id', selectedEmployee);
+        url += `&employee_id=${selectedEmployee}`;
       }
-
-      const { data: attData, error } = await query;
-      if (error) throw error;
-      setData(attData || []);
+      const response = await apiClient.get(url);
+      if (response.status !== 'success') throw new Error('Failed to fetch report');
+      setData(response.data || []);
     } catch (err) {
       console.error("Error fetching report:", err);
     } finally {
@@ -102,11 +92,8 @@ const AttendanceReport = () => {
 
   useEffect(() => {
     fetchReport();
-    const channel = supabase
-      .channel('attendance_report_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => fetchReport())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(() => fetchReport(), 15000);
+    return () => clearInterval(interval);
   }, [startDate, endDate, selectedEmployee]);
 
   const filteredData = data.filter(item => 

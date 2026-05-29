@@ -10,7 +10,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
@@ -65,11 +65,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
         delete record.end_time;
       }
       
-      const { error } = await supabase
-        .from('leave_requests')
-        .insert([record]);
-
-      if (error) throw error;
+      await apiClient.post('/api/leave/request', record);
 
       toast.success("Leave request submitted successfully");
       onSuccess?.();

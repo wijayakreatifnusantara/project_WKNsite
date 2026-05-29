@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { IconCircleCheck, IconClock, IconAlertTriangle, IconActivity } from "@tabler/icons-react";
 import { Loader2 } from "lucide-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 const LiveFeed = ({ loading: parentLoading }) => {
   const [activities, setActivities] = useState([]);
@@ -11,20 +11,10 @@ const LiveFeed = ({ loading: parentLoading }) => {
   const fetchActivities = async () => {
     try {
       setLocalLoading(true);
-      const { data, error } = await supabase
-        .from('attendance')
-        .select(`
-          *,
-          employees (
-            name,
-            id
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(100);
+      const response = await apiClient.get('/api/attendance/live');
+      if (response.status !== 'success') throw new Error('Failed to fetch');
 
-      if (error) throw error;
-
+      const data = response.data;
       const mapped = (data || []).map(item => ({
         name: item.employees?.name || 'Unknown',
         id: item.employees?.id || '-',
@@ -43,11 +33,13 @@ const LiveFeed = ({ loading: parentLoading }) => {
 
   useEffect(() => {
     fetchActivities();
-    const channel = supabase
-      .channel('live_feed_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => fetchActivities())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    
+    // Polling every 10 seconds instead of WebSockets
+    const interval = setInterval(() => {
+      fetchActivities();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const isLoading = parentLoading || localLoading;

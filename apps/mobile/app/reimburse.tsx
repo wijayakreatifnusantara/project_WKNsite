@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, StatusBar, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, StatusBar, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -7,7 +7,8 @@ import * as Haptics from 'expo-haptics';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
-import { supabase } from '../lib/supabaseClient';
+import { apiClient } from '../lib/apiClient';
+import Toast from 'react-native-toast-message';
 
 export default function ReimburseScreen() {
   const { colors, isDark } = useTheme();
@@ -17,6 +18,13 @@ export default function ReimburseScreen() {
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Add logic here to fetch data if there's a list. If none, just wait.
+    setTimeout(() => setRefreshing(false), 1000);
+  };
   
   const handleTakeImage = async (useCamera: boolean) => {
     try {
@@ -86,19 +94,17 @@ export default function ReimburseScreen() {
               const cleanAmount = amount.replace(/[^0-9]/g, '');
               const base64Image = `data:image/jpeg;base64,${file.base64}`;
 
-              const { error } = await supabase.from('reimbursements').insert([{
-                employee_id: userData?.id,
+              const res = await apiClient.post('/submissions/reimburse', {
                 title: description,
                 category: 'Lainnya',
                 amount: parseInt(cleanAmount),
-                status: 'Pending',
                 receipt_image: base64Image
-              }]);
+              });
 
-              if (error) throw error;
+              if (res.status !== 'success') throw new Error(res.message);
 
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              Alert.alert('Berhasil', 'Pengajuan reimburse Anda telah berhasil dikirim.');
+              Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Pengajuan reimburse Anda telah terkirim.' });
               router.back();
             } catch (e: any) {
               console.error(e);
@@ -129,7 +135,13 @@ export default function ReimburseScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
             <Text style={[styles.formTitle, { color: colors.text }]}>Form Klaim Pengeluaran</Text>
             <Text style={{ fontSize: 11, color: colors.subText, marginBottom: 20 }}>Silakan isi data pengeluaran operasional atau medis Anda di bawah ini beserta bukti struk/nota yang sah.</Text>
@@ -217,7 +229,7 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 16 },
   inputLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 0.5, marginBottom: 6 },
   textInput: {
-    height: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, fontSize: 14, fontWeight: '600',
+    minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, fontSize: 14, fontWeight: '600',
   },
   textArea: {
     height: 80, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, fontWeight: '600',
@@ -227,7 +239,7 @@ const styles = StyleSheet.create({
   },
   fileName: { fontSize: 12, fontWeight: '700' },
   submitBtn: {
-    backgroundColor: '#F97316', height: 48, borderRadius: 12, flexDirection: 'row',
+    backgroundColor: '#F97316', minHeight: 48, borderRadius: 12, flexDirection: 'row',
     alignItems: 'center', justifyContent: 'center', marginTop: 10,
     shadowColor: '#F97316', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 4,
   },

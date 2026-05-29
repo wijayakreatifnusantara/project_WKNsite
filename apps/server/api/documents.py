@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from utils.supabase_client import supabase_client
+from utils.jwt_handler import get_current_user
 from typing import List, Dict, Any, Optional
 import os
 
@@ -14,6 +15,20 @@ async def list_documents(category: str = None, employee_id: str = None):
             query = query.eq("category", category)
         if employee_id:
             query = query.eq("employee_id", employee_id)
+            
+        res = query.execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/documents/my-documents")
+async def list_my_documents(category: str = None, current_user: dict = Depends(get_current_user)):
+    """List documents for the current employee"""
+    try:
+        employee_id = current_user.get("employee_id")
+        query = supabase_client.client.table("documents").select("*").eq("employee_id", employee_id)
+        if category:
+            query = query.eq("category", category)
             
         res = query.execute()
         return {"status": "success", "data": res.data}

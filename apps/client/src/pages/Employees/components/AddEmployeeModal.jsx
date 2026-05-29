@@ -21,16 +21,26 @@ import {
   IconEdit,
   IconCamera,
   IconPhoto,
-  IconCircleCheck
+  IconCircleCheck,
+  IconUpload,
+  IconFilePlus,
+  IconAddressBook,
+  IconBuildingBank,
+  IconFileDescription,
+  IconDeviceFloppy,
+  IconChevronRight,
+  IconChevronLeft,
+  IconPlus
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import Tesseract from 'tesseract.js';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IconScan, IconSparkles } from "@tabler/icons-react";
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 
 const InputWrapper = ({ label, icon: Icon, children }) => (
   <div className="space-y-1.5">
@@ -286,41 +296,17 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
     }
   };
 
-  // Auto-generation of ID is handled dynamically when organization is selected.
-
   const generateAutoID = async (orgCode) => {
     const code = (orgCode || 'WKN').toUpperCase();
     try {
-      // Query only the single highest ID starting with the org code to optimize performance
-      const { data, error } = await supabase
-        .from('employees')
-        .select('id')
-        .like('id', `${code}-%`)
-        .not('id', 'like', `${code}-TMP-%`)
-        .order('id', { ascending: false })
-        .limit(1);
-
-      if (error) throw error;
-
-      let maxNum = 0;
-      if (data && data.length > 0) {
-        const item = data[0];
-        const parts = item.id.split('-');
-        if (parts.length > 1) {
-          const num = parseInt(parts[1]);
-          if (!isNaN(num)) {
-            maxNum = num;
-          }
-        }
+      const response = await apiClient.get(`/api/employees/generate-id?org_code=${code}`);
+      if (response.status === 'success') {
+        setFormData(prev => ({ ...prev, employee_id: response.data }));
       }
-
-      const nextNum = maxNum + 1;
-      // We'll use 3-digit padding to match your existing WKN-001 format
-      const nextID = `${code}-${nextNum.toString().padStart(3, '0')}`;
-      setFormData(prev => ({ ...prev, employee_id: nextID }));
-    } catch (err) {
-      console.error('Error generating ID:', err);
-      setFormData(prev => ({ ...prev, employee_id: `${code}-001` }));
+    } catch (error) {
+      console.error('Error generating ID:', error);
+      // Fallback
+      setFormData(prev => ({ ...prev, employee_id: `${code}-TMP-${Math.floor(Math.random() * 1000)}` }));
     }
   };
 
@@ -352,7 +338,21 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
+      // Create user profile in profiles table first via API
+      try {
+        await apiClient.post('/api/auth/profiles', {
+          username: formData.email,
+          full_name: formData.name,
+          password: 'admin', // Default password for new users
+          role: formData.is_field_team ? 'staff' : (formData.job_position?.toLowerCase().includes('manager') ? 'manager' : 'staff'),
+          is_active: true
+        });
+      } catch (err) {
+        console.error('Warning: Failed to create profile:', err);
+      }
+
       const submissionData = { ...formData };
       // Map form's employee_id to database's primary 'id' column for both add and edit
       submissionData.id = formData.employee_id;
@@ -362,6 +362,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       if (!submissionData.mobile_password || submissionData.mobile_password.trim() === '') {
         submissionData.mobile_password = '12345';
       }
+      
+      // Hash password
+      submissionData.mobile_password = CryptoJS.SHA256(submissionData.mobile_password).toString();
 
       Object.keys(submissionData).forEach(key => {
         if (submissionData[key] === '') {
@@ -393,17 +396,12 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         }
 
         // 1. Deactivate the legacy record first (frees up the unique email constraint)
-        const { error: deactivateError } = await supabase
-          .from('employees')
-          .update({
-            is_resigned: true,
-            status: 'MUTASI',
-            resign_date: todayStr,
-            email: mutatedEmail
-          })
-          .eq('id', editData.id);
-
-        if (deactivateError) throw deactivateError;
+        await apiClient.put(`/api/employees/direct/${editData.id}`, {
+          is_resigned: true,
+          status: 'MUTASI',
+          resign_date: todayStr,
+          email: mutatedEmail
+        });
 
         // 2. Create the new record under the new organization
         const newEmployeeData = {
@@ -413,22 +411,14 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
           resign_date: null
         };
 
-        const { error: insertError } = await supabase
-          .from('employees')
-          .insert([newEmployeeData]);
-
-        if (insertError) throw insertError;
+        await apiClient.post('/api/employees/direct', newEmployeeData);
 
       } else {
-        let query;
         if (editData) {
-          query = supabase.from('employees').update(submissionData).eq('id', editData.id);
+          await apiClient.put(`/api/employees/direct/${editData.id}`, submissionData);
         } else {
-          query = supabase.from('employees').insert([submissionData]);
+          await apiClient.post('/api/employees/direct', submissionData);
         }
-
-        const { error } = await query;
-        if (error) throw error;
       }
       
       setSuccess(true);
@@ -618,19 +608,24 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
       const croppedBlob = await processImage(file);
       const fileName = `${formData.employee_id || 'new'}_${Date.now()}.jpg`;
-      const filePath = `avatars/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('employees')
-        .upload(filePath, croppedBlob);
+      // Convert Blob to File
+      const uploadFile = new File([croppedBlob], fileName, { type: 'image/jpeg' });
+      
+      // Use FormData to send file to FastAPI
+      const formPayload = new FormData();
+      formPayload.append('file', uploadFile);
+      formPayload.append('bucket', 'employees');
 
-      if (uploadError) throw uploadError;
+      const response = await apiClient.post('/api/employees/upload', formPayload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('employees')
-        .getPublicUrl(filePath);
+      if (response.status !== 'success') throw new Error('Upload gagal');
 
-      setFormData(prev => ({ ...prev, photo: publicUrl }));
+      setFormData(prev => ({ ...prev, photo: response.publicUrl }));
       alert('Foto berhasil diunggah dengan auto-crop 1:1');
     } catch (error) {
       console.error('Error uploading photo:', error);

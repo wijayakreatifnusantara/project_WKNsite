@@ -16,7 +16,7 @@ import {
 } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 
 const AttendanceRecap = () => {
@@ -93,20 +93,11 @@ const AttendanceRecap = () => {
     try {
       setLoading(true);
       
-      const { data: employees, error: empError } = await supabase
-        .from('employees')
-        .select('id, name, organization_name, job_position')
-        .eq('is_resigned', false);
+      const response = await apiClient.get(`/api/attendance/recap?start_date=${dateRange.start}&end_date=${dateRange.end}`);
+      if (response.status !== 'success') throw new Error('Failed to fetch recap');
 
-      if (empError) throw empError;
-
-      const { data: attendance, error: attError } = await supabase
-        .from('attendance')
-        .select('*')
-        .gte('date', dateRange.start)
-        .lte('date', dateRange.end);
-
-      if (attError) throw attError;
+      const employees = response.data.employees || [];
+      const attendance = response.data.attendance || [];
 
       const processed = employees.map(emp => {
         const logs = attendance.filter(a => a.employee_id === emp.id);
@@ -135,21 +126,13 @@ const AttendanceRecap = () => {
   useEffect(() => {
     fetchRecap();
 
-    // ⚡ AUTO SYNC: Realtime Subscription
-    const channel = supabase
-      .channel('attendance_recap_sync')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'attendance' 
-      }, () => {
-        console.log("⚡ Auto Sync: Data changed, recalculating performance recap...");
-        fetchRecap();
-      })
-      .subscribe();
+    // ⚡ AUTO SYNC: Realtime Polling
+    const interval = setInterval(() => {
+      fetchRecap();
+    }, 15000);
 
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [dateRange]);
 

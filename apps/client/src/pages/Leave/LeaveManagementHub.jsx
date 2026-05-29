@@ -17,7 +17,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LeaveRequestModal from './components/LeaveRequestModal';
@@ -35,23 +35,9 @@ const LeaveManagementHub = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('leave_requests')
-        .select(`
-          *,
-          employees (
-            name,
-            id,
-            organization_name,
-            job_position
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setRequests(data || []);
+      const response = await apiClient.get('/api/leave/requests');
+      // Assume the backend returns them in order, or we sort them here
+      setRequests(response.data.data.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) || []);
     } catch (err) {
       console.error("Error fetching requests:", err);
     } finally {
@@ -61,11 +47,8 @@ const LeaveManagementHub = () => {
 
   const fetchBalances = async () => {
     try {
-      const { data, error } = await supabase
-        .from('leave_balances')
-        .select('*');
-      if (error) throw error;
-      setBalances(data || []);
+      const response = await apiClient.get('/api/leave/balances');
+      setBalances(response.data.data || []);
     } catch (err) {
       console.error("Error fetching balances:", err);
     }
@@ -75,63 +58,24 @@ const LeaveManagementHub = () => {
     fetchRequests();
     fetchBalances();
 
-    const channel = supabase
-      .channel('leave_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leave_requests' }, () => fetchRequests())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leave_balances' }, () => fetchBalances())
-      .subscribe();
+      const interval = setInterval(() => {
+        fetchRequests();
+        fetchBalances();
+      }, 30000); // Polling every 30s instead of websockets for now
 
-    return () => { supabase.removeChannel(channel); };
+    return () => clearInterval(interval);
   }, []);
 
   const handleApprove = async (request, status) => {
     try {
       setLoading(true);
       
-      // 1. Update Request Status
-      const { error: updateError } = await supabase
-        .from('leave_requests')
-        .update({ 
-          status, 
-          approved_by: profile?.employee_id,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', request.id);
-
-      if (updateError) throw updateError;
-
-      // 2. If Approved, Sync with Attendance Table
-      if (status === 'Approved') {
-        const start = new Date(request.start_date);
-        const end = new Date(request.end_date);
-        const attendanceRecords = [];
-
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const dateStr = d.toISOString().split('T')[0];
-          attendanceRecords.push({
-            employee_id: request.employee_id,
-            date: dateStr,
-            status: 'Leave',
-            notes: `Leave: ${request.leave_type} (${request.reason || 'No notes'})`
-          });
-        }
-
-        // Use upsert to prevent duplicates if user already has record
-        const { error: attError } = await supabase
-          .from('attendance')
-          .upsert(attendanceRecords, { onConflict: 'employee_id, date' });
-
-        if (attError) throw attError;
-
-        // 3. Update Balance (if Annual Leave)
-        if (request.leave_type === 'Annual') {
-           const currentBalance = balances.find(b => b.employee_id === request.employee_id)?.annual_leave_balance || 0;
-           await supabase
-            .from('leave_balances')
-            .update({ annual_leave_balance: currentBalance - request.days_count })
-            .eq('employee_id', request.employee_id);
-        }
-      }
+      // 1. Send approval payload to backend
+      // The backend handles PDF regeneration, attendance sync, and balance deduction!
+      await apiClient.patch(`/api/leave/approve/${request.id}`, {
+        status,
+        admin_id: profile?.employee_id || profile?.id
+      });
 
       toast.success(`Request ${status} successfully`);
       fetchRequests();

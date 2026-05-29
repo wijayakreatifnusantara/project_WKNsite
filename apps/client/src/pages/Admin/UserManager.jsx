@@ -23,7 +23,7 @@ import {
   IconEyeOff,
   IconSelector
 } from "@tabler/icons-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { ROLES } from '@/lib/permissions';
 
 const UserManager = () => {
@@ -67,22 +67,14 @@ const UserManager = () => {
     setIsLoading(true);
     try {
       // Fetch Profiles (Users)
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (profilesError) throw profilesError;
-      setUsers(profilesData || []);
+      const profilesRes = await apiClient.get('/api/auth/profiles');
+      setUsers(profilesRes.data.data || []);
 
       // Fetch Employees
-      const { data: employeesData, error: employeesError } = await supabase
-        .from('employees')
-        .select('name, email, employee_id')
-        .order('name', { ascending: true });
-
-      if (employeesError) throw employeesError;
-      setEmployees(employeesData || []);
+      const employeesRes = await apiClient.get('/api/employees');
+      
+      // employee api returns { data, total, page, page_size }
+      setEmployees(employeesRes.data.data || []);
 
     } catch (err) {
       console.error('Error:', err);
@@ -113,14 +105,13 @@ const UserManager = () => {
     }
     setIsActionLoading(true);
     try {
-      const { error } = await supabase.from('profiles').insert([newUser]);
-      if (error) throw error;
+      await apiClient.post('/api/auth/profiles', newUser);
       setMessage({ type: 'success', text: `User ${newUser.username} berhasil didaftarkan!` });
       setNewUser({ username: '', full_name: '', password: '', role: 'staff', is_active: true });
       setShowAddForm(false);
       fetchData(); // Refresh both
     } catch (err) {
-      setMessage({ type: 'error', text: err.message });
+      setMessage({ type: 'error', text: err.response?.data?.detail || err.message });
     } finally {
       setIsActionLoading(false);
     }
@@ -130,21 +121,19 @@ const UserManager = () => {
     e.preventDefault();
     setIsActionLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: editingUser.full_name,
-          role: editingUser.role,
-          password: editingUser.password,
-          is_active: editingUser.is_active
-        })
-        .eq('id', editingUser.id);
-      if (error) throw error;
+      const payload = {
+        full_name: editingUser.full_name,
+        role: editingUser.role,
+        is_active: editingUser.is_active
+      };
+      if (editingUser.password) payload.password = editingUser.password;
+      
+      await apiClient.put(`/api/auth/profiles/${editingUser.id}`, payload);
       setMessage({ type: 'success', text: 'Identitas berhasil diperbarui!' });
       setEditingUser(null);
       fetchData();
     } catch (err) {
-      setMessage({ type: 'error', text: err.message });
+      setMessage({ type: 'error', text: err.response?.data?.detail || err.message });
     } finally {
       setIsActionLoading(false);
     }
@@ -153,11 +142,7 @@ const UserManager = () => {
   const handleToggleStatus = async (user) => {
     setIsActionLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_active: !user.is_active })
-        .eq('id', user.id);
-      if (error) throw error;
+      await apiClient.put(`/api/auth/profiles/${user.id}`, { is_active: !user.is_active });
       fetchData();
     } catch (err) {
       setMessage({ type: 'error', text: 'Gagal merubah status.' });
@@ -170,8 +155,7 @@ const UserManager = () => {
     if (!window.confirm(`Hapus permanen ${username}?`)) return;
     setIsActionLoading(true);
     try {
-      const { error } = await supabase.from('profiles').delete().eq('id', id);
-      if (error) throw error;
+      await apiClient.delete(`/api/auth/profiles/${id}`);
       fetchData();
     } catch (err) {
       setMessage({ type: 'error', text: 'Gagal menghapus.' });

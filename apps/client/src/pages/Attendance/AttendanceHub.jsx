@@ -29,7 +29,6 @@ import { exportDailyAttendance } from './utils/exportAttendance';
 import { Card } from "@/components/ui/card";
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/context/AuthContext';
 
 const AttendanceHub = () => {
@@ -44,15 +43,13 @@ const AttendanceHub = () => {
     fetchTodaySummary();
     fetchTrends(selectedPeriod);
 
-    const channel = supabase
-      .channel('attendance_hub_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => {
-        fetchTodaySummary();
-        fetchTrends(selectedPeriod);
-      })
-      .subscribe();
+    // Polling every 10 seconds for real-time dashboard updates
+    const interval = setInterval(() => {
+      fetchTodaySummary();
+      fetchTrends(selectedPeriod);
+    }, 10000);
 
-    return () => { supabase.removeChannel(channel); };
+    return () => clearInterval(interval);
   }, [selectedPeriod]);
 
   return (

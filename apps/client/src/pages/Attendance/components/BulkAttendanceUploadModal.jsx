@@ -9,7 +9,7 @@ import {
   IconDownload,
   IconLoader2
 } from "@tabler/icons-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { Button } from "@/components/ui/button";
 
 const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
@@ -100,11 +100,8 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
       setError(null);
 
       // 1. Fetch employee mapping to get internal PKs
-      const { data: employeeMap, error: mapError } = await supabase
-        .from('employees')
-        .select('id, employee_id');
-      
-      if (mapError) throw mapError;
+      const response = await apiClient.get('/api/employees');
+      const employeeMap = response.data.data;
 
       const idMap = {};
       employeeMap.forEach(emp => {
@@ -145,11 +142,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
         throw new Error(`The following Employee IDs were not found in the system: ${[...new Set(missingIds)].join(', ')}`);
       }
 
-      const { error: uploadError } = await supabase
-        .from('attendance')
-        .insert(formattedData);
-
-      if (uploadError) throw uploadError;
+      await apiClient.post('/api/attendance/bulk-insert', formattedData);
 
       setSuccess(true);
       setTimeout(() => {

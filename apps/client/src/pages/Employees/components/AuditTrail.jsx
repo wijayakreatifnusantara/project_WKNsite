@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiClient } from '@/lib/apiClient';
 import { 
   IconHistory, 
   IconX, 
@@ -15,57 +16,36 @@ const AuditTrail = ({ isOpen, onClose, employee }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [logs, setLogs] = useState([]);
 
+  const fetchAuditLogs = async () => {
+    if (!employee) return;
+    try {
+      const response = await apiClient.get(`/api/rbac/audit-logs?target_user_id=${employee["EMPLOYEE ID"]}`);
+      if (response.status === 'success' && response.data) {
+        // Map backend logs to frontend format
+        const mappedLogs = response.data.map((log, index) => ({
+          id: log.id,
+          action: log.action,
+          actor: log.profiles?.full_name || 'System / Admin',
+          timestamp: new Date(log.created_at).toLocaleString('sv-SE').replace('T', ' '),
+          icon: <IconHistory size={16} />,
+          color: 'text-blue-500',
+          changes: log.details && typeof log.details === 'object' ? Object.keys(log.details).map(k => ({
+            field: k,
+            from: '-',
+            to: String(log.details[k])
+          })) : [{ field: 'Details', from: '-', to: String(log.details || 'No details') }]
+        }));
+        setLogs(mappedLogs);
+      }
+    } catch (error) {
+      console.error('Error fetching audit logs for employee:', error);
+      setLogs([]);
+    }
+  };
+
   useEffect(() => {
     if (employee) {
-      // Mocking Audit Data
-      const mockLogs = [
-        {
-          id: 1,
-          action: 'Record Updated',
-          actor: 'Adi Anto (Admin)',
-          timestamp: '2024-05-02 14:20:05',
-          icon: <IconUserEdit size={16} />,
-          color: 'text-blue-500',
-          changes: [
-            { field: 'Job Position', from: 'Junior Engineer', to: 'Senior Systems Engineer' },
-            { field: 'Salary Grade', from: 'G3', to: 'G5' }
-          ]
-        },
-        {
-          id: 2,
-          action: 'Database Sync',
-          actor: 'System Automated',
-          timestamp: '2024-05-01 09:00:00',
-          icon: <IconRefresh size={16} />,
-          color: 'text-green-500',
-          changes: [
-            { field: 'Sync Status', from: 'Pending', to: 'Synchronized' }
-          ]
-        },
-        {
-          id: 3,
-          action: 'Digital E-Sign Executed',
-          actor: employee["EMPLOYEE NAME"],
-          timestamp: '2024-04-28 16:45:12',
-          icon: <IconSignature size={16} />,
-          color: 'text-orange-500',
-          changes: [
-            { field: 'Document Status', from: 'Draft', to: 'Legally Signed' }
-          ]
-        },
-        {
-          id: 4,
-          action: 'ID Card Generated',
-          actor: 'Adi Anto (Admin)',
-          timestamp: '2024-04-15 11:30:22',
-          icon: <IconId size={16} />,
-          color: 'text-purple-500',
-          changes: [
-            { field: 'Asset Status', from: 'None', to: 'ID Issued' }
-          ]
-        }
-      ];
-      setLogs(mockLogs);
+      fetchAuditLogs();
     }
   }, [employee]);
 

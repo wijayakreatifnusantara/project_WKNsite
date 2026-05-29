@@ -9,8 +9,8 @@ import {
   IconLoader2
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
+import { apiClient } from '@/lib/apiClient';
 
 const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employment Contract 2024", onSuccess }) => {
   const canvasRef = useRef(null);
@@ -112,32 +112,29 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
       const res = await fetch(dataUrl);
       const blob = await res.blob();
       
-      // Upload to Supabase Storage
+      // Upload to FastAPI
       const empId = employee.id || employee["EMPLOYEE ID"];
-      const fileName = `signatures/sig_${empId}_${Date.now()}.png`;
+      const fileName = `sig_${empId}_${Date.now()}.png`;
       
-      const { error: uploadError } = await supabase.storage
-        .from('employees')
-        .upload(fileName, blob, { contentType: 'image/png', upsert: true });
-        
-      if (uploadError) throw uploadError;
+      const file = new File([blob], fileName, { type: 'image/png' });
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('bucket', 'employees');
       
-      const { data: { publicUrl } } = supabase.storage
-        .from('employees')
-        .getPublicUrl(fileName);
+      const response = await apiClient.post('/api/employees/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      if (response.status !== 'success') throw new Error('Upload gagal');
+      const publicUrl = response.publicUrl;
         
-      // Update database
-      const { error: updateError } = await supabase
-        .from('employees')
-        .update({ signature_url: publicUrl })
-        .eq('id', empId);
-        
-      if (updateError) {
-        const { error: updateError2 } = await supabase
-          .from('employees')
-          .update({ signature_url: publicUrl })
-          .eq('employee_id', empId);
-        if (updateError2) throw updateError2;
+      // Update database using direct endpoint
+      const updateRes = await apiClient.put(`/api/employees/direct/${empId}`, { 
+        signature_url: publicUrl 
+      });
+      
+      if (updateRes.status !== 'success') {
+        throw new Error('Gagal memperbarui database');
       }
       
       toast.success("Tanda tangan elektronik berhasil disimpan!");

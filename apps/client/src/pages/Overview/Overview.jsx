@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zap, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import AnalyticsGrid from './components/AnalyticsGrid';
 import { generateExecutiveReport } from './utils/exportReport';
 import { toast } from 'sonner';
@@ -25,23 +25,9 @@ const Overview = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('employees')
-        .select('*');
-      
-      if (error) throw error;
-      // Map for compatibility with legacy components
-      const mappedData = (data || []).map(e => ({
-        ...e,
-        "EMPLOYEE ID": e.employee_id || e.id,
-        "EMPLOYEE NAME": e.name,
-        "EMAIL": e.email,
-        "Status *": e.status,
-        "Organization Name *": e.organization_name,
-        "Gaji Pokok *": e.base_salary,
-        "JOIN DATE": e.join_date
-      }));
-      setEmployees(mappedData);
+      const response = await apiClient.get('/api/employees?size=500');
+      // Data is already mapped by backend
+      setEmployees(response.data || []);
     } catch (error) {
       console.error('Error fetching analytics data:', error);
     } finally {

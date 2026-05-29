@@ -21,8 +21,8 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
     [selectedEmpId, employees]
   );
 
-  // Mock data for base salary if not in record
-  const baseSalary = 7500000; 
+  // Use actual base salary from selected employee record
+  const baseSalary = selectedEmp?.["Gaji Pokok *"] || 7500000; 
   
   const calculations = useMemo(() => {
     const current = baseSalary;

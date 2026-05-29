@@ -9,7 +9,7 @@ import {
   IconCheck
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate, onSuccess }) => {
@@ -69,17 +69,18 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
       let error;
       if (record && record.id) {
         // Update
-        const { error: updateError } = await supabase
-          .from('attendance')
-          .update(payload)
-          .eq('id', record.id);
-        error = updateError;
+        try {
+          await apiClient.put(`/api/attendance/direct/${record.id}`, payload);
+        } catch (e) {
+          error = e;
+        }
       } else {
         // Insert
-        const { error: insertError } = await supabase
-          .from('attendance')
-          .insert([payload]);
-        error = insertError;
+        try {
+          await apiClient.post('/api/attendance/direct', payload);
+        } catch (e) {
+          error = e;
+        }
       }
 
       if (error) {
@@ -107,12 +108,11 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
 
     try {
       setDeleting(true);
-      const { error } = await supabase
-        .from('attendance')
-        .delete()
-        .eq('id', record.id);
-
-      if (error) throw error;
+      try {
+        await apiClient.delete(`/api/attendance/direct/${record.id}`); // Assuming a delete endpoint exists or we'll create it
+      } catch (e) {
+        throw e;
+      }
 
       toast.success('Attendance record deleted');
       onSuccess();

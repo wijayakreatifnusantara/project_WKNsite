@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export const useCareerPortal = () => {
   const [jobs, setJobs] = useState([]);
@@ -11,14 +11,10 @@ export const useCareerPortal = () => {
       setLoading(true);
       setError(null);
       
-      const { data, error: fetchError } = await supabase
-        .from('job_postings')
-        .select('*')
-        .eq('status', 'Active')
-        .order('created_at', { ascending: false });
+      const response = await apiClient.get('/api/recruitment/public/jobs');
 
-      if (fetchError) throw fetchError;
-      setJobs(data || []);
+      if (response.status !== 'success') throw new Error('Failed to fetch jobs');
+      setJobs(response.data || []);
       
     } catch (err) {
       console.error('Error fetching jobs:', err);
@@ -30,18 +26,15 @@ export const useCareerPortal = () => {
 
   const submitApplication = async (applicationData) => {
     try {
-      const { error } = await supabase
-        .from('job_applicants')
-        .insert([{
-          job_id: applicationData.job_id,
-          name: applicationData.name,
-          email: applicationData.email,
-          phone: applicationData.phone,
-          resume_url: applicationData.resume_url,
-          status: 'New'
-        }]);
+      const response = await apiClient.post('/api/recruitment/public/apply', {
+        job_id: applicationData.job_id,
+        name: applicationData.name,
+        email: applicationData.email,
+        phone: applicationData.phone,
+        resume_url: applicationData.resume_url
+      });
 
-      if (error) throw error;
+      if (response.status !== 'success') throw new Error('Application submission failed');
       return { success: true };
     } catch (err) {
       console.error('Error submitting application:', err);

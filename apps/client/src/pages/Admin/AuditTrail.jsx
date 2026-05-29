@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 
 const AuditTrail = () => {
@@ -27,15 +27,14 @@ const AuditTrail = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      let query = supabase.from('audit_logs').select('*, profiles(full_name)').order('created_at', { ascending: false });
-      
-      if (selectedModule !== 'All') {
-        query = query.eq('module', selectedModule);
+      const response = await apiClient.get('/api/rbac/audit-logs');
+      if (response.status === 'success') {
+        let logData = response.data || [];
+        if (selectedModule !== 'All') {
+          logData = logData.filter(log => log.module === selectedModule);
+        }
+        setLogs(logData);
       }
-
-      const { data, error } = await query.limit(50);
-      if (error) throw error;
-      setLogs(data || []);
     } catch (err) {
       console.error("Error fetching audit logs:", err);
     } finally {

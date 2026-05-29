@@ -8,7 +8,7 @@ import {
   IconAlertTriangle,
   IconDownload
 } from "@tabler/icons-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import * as XLSX from 'xlsx';
 
 const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
@@ -85,11 +85,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
           const chunkSize = 50;
           for (let i = 0; i < mappedData.length; i += chunkSize) {
             const chunk = mappedData.slice(i, i + chunkSize);
-            const { error: insertError } = await supabase
-              .from('employees')
-              .insert(chunk);
-
-            if (insertError) throw insertError;
+            const { data } = await apiClient.post('/api/employees/bulk-insert', chunk);
             setProgress(prev => ({ ...prev, current: Math.min(i + chunkSize, data.length) }));
           }
 

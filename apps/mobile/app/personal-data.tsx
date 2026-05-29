@@ -251,10 +251,9 @@ const styles = StyleSheet.create({
   editForm: { gap: 15 },
   inputGroup: { gap: 6 },
   inputLabel: { fontSize: 10, fontWeight: '800', color: '#8E8E93', letterSpacing: 0.5, marginLeft: 4 },
-  input: { backgroundColor: '#F8F9FB', height: 48, borderRadius: 12, paddingHorizontal: 16, fontSize: 14, fontWeight: '600', color: '#1C1C1E', borderWidth: 1, borderColor: '#E5E7EB' },
+  input: { backgroundColor: '#F8F9FB', minHeight: 48, borderRadius: 12, paddingHorizontal: 16, fontSize: 14, fontWeight: '600', color: '#1C1C1E', borderWidth: 1, borderColor: '#E5E7EB' },
   actionRow: { flexDirection: 'row', gap: 10, marginTop: 10 },
-  cancelBtn: { flex: 1, height: 48, borderRadius: 12, backgroundColor: '#F2F2F7', justifyContent: 'center', alignItems: 'center' },
-  cancelBtnText: { color: '#8E8E93', fontSize: 14, fontWeight: '700' },
-  saveBtn: { flex: 2, height: 48, borderRadius: 12, backgroundColor: '#F97316', justifyContent: 'center', alignItems: 'center', shadowColor: '#F97316', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
+  cancelBtn: { flex: 1, minHeight: 48, borderRadius: 12, backgroundColor: '#F2F2F7', justifyContent: 'center', alignItems: 'center' },
+  saveBtn: { flex: 2, minHeight: 48, borderRadius: 12, backgroundColor: '#F97316', justifyContent: 'center', alignItems: 'center', shadowColor: '#F97316', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
   saveBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' }
 });

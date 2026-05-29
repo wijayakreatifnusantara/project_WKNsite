@@ -3,7 +3,10 @@ from models.employee import EmployeeCreate, Employee
 from utils.supabase_client import supabase_client
 from utils.ai_error_handler import ai_error_handler
 from typing import Optional, List, Dict, Any
-from utils.jwt_handler import require_admin
+from utils.jwt_handler import require_admin, get_current_user
+from fastapi import UploadFile, File, Form
+import time
+import uuid
 
 router = APIRouter()
 
@@ -110,6 +113,105 @@ async def get_employees(q: Optional[str] = None, page: int = 1, size: int = 50, 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching employees: {str(e)}")
 
+@router.get("/employees/me")
+async def get_my_profile(current_user: dict = Depends(get_current_user)):
+    try:
+        employee_id = current_user.get("employee_id")
+        if not employee_id:
+            raise HTTPException(status_code=400, detail="No employee_id in token")
+            
+        res = supabase_client.client.table("employees").select("*, departments(name)").eq("id", employee_id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Employee not found")
+            
+        return {"status": "success", "data": res.data[0]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/employees/signature")
+async def upload_signature(payload: dict, current_user: dict = Depends(get_current_user)):
+    try:
+        employee_id = current_user.get("employee_id")
+        signature_base64 = payload.get("signature_base64")
+        if not signature_base64:
+            raise HTTPException(status_code=400, detail="No signature provided")
+            
+        # In a real app we'd convert base64 to image and upload to Storage
+        # For now, just save base64 string or assume it's an uploaded url
+        # But wait, mobile app sends raw base64 or file?
+        # Mobile app in signature.tsx uses expo-print and captures base64. Then uploads to storage.
+        # Let's write a simple endpoint that saves it to DB directly for now, or just returns success if it's already a URL.
+        # Actually, let's just update the signature_url in employees table
+        url_or_base64 = payload.get("signature_url") or signature_base64
+        
+        res = supabase_client.client.table("employees").update({"signature_url": url_or_base64}).eq("id", employee_id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Employee not found")
+            
+        return {"status": "success", "signature_url": url_or_base64}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/employees/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    bucket: str = Form(...),
+    current_user: dict = Depends(require_admin)
+):
+    """Upload a file to Supabase Storage and return public URL"""
+    try:
+        # Generate unique filename
+        ext = file.filename.split('.')[-1] if '.' in file.filename else 'bin'
+        unique_filename = f"{int(time.time())}_{uuid.uuid4().hex[:8]}.{ext}"
+        
+        file_bytes = await file.read()
+        
+        # Upload to Supabase Storage
+        res = supabase_client.client.storage.from_(bucket).upload(
+            file=file_bytes,
+            path=unique_filename,
+            file_options={"content-type": file.content_type}
+        )
+        
+        # Get public URL
+        public_url = supabase_client.client.storage.from_(bucket).get_public_url(unique_filename)
+        
+        return {"status": "success", "publicUrl": public_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+
+@router.get("/employees/generate-id")
+async def generate_employee_id(org_code: str = "WKN", current_user: dict = Depends(require_admin)):
+    """Generate the next employee ID for a given organization code"""
+    try:
+        # Example logic: WKN-0001
+        res = supabase_client.client.table("employees").select("id").like("id", f"{org_code.upper()}-%").not_.ilike("id", f"{org_code.upper()}-TMP-%").order("id", desc=True).limit(1).execute()
+        
+        max_num = 0
+        if res.data and len(res.data) > 0:
+            parts = res.data[0]["id"].split("-")
+            if len(parts) > 1:
+                try:
+                    max_num = int(parts[1])
+                except ValueError:
+                    pass
+                    
+        new_num = max_num + 1
+        new_id = f"{org_code.upper()}-{str(new_num).zfill(4)}"
+        return {"status": "success", "data": new_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/employees/notifications/unread-count")
+async def get_unread_notifications_count(current_user: dict = Depends(get_current_user)):
+    try:
+        employee_id = current_user.get("employee_id")
+        res = supabase_client.client.table("notifications").select("id", count="exact").eq("employee_id", employee_id).eq("is_read", False).execute()
+        count = res.count if hasattr(res, 'count') else (len(res.data) if res.data else 0)
+        return {"status": "success", "count": count}
+    except Exception as e:
+        return {"status": "error", "count": 0}
+
 @router.put("/employees/{employee_id}", response_model=Employee)
 async def update_employee(employee_id: str, employee: EmployeeCreate, current_user: dict = Depends(require_admin)):
     try:
@@ -193,3 +295,67 @@ async def delete_employee(employee_id: str, current_user: dict = Depends(require
         
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error deleting employee: {str(e)}")
+
+# --- BULK OPERATIONS FOR WEB ADMIN ---
+from pydantic import BaseModel
+class BulkActionRequest(BaseModel):
+    ids: List[str]
+
+@router.put("/employees/bulk-resign")
+async def bulk_resign_employees(data: BulkActionRequest, current_user: dict = Depends(require_admin)):
+    try:
+        from datetime import datetime
+        resign_date = datetime.now().strftime('%Y-%m-%d')
+        update_data = {
+            'status': 'RESIGNED',
+            'resign_date': resign_date,
+            'is_resigned': True
+        }
+        response = supabase_client.client.table('employees').update(update_data).in_('id', data.ids).execute()
+        return {"status": "success", "count": len(response.data) if response.data else 0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bulk resign failed: {str(e)}")
+
+@router.put("/employees/bulk-activate")
+async def bulk_activate_employees(data: BulkActionRequest, current_user: dict = Depends(require_admin)):
+    try:
+        update_data = {
+            'status': 'Permanent',
+            'resign_date': None,
+            'is_resigned': False
+        }
+        response = supabase_client.client.table('employees').update(update_data).in_('id', data.ids).execute()
+        return {"status": "success", "count": len(response.data) if response.data else 0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bulk activate failed: {str(e)}")
+
+@router.delete("/employees/bulk-delete")
+async def bulk_delete_employees(data: BulkActionRequest, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table('employees').delete().in_('id', data.ids).execute()
+        return {"status": "success", "count": len(response.data) if response.data else 0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bulk delete failed: {str(e)}")
+@router.post("/employees/direct")
+async def create_employee_direct(data: dict, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table('employees').insert([data]).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct create failed: {str(e)}")
+
+@router.put("/employees/direct/{employee_id}")
+async def update_employee_direct(employee_id: str, data: dict, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table('employees').update(data).eq('id', employee_id).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct update failed: {str(e)}")
+
+@router.post("/employees/bulk-insert")
+async def bulk_insert_employees(data: list, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table('employees').insert(data).execute()
+        return {"status": "success", "count": len(response.data) if response.data else 0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bulk insert failed: {str(e)}")

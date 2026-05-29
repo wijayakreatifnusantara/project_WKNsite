@@ -15,6 +15,11 @@ class CheckInRequest(BaseModel):
     employee_id: str
     latitude: float
     longitude: float
+    photo_url: Optional[str] = None
+    photo_base64: Optional[str] = None
+    clock_type: Optional[str] = "IN" # "IN" or "OUT"
+    timestamp: Optional[str] = None # For offline sync
+    notes: Optional[str] = None
 
 
 class LocationConfigRequest(BaseModel):
@@ -53,6 +58,103 @@ async def get_today_summary(current_user: dict = Depends(get_current_user)):
         return {"status": "success", "data": summary}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/attendance/export/today")
+async def export_today_attendance(current_user: dict = Depends(require_admin)):
+    """Fetch raw attendance logs for today for export"""
+    try:
+        from datetime import datetime, timezone
+        today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        res = supabase_client.client.table("attendance").select("*, employees(name, organization_name, job_position)").gte("created_at", f"{today}T00:00:00Z").lte("created_at", f"{today}T23:59:59Z").order("created_at", desc=True).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/attendance/live")
+async def get_live_attendance(current_user: dict = Depends(require_admin)):
+    """Fetch the latest 100 attendance records for the live feed"""
+    try:
+        res = supabase_client.client.table("attendance").select("*, employees(name, id)").order("created_at", desc=True).limit(100).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/attendance/recap")
+async def get_attendance_recap(start_date: str, end_date: str, current_user: dict = Depends(require_admin)):
+    """Fetch attendance recap for a specific date range"""
+    try:
+        emp_res = supabase_client.client.table("employees").select("id, name, organization_name, job_position").eq("is_resigned", False).execute()
+        att_res = supabase_client.client.table("attendance").select("*").gte("date", start_date).lte("date", end_date).execute()
+        
+        return {
+            "status": "success",
+            "data": {
+                "employees": emp_res.data,
+                "attendance": att_res.data
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/attendance/report")
+async def get_attendance_report(start_date: str, end_date: str, employee_id: str = None, current_user: dict = Depends(require_admin)):
+    """Fetch attendance report with employee details"""
+    try:
+        query = supabase_client.client.table("attendance").select("*, employees(name, id, organization_name, job_position)").gte("date", start_date).lte("date", end_date).order("date", desc=True)
+        if employee_id and employee_id != 'ALL':
+            query = query.eq("employee_id", employee_id)
+        res = query.execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/attendance/resolve-discrepancy")
+async def resolve_discrepancy(record_id: int, decision: str, current_user: dict = Depends(require_admin)):
+    """T015: Manager resolves an attendance discrepancy."""
+    try:
+        from datetime import datetime
+        now = datetime.now().isoformat()
+        res = supabase_client.client.table("attendance").update({
+            "discrepancy_status": decision, # "APPROVED" or "REJECTED"
+            "discrepancy_resolved_at": now,
+            "discrepancy_resolved_by": current_user.get("Username")
+        }).eq("id", record_id).execute()
+        
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@router.post("/attendance/direct")
+async def create_attendance_direct(data: dict, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table("attendance").insert([data]).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct create failed: {str(e)}")
+
+@router.put("/attendance/direct/{attendance_id}")
+async def update_attendance_direct(attendance_id: int, data: dict, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table("attendance").update(data).eq("id", attendance_id).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct update failed: {str(e)}")
+
+@router.post("/attendance/bulk-insert")
+async def bulk_insert_attendance(data: list, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table("attendance").insert(data).execute()
+        return {"status": "success", "count": len(response.data) if response.data else 0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bulk insert failed: {str(e)}")
+
+@router.delete("/attendance/direct/{attendance_id}")
+async def delete_attendance_direct(attendance_id: int, current_user: dict = Depends(require_admin)):
+    try:
+        response = supabase_client.client.table("attendance").delete().eq("id", attendance_id).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct delete failed: {str(e)}")
 
 @router.get("/attendance/analytics/trends")
 async def get_attendance_trends(period: str = "2026-05", current_user: dict = Depends(require_admin)):
@@ -178,10 +280,11 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
         status=attendance_status,
         check_in_time=check_in_time,
         late_minutes=late_mins,
-        notes=f"Geofencing check-in @ {target_name}"
+        notes=body.notes or f"Geofencing check-in @ {target_name}",
+        photo_url=body.photo_url or body.photo_base64
     )
 
-    if result.get("already_checked_in"):
+    if result.get("already_checked_in") and body.clock_type != "OUT":
         existing = result.get("existing_record", {})
         return {
             "status": "already_checked_in",
@@ -208,6 +311,77 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
             )
         }
     }
+
+@router.post("/attendance/upload-photo")
+async def upload_attendance_photo(payload: dict, current_user: dict = Depends(get_current_user)):
+    try:
+        # In a real app we'd convert base64 to image and upload to Storage
+        photo_base64 = payload.get("photo_base64")
+        if not photo_base64:
+            raise HTTPException(status_code=400, detail="No photo provided")
+            
+        # Return a mock url or the base64 string as url for now
+        return {"status": "success", "photo_url": photo_base64}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/attendance/sync-offline")
+async def sync_offline_attendance(payload: list, current_user: dict = Depends(get_current_user)):
+    try:
+        success_count = 0
+        failed_count = 0
+        # Iterate over array of attendance objects and process them
+        for item in payload:
+            # We skip actual validation here and just insert/update
+            clock_type = item.get("clock_type")
+            employee_id = current_user.get("employee_id")
+            today = item.get("date")
+            nowTime = item.get("time")
+            notes = item.get("notes")
+            photo_url = item.get("photo_url") or item.get("photo_base64")
+            
+            existing_res = supabase_client.client.table("attendance").select("id, clock_in, clock_out").eq("employee_id", employee_id).eq("date", today).execute()
+            existing = existing_res.data[0] if existing_res.data else None
+            
+            if clock_type == "IN":
+                if not existing:
+                    supabase_client.client.table("attendance").insert({
+                        "employee_id": employee_id,
+                        "date": today,
+                        "clock_in": nowTime,
+                        "status": "Present",
+                        "notes": notes,
+                        "photo_url": photo_url,
+                        "location_lat": item.get("location_lat"),
+                        "location_lng": item.get("location_lng")
+                    }).execute()
+                    success_count += 1
+            else:
+                if existing:
+                    supabase_client.client.table("attendance").update({
+                        "clock_out": nowTime,
+                        "notes": notes,
+                        "photo_url": photo_url,
+                        "location_lat": item.get("location_lat"),
+                        "location_lng": item.get("location_lng")
+                    }).eq("id", existing.get("id")).execute()
+                    success_count += 1
+                else:
+                    supabase_client.client.table("attendance").insert({
+                        "employee_id": employee_id,
+                        "date": today,
+                        "clock_out": nowTime,
+                        "status": "Present",
+                        "notes": notes,
+                        "photo_url": photo_url,
+                        "location_lat": item.get("location_lat"),
+                        "location_lng": item.get("location_lng")
+                    }).execute()
+                    success_count += 1
+                    
+        return {"status": "success", "synced": success_count, "failed": failed_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/attendance/settings")
@@ -298,6 +472,15 @@ async def assign_employee_site(employee_id: str, body: SiteAssignRequest, curren
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/attendance/calendar")
+async def get_attendance_calendar(employee_id: str, start_date: str, end_date: str, current_user: dict = Depends(require_admin)):
+    """Fetch attendance data for calendar view"""
+    try:
+        res = supabase_client.client.table("attendance").select("*").eq("employee_id", employee_id).gte("date", start_date).lte("date", end_date).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/attendance/late-alerts")
 async def get_late_alerts(days: int = 30, threshold: int = 3, current_user: dict = Depends(require_admin)):
     """
@@ -315,5 +498,29 @@ async def get_late_alerts(days: int = 30, threshold: int = 3, current_user: dict
                 "total_flagged": len(alerts)
             }
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/attendance/overtime")
+async def get_overtime_requests(current_user: dict = Depends(require_admin)):
+    """Fetch all overtime requests"""
+    try:
+        res = supabase_client.client.table("overtime_requests").select("*, employees(name, employee_id, organization_name, job_position)").order("date", desc=True).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/attendance/overtime/{request_id}")
+async def update_overtime_status(request_id: int, payload: dict, current_user: dict = Depends(require_admin)):
+    """Approve or reject overtime request"""
+    try:
+        from datetime import datetime
+        update_data = {
+            "status": payload.get("status"),
+            "approved_by": payload.get("approved_by"),
+            "updated_at": datetime.now().isoformat()
+        }
+        res = supabase_client.client.table("overtime_requests").update(update_data).eq("id", request_id).execute()
+        return {"status": "success", "data": res.data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

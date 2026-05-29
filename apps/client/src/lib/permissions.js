@@ -38,49 +38,9 @@ export const PERMISSIONS = {
   MANAGE_ATTENDANCE: 'manage_attendance'
 };
 
-const ROLE_PERMISSIONS = {
-  [ROLES.OWNER]: Object.values(PERMISSIONS), // Owner has ALL permissions
-  
-  [ROLES.ADMIN]: [
-    PERMISSIONS.VIEW_WORKFORCE,
-    PERMISSIONS.MANAGE_WORKFORCE,
-    PERMISSIONS.VIEW_DOSSIER,
-    PERMISSIONS.VIEW_TREASURY,
-    PERMISSIONS.MANAGE_PAYROLL,
-    PERMISSIONS.VIEW_REVENUE,
-    PERMISSIONS.VIEW_CRM,
-    PERMISSIONS.MANAGE_PIPELINE,
-    PERMISSIONS.ACCESS_ADMIN_PANEL,
-    PERMISSIONS.MANAGE_USERS,
-    PERMISSIONS.VIEW_AUDIT_TRAIL,
-    PERMISSIONS.CAN_CHECK_IN,
-    PERMISSIONS.VIEW_ATTENDANCE_REPORTS,
-    PERMISSIONS.MANAGE_ATTENDANCE
-  ],
-  
-  [ROLES.MANAGER]: [
-    PERMISSIONS.VIEW_WORKFORCE,
-    PERMISSIONS.VIEW_DOSSIER,
-    PERMISSIONS.VIEW_TREASURY,
-    PERMISSIONS.VIEW_REVENUE,
-    PERMISSIONS.VIEW_CRM,
-    PERMISSIONS.MANAGE_PIPELINE,
-    PERMISSIONS.CAN_CHECK_IN,
-    PERMISSIONS.VIEW_ATTENDANCE_REPORTS
-  ],
-  
-  [ROLES.STAFF]: [
-    PERMISSIONS.VIEW_WORKFORCE,
-    PERMISSIONS.VIEW_CRM,
-    PERMISSIONS.CAN_CHECK_IN
-  ]
-};
 
-/**
- * Validates if a specific role has the required permission.
- */
-export const hasPermission = (role, permission) => {
-  if (!role) return false;
-  const userPermissions = ROLE_PERMISSIONS[role.toLowerCase()] || [];
-  return userPermissions.includes(permission);
+
+export const hasPermission = (user, permission) => {
+  if (!user || !user.permissions) return false;
+  return user.permissions.includes(permission);
 };

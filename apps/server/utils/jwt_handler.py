@@ -55,6 +55,7 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> dic
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         role: str = payload.get("role")
+        permissions: list = payload.get("permissions", [])
         employee_id: str = payload.get("employee_id")
         is_field_team: bool = payload.get("is_field_team", False)
         
@@ -64,6 +65,7 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> dic
         return {
             "username": username,
             "role": role,
+            "permissions": permissions,
             "employee_id": employee_id,
             "is_field_team": is_field_team
         }

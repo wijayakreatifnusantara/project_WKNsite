@@ -20,6 +20,20 @@ async def get_leave_requests(status: str = None, current_user: dict = Depends(re
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/leave/my-requests")
+async def get_my_leave_requests(status: str = None, current_user: dict = Depends(get_current_user)):
+    """Fetch all leave requests for the current employee"""
+    try:
+        employee_id = current_user.get("employee_id")
+        query = supabase_client.client.table("leave_requests").select("*").eq("employee_id", employee_id)
+        if status:
+            query = query.eq("status", status)
+        
+        res = query.execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/leave/balances")
 async def get_leave_balances(current_user: dict = Depends(require_admin)):
     """Fetch leave balances for all employees (Admin only)"""
@@ -48,6 +62,18 @@ async def create_leave_request(payload: Dict[str, Any], current_user: dict = Dep
         
         # Calculate days
         days = calculate_working_days(start_date, end_date)
+        
+        # VALIDASI BISNIS: Tolak jika jumlah hari kerja 0 (misal: pengajuan hanya di akhir pekan)
+        if days <= 0:
+            raise HTTPException(
+                status_code=400, 
+                detail="Pengajuan ditolak. Rentang tanggal yang dipilih tidak memiliki hari kerja aktif."
+            )
+        
+        # Force these fields so the client cannot tamper with them
+        payload.pop("days_count", None)
+        payload.pop("status", None)
+        payload.pop("applied_at", None)
         
         record = {
             **payload,
@@ -168,3 +194,19 @@ async def approve_leave_request(request_id: str, payload: Dict[str, Any], curren
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/leave/direct/{request_id}")
+async def update_leave_direct(request_id: int, data: dict, current_user: dict = Depends(require_admin)):
+    try:
+        res = supabase_client.client.table("leave_requests").update(data).eq("id", request_id).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct update failed: {str(e)}")
+
+@router.delete("/leave/direct/{request_id}")
+async def delete_leave_direct(request_id: int, current_user: dict = Depends(require_admin)):
+    try:
+        res = supabase_client.client.table("leave_requests").delete().eq("id", request_id).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Direct delete failed: {str(e)}")

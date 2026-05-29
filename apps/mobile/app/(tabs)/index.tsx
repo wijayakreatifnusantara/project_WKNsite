@@ -19,7 +19,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AttendanceCamera from '../../components/AttendanceCamera';
-import { supabase } from '../../lib/supabaseClient';
+import { apiClient } from '../../lib/apiClient';
+import Toast from 'react-native-toast-message';
 import { useTheme } from '../../context/ThemeContext';
 
 import * as Location from 'expo-location';
@@ -67,32 +68,23 @@ export default function HomeScreen() {
   const fetchUnreadCount = async () => {
     if (!userData?.id) return;
     try {
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('employee_id', userData.id)
-        .eq('is_read', false);
-      if (!error && count !== null) {
-        setNotificationCount(count);
+      const res = await apiClient.get('/employees/notifications/unread-count');
+      if (res.status === 'success') {
+        setNotificationCount(res.count);
       }
     } catch (e) {}
   };
 
   useEffect(() => {
     if (userData) {
-      fetchTodayAttendance(userData.id);
+      fetchTodayAttendance();
       fetchUnreadCount();
 
-      // Realtime for notifications
-      const notifSub = supabase
-        .channel('public:notifications_count')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `employee_id=eq.${userData.id}` }, () => {
-          fetchUnreadCount();
-        })
-        .subscribe();
+      // Realtime polling since we removed Supabase client
+      const notifTimer = setInterval(() => fetchUnreadCount(), 30000);
         
       return () => {
-        notifSub.unsubscribe();
+        clearInterval(notifTimer);
       };
     }
   }, [userData]);
@@ -208,19 +200,10 @@ export default function HomeScreen() {
     }
   };
 
-  const fetchTodayAttendance = async (employeeId: string) => {
+  const fetchTodayAttendance = async () => {
     try {
       setLoadingAttendance(true);
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      const { data, error } = await supabase
-        .from('attendance')
-        .select('id, clock_in, clock_out, status, date')
-        .eq('employee_id', employeeId)
-        .eq('date', today)
-        .maybeSingle();
-      if (!error) {
-        setTodayRecord(data || null);
-      }
+      const res = await apiClient.get('/attendance/summary/today');
     } catch (e) {
       console.log('fetchTodayAttendance error:', e);
     } finally {
@@ -232,7 +215,7 @@ export default function HomeScreen() {
     setRefreshing(true);
     checkSession();
     getLocationAndWeather();
-    if (userData?.id) fetchTodayAttendance(userData.id);
+    if (userData?.id) fetchTodayAttendance();
     setTimeout(() => setRefreshing(false), 1500);
   }, [userData]);
 
@@ -262,101 +245,20 @@ export default function HomeScreen() {
     if (isSyncing || pendingAttendance.length === 0 || !networkState.isConnected) return;
     
     setIsSyncing(true);
-    const queue = [...pendingAttendance];
-    const failed = [];
-
-    for (const item of queue) {
-      try {
-        const response = await fetch(item.uri);
-        const blob = await response.blob();
-        const fileName = `attendance_${item.employee_id}_${item.timestamp}.jpg`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('attendance_proofs')
-          .upload(fileName, blob, { contentType: 'image/jpeg' });
-          
-        if (uploadError) throw uploadError;
-        
-        const { data: publicUrlData } = supabase.storage
-          .from('attendance_proofs')
-          .getPublicUrl(fileName);
-        
-        const photoUrl = publicUrlData.publicUrl;
-
-        // Check if there is an existing record for that employee on that date
-        const { data: existing } = await supabase
-          .from('attendance')
-          .select('id, clock_in, clock_out')
-          .eq('employee_id', item.employee_id)
-          .eq('date', item.date)
-          .maybeSingle();
-
-        let dbError;
-        if (item.clock_type === 'IN') {
-          if (!existing) {
-            const { error } = await supabase
-              .from('attendance')
-              .insert([{
-                employee_id: item.employee_id,
-                date: item.date,
-                clock_in: item.time,
-                clock_out: null,
-                status: 'Present',
-                notes: item.notes,
-                is_manual: false,
-                photo_url: photoUrl,
-                location_lat: item.location_lat,
-                location_lng: item.location_lng,
-              }]);
-            dbError = error;
-          }
-        } else {
-          // Clock Out
-          if (existing) {
-            const { error } = await supabase
-              .from('attendance')
-              .update({
-                clock_out: item.time,
-                notes: item.notes,
-                photo_url: photoUrl || undefined,
-                location_lat: item.location_lat,
-                location_lng: item.location_lng,
-              })
-              .eq('id', existing.id);
-            dbError = error;
-          } else {
-            const { error } = await supabase
-              .from('attendance')
-              .insert([{
-                employee_id: item.employee_id,
-                date: item.date,
-                clock_in: null,
-                clock_out: item.time,
-                status: 'Present',
-                notes: item.notes,
-                is_manual: false,
-                photo_url: photoUrl,
-                location_lat: item.location_lat,
-                location_lng: item.location_lng,
-              }]);
-            dbError = error;
-          }
-        }
-          
-        if (dbError) throw dbError;
-      } catch (error) {
-        console.log('Sync failed for item:', error);
-        failed.push(item);
+    
+    try {
+      const res = await apiClient.post('/attendance/sync-offline', pendingAttendance);
+      if (res.status === 'success') {
+        setPendingAttendance([]);
+        await AsyncStorage.removeItem('pending_attendance');
+        Toast.show({ type: 'success', text1: 'Sinkronisasi Berhasil', text2: 'Semua data absensi offline telah diunggah.' });
+        if (userData?.id) fetchTodayAttendance();
       }
-    }
-
-    setPendingAttendance(failed);
-    await AsyncStorage.setItem('pending_attendance', JSON.stringify(failed));
-    setIsSyncing(false);
-    if (failed.length === 0) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Sinkronisasi Berhasil', 'Semua data absensi offline telah diunggah.');
-      if (userData?.id) fetchTodayAttendance(userData.id);
+    } catch (error) {
+      console.log('Sync failed:', error);
+      Alert.alert('Sinkronisasi Gagal', 'Beberapa data gagal disinkronkan, akan dicoba lagi nanti.');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -368,10 +270,9 @@ export default function HomeScreen() {
 
   const handleCaptureComplete = async (uri: string) => {
     try {
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      const nowTime = new Date().toTimeString().substring(0, 8); // HH:MM:SS
+      const today = new Date().toISOString().split('T')[0];
+      const nowTime = new Date().toTimeString().substring(0, 8);
 
-      // Anti-Cheating check: Fetch high-accuracy location and check for Mock GPS
       let location: Location.LocationObject | null = null;
       try {
         let { status } = await Location.getForegroundPermissionsAsync();
@@ -381,32 +282,25 @@ export default function HomeScreen() {
           });
           
           if (location && (location as any).mocked) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            Haptics.notificationAsync(Haptics.ImpactFeedbackStyle.Error);
             Alert.alert(
-              '⚠️ Presensi Ditolak (Anti-Cheating)',
-              'Sistem mendeteksi penggunaan Fake GPS / Lokasi Palsu pada perangkat Anda. Silakan matikan aplikasi lokasi palsu Anda untuk melakukan absensi.'
+              '⚠️ Presensi Ditolak',
+              'Sistem mendeteksi penggunaan Fake GPS.'
             );
             setShowCamera(false);
             return;
           }
-        } else {
-          Alert.alert('Izin Lokasi Diperlukan', 'Presensi memerlukan akses lokasi presisi Anda.');
-          setShowCamera(false);
-          return;
         }
-      } catch (err) {
-        console.log('Error verifying location:', err);
-      }
+      } catch (err) {}
 
       if (!networkState.isConnected) {
-        // Offline Mode: Queue for later sync
         const newItem = {
           uri,
           employee_id: userData?.id,
           date: today,
           clock_type: cameraType,
           time: nowTime,
-          notes: `Mobile check-${cameraType.toLowerCase()} (Offline) | ${currentAddress}`,
+          notes: `Mobile check-${cameraType.toLowerCase()} (Offline)`,
           timestamp: Date.now(),
           location_lat: location?.coords.latitude || null,
           location_lng: location?.coords.longitude || null,
@@ -414,91 +308,32 @@ export default function HomeScreen() {
         const newQueue = [...pendingAttendance, newItem];
         setPendingAttendance(newQueue);
         await AsyncStorage.setItem('pending_attendance', JSON.stringify(newQueue));
-        Alert.alert('Mode Offline', 'Koneksi internet tidak tersedia. Absensi Anda telah disimpan di HP dan akan diunggah otomatis saat Anda online.');
+        Alert.alert('Mode Offline', 'Data tersimpan di perangkat.');
         setShowCamera(false);
         return;
       }
 
-      // --- ONLINE MODE ---
-      // Try to upload selfie proof (non-critical, skip if bucket not ready)
-      let photoUrl: string | null = null;
-      try {
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        const fileName = `attendance_${userData?.id}_${Date.now()}.jpg`;
-        const { error: uploadError } = await supabase.storage
-          .from('attendance_proofs')
-          .upload(fileName, blob, { contentType: 'image/jpeg' });
-        if (!uploadError) {
-          const { data: pubData } = supabase.storage
-            .from('attendance_proofs')
-            .getPublicUrl(fileName);
-          photoUrl = pubData?.publicUrl || null;
-        }
-      } catch (_) {}
+      const payload = {
+        employee_id: userData?.id,
+        latitude: location?.coords.latitude || 0,
+        longitude: location?.coords.longitude || 0,
+        clock_type: cameraType,
+        notes: `Mobile check-${cameraType.toLowerCase()} | ${currentAddress}`
+      };
 
-      // Check if there's already a record for today
-      const { data: existing } = await supabase
-        .from('attendance')
-        .select('id, clock_in, clock_out')
-        .eq('employee_id', userData?.id)
-        .eq('date', today)
-        .maybeSingle();
-
-      if (cameraType === 'IN') {
-        if (existing) {
-          Alert.alert('Sudah Absen Masuk', `Anda sudah absen masuk pukul ${existing.clock_in?.substring(0, 5) || '-'} hari ini.`);
-          setShowCamera(false);
-          return;
-        }
-        // INSERT new record
-        const { error: insertError } = await supabase
-          .from('attendance')
-          .insert([{
-            employee_id: userData?.id,
-            date: today,
-            clock_in: nowTime,
-            clock_out: null,
-            status: 'Present',
-            notes: `Mobile check-in | ${currentAddress}`,
-            is_manual: false,
-            photo_url: photoUrl,
-            location_lat: location?.coords.latitude || null,
-            location_lng: location?.coords.longitude || null,
-          }]);
-        if (insertError) throw insertError;
+      const res = await apiClient.post('/attendance/check-in', payload);
+      
+      if (res.status === 'already_checked_in') {
+        Alert.alert('Sudah Absen', res.data?.message || 'Anda sudah melakukan absensi hari ini.');
+      } else if (res.status === 'out_of_range') {
+        Alert.alert('Di Luar Jangkauan', res.data?.message);
+      } else if (res.status === 'success') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert('✅ Absen Masuk Berhasil', `Jam masuk tercatat: ${nowTime.substring(0,5)}`);
-      } else {
-        // CLOCK OUT
-        if (!existing) {
-          Alert.alert('Belum Absen Masuk', 'Anda belum melakukan absen masuk hari ini. Lakukan absen masuk terlebih dahulu.');
-          setShowCamera(false);
-          return;
-        }
-        if (existing.clock_out) {
-          Alert.alert('Sudah Absen Pulang', `Anda sudah absen pulang pukul ${existing.clock_out.substring(0, 5)} hari ini.`);
-          setShowCamera(false);
-          return;
-        }
-        // UPDATE clock_out
-        const { error: updateError } = await supabase
-          .from('attendance')
-          .update({
-            clock_out: nowTime,
-            notes: `Mobile check-out | ${currentAddress}`,
-            photo_url: photoUrl || undefined,
-            location_lat: location?.coords.latitude || null,
-            location_lng: location?.coords.longitude || null,
-          })
-          .eq('id', existing.id);
-        if (updateError) throw updateError;
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert('✅ Absen Pulang Berhasil', `Jam pulang tercatat: ${nowTime.substring(0,5)}`);
+        Toast.show({ type: 'success', text1: '✅ Absen Berhasil', text2: res.data?.message || 'Data berhasil disimpan.' });
       }
 
-      // Refresh today's record
-      if (userData?.id) fetchTodayAttendance(userData.id);
+      if (userData?.id) fetchTodayAttendance();
+
     } catch (error: any) {
       Alert.alert('Gagal', error.message || 'Terjadi kesalahan saat menyimpan absensi');
     } finally {

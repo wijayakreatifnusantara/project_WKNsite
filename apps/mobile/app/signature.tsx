@@ -20,8 +20,10 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ViewShot from 'react-native-view-shot';
-import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
+import { apiClient } from '../lib/apiClient';
 import { useTheme } from '../context/ThemeContext';
+import Toast from 'react-native-toast-message';
 
 const { width } = Dimensions.get('window');
 
@@ -75,18 +77,17 @@ export default function SignatureScreen() {
 
   const fetchCurrentSignature = async (employeeId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('employees')
-        .select('signature_url')
-        .eq('id', employeeId)
-        .single();
+      if (!userData?.id) return;
+      setLoading(true);
 
-      if (error) throw error;
-      if (data && data.signature_url) {
-        setCurrentSignature(data.signature_url);
+      const res = await apiClient.get('/employees/me');
+      if (res.status === 'success' && res.data?.signature_url) {
+        setCurrentSignature(res.data.signature_url);
       }
     } catch (e: any) {
       console.log('Error fetching signature:', e.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,36 +140,17 @@ export default function SignatureScreen() {
       // Capture drawing pad as image URI
       const uri = await (viewShotRef.current as any).capture();
       
-      // Convert file URI to Blob
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      
-      const fileName = `signatures/sig_${userData.id}_${Date.now()}.png`;
-      
-      // Upload blob to Supabase storage 'employees' bucket
-      const { error: uploadError } = await supabase.storage
-        .from('employees')
-        .upload(fileName, blob, { contentType: 'image/png', upsert: true });
+      const payload = {
+        signature_base64: uri
+      };
 
-      if (uploadError) throw uploadError;
+      const res = await apiClient.post('/employees/signature', payload);
+      if (res.status !== 'success') throw new Error(res.message);
 
-      // Fetch public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('employees')
-        .getPublicUrl(fileName);
-
-      // Update employee record
-      const { error: updateError } = await supabase
-        .from('employees')
-        .update({ signature_url: publicUrl })
-        .eq('id', userData.id);
-
-      if (updateError) throw updateError;
-
-      setCurrentSignature(publicUrl);
-      setPaths([]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('✅ Berhasil', 'Tanda tangan elektronik Anda berhasil disimpan dan disinkronkan.');
+      Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Tanda tangan elektronik berhasil disimpan.' });
+      fetchCurrentSignature(userData.id);
+      setPaths([]);
     } catch (e: any) {
       console.log('Error saving signature:', e);
       Alert.alert('Gagal Menyimpan', e.message || 'Terjadi kesalahan saat mengunggah tanda tangan.');

@@ -7,6 +7,9 @@ import * as Haptics from 'expo-haptics';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import * as LocalAuthentication from 'expo-local-authentication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import CryptoJS from 'crypto-js';
 
 export default function PersonalDataAuthScreen() {
   const { userData } = useAuth();
@@ -56,15 +59,23 @@ export default function PersonalDataAuthScreen() {
     setErrorMsg('');
 
     try {
-      // We check against the employees table since mobile_password is there
-      const { data, error } = await supabase
-        .from('employees')
-        .select('mobile_password')
-        .eq('id', userData?.id)
-        .single();
-
-      if (error || !data) throw new Error('Gagal memverifikasi');
-      if (data.mobile_password !== password) throw new Error('Password salah');
+      const hashedPass = CryptoJS.SHA256(password).toString();
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:8000/api';
+      const token = await SecureStore.getItemAsync('authToken');
+      
+      const response = await fetch(`${apiUrl}/auth/employee/verify-password`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: userData?.email || '', password: hashedPass }),
+      });
+      
+      const result = await response.json();
+      if (!response.ok || result.status === 'error') {
+        throw new Error(result.message || 'Password salah');
+      }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace('/personal-data');

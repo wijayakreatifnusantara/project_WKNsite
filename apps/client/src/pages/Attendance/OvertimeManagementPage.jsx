@@ -13,7 +13,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -28,24 +28,9 @@ const OvertimeManagementPage = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('overtime_requests')
-        .select(`
-          *,
-          employees (
-            name,
-            employee_id,
-            organization_name,
-            job_position
-          )
-        `)
-        .order('date', { ascending: false });
-
-
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setRequests(data || []);
+      const response = await apiClient.get('/api/attendance/overtime');
+      if (response.status !== 'success') throw new Error('Failed to fetch');
+      setRequests(response.data || []);
     } catch (err) {
       console.error("Error fetching overtime requests:", err);
       toast.error("Gagal memuat data pengajuan lembur");
@@ -56,30 +41,18 @@ const OvertimeManagementPage = () => {
 
   useEffect(() => {
     fetchRequests();
-
-    const channel = supabase
-      .channel('overtime_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'overtime_requests' }, () => fetchRequests())
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(() => fetchRequests(), 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleApprove = async (request, status) => {
     try {
       setLoading(true);
-      
-      const { error: updateError } = await supabase
-        .from('overtime_requests')
-        .update({ 
-          status, 
-          approved_by: profile?.employee_id,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', request.id);
-
-      if (updateError) throw updateError;
-
+      const response = await apiClient.put(`/api/attendance/overtime/${request.id}`, {
+        status,
+        approved_by: profile?.employee_id
+      });
+      if (response.status !== 'success') throw new Error('Failed');
       toast.success(`Pengajuan lembur ${status === 'Approved' ? 'disetujui' : 'ditolak'} sukses`);
       fetchRequests();
     } catch (err) {

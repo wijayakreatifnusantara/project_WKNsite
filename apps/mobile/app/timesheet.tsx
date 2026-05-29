@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, StatusBar, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, StatusBar, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabaseClient';
+import { apiClient } from '../lib/apiClient';
+import Toast from 'react-native-toast-message';
 
 export default function TimesheetScreen() {
   const { colors, isDark } = useTheme();
@@ -16,6 +17,12 @@ export default function TimesheetScreen() {
   const [taskDesc, setTaskDesc] = useState('');
   const [duration, setDuration] = useState('');
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
 
   const handleSubmit = async () => {
     if (!projectName || !taskDesc || !duration) {
@@ -40,17 +47,16 @@ export default function TimesheetScreen() {
           onPress: async () => {
             setLoading(true);
             try {
-              const { error } = await supabase.from('timesheets').insert([{
-                employee_id: userData?.id,
-                project_name: projectName,
+              const res = await apiClient.post('/submissions/timesheet', {
+                date: new Date().toISOString(),
                 task_description: taskDesc,
-                duration_hours: durationHours
-              }]);
+                hours_worked: durationHours
+              });
 
-              if (error) throw error;
+              if (res.status !== 'success') throw new Error(res.message);
 
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              Alert.alert('Berhasil', 'Laporan Timesheet harian berhasil disimpan.');
+              Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Laporan Timesheet harian berhasil disimpan.' });
               router.back();
             } catch (e: any) {
               console.error(e);
@@ -82,7 +88,14 @@ export default function TimesheetScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false} 
+          contentContainerStyle={{ paddingBottom: 100 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} tintColor="#F97316" />
+          }
+        >
           
           <View style={styles.infoBox}>
             <View style={styles.infoIcon}>

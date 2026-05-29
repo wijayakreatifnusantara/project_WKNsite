@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export const useQuotations = () => {
   const [clients, setClients] = useState([]);
@@ -8,12 +8,9 @@ export const useQuotations = () => {
   const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .order('name');
+      const { data: res } = await apiClient.get('/api/crm/clients');
+      const data = res.data;
       
-      if (error) throw error;
       setClients(data || []);
     } catch (err) {
       console.error('Error fetching clients:', err);
@@ -26,10 +23,15 @@ export const useQuotations = () => {
     try {
       setLoading(true);
       
-      // 1. Insert Quotation
-      const { data: quote, error: quoteError } = await supabase
-        .from('quotations')
-        .insert([{
+      // 2. Insert Items
+      const formattedItems = items.map(item => ({
+        description: item.description,
+        qty: item.qty,
+        rate: item.rate
+      }));
+
+      const { data: res } = await apiClient.post('/api/crm/quotations', {
+        quotation: {
           reference_number: quotationData.reference_number,
           client_id: quotationData.client_id,
           subtotal: quotationData.subtotal,
@@ -37,25 +39,11 @@ export const useQuotations = () => {
           tax_total: quotationData.tax_total,
           grand_total: quotationData.grand_total,
           status: 'Draft'
-        }])
-        .select()
-        .single();
+        },
+        items: formattedItems
+      });
 
-      if (quoteError) throw quoteError;
-
-      // 2. Insert Items
-      const formattedItems = items.map(item => ({
-        quotation_id: quote.id,
-        description: item.description,
-        qty: item.qty,
-        rate: item.rate
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('quotation_items')
-        .insert(formattedItems);
-
-      if (itemsError) throw itemsError;
+      const quote = res.data;
 
       return { success: true, data: quote };
     } catch (err) {

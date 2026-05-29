@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IconUpload, IconDeviceFloppy, IconBrush, IconEye } from "@tabler/icons-react";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export default function PayslipTemplateBuilder() {
   const [template, setTemplate] = useState({
@@ -24,14 +24,9 @@ export default function PayslipTemplateBuilder() {
   }, []);
 
   const fetchTemplate = async () => {
-    const { data, error } = await supabase
-      .from('payslip_templates')
-      .select('*')
-      .eq('is_active', true)
-      .limit(1)
-      .single();
-
-    if (data) {
+    try {
+      const { data: res } = await apiClient.get('/api/payroll/templates/active');
+      const data = res.data;
       setTemplate({
         id: data.id,
         companyName: data.company_name || '',
@@ -41,6 +36,9 @@ export default function PayslipTemplateBuilder() {
         addressText: data.company_address || '',
         watermarkEnabled: data.watermark_enabled !== false,
       });
+    }
+    } catch(err) {
+      console.error(err);
     }
     setLoading(false);
   };
@@ -72,9 +70,10 @@ export default function PayslipTemplateBuilder() {
       };
 
       if (template.id) {
-        await supabase.from('payslip_templates').update(payload).eq('id', template.id);
+        await apiClient.put(`/api/payroll/templates/${template.id}`, payload);
       } else {
-        const { data } = await supabase.from('payslip_templates').insert(payload).select().single();
+        const { data: res } = await apiClient.post('/api/payroll/templates', payload);
+        const data = res.data;
         if (data) setTemplate(prev => ({ ...prev, id: data.id }));
       }
       alert('Template berhasil disimpan! Karyawan sekarang akan melihat format ini pada slip gaji mereka.');

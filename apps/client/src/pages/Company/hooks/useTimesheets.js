@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export const useTimesheets = () => {
   const [logs, setLogs] = useState([]);
@@ -11,29 +11,10 @@ export const useTimesheets = () => {
       setLoading(true);
       setError(null);
       
-      let query = supabase
-        .from('timesheets')
-        .select(`
-          id, 
-          project_name, 
-          task_description, 
-          duration_hours, 
-          date, 
-          status, 
-          created_at,
-          employees ( name )
-        `)
-        .order('date', { ascending: false })
-        .order('created_at', { ascending: false });
-        
-      if (filterType === 'pending') {
-        query = query.eq('status', 'PENDING');
-      }
-
-      const { data, error: fetchError } = await query;
-
-      if (fetchError) throw fetchError;
-      setLogs(data || []);
+      const response = await apiClient.get(`/api/payroll/timesheets?filter_type=${filterType}`);
+      
+      if (response.status !== 'success') throw new Error('Failed to fetch timesheets');
+      setLogs(response.data || []);
       
     } catch (err) {
       console.error('Error fetching timesheets:', err);
@@ -45,12 +26,11 @@ export const useTimesheets = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      const { error } = await supabase
-        .from('timesheets')
-        .update({ status: newStatus })
-        .eq('id', id);
+      const response = await apiClient.put(`/api/payroll/timesheets/${id}`, {
+        status: newStatus
+      });
 
-      if (error) throw error;
+      if (response.status !== 'success') throw new Error('Failed to update status');
       
       // Update local state directly for speed
       setLogs(prev => prev.map(log => log.id === id ? { ...log, status: newStatus } : log));

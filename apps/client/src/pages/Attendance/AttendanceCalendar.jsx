@@ -15,7 +15,7 @@ import {
   IconX
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 import AttendanceEditModal from './components/AttendanceEditModal';
 
@@ -109,43 +109,55 @@ const AttendanceCalendar = () => {
       setAttendanceData([]);
     }
     
-    // Realtime subscription
-    const channel = supabase
-      .channel('attendance_calendar_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => {
-        if (selectedEmployee) fetchAttendanceData();
-      })
-      .subscribe();
+    // Polling instead of Realtime
+    const interval = setInterval(() => {
+      if (selectedEmployee) fetchAttendanceData();
+    }, 15000);
       
-    return () => { supabase.removeChannel(channel); };
+    return () => clearInterval(interval);
   }, [currentDate, selectedEmployee]);
 
   const fetchEmployees = async () => {
-    const { data: empData } = await supabase.from('employees').select('id, name, is_resigned, organization_name, organization_id, department_id, departments(name)').eq('is_resigned', false);
-    
-    const uniqueOrgIds = [...new Set((empData || []).map(e => e.organization_id).filter(Boolean))];
-    const deptMap = {};
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-    
-    await Promise.all(uniqueOrgIds.map(async (orgId) => {
-        try {
-            const res = await fetch(`${apiUrl}/organizations/${orgId}/departments?active_only=true`);
-            const json = await res.json();
-            if (json.status === 'success' && json.data) {
-                json.data.forEach(d => {
-                    deptMap[d.id] = d.name;
-                });
-            }
-        } catch (err) {
-            console.error('Failed to fetch depts for org', orgId, err);
-        }
-    }));
+    try {
+      const response = await apiClient.get('/api/employees?size=500');
+      const rawData = response.data || [];
+      
+      const empData = rawData.map(e => ({
+        id: e['EMPLOYEE ID'],
+        name: e['EMPLOYEE NAME'],
+        is_resigned: e.is_resigned,
+        organization_name: e['Organization Name *'],
+        organization_id: e.organization_id,
+        department_id: e.department_id,
+        departments: e.departments
+      }));
 
-    const mapped = (empData || []).map(e => ({
-       ...e,
-       department_name: deptMap[e.department_id] || e.departments?.name
-    }));
-    setEmployees(mapped);
+      const uniqueOrgIds = [...new Set(empData.map(e => e.organization_id).filter(Boolean))];
+      const deptMap = {};
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      
+      await Promise.all(uniqueOrgIds.map(async (orgId) => {
+          try {
+              const res = await fetch(`${apiUrl}/organizations/${orgId}/departments?active_only=true`);
+              const json = await res.json();
+              if (json.status === 'success' && json.data) {
+                  json.data.forEach(d => {
+                      deptMap[d.id] = d.name;
+                  });
+              }
+          } catch (err) {
+              console.error('Failed to fetch depts for org', orgId, err);
+          }
+      }));
+
+      const mapped = empData.map(e => ({
+         ...e,
+         department_name: deptMap[e.department_id] || e.departments?.name
+      }));
+      setEmployees(mapped);
+    } catch (err) {
+      console.error('Error fetching employees:', err);
+    }
   };
 
   const uniqueOrgs = [...new Set(employees.map(e => e.organization_name))].filter(Boolean).sort();
@@ -170,22 +182,15 @@ const AttendanceCalendar = () => {
       setLoading(true);
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
-      // Get first day of month and last day of month
       const startOfMonth = new Date(year, month, 1);
       const endOfMonth = new Date(year, month + 1, 0);
       
       const startDateStr = startOfMonth.toISOString().split('T')[0];
       const endDateStr = endOfMonth.toISOString().split('T')[0];
       
-      const { data, error } = await supabase
-        .from('attendance')
-        .select('*')
-        .eq('employee_id', selectedEmployee)
-        .gte('date', startDateStr)
-        .lte('date', endDateStr);
-        
-      if (error) throw error;
-      setAttendanceData(data || []);
+      const response = await apiClient.get(`/api/attendance/calendar?employee_id=${selectedEmployee}&start_date=${startDateStr}&end_date=${endDateStr}`);
+      if (response.status !== 'success') throw new Error('Failed');
+      setAttendanceData(response.data || []);
     } catch (err) {
       console.error("Error fetching attendance:", err);
     } finally {

@@ -7,6 +7,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider as CustomThemeProvider } from '../context/ThemeContext';
 import { AuthProvider } from '../context/AuthContext';
 import * as NotificationService from '../lib/NotificationService';
+import Toast from 'react-native-toast-message';
+import OfflineBanner from '../components/OfflineBanner';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -58,6 +60,8 @@ export default function RootLayout() {
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <StatusBar style="auto" />
+          <OfflineBanner />
+          <Toast />
         </CustomThemeProvider>
       </AuthProvider>
     </SafeAreaProvider>

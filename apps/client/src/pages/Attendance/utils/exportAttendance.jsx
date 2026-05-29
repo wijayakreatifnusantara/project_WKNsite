@@ -1,20 +1,16 @@
 import * as XLSX from 'xlsx';
 import dayjs from 'dayjs';
-import { supabase } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 
 export const exportDailyAttendance = async () => {
   try {
     const today = dayjs().format('YYYY-MM-DD');
     
-    // Fetch today's raw logs
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('*, employees(name, organization_name, job_position)')
-      .gte('created_at', `${today}T00:00:00Z`)
-      .lte('created_at', `${today}T23:59:59Z`)
-      .order('created_at', { ascending: false });
+    // Fetch today's raw logs via API
+    const response = await apiClient.get('/api/attendance/export/today');
 
-    if (error) throw error;
+    if (response.status !== 'success') throw new Error('Failed to fetch attendance data');
+    const data = response.data;
 
     if (!data || data.length === 0) {
       alert("No attendance records found for today.");

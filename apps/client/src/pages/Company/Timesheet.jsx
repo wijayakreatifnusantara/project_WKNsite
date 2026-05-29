@@ -22,8 +22,24 @@ const Timesheet = () => {
     fetchTimesheets(filter);
   }, [fetchTimesheets, filter]);
 
-  // Calculate Weekly Summary (Dummy visualization for now, but can be derived from logs)
-  const weeklyData = [32, 45, 12, 60, 40, 0, 0]; 
+  // Calculate Weekly Summary based on actual logs
+  const weeklyData = useMemo(() => {
+    const data = [0, 0, 0, 0, 0, 0, 0];
+    const startOfWeek = dayjs().startOf('week');
+    const endOfWeek = dayjs().endOf('week');
+
+    logs.forEach(log => {
+      const logDate = dayjs(log.date);
+      // Check if log is within current week
+      if (logDate.isAfter(startOfWeek.subtract(1, 'day')) && logDate.isBefore(endOfWeek.add(1, 'day'))) {
+        const dayIndex = logDate.day(); // 0 (Sun) to 6 (Sat)
+        data[dayIndex] += (log.duration_hours || 0);
+      }
+    });
+
+    // Scale hours to percentage for the chart (max 10 hours = 100%)
+    return data.map(hours => Math.min(hours * 10, 100)); 
+  }, [logs]);
 
   const handleApprove = async (id) => {
     await updateStatus(id, 'APPROVED');

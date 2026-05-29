@@ -10,9 +10,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://192.168.0.3:8000/api",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://vlpaszzbebgrfppklqml.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_hNO1hqX8FN2ejpyZe1oYJA_qvbkgEUy"
+        "EXPO_PUBLIC_API_URL": "http://192.168.0.3:8000/api"
       }
     },
     "production": {
@@ -20,9 +18,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.wijayakn.com/api",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://vlpaszzbebgrfppklqml.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_hNO1hqX8FN2ejpyZe1oYJA_qvbkgEUy"
+        "EXPO_PUBLIC_API_URL": "https://api.wijayakn.com/api"
       }
     }
   },

@@ -167,6 +167,46 @@ class WKNSupabaseClient:
             print(f"[CRITICAL] System Error: {str(e)}")
             return None
 
+    async def authenticate_employee(self, email: str, hashed_password: str) -> Optional[Dict[str, Any]]:
+        """Authenticate employee for mobile app"""
+        if not self.client: return None
+        try:
+            clean_email = email.strip()
+            
+            res = self.client.table("employees") \
+                .select("id, name, email, mobile_password, status, is_resigned, job_position, is_field_team, working_location") \
+                .ilike("email", clean_email) \
+                .execute()
+                
+            if not res.data:
+                return None
+                
+            employee = res.data[0]
+            if employee.get("is_resigned") or employee.get("status") == "RESIGNED":
+                return None
+                
+            if employee.get("mobile_password") == hashed_password:
+                # Remove password from return dict
+                clean_employee = employee.copy()
+                if "mobile_password" in clean_employee:
+                    del clean_employee["mobile_password"]
+                return clean_employee
+                
+            return None
+        except Exception as e:
+            print(f"Error authenticating employee: {str(e)}")
+            return None
+
+    async def update_employee_password(self, employee_id: str, new_hashed_password: str) -> bool:
+        """Update employee password"""
+        if not self.client: return False
+        try:
+            self.client.table("employees").update({"mobile_password": new_hashed_password}).eq("id", employee_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating employee password: {str(e)}")
+            return False
+
     async def add_employee(self, employee_data: Dict[str, Any]) -> bool:
         """Add new employee to Supabase"""
         if not self.client: return False
@@ -511,7 +551,7 @@ class WKNSupabaseClient:
 
     async def add_attendance_record(self, employee_id: str, date: str, status: str,
                                     check_in_time: str, late_minutes: int = 0,
-                                    notes: str = "") -> Dict[str, Any]:
+                                    notes: str = "", photo_url: str = None) -> Dict[str, Any]:
         """
         Insert attendance record, handling unique constraint (double check-in prevention).
         
@@ -527,7 +567,8 @@ class WKNSupabaseClient:
                 "status": status,
                 "check_in_time": check_in_time,
                 "late_minutes": late_minutes,
-                "notes": notes
+                "notes": notes,
+                "photo_url": photo_url
             }
             self.client.table("attendance").insert(data).execute()
             return {"success": True, "already_checked_in": False}

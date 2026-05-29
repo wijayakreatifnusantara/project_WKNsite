@@ -20,9 +20,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as DocumentPicker from 'expo-document-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../lib/supabaseClient';
+import * as SecureStore from 'expo-secure-store';
+import { useAuth } from '../context/AuthContext';
+import { apiClient } from '../lib/apiClient';
 import { useTheme } from '../context/ThemeContext';
+import Toast from 'react-native-toast-message';
+import EmptyState from '../components/EmptyState';
 
 const { width } = Dimensions.get('window');
 
@@ -40,7 +43,7 @@ const CATEGORIES = [
 
 export default function DocumentsScreen() {
   const { colors, isDark } = useTheme();
-  const [userData, setUserData] = useState<any>(null);
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -55,47 +58,28 @@ export default function DocumentsScreen() {
   const [pickedFile, setPickedFile] = useState<any>(null);
 
   useEffect(() => {
-    initScreen();
+    fetchDocuments();
   }, []);
 
-  const initScreen = async () => {
-    setLoading(true);
+  const fetchDocuments = async () => {
     try {
-      const sessionStr = await AsyncStorage.getItem('userSession');
-      if (sessionStr) {
-        const user = JSON.parse(sessionStr);
-        setUserData(user);
-        await fetchDocuments(user.id);
-      } else {
-        router.replace('/login');
+      if (!user?.id) return;
+      setLoading(true);
+
+      const res = await apiClient.get('/documents/my-documents');
+      if (res.status === 'success') {
+        setDocuments(res.data || []);
       }
     } catch (e) {
-      console.log('Error initializing screen:', e);
+      console.log('Error fetching documents:', e);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchDocuments = async (employeeId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('employee_id', employeeId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setDocuments(data || []);
-    } catch (e: any) {
-      console.log('Error fetching documents:', e.message);
-    }
-  };
-
   const onRefresh = async () => {
     setRefreshing(true);
-    if (userData?.id) {
-      await fetchDocuments(userData.id);
-    }
+    await fetchDocuments();
     setRefreshing(false);
   };
 
@@ -130,51 +114,32 @@ export default function DocumentsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // 1. Read file content to blob
-      const response = await fetch(pickedFile.uri);
-      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append('file', {
+        uri: pickedFile.uri,
+        name: pickedFile.name,
+        type: pickedFile.mimeType || 'application/octet-stream'
+      } as any);
+      formData.append('document_name', docName);
+      formData.append('category', docCategory);
+      formData.append('description', description);
       
-      const fileExt = pickedFile.name.split('.').pop();
-      const storagePath = `documents/${userData.id}/${Date.now()}_${docName.trim().replace(/\s+/g, '_')}.${fileExt}`;
-
-      // 2. Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(storagePath, blob, { 
-          contentType: pickedFile.mimeType || 'application/octet-stream',
-          upsert: true 
-        });
-
-      if (uploadError) throw uploadError;
-
-      // 3. Get Public URL
-      const { data: urlData } = supabase.storage
-        .from('documents')
-        .getPublicUrl(storagePath);
-
-      const publicUrl = urlData.publicUrl;
-
-      // 4. Save metadata to DB
-      const record = {
-        name: docName.trim(),
-        description: description.trim(),
-        category: docCategory,
-        file_url: publicUrl,
-        file_size: pickedFile.size || blob.size,
-        file_type: pickedFile.mimeType || 'application/octet-stream',
-        employee_id: userData.id,
-        is_private: false,
-        created_at: new Date().toISOString()
-      };
-
-      const { error: dbError } = await supabase
-        .from('documents')
-        .insert([record]);
-
-      if (dbError) throw dbError;
+      const token = await SecureStore.getItemAsync('authToken');
+      const uploadUrl = `${process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:8000/api'}/documents/upload-mobile`;
+      
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      const resData = await response.json();
+      if (!response.ok) throw new Error(resData.detail || 'Gagal mengunggah dokumen');
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('✅ Berhasil', 'Dokumen Anda telah diunggah dan disimpan.');
+      Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Dokumen berhasil diunggah.' });
       
       // Reset Form
       setDocName('');
@@ -184,17 +149,12 @@ export default function DocumentsScreen() {
       setShowForm(false);
 
       // Refresh list
-      await fetchDocuments(userData.id);
+      await fetchDocuments();
     } catch (e: any) {
       Alert.alert('Gagal Mengunggah', e.message || 'Terjadi kesalahan sistem.');
     } finally {
       setSubmitLoading(false);
     }
-  };
-
-  const getStoragePathFromUrl = (url: string) => {
-    const parts = url.split('/public/documents/');
-    return parts.length > 1 ? parts[1] : url;
   };
 
   const handleDeleteDocument = async (doc: any) => {
@@ -209,26 +169,15 @@ export default function DocumentsScreen() {
           onPress: async () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             try {
-              setLoading(true);
-              
-              // 1. Delete from Supabase Storage
-              const path = getStoragePathFromUrl(doc.file_url);
-              await supabase.storage.from('documents').remove([path]);
-
-              // 2. Delete from DB
-              const { error } = await supabase
-                .from('documents')
-                .delete()
-                .eq('id', doc.id);
-
-              if (error) throw error;
-
-              toastFeedback('Dokumen berhasil dihapus.');
-              await fetchDocuments(userData.id);
+              const res = await apiClient.delete(`/documents/${doc.id}`);
+              if (res.status === 'success') {
+                Toast.show({ type: 'success', text1: 'Berhasil', text2: 'Dokumen dihapus.' });
+                fetchDocuments();
+              } else {
+                throw new Error(res.message);
+              }
             } catch (e: any) {
-              Alert.alert('Gagal Menghapus', e.message || 'Terjadi kesalahan sistem.');
-            } finally {
-              setLoading(false);
+              Alert.alert('Gagal', e.message || 'Gagal menghapus dokumen.');
             }
           }
         }
@@ -433,19 +382,10 @@ export default function DocumentsScreen() {
               }
             >
               {filteredDocs.length === 0 ? (
-                <View style={[styles.emptyContainer, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-                  <Ionicons name="folder-open-outline" size={48} color="#94A3B8" />
-                  <Text style={[styles.emptyText, { color: colors.subText }]}>Belum ada dokumen yang diunggah.</Text>
-                  <TouchableOpacity 
-                    style={styles.emptyAddBtn} 
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setShowForm(true);
-                    }}
-                  >
-                    <Text style={styles.emptyAddBtnText}>Unggah Dokumen</Text>
-                  </TouchableOpacity>
-                </View>
+                <EmptyState 
+                  title="Belum Ada Dokumen" 
+                  message="Anda belum memiliki dokumen yang diunggah. Klik ikon unggah di sudut kanan atas untuk menambahkan berkas." 
+                />
               ) : (
                 filteredDocs.map((item) => (
                   <View key={item.id} style={[styles.docCard, { backgroundColor: colors.card, borderColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
@@ -597,7 +537,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   textInput: {
-    height: 48,
+    minHeight: 48,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 14,
@@ -626,7 +566,7 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     backgroundColor: '#F97316',
-    height: 48,
+    minHeight: 48,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',

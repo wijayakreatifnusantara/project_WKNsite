@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 export default function Announcements() {
@@ -20,14 +20,14 @@ export default function Announcements() {
   const fetchFilters = async () => {
     try {
       const [deptRes, empRes] = await Promise.all([
-        supabase.from('departments').select('id, name'),
-        supabase.from('employees').select('job_position')
+        apiClient.get('/api/organizations/departments'),
+        apiClient.get('/api/employees')
       ]);
 
-      if (deptRes.data) setDepartments(deptRes.data);
-      if (empRes.data) {
+      if (deptRes.data && deptRes.data.data) setDepartments(deptRes.data.data);
+      if (empRes.data && empRes.data.data) {
         // Extract unique job positions
-        const uniquePositions = [...new Set(empRes.data.map(emp => emp.job_position).filter(Boolean))];
+        const uniquePositions = [...new Set(empRes.data.data.map(emp => emp.job_position).filter(Boolean))];
         setPositions(uniquePositions);
       }
     } catch (error) {
@@ -49,41 +49,16 @@ export default function Announcements() {
 
     setLoading(true);
     try {
-      // 1. Fetch target employees
-      let query = supabase.from('employees').select('id');
-      
-      if (targetType === 'DEPARTMENT') {
-        query = query.eq('department_id', targetValue);
-      } else if (targetType === 'POSITION') {
-        query = query.eq('job_position', targetValue);
-      }
-
-      const { data: employees, error: fetchError } = await query;
-      
-      if (fetchError) throw fetchError;
-      if (!employees || employees.length === 0) {
-        toast.error('Tidak ada karyawan yang cocok dengan kriteria tersebut');
-        setLoading(false);
-        return;
-      }
-
-      // 2. Prepare bulk insert
-      const notifications = employees.map(emp => ({
-        employee_id: emp.id,
+      const payload = {
         title,
         body,
         type,
-        is_read: false
-      }));
+        targetType,
+        targetValue
+      };
 
-      // 3. Insert into notifications
-      const { error: insertError } = await supabase
-        .from('notifications')
-        .insert(notifications);
-
-      if (insertError) throw insertError;
-
-      toast.success(`Pengumuman berhasil dikirim ke ${employees.length} karyawan!`);
+      const res = await apiClient.post('/api/company/announcements', payload);
+      toast.success(res.data.message || 'Pengumuman berhasil dikirim!');
       
       // Reset form
       setTitle('');

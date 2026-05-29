@@ -6,6 +6,9 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import CryptoJS from 'crypto-js';
 
 export default function ChangePasswordScreen() {
   const { userData } = useAuth();
@@ -36,23 +39,37 @@ export default function ChangePasswordScreen() {
     setLoading(true);
 
     try {
-      // 1. Verify current password
-      const { data: user, error: fetchError } = await supabase
-        .from('employees')
-        .select('mobile_password')
-        .eq('id', userData?.id)
-        .single();
+      // 1. Send update request to Backend API
+      const hashedCurrent = CryptoJS.SHA256(currentPassword).toString();
+      const hashedNew = CryptoJS.SHA256(newPassword).toString();
 
-      if (fetchError || !user) throw new Error('Gagal memverifikasi password lama');
-      if (user.mobile_password !== currentPassword) throw new Error('Password saat ini salah');
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:8000/api';
+      const token = await SecureStore.getItemAsync('authToken');
+      
+      const response = await fetch(`${apiUrl}/auth/employee/change-password`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          current_password: hashedCurrent, 
+          new_password: hashedNew 
+        }),
+      });
+      
+      const result = await response.json();
+      if (!response.ok || result.status === 'error') {
+        throw new Error(result.message || 'Gagal mengubah password');
+      }
 
-      // 2. Update password
-      const { error: updateError } = await supabase
-        .from('employees')
-        .update({ mobile_password: newPassword })
-        .eq('id', userData?.id);
-
-      if (updateError) throw updateError;
+      // Update saved credentials for biometrics
+      const savedStr = await SecureStore.getItemAsync('savedCredentials');
+      if (savedStr) {
+        const saved = JSON.parse(savedStr);
+        saved.password = hashedNew;
+        await SecureStore.setItemAsync('savedCredentials', JSON.stringify(saved));
+      }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
