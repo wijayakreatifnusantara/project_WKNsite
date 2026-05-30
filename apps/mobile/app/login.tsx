@@ -7,9 +7,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as Device from 'expo-device';
 import { useAuth } from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import { useAuth } from '../context/AuthContext';
 import CryptoJS from 'crypto-js';
 
 export default function LoginScreen() {
