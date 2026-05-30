@@ -311,7 +311,7 @@ export default function AttendanceCamera({ type = 'IN', onCaptureComplete, userD
         {/* Top Right: WKN Logo & WKN Mobile */}
         <View style={styles.topRight}>
           <Image 
-            source={require('../assets/images/wkn-logo-square.jpg')} 
+            source={require('../assets/images/icon.png')} 
             style={styles.watermarkLogo} 
             resizeMode="contain"
           />
