@@ -4,7 +4,7 @@
     "slug": "wkn-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/wkn-logo-square.png",
+    "icon": "./assets/images/wkn-logo-square.jpg",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +16,7 @@
       "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#F97316",
-        "foregroundImage": "./assets/images/wkn-logo-square.png"
+        "foregroundImage": "./assets/images/wkn-logo-square.jpg"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -52,7 +52,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/wkn-logo-square.png",
+          "image": "./assets/images/wkn-logo-square.jpg",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
