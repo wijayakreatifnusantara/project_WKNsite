@@ -33,19 +33,24 @@ export const registerForPushNotificationsAsync = async () => {
     return null;
   }
 
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-  console.log('Expo Push Token:', token);
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
+  try {
+    const projectId = 'cbd3d71d-a69c-4188-ba8f-a775202b26b5'; // dari app.json eas.projectId
+    const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+    console.log('Expo Push Token:', token);
+    
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+    return token;
+  } catch (e) {
+    console.log('Error getting push token:', e);
+    return null;
   }
-
-  return token;
 };
 
 export const scheduleSmartReminders = async () => {
