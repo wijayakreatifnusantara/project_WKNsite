@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "641231087477",
+    "project_id": "project-absensi-wkn",
+    "storage_bucket": "project-absensi-wkn.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641231087477:android:f936db83d86f47a628153c",
+        "android_client_info": {
+          "package_name": "com.example.flutter_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANI5jAHqXtnQGtVot6mypSJA9aTgGehM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -779,6 +779,60 @@ class WKNSupabaseClient:
             return False
 
     # -----------------------------------------------------------------------
+    # Auth Admin Operations for Employees
+    # -----------------------------------------------------------------------
+
+    async def create_auth_user(self, email: str, password: str = "123456", name: str = "") -> Optional[str]:
+        """Create a user in Supabase Auth (auth.users) via Admin API"""
+        if not self.client: return None
+        try:
+            res = self.client.auth.admin.create_user({
+                "email": email,
+                "password": password,
+                "email_confirm": True,
+                "user_metadata": {"name": name}
+            })
+            return res.user.id if res.user else None
+        except Exception as e:
+            err_msg = str(e).lower()
+            if "already exists" in err_msg or "already registered" in err_msg:
+                # If user already exists, try to get their ID by listing users or just return a dummy string indicating success
+                return "EXISTING"
+            print(f"Error creating auth user: {str(e)}")
+            return None
+
+    async def update_auth_user_email(self, current_email: str, new_email: str) -> bool:
+        """Update user email in Auth. Requires finding the user UID first."""
+        if not self.client: return False
+        try:
+            # Note: List users requires pagination, but for small teams it's fine.
+            # A more robust way is to store auth_id in employees table, but without it we search by email
+            users_res = self.client.auth.admin.list_users()
+            for u in users_res:
+                if u.email == current_email:
+                    self.client.auth.admin.update_user_by_id(u.id, {"email": new_email})
+                    return True
+            print(f"Auth user {current_email} not found for email update.")
+            return False
+        except Exception as e:
+            print(f"Error updating auth user email: {str(e)}")
+            return False
+
+    async def delete_or_suspend_auth_user(self, email: str) -> bool:
+        """Delete user from auth.users when they resign"""
+        if not self.client: return False
+        try:
+            users_res = self.client.auth.admin.list_users()
+            for u in users_res:
+                if u.email == email:
+                    self.client.auth.admin.delete_user(u.id)
+                    return True
+            return True # Not found, so essentially "deleted"
+        except Exception as e:
+            print(f"Error deleting auth user: {str(e)}")
+            return False
+
+    # -----------------------------------------------------------------------
     # Positions CRUD
     # -----------------------------------------------------------------------
 

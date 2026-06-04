@@ -173,42 +173,10 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     return breadcrumbMap[matched] || ['Dashboard', 'Overview'];
   };
 
-  // Sidebar Group state
-  const [expandedGroups, setExpandedGroups] = useState({
-    hr: true,
-    finance: true,
-    operations: false,
-    company: false
-  });
-
-  const toggleGroup = (group) => {
-    setExpandedGroups(prev => ({
-      ...prev,
-      [group]: !prev[group]
-    }));
-  };
-
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // Auto-expand groups based on active route
-  useEffect(() => {
-    const path = location.pathname;
-    if (path.includes('/employees') || path.includes('/attendance') || path.includes('/leave') || path.includes('/performance') || path.includes('/documents')) {
-      setExpandedGroups(prev => ({ ...prev, hr: true }));
-    }
-    if (path.includes('/payroll')) {
-      setExpandedGroups(prev => ({ ...prev, finance: true }));
-    }
-    if (path.includes('/crm') || path.includes('/recruitment') || path.includes('/academy') || path.includes('/assets')) {
-      setExpandedGroups(prev => ({ ...prev, operations: true }));
-    }
-    if (path.includes('/company')) {
-      setExpandedGroups(prev => ({ ...prev, company: true }));
-    }
-  }, [location.pathname]);
 
   const formatDate = (date) => {
     return date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -316,7 +284,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </div>
 
           {/* Core HR Group */}
-          <NavGroup label="Core HR" isOpen={expandedGroups.hr} onToggle={() => toggleGroup('hr')} isCollapsed={isSidebarCollapsed}>
+          <NavGroup label="Core HR" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconUsers size={15} />} label="Database Karyawan" to="/employees" />
             )}
@@ -341,14 +309,14 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Finance Group */}
-          <NavGroup label="Finance" isOpen={expandedGroups.finance} onToggle={() => toggleGroup('finance')} isCollapsed={isSidebarCollapsed}>
+          <NavGroup label="Finance" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.MANAGE_PAYROLL) && (
               <NavItem icon={<IconCreditCard size={15} />} label="Penggajian (Payroll)" to="/payroll" />
             )}
           </NavGroup>
 
           {/* Operations Group */}
-          <NavGroup label="Operations" isOpen={expandedGroups.operations} onToggle={() => toggleGroup('operations')} isCollapsed={isSidebarCollapsed}>
+          <NavGroup label="Operations" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.VIEW_CRM) && (
               <NavItem icon={<IconTrendingUp size={15} />} label="CRM Sales" to="/crm" />
             )}
@@ -367,7 +335,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Hub Perusahaan */}
-          <NavGroup label="Hub Perusahaan" isOpen={expandedGroups.company} onToggle={() => toggleGroup('company')} isCollapsed={isSidebarCollapsed}>
+          <NavGroup label="Hub Perusahaan" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconHierarchy2 size={15} />} label="Struktur Org" to="/company/org-chart" />
             )}
@@ -437,7 +405,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
               {/* On mobile, show current page title. On desktop, show breadcrumbs */}
               <div className="md:hidden flex items-center min-w-0">
-                <span className="text-xs font-black text-slate-800 uppercase tracking-wider font-outfit truncate">{getPageTitle()}</span>
+                <span className="text-sm font-semibold text-slate-800 truncate">{getPageTitle()}</span>
               </div>
 
               <div className="hidden md:block h-3 w-[1px] bg-slate-200 shrink-0"></div>
@@ -445,7 +413,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               {/* Breadcrumb & Clock Container */}
               <div className="hidden md:flex flex-col gap-1">
                 {/* Minimalist Breadcrumbs */}
-                <div className="flex items-center gap-1.5 text-[9.5px] font-black uppercase tracking-[0.2em] text-slate-400">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                   <span className="hover:text-[#E31E24] cursor-pointer transition-colors text-slate-700">WKNsite</span>
                   <span className="text-slate-300">/</span>
                   {getBreadcrumbs().map((part, index, arr) => (
@@ -456,10 +424,10 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                   ))}
                 </div>
                 {/* Clock directly under WKNsite */}
-                <div className="flex items-center gap-1.5 pl-0.5">
-                  <span className="text-[8.5px] font-semibold text-slate-400 uppercase tracking-widest">{formatDate(currentTime)}</span>
-                  <span className="text-slate-300 text-[8.5px]">•</span>
-                  <span className="text-[8.5px] font-mono font-bold text-[#E31E24]">{formatTime(currentTime)}</span>
+                <div className="flex items-center gap-1.5 pl-0.5 mt-0.5">
+                  <span className="text-xs text-slate-500">{formatDate(currentTime)}</span>
+                  <span className="text-slate-300 text-xs">•</span>
+                  <span className="text-xs font-mono font-medium text-slate-600">{formatTime(currentTime)}</span>
                 </div>
               </div>
 
@@ -546,7 +514,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   );
 };
 
-const NavGroup = ({ label, isOpen, onToggle, isCollapsed, children }) => {
+const NavGroup = ({ label, isCollapsed, children }) => {
   // Check if any of children exist (are visible based on permission checks)
   const hasVisibleChildren = React.Children.toArray(children).some(child => child !== null && child !== undefined && child !== false);
 
@@ -566,21 +534,12 @@ const NavGroup = ({ label, isOpen, onToggle, isCollapsed, children }) => {
   }
 
   return (
-    <div className="space-y-1">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between px-4 py-2 mt-4 text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-[0.25em] transition-colors select-none"
-      >
-        <span>{label}</span>
-        <IconChevronRight
-          size={12}
-          className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-90 text-[#E31E24]' : ''}`}
-        />
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="space-y-1 pl-1.5 mt-1">
-          {children}
-        </div>
+    <div className="mb-4">
+      <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider select-none">
+        {label}
+      </div>
+      <div className="space-y-0.5">
+        {children}
       </div>
     </div>
   );
@@ -592,11 +551,11 @@ const NavItem = ({ icon, label, to, isCollapsed, end = true }) => (
     end={end}
     title={isCollapsed ? label : undefined}
     className={({ isActive }) => `
-      relative flex items-center rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 group
-      ${isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'w-full px-4 py-2.5 gap-3'}
+      relative flex items-center rounded-lg text-sm font-medium transition-all duration-200 group
+      ${isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'w-full px-4 py-2 gap-3'}
       ${isActive 
-        ? 'bg-red-50/50 text-[#E31E24]' 
-        : 'text-slate-400 hover:text-[#E31E24] hover:bg-slate-50'}
+        ? 'bg-red-50 text-[#E31E24]' 
+        : 'text-slate-600 hover:text-[#E31E24] hover:bg-slate-50'}
     `}
   >
     {({ isActive }) => (

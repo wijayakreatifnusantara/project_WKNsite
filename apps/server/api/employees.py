@@ -78,6 +78,9 @@ async def create_employee(employee: EmployeeCreate, current_user: dict = Depends
         if not success:
             raise HTTPException(status_code=500, detail="Failed to add employee to Spreadsheet")
         
+        if employee.email:
+            await supabase_client.create_auth_user(email=employee.email, password="123456", name=employee.employee_name)
+        
         return Employee(**employee_dict, id=0)
         
     except Exception as e:
@@ -215,6 +218,10 @@ async def get_unread_notifications_count(current_user: dict = Depends(get_curren
 @router.put("/employees/{employee_id}", response_model=Employee)
 async def update_employee(employee_id: str, employee: EmployeeCreate, current_user: dict = Depends(require_admin)):
     try:
+        # Fetch old email to detect changes
+        old_res = supabase_client.client.table('employees').select('email').eq('id', employee_id).execute()
+        old_email = old_res.data[0].get('email') if old_res.data else None
+
         employee_dict = employee.dict()
         header_map = {
             "employee_id": "EMPLOYEE ID",
@@ -279,6 +286,9 @@ async def update_employee(employee_id: str, employee: EmployeeCreate, current_us
         if not success:
             raise HTTPException(status_code=404, detail="Employee not found")
             
+        if old_email and employee.email and old_email != employee.email:
+            await supabase_client.update_auth_user_email(old_email, employee.email)
+            
         return Employee(**employee_dict, id=0)
         
     except Exception as e:
@@ -287,9 +297,15 @@ async def update_employee(employee_id: str, employee: EmployeeCreate, current_us
 @router.delete("/employees/{employee_id}")
 async def delete_employee(employee_id: str, current_user: dict = Depends(require_admin)):
     try:
+        old_res = supabase_client.client.table('employees').select('email').eq('id', employee_id).execute()
+        old_email = old_res.data[0].get('email') if old_res.data else None
+
         success = await supabase_client.delete_employee(employee_id)
         if not success:
             raise HTTPException(status_code=404, detail="Employee not found")
+            
+        if old_email:
+            await supabase_client.delete_or_suspend_auth_user(old_email)
             
         return {"status": "success", "message": "Employee soft-deleted"}
         
@@ -305,6 +321,11 @@ class BulkActionRequest(BaseModel):
 async def bulk_resign_employees(data: BulkActionRequest, current_user: dict = Depends(require_admin)):
     try:
         from datetime import datetime
+        
+        # Fetch emails
+        res = supabase_client.client.table('employees').select('email').in_('id', data.ids).execute()
+        emails_to_ban = [row['email'] for row in res.data if row.get('email')]
+
         resign_date = datetime.now().strftime('%Y-%m-%d')
         update_data = {
             'status': 'RESIGNED',
@@ -312,6 +333,10 @@ async def bulk_resign_employees(data: BulkActionRequest, current_user: dict = De
             'is_resigned': True
         }
         response = supabase_client.client.table('employees').update(update_data).in_('id', data.ids).execute()
+        
+        for email in emails_to_ban:
+            await supabase_client.delete_or_suspend_auth_user(email)
+            
         return {"status": "success", "count": len(response.data) if response.data else 0}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Bulk resign failed: {str(e)}")
@@ -332,7 +357,14 @@ async def bulk_activate_employees(data: BulkActionRequest, current_user: dict = 
 @router.delete("/employees/bulk-delete")
 async def bulk_delete_employees(data: BulkActionRequest, current_user: dict = Depends(require_admin)):
     try:
+        res = supabase_client.client.table('employees').select('email').in_('id', data.ids).execute()
+        emails_to_ban = [row['email'] for row in res.data if row.get('email')]
+        
         response = supabase_client.client.table('employees').delete().in_('id', data.ids).execute()
+        
+        for email in emails_to_ban:
+            await supabase_client.delete_or_suspend_auth_user(email)
+            
         return {"status": "success", "count": len(response.data) if response.data else 0}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Bulk delete failed: {str(e)}")
