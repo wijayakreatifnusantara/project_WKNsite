@@ -7,7 +7,8 @@ import {
 } from '@tabler/icons-react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const _rawApi = import.meta.env.VITE_API_URL;
+const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
 
 // ─── HQ Config Form ──────────────────────────────────────────────────────────
 const HQConfigForm = ({ onSettingsUpdated }) => {

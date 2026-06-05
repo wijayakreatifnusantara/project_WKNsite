@@ -115,7 +115,8 @@ const initialFormData = {
   mobile_password: ''
 };
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const _rawApi = import.meta.env.VITE_API_URL;
+const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
 
 const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const [loading, setLoading] = useState(false);

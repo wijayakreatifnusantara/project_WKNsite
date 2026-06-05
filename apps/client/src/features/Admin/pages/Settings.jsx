@@ -24,7 +24,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const _rawApi = import.meta.env.VITE_API_URL;
+const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('general');

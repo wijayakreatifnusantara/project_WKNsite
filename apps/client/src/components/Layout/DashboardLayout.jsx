@@ -84,7 +84,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   useEffect(() => {
     const fetchOrgs = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const _rawApi = import.meta.env.VITE_API_URL;
+const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
         const response = await fetch(`${API_URL}/organizations?active_only=true`);
         const data = await response.json();
         

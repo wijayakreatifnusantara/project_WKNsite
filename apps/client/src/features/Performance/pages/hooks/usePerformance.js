@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const _rawApi = import.meta.env.VITE_API_URL;
+const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
 
 // Performance Badge Logic (T018)
 export const getPerformanceBadge = (totalScore) => {
