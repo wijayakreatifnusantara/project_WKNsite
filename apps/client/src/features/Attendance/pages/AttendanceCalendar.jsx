@@ -134,7 +134,8 @@ const AttendanceCalendar = () => {
 
       const uniqueOrgIds = [...new Set(empData.map(e => e.organization_id).filter(Boolean))];
       const deptMap = {};
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const _rawApi = import.meta.env.VITE_API_URL;
+      const apiUrl = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
       
       await Promise.all(uniqueOrgIds.map(async (orgId) => {
           try {
