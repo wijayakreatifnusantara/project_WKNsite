@@ -556,7 +556,30 @@ const EmployeeForm = () => {
               </button>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pr-6">
                 <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama</label><input value={member.name} onChange={e => handleArrayChange('family_members', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Hubungan</label><input value={member.relation} onChange={e => handleArrayChange('family_members', idx, 'relation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase">Hubungan</label>
+                  <select 
+                    value={member.relation || ''} 
+                    onChange={e => handleArrayChange('family_members', idx, 'relation', e.target.value)} 
+                    className={inputStyle} 
+                    disabled={!formData.employee_id}
+                  >
+                    <option value="">Pilih Hubungan</option>
+                    <option value="Ayah Kandung">Ayah Kandung</option>
+                    <option value="Ibu Kandung">Ibu Kandung</option>
+                    <option value="Ayah Tiri">Ayah Tiri</option>
+                    <option value="Ibu Tiri">Ibu Tiri</option>
+                    <option value="Suami">Suami</option>
+                    <option value="Istri">Istri</option>
+                    <option value="Anak">Anak</option>
+                    <option value="Kakak">Kakak</option>
+                    <option value="Adik">Adik</option>
+                    <option value="Mertua">Mertua</option>
+                    <option value="Kakek">Kakek</option>
+                    <option value="Nenek">Nenek</option>
+                    <option value="Lain-lain">Lain-lain</option>
+                  </select>
+                </div>
                 <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Pekerjaan</label><input value={member.occupation} onChange={e => handleArrayChange('family_members', idx, 'occupation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
                 <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">No. Telepon</label><input value={member.phone} onChange={e => handleArrayChange('family_members', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
               </div>
