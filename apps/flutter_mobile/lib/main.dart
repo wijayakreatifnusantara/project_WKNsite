@@ -11,6 +11,7 @@ import 'features/reports/data/attendance_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/utils/notification_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/di/dependency_injection.dart';
 
@@ -69,6 +70,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primaryColor),
+        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
         useMaterial3: true,
         scaffoldBackgroundColor: AppConstants.backgroundColor,
         pageTransitionsTheme: const PageTransitionsTheme(

@@ -357,7 +357,7 @@ const Employees = () => {
                 <IconTable size={14} className="text-blue-500" /> Impor Bulk
               </Button>
               {isAdmin() && (
-                <Button onClick={() => { setEditingEmployee(null); setIsAddModalOpen(true); }} className="h-9 px-4 bg-[#E31E24] text-white shadow-sm rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
+                <Button onClick={() => navigate('/master/employees/create')} className="h-9 px-4 bg-[#E31E24] text-white shadow-sm rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
                   <IconPlus size={14} /> Tambah Karyawan
                 </Button>
               )}
@@ -495,7 +495,7 @@ const Employees = () => {
                           Lihat
                         </button>
                         <button 
-                          onClick={() => {setEditingEmployee(emp); setIsAddModalOpen(true);}} 
+                          onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} 
                           className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
                         >
                           Edit
@@ -656,7 +656,7 @@ const Employees = () => {
                             <td className="w-[15%] px-4 py-2.5 text-right">
                               <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 <ActionButton onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} icon={<IconEye size={14} />} hover="hover:text-blue-600 hover:bg-blue-50" label="LIHAT" />
-                                <ActionButton onClick={() => {setEditingEmployee(emp); setIsAddModalOpen(true);}} icon={<IconEdit size={14} />} hover="hover:text-green-600 hover:bg-green-50" label="EDIT" />
+                                <ActionButton onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} icon={<IconEdit size={14} />} hover="hover:text-green-600 hover:bg-green-50" label="EDIT" />
                                 <ActionButton onClick={() => {setESignTargetEmployee(emp); setIsESignOpen(true);}} icon={<IconSignature size={14} />} hover="hover:text-amber-600 hover:bg-amber-50" label="TANDA TANGAN" />
                                 {isAdmin() && (
                                   <>

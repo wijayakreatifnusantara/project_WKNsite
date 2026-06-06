@@ -2,54 +2,28 @@ import asyncio
 import os
 import sys
 
-# Add apps/server to path
-sys.path.append(os.path.join(os.getcwd(), "apps", "server"))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../apps/server'))
 
-from utils.supabase_client import supabase_client
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '../apps/server/.env'))
 
-async def check():
-    employees_res = await supabase_client.get_employees()
-    if employees_res and employees_res.get("data"):
-        employees = employees_res["data"]
-        print(f"Successfully retrieved employees. Total count in result: {len(employees)}")
-        print(f"Sample employee keys: {list(employees[0].keys())}")
-        
-        # Get raw data from table
-        res = supabase_client.client.table("employees").select("*").limit(1).execute()
-        if res.data:
-            print(f"Raw DB columns in employees: {list(res.data[0].keys())}")
-        else:
-            print("No raw employee rows to check columns.")
-    else:
-        print("No employees found in client.get_employees()")
-        # Try raw select anyway
-        try:
-            res = supabase_client.client.table("employees").select("*").limit(1).execute()
-            if res.data:
-                print(f"Raw DB columns in employees: {list(res.data[0].keys())}")
-        except Exception as e:
-            print(f"Error querying employees table: {str(e)}")
+from utils.supabase_client import WKNSupabaseClient
 
-    # Check system_configs table
-    print("\nChecking 'system_configs' table...")
+async def main():
     try:
-        res = supabase_client.client.table("system_configs").select("*").execute()
-        print(f"system_configs exists! Rows count: {len(res.data)}")
-        if res.data:
-            print(f"Row data: {res.data}")
+        client = WKNSupabaseClient()
+        if not client.client:
+            print("Failed to initialize Supabase client")
+            return
+            
+        tables_to_check = ["employees", "profiles", "organizations", "departments", "attendance"]
+        for table in tables_to_check:
+            print(f"Fetching {table}...")
+            res = client.client.table(table).select("id", count="exact").execute()
+            print(f"Count for {table}: {res.count}")
+            
     except Exception as e:
-        print(f"Failed to query system_configs table (might not exist): {str(e)}")
-
-    # Check attendance table columns
-    print("\nChecking 'attendance' table...")
-    try:
-        res = supabase_client.client.table("attendance").select("*").limit(1).execute()
-        if res.data:
-            print(f"Raw DB columns in attendance: {list(res.data[0].keys())}")
-        else:
-            print("attendance table exists but is empty.")
-    except Exception as e:
-        print(f"Failed to query attendance table: {str(e)}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(check())
+    asyncio.run(main())

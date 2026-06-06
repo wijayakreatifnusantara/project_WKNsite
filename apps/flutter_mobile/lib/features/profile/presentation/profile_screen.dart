@@ -291,7 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               const Text('SYSTEM ID', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
                               const SizedBox(height: 2),
-                              Text(user?['employee_code'] ?? user?['id']?.toString().substring(0, 8).toUpperCase() ?? 'WKN-0000', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                              Text(user?['employee_code'] ?? (((user?['id']?.toString().length ?? 0) > 8) ? user!['id'].toString().substring(0, 8).toUpperCase() : (user?['id']?.toString().toUpperCase() ?? 'WKN-0000')), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
                             ],
                           ),
                         ),

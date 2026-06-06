@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../features/Login/pages/Login';
 import Employees from '../features/Employees/pages/Employees';
+import EmployeeForm from '../features/Employees/pages/EmployeeForm';
 import AttendanceHub from '../features/Attendance/pages/AttendanceHub';
 import AttendanceReport from '../features/Attendance/pages/AttendanceReport';
 import AttendanceRecap from '../features/Attendance/pages/AttendanceRecap';
@@ -58,7 +59,9 @@ const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/overview" replace />} />
         <Route path="/dashboard" element={<Navigate to="/overview" replace />} />
         <Route path="/overview" element={<Overview />} />
-        <Route path="/employees" element={<Employees />} />
+        <Route path="/master/employees" element={<Employees />} />
+        <Route path="/master/employees/create" element={<EmployeeForm />} />
+        <Route path="/master/employees/edit/:id" element={<EmployeeForm />} />
         <Route path="/employees/onboarding" element={<OnboardingPage />} />
         <Route path="/attendance" element={<AttendanceHub />} />
         <Route path="/attendance/calendar" element={<AttendanceCalendar />} />

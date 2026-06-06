@@ -42,7 +42,11 @@ import {
   IconFileText,
   IconClipboardList,
   IconBuildingSkyscraper,
-  IconMenu2
+  IconMenu2,
+  IconCalendarEvent,
+  IconCalendarTime,
+  IconEditCircle,
+  IconClockPlay
 } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Clock, Users, CreditCard, Settings, Calendar, Bell } from "lucide-react";
@@ -82,14 +86,32 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     const path = location.pathname;
     const breadcrumbMap = {
       '/overview': ['Dashboard', 'Overview'],
-      '/employees': ['Core HR', 'Database Karyawan'],
+      
+      // Data Master
+      '/master/employees': ['Data Master', 'Database Karyawan'],
+      '/master/organization': ['Data Master', 'Organisasi & Lokasi'],
+      '/master/positions': ['Data Master', 'Jabatan & Golongan'],
+      '/master/shifts': ['Data Master', 'Shift & Libur Nasional'],
+      
+      // Time & Attendance
+      '/attendance/log': ['Time & Attendance', 'Log Kehadiran'],
+      '/attendance/location': ['Time & Attendance', 'Lokasi Kerja'],
+      '/attendance/schedule': ['Time & Attendance', 'Jadwal & Shift'],
+      '/attendance/correction': ['Time & Attendance', 'Koreksi Absen'],
+      '/leave': ['Time & Attendance', 'Cuti & Izin'],
+      '/overtime': ['Time & Attendance', 'Manajemen Lembur'],
+      '/attendance/reports': ['Time & Attendance', 'Rekap Laporan Bulanan'],
+      
+      // Core HR
       '/employees/onboarding': ['Core HR', 'Onboarding Karyawan'],
-      '/attendance': ['Core HR', 'Absensi Karyawan'],
-      '/attendance/location': ['Core HR', 'Lokasi Kerja'],
-      '/leave': ['Core HR', 'Manajemen Cuti'],
       '/performance': ['Core HR', 'Kinerja Karyawan'],
       '/documents': ['Core HR', 'Dokumen Hub'],
-      '/payroll': ['Finance', 'Penggajian (Payroll)'],
+      
+      // Finance
+      '/finance/salary': ['Finance & Payroll', 'Data Gaji Karyawan'],
+      '/payroll': ['Finance & Payroll', 'Penggajian (Payroll)'],
+      
+      // Operations & Hub
       '/crm': ['Operations', 'CRM Sales'],
       '/recruitment': ['Operations', 'Rekrutmen'],
       '/academy': ['Operations', 'Akademi'],
@@ -129,14 +151,26 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes('/overview')) return 'SYSTEM OVERVIEW';
-    if (path.includes('/employees/onboarding')) return 'ONBOARDING KARYAWAN';
-    if (path.includes('/employees')) return 'DATABASE KARYAWAN';
+    if (path.includes('/master/employees')) return 'DATABASE KARYAWAN';
+    if (path.includes('/master/organization')) return 'ORGANISASI & LOKASI';
+    if (path.includes('/master/positions')) return 'JABATAN & GOLONGAN';
+    if (path.includes('/master/shifts')) return 'SHIFT & LIBUR NASIONAL';
+    
+    if (path.includes('/attendance/log')) return 'LOG KEHADIRAN';
     if (path.includes('/attendance/location')) return 'LOKASI KERJA';
-    if (path.includes('/attendance')) return 'ABSENSI KARYAWAN';
-    if (path.includes('/leave')) return 'MANAJEMEN CUTI';
-    if (path.includes('/payroll')) return 'PENGGAJIAN KARYAWAN';
+    if (path.includes('/attendance/schedule')) return 'JADWAL & SHIFT';
+    if (path.includes('/attendance/correction')) return 'KOREKSI ABSEN';
+    if (path.includes('/attendance/reports')) return 'REKAP LAPORAN BULANAN';
+    if (path.includes('/leave')) return 'CUTI & IZIN';
+    if (path.includes('/overtime')) return 'MANAJEMEN LEMBUR';
+    
+    if (path.includes('/employees/onboarding')) return 'ONBOARDING KARYAWAN';
     if (path.includes('/performance')) return 'KINERJA KARYAWAN (KPI)';
     if (path.includes('/documents')) return 'DOKUMEN HUB';
+    
+    if (path.includes('/finance/salary')) return 'DATA GAJI KARYAWAN';
+    if (path.includes('/payroll')) return 'PENGGAJIAN (PAYROLL)';
+    
     if (path.includes('/assets/consumables')) return 'MANAGEMENT CONSUMABLES';
     if (path.includes('/assets')) return 'INVENTARIS ASET';
     if (path.includes('/crm')) return 'CRM & SALES QUOTATION';
@@ -187,22 +221,51 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <NavItem icon={<IconLayoutDashboard size={15} />} label="Overview" to="/overview" isCollapsed={isSidebarCollapsed} />
           </div>
 
-          {/* Core HR Group */}
-          <NavGroup label="Core HR" isCollapsed={isSidebarCollapsed}>
+          {/* Data Master Group */}
+          <NavGroup label="Data Master" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-              <NavItem icon={<IconUsers size={15} />} label="Database Karyawan" to="/employees" />
+              <NavItem icon={<IconUsers size={15} />} label="Database Karyawan" to="/master/employees" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-              <NavItem icon={<IconUserPlus size={15} />} label="Onboarding Karyawan" to="/employees/onboarding" />
+              <NavItem icon={<IconBuildingSkyscraper size={15} />} label="Organisasi & Lokasi" to="/master/organization" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-              <NavItem icon={<IconClock size={15} />} label="Absensi Karyawan" to="/attendance" />
+              <NavItem icon={<IconId size={15} />} label="Jabatan & Golongan" to="/master/positions" />
+            )}
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
+              <NavItem icon={<IconCalendarEvent size={15} />} label="Shift & Libur Nasional" to="/master/shifts" />
+            )}
+          </NavGroup>
+
+          {/* Time & Attendance Group */}
+          <NavGroup label="Time & Attendance" isCollapsed={isSidebarCollapsed}>
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
+              <NavItem icon={<IconClock size={15} />} label="Log Kehadiran" to="/attendance/log" />
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
               <NavItem icon={<IconMapPin size={15} />} label="Lokasi Kerja" to="/attendance/location" />
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
-              <NavItem icon={<IconClipboardCheck size={15} />} label="Manajemen Cuti" to="/leave" />
+              <NavItem icon={<IconCalendarTime size={15} />} label="Jadwal & Shift" to="/attendance/schedule" />
+            )}
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+              <NavItem icon={<IconEditCircle size={15} />} label="Koreksi Absen" to="/attendance/correction" />
+            )}
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+              <NavItem icon={<IconClipboardCheck size={15} />} label="Cuti & Izin" to="/leave" />
+            )}
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+              <NavItem icon={<IconClockPlay size={15} />} label="Manajemen Lembur" to="/overtime" />
+            )}
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+              <NavItem icon={<IconChartBar size={15} />} label="Rekap Laporan" to="/attendance/reports" />
+            )}
+          </NavGroup>
+
+          {/* Core HR Group */}
+          <NavGroup label="Core HR" isCollapsed={isSidebarCollapsed}>
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
+              <NavItem icon={<IconUserPlus size={15} />} label="Onboarding Karyawan" to="/employees/onboarding" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconTrophy size={15} />} label="Kinerja Karyawan" to="/performance" />
@@ -212,8 +275,11 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             )}
           </NavGroup>
 
-          {/* Finance Group */}
-          <NavGroup label="Finance" isCollapsed={isSidebarCollapsed}>
+          {/* Finance & Payroll Group */}
+          <NavGroup label="Finance & Payroll" isCollapsed={isSidebarCollapsed}>
+            {can(PERMISSIONS.MANAGE_PAYROLL) && (
+              <NavItem icon={<IconReceipt size={15} />} label="Data Gaji Karyawan" to="/finance/salary" />
+            )}
             {can(PERMISSIONS.MANAGE_PAYROLL) && (
               <NavItem icon={<IconCreditCard size={15} />} label="Penggajian (Payroll)" to="/payroll" />
             )}

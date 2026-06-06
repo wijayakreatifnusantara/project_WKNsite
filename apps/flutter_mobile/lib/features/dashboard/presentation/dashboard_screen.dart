@@ -298,7 +298,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             expandedHeight: 240.0,
             floating: false,
             pinned: true,
-            backgroundColor: AppConstants.primaryColor,
+            backgroundColor: Colors.white,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
@@ -312,7 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     opacity: t, 
                     child: Row(
                       children: [
-                        const Text('WKN Mobile', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                        const Text('WKN Mobile', style: TextStyle(color: AppConstants.slate800, fontWeight: FontWeight.bold, fontSize: 18)),
                         const Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0),
@@ -320,8 +320,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             onTap: () => context.push('/id-card'),
                             child: CircleAvatar(
                               radius: 14,
-                              backgroundColor: Colors.white24,
-                              child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'A', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                              backgroundColor: AppConstants.slate200,
+                              child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'A', style: const TextStyle(color: AppConstants.slate800, fontSize: 12, fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ),
@@ -331,15 +331,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
               background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppConstants.primaryColor,
-                      AppConstants.primaryColor.withValues(alpha: 0.8),
-                    ],
-                  ),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  border: Border(bottom: BorderSide(color: AppConstants.slate200, width: 1)),
                 ),
                 child: SafeArea(
                   child: Padding(
@@ -353,15 +347,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Selamat Pagi,', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14)),
+                                const Text('Selamat Pagi,', style: TextStyle(color: AppConstants.slate600, fontSize: 14)),
                                 const SizedBox(height: 4),
-                                Text(user?['name'] ?? 'Karyawan', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                                Text(user?['name'] ?? 'Karyawan', style: const TextStyle(color: AppConstants.slate800, fontSize: 24, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-                              child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 24),
+                              decoration: BoxDecoration(color: AppConstants.slate50, border: Border.all(color: AppConstants.slate200), borderRadius: BorderRadius.circular(12)),
+                              child: const Icon(Icons.notifications_outlined, color: AppConstants.slate800, size: 24),
                             ),
                           ],
                         ),
@@ -372,28 +366,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('WAKTU SAAT INI', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                                const Text('WAKTU SAAT INI', style: TextStyle(color: AppConstants.slate500, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.baseline,
                                   textBaseline: TextBaseline.alphabetic,
                                   children: [
-                                    const Text('08:15', style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
+                                    const Text('08:15', style: TextStyle(color: AppConstants.slate800, fontSize: 36, fontWeight: FontWeight.w900)),
                                     const SizedBox(width: 4),
-                                    Text('WIB', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.bold)),
+                                    const Text('WIB', style: TextStyle(color: AppConstants.slate600, fontSize: 14, fontWeight: FontWeight.bold)),
                                   ],
                                 ),
-                                const Text('Senin, 30 Mei 2026', style: TextStyle(color: Colors.white, fontSize: 12)),
+                                const Text('Senin, 30 Mei 2026', style: TextStyle(color: AppConstants.slate600, fontSize: 12)),
                               ],
                             ),
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.green.shade400, borderRadius: BorderRadius.circular(20)),
+                              decoration: BoxDecoration(color: Colors.green.shade50, border: Border.all(color: Colors.green.shade200), borderRadius: BorderRadius.circular(20)),
                               child: Row(
-                                children: const [
-                                  Icon(Icons.wifi, color: Colors.white, size: 12),
-                                  SizedBox(width: 6),
-                                  Text('ONLINE', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                                children: [
+                                  Icon(Icons.wifi, color: Colors.green.shade600, size: 12),
+                                  const SizedBox(width: 6),
+                                  Text('ONLINE', style: TextStyle(color: Colors.green.shade700, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                                 ],
                               ),
                             ),
@@ -486,12 +480,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppConstants.textPrimary,
-        onPressed: () => context.push('/assistant'),
-        elevation: 4,
-        child: const Icon(Icons.auto_awesome, color: Colors.white),
-      ),
     );
   }
 
@@ -500,7 +488,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: AppConstants.primaryColor.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 10))],
+        border: Border.all(color: AppConstants.slate200, width: 1),
+        boxShadow: AppConstants.flatShadow,
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -606,10 +595,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 width: 58, height: 58,
                 decoration: BoxDecoration(
-                  color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.1) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: isAllButton ? Colors.transparent : Colors.grey.shade100),
-                  boxShadow: isAllButton ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 10, offset: const Offset(0, 4))],
+                  color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.05) : AppConstants.slate50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.2) : AppConstants.slate200, width: 1),
                 ),
                 child: Icon(
                   action['icon'] as IconData,

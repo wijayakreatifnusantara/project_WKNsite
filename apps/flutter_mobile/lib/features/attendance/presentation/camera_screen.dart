@@ -12,6 +12,7 @@ import '../../auth/data/auth_provider.dart';
 import '../data/attendance_service.dart';
 import '../data/offline_attendance_service.dart';
 import '../utils/liveness_checker.dart';
+import '../../../core/utils/biometric_helper.dart';
 
 class CameraScreen extends StatefulWidget {
   final String clockType;
@@ -111,6 +112,19 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _takePictureAndSubmit() async {
     if (!_controller!.value.isInitialized || _isProcessing) return;
+
+    // Ekstra Keamanan: Wajib verifikasi sidik jari/wajah sebelum absen
+    final biometricHelper = BiometricHelper();
+    bool authenticated = await biometricHelper.authenticate();
+    
+    if (!authenticated) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Verifikasi Biometrik gagal atau dibatalkan. Absensi tidak dapat diproses.'), backgroundColor: Colors.red),
+        );
+      }
+      return;
+    }
 
     setState(() {
       _isProcessing = true;
@@ -264,7 +278,7 @@ class _CameraScreenState extends State<CameraScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.redAccent.withOpacity(0.9),
+                  color: Colors.redAccent.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: const Text(
@@ -291,7 +305,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: _isLivenessPassed ? Colors.white : Colors.grey, width: 4),
-                        color: _isLivenessPassed ? AppConstants.primaryColor : Colors.grey.withOpacity(0.5),
+                        color: _isLivenessPassed ? AppConstants.primaryColor : Colors.grey.withValues(alpha: 0.5),
                       ),
                       child: Icon(
                         _isLivenessPassed ? Icons.camera_alt : Icons.lock_outline, 

@@ -17,87 +17,85 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  bool _isAuthenticated = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkBiometric();
-  }
-
-  Future<void> _checkBiometric() async {
-    final helper = BiometricHelper();
-    final authenticated = await helper.authenticate();
-    if (authenticated) {
-      setState(() {
-        _isAuthenticated = true;
-      });
-    } else {
-      // Keluar dari app jika gagal/batal
-      SystemNavigator.pop();
-    }
-  }
 
   final List<Widget> _screens = [
     const DashboardScreen(),
     const InboxScreen(),
-    const Center(child: Text('Kamera Absen')),
+    const Center(child: Text('Kamera Absen')), // This is a placeholder, routed separately
     const HelpdeskScreen(),
     const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    if (!_isAuthenticated) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Icon(Icons.fingerprint, size: 64, color: Colors.white54),
-        ),
-      );
-    }
-
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          if (index == 2) {
-            context.push('/camera');
-          } else {
-            setState(() {
-              _currentIndex = index;
-            });
-          }
-        },
-        backgroundColor: Colors.white,
-        indicatorColor: AppConstants.primaryColor.withValues(alpha: 0.2),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home, color: AppConstants.primaryColor),
-            label: 'Beranda',
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/assistant'),
+        backgroundColor: AppConstants.secondaryColor,
+        shape: const CircleBorder(),
+        elevation: 0, // Flat premium look
+        highlightElevation: 2,
+        child: const Icon(Icons.auto_awesome, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: AppConstants.slate200, width: 1)),
+        ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            elevation: 0,
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppConstants.primaryColor);
+              }
+              return const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppConstants.textSecondary);
+            }),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.mail_outline),
-            selectedIcon: Icon(Icons.mail, color: AppConstants.primaryColor),
-            label: 'Kotak Masuk',
+          child: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              if (index == 2) {
+                context.push('/assistant');
+              } else {
+                setState(() {
+                  _currentIndex = index;
+                });
+              }
+            },
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            indicatorColor: AppConstants.primaryColor.withValues(alpha: 0.1),
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home, color: AppConstants.primaryColor),
+                label: 'Beranda',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.mail_outline),
+                selectedIcon: Icon(Icons.mail, color: AppConstants.primaryColor),
+                label: 'Inbox',
+              ),
+              NavigationDestination(
+                icon: SizedBox.shrink(),
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.help_outline),
+                selectedIcon: Icon(Icons.help, color: AppConstants.primaryColor),
+                label: 'Bantuan',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person_outline),
+                selectedIcon: Icon(Icons.person, color: AppConstants.primaryColor),
+                label: 'Profil',
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.fingerprint, size: 32, color: AppConstants.primaryColor),
-            label: 'Absen',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.help_outline),
-            selectedIcon: Icon(Icons.help, color: AppConstants.primaryColor),
-            label: 'Bantuan',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person, color: AppConstants.primaryColor),
-            label: 'Profil',
-          ),
-        ],
+        ),
       ),
     );
   }
