@@ -129,8 +129,8 @@ const EmployeeForm = () => {
     if (org) {
       setFormData(prev => ({ ...prev, organization_name: org.name, organization_id: org.id, department_id: '' }));
       if (!id && !formData.employee_id) {
-        apiClient.get(`/api/employees/generate-id?org_code=${org.code}`)
-          .then(res => { if (res.status === 'success') setFormData(prev => ({ ...prev, employee_id: res.data })); })
+        apiClient.get(`/api/employees/generate-id?org_code=${org.code || 'TMP'}`)
+          .then(res => { if (res.data.status === 'success') setFormData(prev => ({ ...prev, employee_id: res.data.data })); })
           .catch(() => setFormData(prev => ({ ...prev, employee_id: `${org.code}-TMP-${Math.floor(Math.random() * 1000)}` })));
       }
     } else {
