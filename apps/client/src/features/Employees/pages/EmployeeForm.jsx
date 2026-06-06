@@ -888,7 +888,7 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Kursus atau Sertifikasi</h3>
-          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', city: '', phone: '', year: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', city: '', phone: '', year: '', certificate_number: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Sertifikasi
           </button>
         </div>
@@ -901,6 +901,7 @@ const EmployeeForm = () => {
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={cert.city || ''} onChange={e => handleArrayChange('certifications', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Telp Institusi</label><input value={cert.phone || ''} onChange={e => handleArrayChange('certifications', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun</label><input value={cert.year || ''} onChange={e => handleArrayChange('certifications', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Sertifikat</label><input value={cert.certificate_number || ''} onChange={e => handleArrayChange('certifications', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
             </div>
           ))}
           {(!formData.certifications || formData.certifications.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada kursus atau sertifikasi.</div>}
