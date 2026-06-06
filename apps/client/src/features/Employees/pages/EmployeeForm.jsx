@@ -274,7 +274,7 @@ const EmployeeForm = () => {
               </select>
             </InputWrapper>
             <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
-              <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} disabled={!formData.employee_id} />
+              <DatePicker portalId="root-portal" selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} disabled={!formData.employee_id} />
             </InputWrapper>
             <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
               <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>

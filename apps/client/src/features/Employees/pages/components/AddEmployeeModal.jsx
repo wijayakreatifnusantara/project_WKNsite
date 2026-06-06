@@ -59,6 +59,7 @@ const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon, d
   <div className="relative w-full">
     {Icon && <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />}
     <DatePicker
+      portalId="root-portal"
       selected={selected ? new Date(selected) : null}
       onChange={onChange}
       dateFormat="dd/MM/yyyy"
