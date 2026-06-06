@@ -3,12 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   IconArrowLeft, IconDeviceFloppy, IconUserCircle, IconBriefcase, IconCreditCard,
   IconId, IconMail, IconPhone, IconMapPin, IconBuildingSkyscraper, IconAward,
-  IconCalendarEvent, IconGenderBigender, IconScan, IconLoader2, IconCamera, IconX
+  IconCalendarEvent, IconGenderBigender, IconLoader2, IconFileUpload, IconFileDescription, IconTrash, IconCheck
 } from "@tabler/icons-react";
 import { apiClient } from '@/lib/apiClient';
+import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
-import Tesseract from 'tesseract.js';
 import CryptoJS from 'crypto-js';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -38,25 +38,35 @@ const initialFormData = {
   base_salary: 0, join_date: new Date().toISOString().split('T')[0],
   emergency_contact_1_name: '', emergency_contact_1_rel: '', emergency_contact_1_phone: '',
   bank_name: '', bank_account: '', bank_account_holder: '', bpjs_tk_number: '', bpjs_ks_number: '',
-  mobile_password: ''
+  mobile_password: '', documents: {}
 };
+
+const DOC_TYPES = [
+  { id: 'cv', label: 'Curriculum Vitae (CV)' },
+  { id: 'ktp', label: 'KTP' },
+  { id: 'kk', label: 'Kartu Keluarga (KK)' },
+  { id: 'sim_a', label: 'SIM A' },
+  { id: 'sim_c', label: 'SIM C' },
+  { id: 'passport', label: 'Passport' },
+  { id: 'buku_tabungan', label: 'Buku Tabungan' },
+  { id: 'npwp', label: 'NPWP' },
+  { id: 'lain_lain', label: 'Dokumen Lainnya' }
+];
 
 const EmployeeForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuth();
   
-  const [activeTab, setActiveTab] = useState('personal');
+  const [activeTab, setActiveTab] = useState('main');
   const [loading, setLoading] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [organizations, setOrganizations] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
-  const fileInputRef = useRef(null);
 
   const isOwnerOrSuperAdmin = user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'superadmin';
-  const isFieldsLocked = !formData.organization_id;
 
   // Load Master Data
   useEffect(() => {
@@ -87,7 +97,12 @@ const EmployeeForm = () => {
         .then(res => {
           if (res.status === 'success') {
             const data = res.data;
-            const normalized = { ...initialFormData, ...data, employee_id: data.employee_id || data.id };
+            const normalized = { 
+              ...initialFormData, 
+              ...data, 
+              employee_id: data.employee_id || data.id,
+              documents: data.documents || {} 
+            };
             setFormData(normalized);
             if (normalized.organization_id) fetchDepartments(normalized.organization_id);
             if (normalized.department_id) fetchPositions(normalized.department_id);
@@ -123,6 +138,53 @@ const EmployeeForm = () => {
     }
   };
 
+  const handleFileUpload = async (e, docType) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal 5MB!');
+      return;
+    }
+
+    setUploadingDoc(docType);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${formData.employee_id || 'new'}_${docType}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('employee_documents')
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage.from('employee_documents').getPublicUrl(filePath);
+
+      setFormData(prev => ({
+        ...prev,
+        documents: {
+          ...prev.documents,
+          [docType]: publicUrl
+        }
+      }));
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Gagal mengunggah dokumen: ' + error.message);
+    } finally {
+      setUploadingDoc(null);
+    }
+  };
+
+  const handleRemoveDocument = (docType) => {
+    setFormData(prev => {
+      const newDocs = { ...prev.documents };
+      delete newDocs[docType];
+      return { ...prev, documents: newDocs };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -146,83 +208,87 @@ const EmployeeForm = () => {
     }
   };
 
-  const renderPersonalTab = () => (
-    <div className="space-y-6 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <InputWrapper label="NIK KTP" icon={IconId}>
-          <input required name="nik" value={formData.nik} onChange={handleChange} placeholder="3201..." className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="Nama Lengkap" icon={IconUserCircle}>
-          <input required name="name" value={formData.name} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="Email" icon={IconMail}>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} />
-        </InputWrapper>
-        <InputWrapper label="No. Handphone" icon={IconPhone}>
-          <input required name="phone" value={formData.phone} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="Jenis Kelamin" icon={IconGenderBigender}>
-          <select name="gender" value={formData.gender} onChange={handleChange} className={inputStyle}>
-            <option value="Laki-laki">LAKI-LAKI</option>
-            <option value="Perempuan">PEREMPUAN</option>
-          </select>
-        </InputWrapper>
-        <InputWrapper label="Status Pernikahan" icon={IconUserCircle}>
-          <select name="marital_status" value={formData.marital_status} onChange={handleChange} className={inputStyle}>
-            <option value="Belum Kawin">BELUM KAWIN</option>
-            <option value="Kawin">KAWIN</option>
-          </select>
-        </InputWrapper>
+  const renderMainTab = () => (
+    <div className="space-y-8 animate-fade-in">
+      {/* SEKSI DATA PRIBADI */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Pribadi</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="NIK KTP" icon={IconId}>
+            <input required name="nik" value={formData.nik} onChange={handleChange} placeholder="3201..." className={inputStyle} />
+          </InputWrapper>
+          <InputWrapper label="Nama Lengkap" icon={IconUserCircle}>
+            <input required name="name" value={formData.name} onChange={handleChange} className={inputStyle} />
+          </InputWrapper>
+          <InputWrapper label="Email" icon={IconMail}>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} />
+          </InputWrapper>
+          <InputWrapper label="No. Handphone" icon={IconPhone}>
+            <input required name="phone" value={formData.phone} onChange={handleChange} className={inputStyle} />
+          </InputWrapper>
+          <InputWrapper label="Jenis Kelamin" icon={IconGenderBigender}>
+            <select name="gender" value={formData.gender} onChange={handleChange} className={inputStyle}>
+              <option value="Laki-laki">LAKI-LAKI</option>
+              <option value="Perempuan">PEREMPUAN</option>
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Status Pernikahan" icon={IconUserCircle}>
+            <select name="marital_status" value={formData.marital_status} onChange={handleChange} className={inputStyle}>
+              <option value="Belum Kawin">BELUM KAWIN</option>
+              <option value="Kawin">KAWIN</option>
+            </select>
+          </InputWrapper>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <InputWrapper label="Alamat KTP" icon={IconMapPin}>
+            <textarea rows="3" name="ktp_address" value={formData.ktp_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
+          </InputWrapper>
+          <InputWrapper label="Alamat Domisili" icon={IconMapPin}>
+            <textarea rows="3" name="domicile_address" value={formData.domicile_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
+          </InputWrapper>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputWrapper label="Alamat KTP" icon={IconMapPin}>
-          <textarea rows="3" name="ktp_address" value={formData.ktp_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
-        </InputWrapper>
-        <InputWrapper label="Alamat Domisili" icon={IconMapPin}>
-          <textarea rows="3" name="domicile_address" value={formData.domicile_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
-        </InputWrapper>
-      </div>
-    </div>
-  );
 
-  const renderEmploymentTab = () => (
-    <div className="space-y-6 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
-          <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
-            <option value="">PILIH ORGANISASI</option>
-            {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
-          </select>
-        </InputWrapper>
-        <InputWrapper label="Departemen" icon={IconBriefcase}>
-          <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id}>
-            <option value="">PILIH DEPARTEMEN</option>
-            {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
-          </select>
-        </InputWrapper>
-        <InputWrapper label="Jabatan" icon={IconAward}>
-          <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id}>
-            <option value="">PILIH JABATAN</option>
-            {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
-          </select>
-        </InputWrapper>
-        <InputWrapper label="Status Pegawai" icon={IconUserCircle}>
-          <select name="status" value={formData.status} onChange={handleChange} className={inputStyle}>
-            <option value="Aktif">AKTIF</option>
-            <option value="Kontrak">KONTRAK</option>
-            <option value="Probation">PROBATION</option>
-          </select>
-        </InputWrapper>
-        <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
-          <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} />
-        </InputWrapper>
-        <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
-          <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle}>
-            <option value="Head Office">HEAD OFFICE</option>
-            <option value="Branch A">BRANCH A</option>
-            <option value="Remote">REMOTE</option>
-          </select>
-        </InputWrapper>
+      {/* SEKSI KEPEGAWAIAN */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Kepegawaian</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
+            <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
+              <option value="">PILIH ORGANISASI</option>
+              {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Departemen" icon={IconBriefcase}>
+            <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id}>
+              <option value="">PILIH DEPARTEMEN</option>
+              {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Jabatan" icon={IconAward}>
+            <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id}>
+              <option value="">PILIH JABATAN</option>
+              {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Status Pegawai" icon={IconUserCircle}>
+            <select name="status" value={formData.status} onChange={handleChange} className={inputStyle}>
+              <option value="Aktif">AKTIF</option>
+              <option value="Kontrak">KONTRAK</option>
+              <option value="Probation">PROBATION</option>
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
+            <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} />
+          </InputWrapper>
+          <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
+            <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle}>
+              <option value="Head Office">HEAD OFFICE</option>
+              <option value="Branch A">BRANCH A</option>
+              <option value="Remote">REMOTE</option>
+            </select>
+          </InputWrapper>
+        </div>
       </div>
     </div>
   );
@@ -252,6 +318,73 @@ const EmployeeForm = () => {
     </div>
   );
 
+  const renderDocumentsTab = () => (
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3">
+        <IconFileDescription className="text-blue-500 shrink-0 mt-0.5" />
+        <div>
+          <h4 className="text-xs font-bold text-blue-900 uppercase tracking-wide">Penyimpanan Dokumen Karyawan</h4>
+          <p className="text-xs text-blue-700 mt-1">Unggah dokumen format PDF, JPG, atau PNG. Maksimal 5MB per file. Dokumen akan langsung tersimpan di Cloud Storage.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {DOC_TYPES.map(doc => {
+          const isUploaded = !!formData.documents?.[doc.id];
+          const isUploading = uploadingDoc === doc.id;
+
+          return (
+            <div key={doc.id} className="border border-slate-200 rounded-xl p-4 flex flex-col justify-between bg-slate-50 relative overflow-hidden group">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-2">
+                  <div className={`p-2 rounded-lg ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-slate-200 text-slate-500'}`}>
+                    {isUploaded ? <IconCheck size={20} /> : <IconFileDescription size={20} />}
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-800">{doc.label}</h5>
+                    <span className="text-[10px] text-slate-500">{isUploaded ? 'Terunggah' : 'Belum diunggah'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                {isUploaded ? (
+                  <>
+                    <a href={formData.documents[doc.id]} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 h-8 bg-white border border-slate-300 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all">
+                      Lihat File
+                    </a>
+                    <button type="button" onClick={() => handleRemoveDocument(doc.id)} className="h-8 w-8 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-all">
+                      <IconTrash size={14} />
+                    </button>
+                  </>
+                ) : (
+                  <div className="relative flex-1">
+                    <input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      onChange={(e) => handleFileUpload(e, doc.id)}
+                      disabled={isUploading || !formData.employee_id}
+                    />
+                    <button type="button" disabled={isUploading || !formData.employee_id} className="w-full flex items-center justify-center gap-2 h-8 bg-white border border-slate-300 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all disabled:opacity-50">
+                      {isUploading ? <IconLoader2 size={14} className="animate-spin" /> : <IconFileUpload size={14} />}
+                      {isUploading ? 'Mengunggah...' : 'Pilih File'}
+                    </button>
+                  </div>
+                )}
+              </div>
+              {!formData.employee_id && !isUploaded && (
+                <div className="absolute inset-x-0 bottom-0 text-center py-1 bg-red-100 text-red-600 text-[9px] font-bold">
+                  Simpan data awal karyawan terlebih dahulu
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col h-full bg-slate-50 font-inter">
       {/* HEADER */}
@@ -268,9 +401,9 @@ const EmployeeForm = () => {
         
         {/* TAB NAVIGATION */}
         <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg">
-          <button onClick={() => setActiveTab('personal')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'personal' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Pribadi</button>
-          <button onClick={() => setActiveTab('employment')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'employment' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Kepegawaian</button>
-          <button onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
+          <button type="button" onClick={() => setActiveTab('main')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'main' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Utama</button>
+          <button type="button" onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
+          <button type="button" onClick={() => setActiveTab('documents')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'documents' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Dokumen</button>
         </div>
       </header>
 
@@ -278,9 +411,9 @@ const EmployeeForm = () => {
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div className="max-w-6xl mx-auto">
           <form id="employee-form" onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
-            {activeTab === 'personal' && renderPersonalTab()}
-            {activeTab === 'employment' && renderEmploymentTab()}
+            {activeTab === 'main' && renderMainTab()}
             {activeTab === 'financial' && renderFinancialTab()}
+            {activeTab === 'documents' && renderDocumentsTab()}
           </form>
         </div>
       </div>

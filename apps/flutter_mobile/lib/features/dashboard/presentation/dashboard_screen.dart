@@ -8,6 +8,11 @@ import '../../auth/data/auth_provider.dart';
 import '../../../core/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../attendance/data/attendance_service.dart';
+import 'dart:async';
+import 'dart:math' as math;
+import 'package:flutter_compass/flutter_compass.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import '../../attendance/data/offline_attendance_service.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -46,6 +51,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _pendingOfflineCount = 0;
   bool _isSyncing = false;
 
+  Timer? _timer;
+  String _currentTime = '';
+  String _currentDate = '';
+  String _weatherTemp = '--';
+  String _weatherCondition = 'Memuat Cuaca...';
+  double? _compassHeading;
+  StreamSubscription<CompassEvent>? _compassSubscription;
   @override
   void initState() {
     super.initState();
@@ -54,6 +66,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _fetchTodayAttendance();
       _checkOfflineData();
     });
+    _updateTime();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+    _initSensors();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _compassSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _updateTime() {
+    final now = DateTime.now();
+    final timeStr = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    final days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    final dayStr = days[now.weekday - 1];
+    final dateStr = "$dayStr, ${now.day} ${months[now.month - 1]} ${now.year}";
+    
+    if (mounted) {
+      setState(() {
+        _currentTime = timeStr;
+        _currentDate = dateStr;
+      });
+    }
+  }
+
+  Future<void> _initSensors() async {
+    // Compass
+    _compassSubscription = FlutterCompass.events?.listen((event) {
+      if (mounted) setState(() => _compassHeading = event.heading);
+    });
+
+    // Weather
+    try {
+      LocationPermission perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.whileInUse || perm == LocationPermission.always) {
+        final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+        final url = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=${pos.latitude}&longitude=${pos.longitude}&current_weather=true');
+        final res = await http.get(url);
+        if (res.statusCode == 200) {
+          final data = jsonDecode(res.body);
+          final current = data['current_weather'];
+          if (mounted) {
+            setState(() {
+              _weatherTemp = "${current['temperature']}°C";
+              _weatherCondition = _getWeatherDesc(current['weathercode']);
+            });
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) setState(() { _weatherTemp = '--'; _weatherCondition = 'Gagal memuat'; });
+    }
+  }
+
+  String _getWeatherDesc(int code) {
+    if (code == 0) return 'Cerah';
+    if (code <= 3) return 'Berawan';
+    if (code <= 48) return 'Berkabut';
+    if (code <= 67) return 'Hujan Ringan';
+    if (code <= 77) return 'Salju Ringan';
+    if (code <= 82) return 'Hujan Deras';
+    if (code <= 86) return 'Salju Lebat';
+    if (code <= 99) return 'Badai Petir';
+    return 'Berawan';
   }
 
   Future<void> _fetchTodayAttendance() async {
@@ -295,10 +377,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         slivers: [
           // Dynamic Header with Scroll Transition
           SliverAppBar(
-            expandedHeight: 240.0,
+            expandedHeight: 280.0,
             floating: false,
             pinned: true,
-            backgroundColor: Colors.white,
+            backgroundColor: AppConstants.primaryColor,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
@@ -312,7 +394,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     opacity: t, 
                     child: Row(
                       children: [
-                        const Text('WKN Mobile', style: TextStyle(color: AppConstants.slate800, fontWeight: FontWeight.bold, fontSize: 18)),
+                        const Text('WKN Enterprise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                         const Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0),
@@ -320,8 +402,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             onTap: () => context.push('/id-card'),
                             child: CircleAvatar(
                               radius: 14,
-                              backgroundColor: AppConstants.slate200,
-                              child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'A', style: const TextStyle(color: AppConstants.slate800, fontSize: 12, fontWeight: FontWeight.bold)),
+                              backgroundColor: Colors.white24,
+                              child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'A', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ),
@@ -332,8 +414,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               background: Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
-                  border: Border(bottom: BorderSide(color: AppConstants.slate200, width: 1)),
+                  gradient: LinearGradient(
+                    colors: [AppConstants.primaryColor, Color(0xFFC1181E)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
                 child: SafeArea(
                   child: Padding(
@@ -344,54 +429,87 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Selamat Pagi,', style: TextStyle(color: AppConstants.slate600, fontSize: 14)),
-                                const SizedBox(height: 4),
-                                Text(user?['name'] ?? 'Karyawan', style: const TextStyle(color: AppConstants.slate800, fontSize: 24, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: AppConstants.slate50, border: Border.all(color: AppConstants.slate200), borderRadius: BorderRadius.circular(12)),
-                              child: const Icon(Icons.notifications_outlined, color: AppConstants.slate800, size: 24),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('WAKTU SAAT INI', style: TextStyle(color: AppConstants.slate500, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                                  textBaseline: TextBaseline.alphabetic,
-                                  children: [
-                                    const Text('08:15', style: TextStyle(color: AppConstants.slate800, fontSize: 36, fontWeight: FontWeight.w900)),
-                                    const SizedBox(width: 4),
-                                    const Text('WIB', style: TextStyle(color: AppConstants.slate600, fontSize: 14, fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                const Text('Senin, 30 Mei 2026', style: TextStyle(color: AppConstants.slate600, fontSize: 12)),
-                              ],
-                            ),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.green.shade50, border: Border.all(color: Colors.green.shade200), borderRadius: BorderRadius.circular(20)),
-                              child: Row(
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.wifi, color: Colors.green.shade600, size: 12),
-                                  const SizedBox(width: 6),
-                                  Text('ONLINE', style: TextStyle(color: Colors.green.shade700, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                                  const Text('Selamat Pagi,', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                  const SizedBox(height: 4),
+                                  Text(user?['name'] ?? 'Karyawan', overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 16),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(12)),
+                              child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 24),
+                            ),
                           ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Premium Glassmorphism Widget: Clock + Sensor
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                                    textBaseline: TextBaseline.alphabetic,
+                                    children: [
+                                      Text(
+                                        _currentTime.isNotEmpty ? '${_currentTime.split(':')[0]}:${_currentTime.split(':')[1]}' : '00:00', 
+                                        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFeatures: [FontFeature.tabularFigures()])
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _currentTime.isNotEmpty ? ':${_currentTime.split(':')[2]}' : ':00', 
+                                        style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Text('WIB', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                  Text(_currentDate.isNotEmpty ? _currentDate : 'Memuat Tanggal...', style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                                ],
+                              ),
+                              // Weather & Compass Wrap
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.thermostat, color: Colors.white70, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(_weatherTemp, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 8),
+                                      Text(_weatherCondition, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Text('Arah: ${_compassHeading?.toStringAsFixed(0) ?? '--'}°', style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                                      const SizedBox(width: 8),
+                                      Transform.rotate(
+                                        angle: ((_compassHeading ?? 0) * (math.pi / 180) * -1),
+                                        child: const Icon(Icons.explore, color: Colors.white, size: 20),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
                         )
                       ],
                     ),
@@ -404,7 +522,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Body Content
           SliverToBoxAdapter(
             child: Transform.translate(
-              offset: const Offset(0, -30), // Floating overlapping effect
+              offset: const Offset(0, -15), // Reduced floating overlapping effect
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(

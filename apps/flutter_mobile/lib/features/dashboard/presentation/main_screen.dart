@@ -30,71 +30,92 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/assistant'),
-        backgroundColor: AppConstants.secondaryColor,
-        shape: const CircleBorder(),
-        elevation: 0, // Flat premium look
-        highlightElevation: 2,
-        child: const Icon(Icons.auto_awesome, color: Colors.white),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppConstants.secondaryColor.withValues(alpha: 0.3),
+              blurRadius: 15,
+              spreadRadius: 2,
+              offset: const Offset(0, 5),
+            )
+          ]
+        ),
+        child: FloatingActionButton(
+          onPressed: () => context.push('/assistant'),
+          backgroundColor: AppConstants.secondaryColor,
+          shape: const CircleBorder(),
+          elevation: 0,
+          child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppConstants.slate200, width: 1)),
-        ),
-        child: NavigationBarTheme(
-          data: NavigationBarThemeData(
-            elevation: 0,
-            labelTextStyle: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppConstants.primaryColor);
-              }
-              return const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppConstants.textSecondary);
-            }),
-          ),
-          child: NavigationBar(
-            selectedIndex: _currentIndex,
-            onDestinationSelected: (index) {
-              if (index == 2) {
-                context.push('/assistant');
-              } else {
-                setState(() {
-                  _currentIndex = index;
-                });
-              }
-            },
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            indicatorColor: AppConstants.primaryColor.withValues(alpha: 0.1),
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home, color: AppConstants.primaryColor),
-                label: 'Beranda',
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 10,
+        color: Colors.white,
+        elevation: 20,
+        child: SizedBox(
+          height: 65,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildNavItem(0, Icons.home_outlined, Icons.home, 'Beranda'),
+                  _buildNavItem(1, Icons.mail_outline, Icons.mail, 'Inbox'),
+                ],
               ),
-              NavigationDestination(
-                icon: Icon(Icons.mail_outline),
-                selectedIcon: Icon(Icons.mail, color: AppConstants.primaryColor),
-                label: 'Inbox',
-              ),
-              NavigationDestination(
-                icon: SizedBox.shrink(),
-                label: '',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.help_outline),
-                selectedIcon: Icon(Icons.help, color: AppConstants.primaryColor),
-                label: 'Bantuan',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person, color: AppConstants.primaryColor),
-                label: 'Profil',
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildNavItem(3, Icons.help_outline, Icons.help, 'Bantuan'),
+                  _buildNavItem(4, Icons.person_outline, Icons.person, 'Profil'),
+                ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label) {
+    final isSelected = _currentIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width / 5,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected ? AppConstants.primaryColor.withValues(alpha: 0.1) : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected ? AppConstants.primaryColor : Colors.grey.shade400,
+                size: 26,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: isSelected ? AppConstants.primaryColor : Colors.grey.shade500,
+              ),
+            )
+          ],
         ),
       ),
     );
