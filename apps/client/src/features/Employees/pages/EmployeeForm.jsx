@@ -30,8 +30,9 @@ const inputStyle = "w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 r
 const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
 
 const initialFormData = {
-  employee_id: '', name: '', email: '', phone: '', gender: 'Laki-laki',
+  employee_id: '', name: '', nickname: '', email: '', phone: '', gender: 'Laki-laki',
   date_of_birth: '', place_of_birth: '', religion: 'Islam', marital_status: 'Belum Kawin',
+  residence_status: 'Milik Sendiri', blood_type: 'O', height: '', weight: '', uniform_size: '', shoe_size: '',
   nik: '', kk_number: '', ktp_address: '', domicile_address: '', photo: '',
   organization_name: '', organization_id: '', department_id: '', job_position: '',
   job_level: 'Staff', status: 'Aktif', employment_type: 'Permanent', working_location: 'Head Office',
@@ -352,6 +353,25 @@ const EmployeeForm = () => {
           <InputWrapper label="Nama Lengkap" icon={IconUserCircle}>
             <input required name="name" value={formData.name} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
+          <InputWrapper label="Nama Panggilan" icon={IconUserCircle}>
+            <input name="nickname" value={formData.nickname} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Tempat Lahir" icon={IconMapPin}>
+            <input name="place_of_birth" value={formData.place_of_birth} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Tanggal Lahir" icon={IconCalendarEvent}>
+            <DatePicker portalId="root-portal" selected={formData.date_of_birth ? new Date(formData.date_of_birth) : null} onChange={(date) => setFormData(p => ({...p, date_of_birth: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Agama" icon={IconUserCircle}>
+            <select name="religion" value={formData.religion} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="Islam">ISLAM</option>
+              <option value="Kristen Protestan">KRISTEN PROTESTAN</option>
+              <option value="Katolik">KATOLIK</option>
+              <option value="Hindu">HINDU</option>
+              <option value="Buddha">BUDDHA</option>
+              <option value="Konghucu">KONGHUCU</option>
+            </select>
+          </InputWrapper>
           <InputWrapper label="Email" icon={IconMail}>
             <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
           </InputWrapper>
@@ -369,6 +389,35 @@ const EmployeeForm = () => {
               <option value="Belum Kawin">BELUM KAWIN</option>
               <option value="Kawin">KAWIN</option>
             </select>
+          </InputWrapper>
+          <InputWrapper label="Status Tempat Tinggal" icon={IconBuildingSkyscraper}>
+            <select name="residence_status" value={formData.residence_status} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="Milik Sendiri">MILIK SENDIRI</option>
+              <option value="Milik Orang Tua">MILIK ORANG TUA</option>
+              <option value="Milik Keluarga">MILIK KELUARGA</option>
+              <option value="Kontrakan (Kosan)">KONTRAKAN (KOSAN)</option>
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Golongan Darah" icon={IconUserCircle}>
+            <select name="blood_type" value={formData.blood_type} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="AB">AB</option>
+              <option value="O">O</option>
+              <option value="Tidak Tahu">TIDAK TAHU</option>
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Tinggi Badan (cm)" icon={IconUserCircle}>
+            <input type="number" name="height" value={formData.height} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Berat Badan (kg)" icon={IconUserCircle}>
+            <input type="number" name="weight" value={formData.weight} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Ukuran Seragam" icon={IconUserCircle}>
+            <input name="uniform_size" value={formData.uniform_size} onChange={handleChange} placeholder="S/M/L/XL" className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Ukuran Sepatu" icon={IconUserCircle}>
+            <input type="number" name="shoe_size" value={formData.shoe_size} onChange={handleChange} placeholder="40" className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
