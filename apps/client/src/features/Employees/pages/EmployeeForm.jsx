@@ -124,7 +124,7 @@ const EmployeeForm = () => {
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     let finalValue = value;
-    if ((type === 'text' || e.target.tagName === 'TEXTAREA') && name !== 'email') {
+    if ((type === 'text' || e.target.tagName === 'TEXTAREA') && name !== 'email' && name !== 'mobile_password') {
       finalValue = value.toUpperCase();
     }
     setFormData(prev => ({ ...prev, [name]: name === 'base_salary' ? parseFloat(value) || 0 : finalValue }));
@@ -226,7 +226,9 @@ const EmployeeForm = () => {
       const payload = { ...formData, id: formData.employee_id };
       delete payload.employee_id;
       if (!payload.mobile_password) payload.mobile_password = '12345';
-      payload.mobile_password = CryptoJS.SHA256(payload.mobile_password).toString();
+      if (!/^[a-fA-F0-9]{64}$/.test(payload.mobile_password)) {
+        payload.mobile_password = CryptoJS.SHA256(payload.mobile_password).toString();
+      }
 
       if (id) {
         await apiClient.put(`/api/employees/direct/${id}`, payload);
@@ -377,8 +379,22 @@ const EmployeeForm = () => {
               <option value="Konghucu">KONGHUCU</option>
             </select>
           </InputWrapper>
-          <InputWrapper label="Email" icon={IconMail}>
+          <InputWrapper label="Email (Login Mobile)" icon={IconMail}>
             <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Password Mobile App" icon={IconUserCircle}>
+            <div className="relative">
+              <input type="text" name="mobile_password" value={formData.mobile_password || ''} onChange={handleChange} placeholder="Default: 12345" className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
+              <button 
+                type="button" 
+                onClick={() => setFormData(p => ({...p, mobile_password: p.nik}))}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition-colors"
+                disabled={!formData.employee_id || !formData.nik}
+                title="Gunakan NIK sebagai Password"
+              >
+                Samakan NIK
+              </button>
+            </div>
           </InputWrapper>
           <InputWrapper label="No. Handphone" icon={IconPhone}>
             <input required name="phone" value={formData.phone} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
@@ -492,9 +508,11 @@ const EmployeeForm = () => {
   );
 
   const handleArrayChange = (field, index, key, value) => {
+    let finalValue = value;
+    if (typeof value === 'string' && key !== 'email') finalValue = value.toUpperCase();
     setFormData(prev => {
       const arr = [...(prev[field] || [])];
-      arr[index] = { ...arr[index], [key]: value };
+      arr[index] = { ...arr[index], [key]: finalValue };
       return { ...prev, [field]: arr };
     });
   };
