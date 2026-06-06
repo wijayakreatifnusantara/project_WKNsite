@@ -89,7 +89,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       
       // Data Master
       '/master/employees': ['Data Master', 'Database Karyawan'],
-      '/master/organization': ['Data Master', 'Organisasi & Lokasi'],
+      '/master/organization': ['Data Master', 'Org, Dept & Jabatan'],
       '/master/positions': ['Data Master', 'Jabatan & Golongan'],
       '/master/shifts': ['Data Master', 'Shift & Libur Nasional'],
       
@@ -152,7 +152,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     const path = location.pathname;
     if (path.includes('/overview')) return 'SYSTEM OVERVIEW';
     if (path.includes('/master/employees')) return 'DATABASE KARYAWAN';
-    if (path.includes('/master/organization')) return 'ORGANISASI & LOKASI';
+    if (path.includes('/master/organization')) return 'ORG, DEPT & JABATAN';
     if (path.includes('/master/positions')) return 'JABATAN & GOLONGAN';
     if (path.includes('/master/shifts')) return 'SHIFT & LIBUR NASIONAL';
     
@@ -227,10 +227,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               <NavItem icon={<IconUsers size={15} />} label="Database Karyawan" to="/master/employees" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-              <NavItem icon={<IconBuildingSkyscraper size={15} />} label="Organisasi & Lokasi" to="/master/organization" />
-            )}
-            {can(PERMISSIONS.VIEW_WORKFORCE) && (
-              <NavItem icon={<IconId size={15} />} label="Jabatan & Golongan" to="/master/positions" />
+              <NavItem icon={<IconBuildingSkyscraper size={15} />} label="Org, Dept & Jabatan" to="/master/organization" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconCalendarEvent size={15} />} label="Shift & Libur Nasional" to="/master/shifts" />
