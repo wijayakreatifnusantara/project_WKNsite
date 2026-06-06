@@ -56,6 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _currentDate = '';
   String _weatherTemp = '--';
   String _weatherCondition = 'Memuat Cuaca...';
+  int? _weatherCode;
   double? _compassHeading;
   StreamSubscription<CompassEvent>? _compassSubscription;
   @override
@@ -117,6 +118,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             setState(() {
               _weatherTemp = "${current['temperature']}°C";
               _weatherCondition = _getWeatherDesc(current['weathercode']);
+              _weatherCode = current['weathercode'];
             });
           }
         }
@@ -136,6 +138,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (code <= 86) return 'Salju Lebat';
     if (code <= 99) return 'Badai Petir';
     return 'Berawan';
+  }
+
+  IconData _getWeatherIcon(int? code) {
+    if (code == null) return Icons.cloud;
+    if (code == 0) return Icons.wb_sunny;
+    if (code <= 3) return Icons.cloud;
+    if (code <= 48) return Icons.foggy;
+    if (code <= 67) return Icons.grain;
+    if (code <= 77) return Icons.ac_unit;
+    if (code <= 82) return Icons.water_drop;
+    if (code <= 86) return Icons.ac_unit;
+    if (code <= 99) return Icons.thunderstorm;
+    return Icons.cloud;
+  }
+
+  String get _greeting {
+    final hour = DateTime.now().hour;
+    if (hour < 11) return 'Selamat Pagi,';
+    if (hour < 15) return 'Selamat Siang,';
+    if (hour < 18) return 'Selamat Sore,';
+    return 'Selamat Malam,';
   }
 
   Future<void> _fetchTodayAttendance() async {
@@ -377,7 +400,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         slivers: [
           // Dynamic Header with Scroll Transition
           SliverAppBar(
-            expandedHeight: 280.0,
+            expandedHeight: 320.0,
             floating: false,
             pinned: true,
             backgroundColor: AppConstants.primaryColor,
@@ -433,7 +456,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Selamat Pagi,', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                  Text(_greeting, style: const TextStyle(color: Colors.white70, fontSize: 13)),
                                   const SizedBox(height: 4),
                                   Text(user?['name'] ?? 'Karyawan', overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                                 ],
@@ -452,9 +475,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: Colors.black.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -488,7 +510,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(Icons.thermostat, color: Colors.white70, size: 14),
+                                      Icon(_getWeatherIcon(_weatherCode), color: Colors.white70, size: 14),
                                       const SizedBox(width: 4),
                                       Text(_weatherTemp, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                                       const SizedBox(width: 8),
