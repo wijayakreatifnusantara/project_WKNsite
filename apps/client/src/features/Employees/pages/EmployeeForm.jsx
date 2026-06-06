@@ -850,7 +850,7 @@ const EmployeeForm = () => {
               </div>
               
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Jurusan</label><input value={edu.major || ''} onChange={e => handleArrayChange('education_history', idx, 'major', e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi</label><input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi/Sekolah</label><input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={edu.city || ''} onChange={e => handleArrayChange('education_history', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year || ''} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
               <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Ijazah</label><input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
@@ -864,17 +864,20 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pengalaman Kerja</h3>
-          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '', city: '', manager_name: '', manager_phone: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Pengalaman
           </button>
         </div>
         <div className="space-y-4">
           {formData.work_experience?.map((work, idx) => (
-            <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+            <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('work_experience', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Perusahaan</label><input value={work.company} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Posisi</label><input value={work.position} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Durasi / Tahun</label><input value={work.duration} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="2018 - 2021" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Perusahaan</label><input value={work.company || ''} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Posisi</label><input value={work.position || ''} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={work.city || ''} onChange={e => handleArrayChange('work_experience', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Durasi (Bulan & Tahun)</label><input value={work.duration || ''} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="Contoh: Jan 2018 - Des 2021" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama Atasan/HRD</label><input value={work.manager_name || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Telp Atasan/HRD</label><input value={work.manager_phone || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
             </div>
           ))}
           {(!formData.work_experience || formData.work_experience.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada pengalaman kerja.</div>}
