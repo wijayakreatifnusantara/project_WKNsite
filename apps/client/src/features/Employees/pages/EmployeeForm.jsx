@@ -32,7 +32,7 @@ const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-slate-50 border border-slate-2
 const initialFormData = {
   employee_id: '', name: '', email: '', phone: '', gender: 'Laki-laki',
   date_of_birth: '', place_of_birth: '', religion: 'Islam', marital_status: 'Belum Kawin',
-  nik: '', ktp_address: '', domicile_address: '', photo: '',
+  nik: '', kk_number: '', ktp_address: '', domicile_address: '', photo: '',
   organization_name: '', organization_id: '', department_id: '', job_position: '',
   job_level: 'Staff', status: 'Aktif', employment_type: 'Permanent', working_location: 'Head Office',
   base_salary: 0, join_date: new Date().toISOString().split('T')[0],
@@ -345,6 +345,9 @@ const EmployeeForm = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="NIK KTP" icon={IconId}>
             <input required name="nik" value={formData.nik} onChange={handleChange} placeholder="3201..." className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Nomor Kartu Keluarga" icon={IconId}>
+            <input required name="kk_number" value={formData.kk_number} onChange={handleChange} placeholder="3201..." className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Nama Lengkap" icon={IconUserCircle}>
             <input required name="name" value={formData.name} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
