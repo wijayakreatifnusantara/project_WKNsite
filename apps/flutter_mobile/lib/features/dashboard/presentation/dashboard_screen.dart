@@ -444,13 +444,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 child: SafeArea(
-                  child: Opacity(
-                    opacity: t,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final settings = context.dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
+                      final t = settings == null ? 1.0 : ((settings.currentExtent - settings.minExtent) / (settings.maxExtent - settings.minExtent)).clamp(0.0, 1.0);
+                      return Opacity(
+                        opacity: t,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -539,9 +543,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
+        ),
+      ),
+    ),
           
           // Body Content
           SliverToBoxAdapter(

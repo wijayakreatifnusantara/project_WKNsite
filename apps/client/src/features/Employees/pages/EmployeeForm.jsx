@@ -599,7 +599,7 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Histori Pendidikan</h3>
-          <button type="button" onClick={() => addArrayItem('education_history', { degree: '', institution: '', year: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('education_history', { level: '', major: '', institution: '', year: '', certificate_number: '', city: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Pendidikan
           </button>
         </div>
@@ -607,9 +607,25 @@ const EmployeeForm = () => {
           {formData.education_history?.map((edu, idx) => (
             <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('education_history', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tingkat / Jurusan</label><input value={edu.degree} onChange={e => handleArrayChange('education_history', idx, 'degree', e.target.value)} placeholder="S1 Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi</label><input value={edu.institution} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+              
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-500 uppercase">Tingkat</label>
+                <select value={edu.level || edu.degree || ''} onChange={e => handleArrayChange('education_history', idx, 'level', e.target.value)} className={inputStyle} disabled={!formData.employee_id}>
+                  <option value="">Pilih Tingkat</option>
+                  <option value="SD">SD</option>
+                  <option value="SMP">SMP</option>
+                  <option value="SMA">SMA</option>
+                  <option value="D3">D3</option>
+                  <option value="S1">S1</option>
+                  <option value="S2">S2</option>
+                </select>
+              </div>
+              
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Jurusan</label><input value={edu.major || ''} onChange={e => handleArrayChange('education_history', idx, 'major', e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi</label><input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={edu.city || ''} onChange={e => handleArrayChange('education_history', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year || ''} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Ijazah</label><input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
             </div>
           ))}
           {(!formData.education_history || formData.education_history.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada histori pendidikan.</div>}
