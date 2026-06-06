@@ -193,6 +193,19 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
               child: _isEditingBank ? _buildBankForm() : _buildBankInfo(),
             ),
+            const SizedBox(height: 24),
+
+            // NPWP & BPJS
+            Row(
+              children: [
+                const Icon(Icons.shield_outlined, size: 16, color: AppConstants.primaryColor),
+                const SizedBox(width: 8),
+                const Text('PAJAK & ASURANSI', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _buildTaxAndInsuranceInfo(),
+            
             const SizedBox(height: 40),
           ],
         ),
@@ -219,6 +232,22 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         const Divider(height: 24),
         _buildInfoRow('Nama Pemilik', _employeeData?['bank_account_holder'] ?? '-'),
       ],
+    );
+  }
+
+  Widget _buildTaxAndInsuranceInfo() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
+      child: Column(
+        children: [
+          _buildInfoRow('NPWP', _employeeData?['npwp'] ?? '-'),
+          const Divider(height: 24),
+          _buildInfoRow('BPJS Ketenagakerjaan', _employeeData?['bpjs_tk_number'] ?? '-'),
+          const Divider(height: 24),
+          _buildInfoRow('BPJS Kesehatan', _employeeData?['bpjs_ks_number'] ?? '-'),
+        ],
+      ),
     );
   }
 
