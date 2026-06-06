@@ -452,6 +452,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 };
 
 const NavGroup = ({ label, isCollapsed, children }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   // Check if any of children exist (are visible based on permission checks)
   const hasVisibleChildren = React.Children.toArray(children).some(child => child !== null && child !== undefined && child !== false);
 
@@ -471,11 +473,15 @@ const NavGroup = ({ label, isCollapsed, children }) => {
   }
 
   return (
-    <div className="mb-4">
-      <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider select-none">
-        {label}
+    <div className="mb-2">
+      <div 
+        className="px-4 py-2 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest select-none cursor-pointer hover:text-slate-600 transition-colors group"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <span>{label}</span>
+        <IconChevronRight size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} text-slate-300 group-hover:text-slate-500`} />
       </div>
-      <div className="space-y-0.5">
+      <div className={`space-y-0.5 overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
         {children}
       </div>
     </div>
