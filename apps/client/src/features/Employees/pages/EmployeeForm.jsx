@@ -150,28 +150,26 @@ const EmployeeForm = () => {
 
     setUploadingDoc(docType);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${formData.employee_id || 'new'}_${docType}_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('bucket', 'employee_documents');
 
-      const { data, error } = await supabase.storage
-        .from('employee_documents')
-        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+      const res = await apiClient.post('/api/employees/upload', formDataUpload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage.from('employee_documents').getPublicUrl(filePath);
+      if (res.data.status !== 'success') throw new Error('Upload failed on server');
 
       setFormData(prev => ({
         ...prev,
         documents: {
           ...prev.documents,
-          [docType]: publicUrl
+          [docType]: res.data.publicUrl
         }
       }));
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Gagal mengunggah dokumen: ' + error.message);
+      alert('Gagal mengunggah dokumen: ' + (error.response?.data?.detail || error.message));
     } finally {
       setUploadingDoc(null);
     }
@@ -188,22 +186,20 @@ const EmployeeForm = () => {
 
     setUploadingDoc('photo');
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${formData.employee_id || 'new'}_photo_${Date.now()}.${fileExt}`;
-      const filePath = `photos/${fileName}`;
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('bucket', 'employee_documents');
 
-      const { data, error } = await supabase.storage
-        .from('employee_documents')
-        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+      const res = await apiClient.post('/api/employees/upload', formDataUpload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
-      if (error) throw error;
+      if (res.data.status !== 'success') throw new Error('Upload failed on server');
 
-      const { data: { publicUrl } } = supabase.storage.from('employee_documents').getPublicUrl(filePath);
-
-      setFormData(prev => ({ ...prev, photo: publicUrl }));
+      setFormData(prev => ({ ...prev, photo: res.data.publicUrl }));
     } catch (error) {
       console.error('Error uploading photo:', error);
-      alert('Gagal mengunggah foto: ' + error.message);
+      alert('Gagal mengunggah foto: ' + (error.response?.data?.detail || error.message));
     } finally {
       setUploadingDoc(null);
     }
