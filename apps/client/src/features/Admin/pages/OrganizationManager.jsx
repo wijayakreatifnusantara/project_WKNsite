@@ -415,22 +415,39 @@ const OrganizationManager = () => {
   };
 
   return (
-    <div className="p-4 h-full overflow-y-auto no-scrollbar bg-[#f8fafc] animate-fade-in">
-      <div className="max-w-[1200px] mx-auto space-y-4 pb-20">
-        
-        {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="space-y-1">
+    <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #E31E24;
+        }
+      `}</style>
+
+      {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
+      <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">
+        <div className="max-w-[1400px] mx-auto p-4 space-y-3">
+          
+          {/* HEADER ROW */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
-                <IconBuilding size={20} />
+              <div className="h-10 w-10 bg-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24]">
+                <IconBuilding size={22} stroke={2} />
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">Manajemen Organisasi</h1>
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Multi-Enterprise & Unit Configurations</p>
+                <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">Manajemen Organisasi</h1>
+                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1.5">Multi-Enterprise & Unit Configurations</p>
               </div>
             </div>
-          </div>
           
           <div className="flex flex-wrap items-center gap-3">
             {/* Auto-Sync status toggle badge */}
@@ -489,22 +506,27 @@ const OrganizationManager = () => {
             </button>
           </div>
         </div>
+      </div>
 
-        {/* NOTIFICATION FEEDBACK */}
-        {message.text && (
+      {/* NOTIFICATION FEEDBACK */}
+      {message.text && (
+        <div className="px-4 pt-4 max-w-[1400px] mx-auto w-full">
           <div className={`p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
             {message.type === 'success' ? <IconCircleCheck size={16} /> : <IconAlertCircle size={16} />}
             <span className="text-[10px] font-black uppercase tracking-widest">{message.text}</span>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* CONTENT LOADING */}
-        {isLoading && organizations.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center gap-4">
-            <IconLoader2 className="animate-spin text-[#E31E24]" size={32} />
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Loading database...</p>
-          </div>
-        ) : (
+      {/* CONTENT LOADING */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="max-w-[1400px] mx-auto space-y-4 pb-20">
+          {isLoading && organizations.length === 0 ? (
+            <div className="h-64 flex flex-col items-center justify-center gap-4">
+              <IconLoader2 className="animate-spin text-[#E31E24]" size={32} />
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Loading database...</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 gap-4">
             {organizations.map((org) => {
               const isExpanded = expandedOrg === org.id;
@@ -955,9 +977,7 @@ const OrganizationManager = () => {
                 </div>
               </form>
             </div>
-          </div>
         )}
-
       </div>
     </div>
   );
