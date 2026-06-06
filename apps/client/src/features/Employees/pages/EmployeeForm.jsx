@@ -210,6 +210,51 @@ const EmployeeForm = () => {
 
   const renderMainTab = () => (
     <div className="space-y-8 animate-fade-in">
+      {/* SEKSI KEPEGAWAIAN */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Kepegawaian</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
+            <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
+              <option value="">PILIH ORGANISASI</option>
+              {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
+            </select>
+          </InputWrapper>
+          <InputWrapper label="ID Karyawan" icon={IconId}>
+            <input name="employee_id" value={formData.employee_id} readOnly placeholder="Otomatis setelah pilih Organisasi" className={`${inputStyle} bg-slate-100 text-slate-500 cursor-not-allowed`} />
+          </InputWrapper>
+          <InputWrapper label="Departemen" icon={IconBriefcase}>
+            <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id}>
+              <option value="">PILIH DEPARTEMEN</option>
+              {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Jabatan" icon={IconAward}>
+            <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id}>
+              <option value="">PILIH JABATAN</option>
+              {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Status Pegawai" icon={IconUserCircle}>
+            <select name="status" value={formData.status} onChange={handleChange} className={inputStyle}>
+              <option value="Aktif">AKTIF</option>
+              <option value="Kontrak">KONTRAK</option>
+              <option value="Probation">PROBATION</option>
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
+            <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} />
+          </InputWrapper>
+          <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
+            <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle}>
+              <option value="Head Office">HEAD OFFICE</option>
+              <option value="Branch A">BRANCH A</option>
+              <option value="Remote">REMOTE</option>
+            </select>
+          </InputWrapper>
+        </div>
+      </div>
+
       {/* SEKSI DATA PRIBADI */}
       <div>
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Pribadi</h3>
@@ -245,48 +290,6 @@ const EmployeeForm = () => {
           </InputWrapper>
           <InputWrapper label="Alamat Domisili" icon={IconMapPin}>
             <textarea rows="3" name="domicile_address" value={formData.domicile_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
-          </InputWrapper>
-        </div>
-      </div>
-
-      {/* SEKSI KEPEGAWAIAN */}
-      <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Kepegawaian</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
-            <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
-              <option value="">PILIH ORGANISASI</option>
-              {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Departemen" icon={IconBriefcase}>
-            <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id}>
-              <option value="">PILIH DEPARTEMEN</option>
-              {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Jabatan" icon={IconAward}>
-            <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id}>
-              <option value="">PILIH JABATAN</option>
-              {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Status Pegawai" icon={IconUserCircle}>
-            <select name="status" value={formData.status} onChange={handleChange} className={inputStyle}>
-              <option value="Aktif">AKTIF</option>
-              <option value="Kontrak">KONTRAK</option>
-              <option value="Probation">PROBATION</option>
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
-            <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} />
-          </InputWrapper>
-          <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
-            <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle}>
-              <option value="Head Office">HEAD OFFICE</option>
-              <option value="Branch A">BRANCH A</option>
-              <option value="Remote">REMOTE</option>
-            </select>
           </InputWrapper>
         </div>
       </div>
