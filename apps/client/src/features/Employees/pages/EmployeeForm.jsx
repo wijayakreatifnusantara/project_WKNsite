@@ -174,8 +174,6 @@ const EmployeeForm = () => {
       alert('Gagal mengunggah dokumen: ' + error.message);
     } finally {
       setUploadingDoc(null);
-    } finally {
-      setUploadingDoc(null);
     }
   };
 
