@@ -44,6 +44,22 @@ const initialFormData = {
   emergency_contact_2_name: '', emergency_contact_2_rel: '', emergency_contact_2_phone: '',
   bank_name: '', bank_account: '', bank_account_holder: '', bpjs_tk_number: '', bpjs_ks_number: '',
   mobile_password: '', documents: {},
+  npwp: '', ptkp_status: '', salary_type: 'Netto',
+  payroll_components: {
+    fixed_income: {
+      tunjangan_jabatan: 0, tunjangan_keahlian: 0, tunjangan_komunikasi: 0,
+      bpjs_tk_jkk: 0, bpjs_tk_jkm: 0, bpjs_tk_jht: 0, bpjs_tk_jp: 0, bpjs_kesehatan: 0
+    },
+    variable_income: {
+      work_order_allowance: 0, meals_allowance: 0, transport_allowance: 0, overtime_allowance: 0
+    },
+    non_wage_income: {
+      thr: 0, bonus: 0, incentive: 0, miscellaneous_earnings: 0
+    },
+    deductions: {
+      pph21: 0, bpjs_tk_jht: 0, bpjs_tk_jp: 0, bpjs_kesehatan: 0, loan: 0, miscellaneous_deduction: 0
+    }
+  },
   family_members: [], education_history: [], work_experience: [], certifications: [], skills: ''
 };
 
@@ -103,11 +119,21 @@ const EmployeeForm = () => {
         .then(res => {
           if (res.status === 'success') {
             const data = res.data;
+            
+            const fetchedPayroll = data.payroll_components || {};
+            const mergedPayroll = {
+              fixed_income: { ...initialFormData.payroll_components.fixed_income, ...(fetchedPayroll.fixed_income || {}) },
+              variable_income: { ...initialFormData.payroll_components.variable_income, ...(fetchedPayroll.variable_income || {}) },
+              non_wage_income: { ...initialFormData.payroll_components.non_wage_income, ...(fetchedPayroll.non_wage_income || {}) },
+              deductions: { ...initialFormData.payroll_components.deductions, ...(fetchedPayroll.deductions || {}) }
+            };
+
             const normalized = { 
               ...initialFormData, 
               ...data, 
               employee_id: data.employee_id || data.id,
-              documents: data.documents || {} 
+              documents: data.documents || {},
+              payroll_components: mergedPayroll
             };
             setFormData(normalized);
             if (normalized.organization_id) fetchDepartments(normalized.organization_id);
@@ -128,6 +154,19 @@ const EmployeeForm = () => {
       finalValue = value.toUpperCase();
     }
     setFormData(prev => ({ ...prev, [name]: name === 'base_salary' ? parseFloat(value) || 0 : finalValue }));
+  };
+
+  const handlePayrollChange = (category, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      payroll_components: {
+        ...prev.payroll_components,
+        [category]: {
+          ...prev.payroll_components[category],
+          [field]: parseFloat(value) || 0
+        }
+      }
+    }));
   };
 
   const handleOrgChange = async (e) => {
@@ -483,26 +522,167 @@ const EmployeeForm = () => {
   );
 
   const renderFinancialTab = () => (
-    <div className="space-y-6 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <InputWrapper label="Nama Bank" icon={IconBuildingSkyscraper}>
-          <input name="bank_name" value={formData.bank_name} onChange={handleChange} placeholder="BCA / MANDIRI" className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="No. Rekening" icon={IconCreditCard}>
-          <input name="bank_account" value={formData.bank_account} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="Atas Nama Rekening" icon={IconUserCircle}>
-          <input name="bank_account_holder" value={formData.bank_account_holder} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="No. BPJS Ketenagakerjaan" icon={IconId}>
-          <input name="bpjs_tk_number" value={formData.bpjs_tk_number} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="No. BPJS Kesehatan" icon={IconId}>
-          <input name="bpjs_ks_number" value={formData.bpjs_ks_number} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
-        <InputWrapper label="Gaji Pokok (Base Salary)" icon={IconCreditCard}>
-          <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} />
-        </InputWrapper>
+    <div className="space-y-8 animate-fade-in">
+      {/* INFORMASI REKENING & PAJAK */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Rekening & Pajak</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="Nama Bank" icon={IconBuildingSkyscraper}>
+            <input name="bank_name" value={formData.bank_name} onChange={handleChange} placeholder="BCA / MANDIRI" className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="No. Rekening" icon={IconCreditCard}>
+            <input name="bank_account" value={formData.bank_account} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Atas Nama Rekening" icon={IconUserCircle}>
+            <input name="bank_account_holder" value={formData.bank_account_holder} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="NPWP" icon={IconId}>
+            <input name="npwp" value={formData.npwp} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Status PTKP" icon={IconUserCircle}>
+            <select name="ptkp_status" value={formData.ptkp_status} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="">PILIH STATUS</option>
+              <option value="TK/0">TK/0</option>
+              <option value="TK/1">TK/1</option>
+              <option value="TK/2">TK/2</option>
+              <option value="TK/3">TK/3</option>
+              <option value="K/0">K/0</option>
+              <option value="K/1">K/1</option>
+              <option value="K/2">K/2</option>
+              <option value="K/3">K/3</option>
+            </select>
+          </InputWrapper>
+          <InputWrapper label="Type Gaji" icon={IconCreditCard}>
+            <select name="salary_type" value={formData.salary_type} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="Netto">NETTO</option>
+              <option value="Gross">GROSS</option>
+              <option value="Gross Up">GROSS UP</option>
+            </select>
+          </InputWrapper>
+        </div>
+      </div>
+
+      {/* NOMOR BPJS (REFERENSI) */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Nomor BPJS (Referensi)</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="No. BPJS Ketenagakerjaan" icon={IconId}>
+            <input name="bpjs_tk_number" value={formData.bpjs_tk_number} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="No. BPJS Kesehatan" icon={IconId}>
+            <input name="bpjs_ks_number" value={formData.bpjs_ks_number} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
+      </div>
+
+      {/* KOMPONEN GAJI: FIXED INCOME */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Fixed Income</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="Gaji Pokok (Base Salary)" icon={IconCreditCard}>
+            <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Tunjangan Jabatan" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.fixed_income?.tunjangan_jabatan || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_jabatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Tunjangan Keahlian" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.fixed_income?.tunjangan_keahlian || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_keahlian', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Tunjangan Komunikasi" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.fixed_income?.tunjangan_komunikasi || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_komunikasi', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          
+          <div className="col-span-full mt-2">
+            <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Tunjangan BPJS Ketenagakerjaan (Dibayarkan Perusahaan)</label>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-lg border border-slate-200">
+              <InputWrapper label="JKK" icon={IconCreditCard}>
+                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jkk || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkk', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="JKM" icon={IconCreditCard}>
+                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jkm || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkm', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="JHT" icon={IconCreditCard}>
+                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="JP" icon={IconCreditCard}>
+                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jp || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jp', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+            </div>
+          </div>
+          <InputWrapper label="Tunjangan BPJS Kesehatan" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_kesehatan || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_kesehatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
+      </div>
+
+      {/* KOMPONEN GAJI: VARIABLE INCOME */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Variable Income</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="Work Order Allowance" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.variable_income?.work_order_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'work_order_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Meals Allowance" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.variable_income?.meals_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'meals_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Transport Allowance" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.variable_income?.transport_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'transport_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Overtime Allowance" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.variable_income?.overtime_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'overtime_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
+      </div>
+
+      {/* KOMPONEN GAJI: NON-WAGE INCOME */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Non-Wage Income</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="THR" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.non_wage_income?.thr || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'thr', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Bonus" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.non_wage_income?.bonus || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'bonus', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Incentive" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.non_wage_income?.incentive || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'incentive', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Miscellaneous Earnings" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.non_wage_income?.miscellaneous_earnings || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'miscellaneous_earnings', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
+      </div>
+
+      {/* KOMPONEN GAJI: DEDUCTION */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Deduction (Potongan)</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InputWrapper label="PPh21" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.deductions?.pph21 || ''} onChange={(e) => handlePayrollChange('deductions', 'pph21', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          
+          <div className="col-span-full mt-2">
+            <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Potongan BPJS Ketenagakerjaan</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50/50 rounded-lg border border-slate-200">
+              <InputWrapper label="JHT" icon={IconCreditCard}>
+                <input type="number" value={formData.payroll_components?.deductions?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="JP" icon={IconCreditCard}>
+                <input type="number" value={formData.payroll_components?.deductions?.bpjs_tk_jp || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jp', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+            </div>
+          </div>
+          
+          <InputWrapper label="Potongan BPJS Kesehatan" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.deductions?.bpjs_kesehatan || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_kesehatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Loan" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.deductions?.loan || ''} onChange={(e) => handlePayrollChange('deductions', 'loan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Miscellaneous Deduction" icon={IconCreditCard}>
+            <input type="number" value={formData.payroll_components?.deductions?.miscellaneous_deduction || ''} onChange={(e) => handlePayrollChange('deductions', 'miscellaneous_deduction', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
       </div>
     </div>
   );
