@@ -20,6 +20,7 @@ from api.rbac import router as rbac_router
 from api.crm import router as crm_router
 from api.recruitment import router as recruitment_router
 from api.announcements import router as announcements_router
+from api.master import router as master_router
 from fastapi.staticfiles import StaticFiles
 import os
 import sentry_sdk
@@ -93,6 +94,7 @@ app.include_router(rbac_router, prefix="/api", tags=["rbac"])
 app.include_router(crm_router, prefix="/api", tags=["crm"])
 app.include_router(recruitment_router, prefix="/api", tags=["recruitment"])
 app.include_router(announcements_router, prefix="/api", tags=["announcements"])
+app.include_router(master_router, prefix="/api/master", tags=["master"])
 
 @app.on_event("startup")
 async def startup_event():
