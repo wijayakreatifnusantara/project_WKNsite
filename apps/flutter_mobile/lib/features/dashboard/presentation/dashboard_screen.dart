@@ -542,13 +542,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                ),
-              );
+                );
             },
           ),
         ),
-      ),
-    ),
+      ), // end Container
+    ), // end FlexibleSpaceBar
+  ), // end SliverAppBar
           
           // Body Content
           SliverToBoxAdapter(
