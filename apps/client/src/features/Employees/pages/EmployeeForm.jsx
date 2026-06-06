@@ -242,111 +242,118 @@ const EmployeeForm = () => {
 
   const renderMainTab = () => (
     <div className="space-y-8 animate-fade-in">
-      
-      {/* FOTO KARYAWAN (PALING ATAS) */}
-      <div className="bg-white p-6 border border-slate-200 rounded-xl flex items-center gap-6">
-        <div className="relative w-24 h-32 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
-          {formData.photo ? (
-            <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
-          ) : (
-            <IconUserCircle size={40} className="text-blue-300" />
-          )}
-          <input 
-            type="file" 
-            accept=".jpg,.jpeg,.png"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-            onChange={handlePhotoUpload}
-            disabled={uploadingDoc === 'photo' || !formData.employee_id}
-          />
-          {uploadingDoc === 'photo' && (
-            <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-              <IconLoader2 className="animate-spin text-blue-500" />
-            </div>
-          )}
-        </div>
-        <div>
-          <h4 className="text-sm font-bold text-slate-700">Foto Karyawan</h4>
-          <p className="text-[11px] text-slate-500 mt-1 max-w-md leading-relaxed">
-            Unggah pas foto formal. Sangat disarankan berlatar belakang biru. Format JPG/PNG, maks 2MB.
-          </p>
-          {!formData.employee_id && (
-            <p className="text-[10px] text-red-500 font-bold mt-2 bg-red-50 p-2 rounded border border-red-100 inline-block">
-              *Pilih Organisasi (di bagian Informasi Kepegawaian) terlebih dahulu sebelum mengunggah foto.
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* SEKSI KEPEGAWAIAN */}
+      {/* SEKSI KEPEGAWAIAN & FOTO */}
       <div>
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Kepegawaian</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <InputWrapper label="ID Karyawan" icon={IconId}>
-            <input name="employee_id" value={formData.employee_id} readOnly placeholder="Otomatis setelah pilih Organisasi" className={`${inputStyle} bg-slate-100 text-slate-500 cursor-not-allowed`} />
-          </InputWrapper>
-          <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
-            <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
-              <option value="">PILIH ORGANISASI</option>
-              {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Departemen" icon={IconBriefcase}>
-            <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id}>
-              <option value="">PILIH DEPARTEMEN</option>
-              {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Jabatan" icon={IconAward}>
-            <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id}>
-              <option value="">PILIH JABATAN</option>
-              {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Status Pegawai" icon={IconUserCircle}>
-            <select name="status" value={formData.status} onChange={handleChange} className={inputStyle}>
-              <option value="Aktif">AKTIF</option>
-              <option value="Kontrak">KONTRAK</option>
-              <option value="Probation">PROBATION</option>
-            </select>
-          </InputWrapper>
-          <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
-            <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} />
-          </InputWrapper>
-          <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
-            <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle}>
-              <option value="Head Office">HEAD OFFICE</option>
-              <option value="Branch A">BRANCH A</option>
-              <option value="Remote">REMOTE</option>
-            </select>
-          </InputWrapper>
+        
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* KOLOM KIRI: FORM */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputWrapper label="ID Karyawan" icon={IconId}>
+              <input name="employee_id" value={formData.employee_id} readOnly placeholder="Otomatis setelah pilih Organisasi" className={`${inputStyle} bg-slate-100 text-slate-500 cursor-not-allowed`} />
+            </InputWrapper>
+            <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
+              <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
+                <option value="">PILIH ORGANISASI</option>
+                {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
+              </select>
+            </InputWrapper>
+            <InputWrapper label="Departemen" icon={IconBriefcase}>
+              <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id || !formData.employee_id}>
+                <option value="">PILIH DEPARTEMEN</option>
+                {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
+              </select>
+            </InputWrapper>
+            <InputWrapper label="Jabatan" icon={IconAward}>
+              <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id || !formData.employee_id}>
+                <option value="">PILIH JABATAN</option>
+                {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
+              </select>
+            </InputWrapper>
+            <InputWrapper label="Status Pegawai" icon={IconUserCircle}>
+              <select name="status" value={formData.status} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+                <option value="Aktif">AKTIF</option>
+                <option value="Kontrak">KONTRAK</option>
+                <option value="Probation">PROBATION</option>
+              </select>
+            </InputWrapper>
+            <InputWrapper label="Tanggal Bergabung" icon={IconCalendarEvent}>
+              <DatePicker selected={formData.join_date ? new Date(formData.join_date) : null} onChange={(date) => setFormData(p => ({...p, join_date: date.toISOString().split('T')[0]}))} dateFormat="dd/MM/yyyy" className={dateInputStyle} disabled={!formData.employee_id} />
+            </InputWrapper>
+            <InputWrapper label="Lokasi Kerja" icon={IconMapPin}>
+              <select name="working_location" value={formData.working_location} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+                <option value="Head Office">HEAD OFFICE</option>
+                <option value="Branch A">BRANCH A</option>
+                <option value="Remote">REMOTE</option>
+              </select>
+            </InputWrapper>
+          </div>
+
+          {/* KOLOM KANAN: FOTO */}
+          <div className="w-full lg:w-56 shrink-0 flex flex-col gap-3">
+            <h4 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider text-center">Foto Karyawan</h4>
+            <div className={`relative w-full aspect-[3/4] rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all border-2 ${formData.employee_id ? 'bg-blue-50 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400' : 'bg-slate-50 border-slate-200 opacity-50'}`}>
+              {formData.photo ? (
+                <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center text-blue-400 p-4 text-center">
+                  <IconUserCircle size={48} className="mb-2 opacity-50" />
+                  <span className="text-[10px] font-bold uppercase tracking-wide opacity-80">Pilih Foto</span>
+                </div>
+              )}
+              <input 
+                type="file" 
+                accept=".jpg,.jpeg,.png"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                onChange={handlePhotoUpload}
+                disabled={uploadingDoc === 'photo' || !formData.employee_id}
+              />
+              {uploadingDoc === 'photo' && (
+                <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center gap-2">
+                  <IconLoader2 className="animate-spin text-blue-600" size={24} />
+                  <span className="text-[9px] font-bold text-blue-600 uppercase">Mengunggah...</span>
+                </div>
+              )}
+            </div>
+            <p className="text-[9px] font-medium text-slate-500 leading-relaxed text-center bg-slate-50 p-2 rounded-lg border border-slate-100 mt-1">
+              Latar belakang biru. Format JPG/PNG (Maks 2MB).
+            </p>
+          </div>
         </div>
+        
+        {!formData.employee_id && (
+          <div className="mt-6 p-3 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-lg border border-amber-200 flex items-center gap-2 animate-pulse">
+            <IconBuildingSkyscraper size={16} />
+            Silakan pilih Organisasi terlebih dahulu untuk menghasilkan ID Karyawan dan membuka form isian.
+          </div>
+        )}
       </div>
 
       {/* SEKSI DATA PRIBADI */}
-      <div>
+      <div className={`transition-opacity duration-300 ${!formData.employee_id ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Pribadi</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="NIK KTP" icon={IconId}>
-            <input required name="nik" value={formData.nik} onChange={handleChange} placeholder="3201..." className={inputStyle} />
+            <input required name="nik" value={formData.nik} onChange={handleChange} placeholder="3201..." className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Nama Lengkap" icon={IconUserCircle}>
-            <input required name="name" value={formData.name} onChange={handleChange} className={inputStyle} />
+            <input required name="name" value={formData.name} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Email" icon={IconMail}>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} />
+            <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="No. Handphone" icon={IconPhone}>
-            <input required name="phone" value={formData.phone} onChange={handleChange} className={inputStyle} />
+            <input required name="phone" value={formData.phone} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Jenis Kelamin" icon={IconGenderBigender}>
-            <select name="gender" value={formData.gender} onChange={handleChange} className={inputStyle}>
+            <select name="gender" value={formData.gender} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
               <option value="Laki-laki">LAKI-LAKI</option>
               <option value="Perempuan">PEREMPUAN</option>
             </select>
           </InputWrapper>
           <InputWrapper label="Status Pernikahan" icon={IconUserCircle}>
-            <select name="marital_status" value={formData.marital_status} onChange={handleChange} className={inputStyle}>
+            <select name="marital_status" value={formData.marital_status} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
               <option value="Belum Kawin">BELUM KAWIN</option>
               <option value="Kawin">KAWIN</option>
             </select>
@@ -354,10 +361,10 @@ const EmployeeForm = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <InputWrapper label="Alamat KTP" icon={IconMapPin}>
-            <textarea rows="3" name="ktp_address" value={formData.ktp_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
+            <textarea rows="3" name="ktp_address" value={formData.ktp_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Alamat Domisili" icon={IconMapPin}>
-            <textarea rows="3" name="domicile_address" value={formData.domicile_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} />
+            <textarea rows="3" name="domicile_address" value={formData.domicile_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
       </div>
