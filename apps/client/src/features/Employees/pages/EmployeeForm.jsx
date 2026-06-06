@@ -244,7 +244,41 @@ const EmployeeForm = () => {
 
   const renderMainTab = () => (
     <div className="space-y-8 animate-fade-in">
-      {/* SEKSI KEPEGAWAIAN */}
+      
+      {/* FOTO KARYAWAN (PALING ATAS) */}
+      <div className="bg-white p-6 border border-slate-200 rounded-xl flex items-center gap-6">
+        <div className="relative w-24 h-32 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+          {formData.photo ? (
+            <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
+          ) : (
+            <IconUserCircle size={40} className="text-blue-300" />
+          )}
+          <input 
+            type="file" 
+            accept=".jpg,.jpeg,.png"
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            onChange={handlePhotoUpload}
+            disabled={uploadingDoc === 'photo' || !formData.employee_id}
+          />
+          {uploadingDoc === 'photo' && (
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+              <IconLoader2 className="animate-spin text-blue-500" />
+            </div>
+          )}
+        </div>
+        <div>
+          <h4 className="text-sm font-bold text-slate-700">Foto Karyawan</h4>
+          <p className="text-[11px] text-slate-500 mt-1 max-w-md leading-relaxed">
+            Unggah pas foto formal. Sangat disarankan berlatar belakang biru. Format JPG/PNG, maks 2MB.
+          </p>
+          {!formData.employee_id && (
+            <p className="text-[10px] text-red-500 font-bold mt-2 bg-red-50 p-2 rounded border border-red-100 inline-block">
+              *Pilih Organisasi (di bagian Informasi Kepegawaian) terlebih dahulu sebelum mengunggah foto.
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* SEKSI KEPEGAWAIAN */}
       <div>
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Kepegawaian</h3>
@@ -294,40 +328,6 @@ const EmployeeForm = () => {
       <div>
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Pribadi</h3>
         
-        {/* FOTO KARYAWAN */}
-        <div className="mb-6 flex items-center gap-6">
-          <div className="relative w-24 h-32 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg flex items-center justify-center overflow-hidden">
-            {formData.photo ? (
-              <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
-            ) : (
-              <IconUserCircle size={40} className="text-blue-300" />
-            )}
-            <input 
-              type="file" 
-              accept=".jpg,.jpeg,.png"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-              onChange={handlePhotoUpload}
-              disabled={uploadingDoc === 'photo' || !formData.employee_id}
-            />
-            {uploadingDoc === 'photo' && (
-              <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                <IconLoader2 className="animate-spin text-blue-500" />
-              </div>
-            )}
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-slate-700">Foto Karyawan</h4>
-            <p className="text-[10px] text-slate-500 mt-1 max-w-xs leading-relaxed">
-              Unggah pas foto formal. Sangat disarankan berlatar belakang biru. Format JPG/PNG, maks 2MB.
-            </p>
-            {!formData.employee_id && (
-              <p className="text-[10px] text-red-500 font-bold mt-1">
-                *Pilih Organisasi di Informasi Kepegawaian terlebih dahulu sebelum mengunggah foto.
-              </p>
-            )}
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="NIK KTP" icon={IconId}>
             <input required name="nik" value={formData.nik} onChange={handleChange} placeholder="3201..." className={inputStyle} />
