@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   IconArrowLeft, IconDeviceFloppy, IconUserCircle, IconBriefcase, IconCreditCard,
   IconId, IconMail, IconPhone, IconMapPin, IconBuildingSkyscraper, IconAward,
-  IconCalendarEvent, IconGenderBigender, IconLoader2, IconFileUpload, IconFileDescription, IconTrash, IconCheck, IconX
+  IconCalendarEvent, IconGenderBigender, IconLoader2, IconFileUpload, IconFileDescription, IconTrash, IconCheck, IconX, IconPlus
 } from "@tabler/icons-react";
 import { apiClient } from '@/lib/apiClient';
 import { supabase } from '@/lib/supabaseClient';
@@ -41,8 +41,10 @@ const initialFormData = {
   job_level: 'Staff', status: 'Aktif', employment_type: 'Permanent', working_location: 'Head Office',
   base_salary: 0, join_date: new Date().toISOString().split('T')[0],
   emergency_contact_1_name: '', emergency_contact_1_rel: '', emergency_contact_1_phone: '',
+  emergency_contact_2_name: '', emergency_contact_2_rel: '', emergency_contact_2_phone: '',
   bank_name: '', bank_account: '', bank_account_holder: '', bpjs_tk_number: '', bpjs_ks_number: '',
-  mobile_password: '', documents: {}
+  mobile_password: '', documents: {},
+  family_members: [], education_history: [], work_experience: [], certifications: [], skills: ''
 };
 
 const DOC_TYPES = [
@@ -489,6 +491,166 @@ const EmployeeForm = () => {
     </div>
   );
 
+  const handleArrayChange = (field, index, key, value) => {
+    setFormData(prev => {
+      const arr = [...(prev[field] || [])];
+      arr[index] = { ...arr[index], [key]: value };
+      return { ...prev, [field]: arr };
+    });
+  };
+
+  const addArrayItem = (field, defaultItem) => {
+    setFormData(prev => ({ ...prev, [field]: [...(prev[field] || []), defaultItem] }));
+  };
+
+  const removeArrayItem = (field, index) => {
+    setFormData(prev => {
+      const arr = [...(prev[field] || [])];
+      arr.splice(index, 1);
+      return { ...prev, [field]: arr };
+    });
+  };
+
+  const renderFamilyTab = () => (
+    <div className="space-y-8 animate-fade-in">
+      {/* KONTAK DARURAT */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Kontak Darurat (Utama)</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <InputWrapper label="Nama Kontak 1" icon={IconUserCircle}>
+            <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Hubungan" icon={IconUserCircle}>
+            <input name="emergency_contact_1_rel" value={formData.emergency_contact_1_rel || ''} onChange={handleChange} placeholder="Istri / Suami / Ayah" className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="No. Handphone" icon={IconPhone}>
+            <input name="emergency_contact_1_phone" value={formData.emergency_contact_1_phone || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+          <InputWrapper label="Nama Kontak 2" icon={IconUserCircle}>
+            <input name="emergency_contact_2_name" value={formData.emergency_contact_2_name || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="Hubungan" icon={IconUserCircle}>
+            <input name="emergency_contact_2_rel" value={formData.emergency_contact_2_rel || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+          <InputWrapper label="No. Handphone" icon={IconPhone}>
+            <input name="emergency_contact_2_phone" value={formData.emergency_contact_2_phone || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+          </InputWrapper>
+        </div>
+      </div>
+
+      {/* DATA KELUARGA DINAMIS */}
+      <div>
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Daftar Anggota Keluarga</h3>
+          <button type="button" onClick={() => addArrayItem('family_members', { name: '', relation: '', occupation: '', phone: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+            <IconPlus size={14} /> Tambah Keluarga
+          </button>
+        </div>
+        <div className="space-y-4">
+          {formData.family_members?.map((member, idx) => (
+            <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl">
+              <button type="button" onClick={() => removeArrayItem('family_members', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500">
+                <IconX size={16} />
+              </button>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pr-6">
+                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama</label><input value={member.name} onChange={e => handleArrayChange('family_members', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Hubungan</label><input value={member.relation} onChange={e => handleArrayChange('family_members', idx, 'relation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Pekerjaan</label><input value={member.occupation} onChange={e => handleArrayChange('family_members', idx, 'occupation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">No. Telepon</label><input value={member.phone} onChange={e => handleArrayChange('family_members', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              </div>
+            </div>
+          ))}
+          {(!formData.family_members || formData.family_members.length === 0) && (
+            <div className="text-center text-slate-400 text-xs py-4">Belum ada data anggota keluarga.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderHistoryTab = () => (
+    <div className="space-y-8 animate-fade-in">
+      {/* PENDIDIKAN */}
+      <div>
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Histori Pendidikan</h3>
+          <button type="button" onClick={() => addArrayItem('education_history', { degree: '', institution: '', year: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+            <IconPlus size={14} /> Tambah Pendidikan
+          </button>
+        </div>
+        <div className="space-y-4">
+          {formData.education_history?.map((edu, idx) => (
+            <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+              <button type="button" onClick={() => removeArrayItem('education_history', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tingkat / Jurusan</label><input value={edu.degree} onChange={e => handleArrayChange('education_history', idx, 'degree', e.target.value)} placeholder="S1 Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi</label><input value={edu.institution} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+            </div>
+          ))}
+          {(!formData.education_history || formData.education_history.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada histori pendidikan.</div>}
+        </div>
+      </div>
+
+      {/* PENGALAMAN KERJA */}
+      <div>
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pengalaman Kerja</h3>
+          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+            <IconPlus size={14} /> Tambah Pengalaman
+          </button>
+        </div>
+        <div className="space-y-4">
+          {formData.work_experience?.map((work, idx) => (
+            <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+              <button type="button" onClick={() => removeArrayItem('work_experience', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Perusahaan</label><input value={work.company} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Posisi</label><input value={work.position} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Durasi / Tahun</label><input value={work.duration} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="2018 - 2021" className={inputStyle} disabled={!formData.employee_id} /></div>
+            </div>
+          ))}
+          {(!formData.work_experience || formData.work_experience.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada pengalaman kerja.</div>}
+        </div>
+      </div>
+
+      {/* KURSUS & SERTIFIKASI */}
+      <div>
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Kursus atau Sertifikasi</h3>
+          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', year: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+            <IconPlus size={14} /> Tambah Sertifikasi
+          </button>
+        </div>
+        <div className="space-y-4">
+          {formData.certifications?.map((cert, idx) => (
+            <div key={idx} className="relative bg-slate-50 border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+              <button type="button" onClick={() => removeArrayItem('certifications', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama Sertifikasi</label><input value={cert.name} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi / Penyelenggara</label><input value={cert.institution} onChange={e => handleArrayChange('certifications', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun</label><input value={cert.year} onChange={e => handleArrayChange('certifications', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+            </div>
+          ))}
+          {(!formData.certifications || formData.certifications.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada kursus atau sertifikasi.</div>}
+        </div>
+      </div>
+
+      {/* KEAHLIAN */}
+      <div>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Keahlian (Skills)</h3>
+        <textarea 
+          name="skills" 
+          value={formData.skills || ''} 
+          onChange={handleChange} 
+          placeholder="Pisahkan dengan koma. Contoh: Bahasa Inggris, Microsoft Excel, Desain Grafis" 
+          className={`${inputStyle} h-auto py-3 normal-case`} 
+          rows="3"
+          disabled={!formData.employee_id}
+        />
+      </div>
+    </div>
+  );
+
   const renderDocumentsTab = () => (
     <div className="space-y-6 animate-fade-in">
       <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3">
@@ -573,6 +735,8 @@ const EmployeeForm = () => {
         {/* TAB NAVIGATION */}
         <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg">
           <button type="button" onClick={() => setActiveTab('main')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'main' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Utama</button>
+          <button type="button" onClick={() => setActiveTab('family')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'family' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Keluarga</button>
+          <button type="button" onClick={() => setActiveTab('history')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'history' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Pendidikan & Pengalaman</button>
           <button type="button" onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
           <button type="button" onClick={() => setActiveTab('documents')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'documents' ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Dokumen</button>
         </div>
@@ -583,6 +747,8 @@ const EmployeeForm = () => {
         <div className="max-w-6xl mx-auto">
           <form id="employee-form" onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
             {activeTab === 'main' && renderMainTab()}
+            {activeTab === 'family' && renderFamilyTab()}
+            {activeTab === 'history' && renderHistoryTab()}
             {activeTab === 'financial' && renderFinancialTab()}
             {activeTab === 'documents' && renderDocumentsTab()}
           </form>

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 class EmployeeBase(BaseModel):
     # Core Identity (A-C)
@@ -36,6 +36,13 @@ class EmployeeBase(BaseModel):
     emergency_contact_2_name: Optional[str] = None
     emergency_contact_2_relationship: Optional[str] = None
     emergency_contact_2_phone: Optional[str] = None
+    
+    # Advanced Data (JSON Arrays)
+    family_members: Optional[List[Dict[str, Any]]] = None
+    education_history: Optional[List[Dict[str, Any]]] = None
+    work_experience: Optional[List[Dict[str, Any]]] = None
+    certifications: Optional[List[Dict[str, Any]]] = None
+    skills: Optional[str] = None
     
     # Employment (Q-T)
     organization_name: str
