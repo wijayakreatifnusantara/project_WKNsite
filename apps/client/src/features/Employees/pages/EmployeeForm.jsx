@@ -719,7 +719,22 @@ const EmployeeForm = () => {
             <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Hubungan" icon={IconUserCircle}>
-            <input name="emergency_contact_1_rel" value={formData.emergency_contact_1_rel || ''} onChange={handleChange} placeholder="Istri / Suami / Ayah" className={inputStyle} disabled={!formData.employee_id} />
+            <select name="emergency_contact_1_rel" value={formData.emergency_contact_1_rel || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="">PILIH HUBUNGAN</option>
+              <option value="AYAH KANDUNG">AYAH KANDUNG</option>
+              <option value="IBU KANDUNG">IBU KANDUNG</option>
+              <option value="AYAH TIRI">AYAH TIRI</option>
+              <option value="IBU TIRI">IBU TIRI</option>
+              <option value="SUAMI">SUAMI</option>
+              <option value="ISTRI">ISTRI</option>
+              <option value="ANAK">ANAK</option>
+              <option value="KAKAK">KAKAK</option>
+              <option value="ADIK">ADIK</option>
+              <option value="MERTUA">MERTUA</option>
+              <option value="KAKEK">KAKEK</option>
+              <option value="NENEK">NENEK</option>
+              <option value="LAIN-LAIN">LAIN-LAIN</option>
+            </select>
           </InputWrapper>
           <InputWrapper label="No. Handphone" icon={IconPhone}>
             <input name="emergency_contact_1_phone" value={formData.emergency_contact_1_phone || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
@@ -730,7 +745,22 @@ const EmployeeForm = () => {
             <input name="emergency_contact_2_name" value={formData.emergency_contact_2_name || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Hubungan" icon={IconUserCircle}>
-            <input name="emergency_contact_2_rel" value={formData.emergency_contact_2_rel || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+            <select name="emergency_contact_2_rel" value={formData.emergency_contact_2_rel || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="">PILIH HUBUNGAN</option>
+              <option value="AYAH KANDUNG">AYAH KANDUNG</option>
+              <option value="IBU KANDUNG">IBU KANDUNG</option>
+              <option value="AYAH TIRI">AYAH TIRI</option>
+              <option value="IBU TIRI">IBU TIRI</option>
+              <option value="SUAMI">SUAMI</option>
+              <option value="ISTRI">ISTRI</option>
+              <option value="ANAK">ANAK</option>
+              <option value="KAKAK">KAKAK</option>
+              <option value="ADIK">ADIK</option>
+              <option value="MERTUA">MERTUA</option>
+              <option value="KAKEK">KAKEK</option>
+              <option value="NENEK">NENEK</option>
+              <option value="LAIN-LAIN">LAIN-LAIN</option>
+            </select>
           </InputWrapper>
           <InputWrapper label="No. Handphone" icon={IconPhone}>
             <input name="emergency_contact_2_phone" value={formData.emergency_contact_2_phone || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
