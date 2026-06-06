@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   IconArrowLeft, IconDeviceFloppy, IconUserCircle, IconBriefcase, IconCreditCard,
   IconId, IconMail, IconPhone, IconMapPin, IconBuildingSkyscraper, IconAward,
-  IconCalendarEvent, IconGenderBigender, IconLoader2, IconFileUpload, IconFileDescription, IconTrash, IconCheck
+  IconCalendarEvent, IconGenderBigender, IconLoader2, IconFileUpload, IconFileDescription, IconTrash, IconCheck, IconX
 } from "@tabler/icons-react";
 import { apiClient } from '@/lib/apiClient';
 import { supabase } from '@/lib/supabaseClient';
@@ -290,7 +290,20 @@ const EmployeeForm = () => {
             <h4 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider text-center">Foto Karyawan</h4>
             <div className={`relative w-full aspect-[3/4] rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all border-2 ${formData.employee_id ? 'bg-blue-50 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400' : 'bg-slate-50 border-slate-200 opacity-50'}`}>
               {formData.photo ? (
-                <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
+                <>
+                  <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFormData(prev => ({ ...prev, photo: '' }));
+                    }}
+                    className="absolute top-2 right-2 bg-slate-900/50 hover:bg-red-500 text-white p-1.5 rounded-full backdrop-blur-sm transition-all hover:scale-110 z-20"
+                    title="Hapus Foto"
+                  >
+                    <IconX size={16} stroke={2.5} />
+                  </button>
+                </>
               ) : (
                 <div className="flex flex-col items-center text-blue-400 p-4 text-center">
                   <IconUserCircle size={48} className="mb-2 opacity-50" />
@@ -300,7 +313,7 @@ const EmployeeForm = () => {
               <input 
                 type="file" 
                 accept=".jpg,.jpeg,.png"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
                 onChange={handlePhotoUpload}
                 disabled={uploadingDoc === 'photo' || !formData.employee_id}
               />
