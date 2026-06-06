@@ -8,14 +8,25 @@ class EmployeeBase(BaseModel):
     email: Optional[str] = None
     
     # Personal Info (D-H)
+    nickname: Optional[str] = None
     phone_number: Optional[str] = None
     whatsapp_number: Optional[str] = None
     gender: Optional[str] = None
+    place_of_birth: Optional[str] = None
     date_of_birth: Optional[str] = None
+    religion: Optional[str] = None
     marital_status: Optional[str] = None
+    residence_status: Optional[str] = None
+    blood_type: Optional[str] = None
+    height: Optional[str] = None
+    weight: Optional[str] = None
+    uniform_size: Optional[str] = None
+    shoe_size: Optional[str] = None
     
     # IDs & Address (I-J)
     national_id_nik: Optional[str] = None
+    nik: Optional[str] = None
+    kk_number: Optional[str] = None
     address: Optional[str] = None
     
     # Emergency Contacts (K-P)
