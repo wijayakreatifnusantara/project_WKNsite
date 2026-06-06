@@ -10,6 +10,7 @@ import AttendanceCalendar from '../features/Attendance/pages/AttendanceCalendar'
 import AdminHub from '../features/Admin/pages/AdminHub';
 import Overview from '../features/Overview/pages/Overview';
 import OrganizationManager from '../features/Admin/pages/OrganizationManager';
+import ShiftManager from '../features/Master/pages/ShiftManager';
 import LeaveManagementHub from '../features/Leave/pages/LeaveManagementHub';
 import Payroll from '../features/Payroll/pages/Payroll';
 import Expenses from '../features/Finance/pages/Expenses';
@@ -62,6 +63,7 @@ const AppRoutes = () => {
         <Route path="/overview" element={<Overview />} />
         <Route path="/master/employees" element={<Employees />} />
         <Route path="/master/organization" element={<OrganizationManager />} />
+        <Route path="/master/shifts" element={<ShiftManager />} />
         <Route path="/master/employees/create" element={<EmployeeForm />} />
         <Route path="/master/employees/edit/:id" element={<EmployeeForm />} />
         <Route path="/employees/onboarding" element={<OnboardingPage />} />
