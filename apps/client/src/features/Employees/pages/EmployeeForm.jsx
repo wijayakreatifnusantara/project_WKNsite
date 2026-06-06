@@ -16,11 +16,14 @@ import "react-datepicker/dist/react-datepicker.css";
 const _rawApi = import.meta.env.VITE_API_URL;
 const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
 
-const InputWrapper = ({ label, icon: Icon, children }) => (
+const InputWrapper = ({ label, icon: Icon, children, labelRight }) => (
   <div className="space-y-1.5">
-    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider pl-1">{label}</label>
+    <div className="flex justify-between items-center pl-1">
+      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
+      {labelRight && <div>{labelRight}</div>}
+    </div>
     <div className="relative">
-      <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+      <Icon size={16} className="absolute left-3 top-3 text-slate-400 pointer-events-none z-10" />
       {children}
     </div>
   </div>
@@ -414,7 +417,15 @@ const EmployeeForm = () => {
             <input type="number" name="weight" value={formData.weight} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Ukuran Seragam" icon={IconUserCircle}>
-            <input name="uniform_size" value={formData.uniform_size} onChange={handleChange} placeholder="S/M/L/XL" className={inputStyle} disabled={!formData.employee_id} />
+            <select name="uniform_size" value={formData.uniform_size} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+              <option value="">PILIH UKURAN</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+            </select>
           </InputWrapper>
           <InputWrapper label="Ukuran Sepatu" icon={IconUserCircle}>
             <input type="number" name="shoe_size" value={formData.shoe_size} onChange={handleChange} placeholder="40" className={inputStyle} disabled={!formData.employee_id} />
@@ -424,7 +435,28 @@ const EmployeeForm = () => {
           <InputWrapper label="Alamat KTP" icon={IconMapPin}>
             <textarea rows="3" name="ktp_address" value={formData.ktp_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} disabled={!formData.employee_id} />
           </InputWrapper>
-          <InputWrapper label="Alamat Domisili" icon={IconMapPin}>
+          <InputWrapper 
+            label="Alamat Domisili" 
+            icon={IconMapPin}
+            labelRight={
+              <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 cursor-pointer hover:text-slate-700">
+                <input 
+                  type="checkbox" 
+                  checked={formData.domicile_address && formData.domicile_address === formData.ktp_address} 
+                  onChange={(e) => {
+                    if(e.target.checked) {
+                      setFormData(prev => ({...prev, domicile_address: prev.ktp_address}));
+                    } else {
+                      setFormData(prev => ({...prev, domicile_address: ''}));
+                    }
+                  }} 
+                  className="rounded border-slate-300 text-[#E31E24] focus:ring-[#E31E24]"
+                  disabled={!formData.employee_id || !formData.ktp_address}
+                />
+                <span>Sama dengan KTP</span>
+              </label>
+            }
+          >
             <textarea rows="3" name="domicile_address" value={formData.domicile_address} onChange={handleChange} className={`${inputStyle} h-auto py-2`} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
