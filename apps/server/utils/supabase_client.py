@@ -43,7 +43,7 @@ class WKNSupabaseClient:
             start = (page - 1) * page_size
             end = start + page_size - 1
             
-            query = self.client.table("employees").select("*", count="exact")
+            query = self.client.table("employees").select("*, divisions(name), departments(name), positions(name)", count="exact")
             
             if q:
                 # Optimized server-side filtering
@@ -53,10 +53,17 @@ class WKNSupabaseClient:
             data = response.data
             total = response.count
             
-            # Mapping back to Sheets format for frontend compatibility
-            compat_data = []
+            # Mapping back to Sheets format for frontend compatibility, while keeping raw keys
             for e in data:
-                compat_data.append({
+                # Extract relational names if joined
+                if e.get("divisions") and isinstance(e["divisions"], dict):
+                    e["division_name"] = e["divisions"].get("name", e.get("division_name"))
+                if e.get("departments") and isinstance(e["departments"], dict):
+                    e["department_name"] = e["departments"].get("name")
+                if e.get("positions") and isinstance(e["positions"], dict):
+                    e["job_position"] = e["positions"].get("name", e.get("job_position"))
+                    
+                e.update({
                     "EMPLOYEE ID": e.get("id"),
                     "EMPLOYEE NAME": e.get("name"),
                     "EMAIL": e.get("email"),
@@ -69,15 +76,12 @@ class WKNSupabaseClient:
                     "JOIN DATE": e.get("join_date"),
                     "Contract End Date": e.get("contract_end_date"),
                     "Resign Date": e.get("resign_date"),
-                    "is_resigned": e.get("is_resigned"),
-                    "working_location": e.get("working_location"),
                     "Working Location": e.get("working_location"),
-                    "is_field_team": e.get("is_field_team"),
                     "isFieldTeam": e.get("is_field_team")
                 })
             
             result = {
-                "data": compat_data,
+                "data": data,
                 "total": total,
                 "page": page,
                 "page_size": page_size
@@ -211,50 +215,54 @@ class WKNSupabaseClient:
         """Add new employee to Supabase"""
         if not self.client: return False
         try:
-            # Map back to Supabase snake_case columns
+            # Map back to Supabase snake_case columns.
+            # Handle both raw Pydantic keys (e.g., employee_id) and old Pseudo-headers (e.g., "EMPLOYEE ID")
             db_data = {
-                "id": employee_data.get("EMPLOYEE ID"),
-                "name": employee_data.get("EMPLOYEE NAME"),
-                "nickname": employee_data.get("NICKNAME"),
-                "email": employee_data.get("EMAIL"),
-                "phone_number": employee_data.get("PHONE NUMBER"),
-                "whatsapp_number": employee_data.get("WHATSAPP NUMBER"),
-                "gender": employee_data.get("GENDER"),
-                "place_of_birth": employee_data.get("PLACE OF BIRTH"),
-                "date_of_birth": employee_data.get("DATE OF BIRTH"),
-                "religion": employee_data.get("RELIGION"),
-                "marital_status": employee_data.get("MARITAL STATUS"),
-                "residence_status": employee_data.get("RESIDENCE STATUS"),
-                "blood_type": employee_data.get("BLOOD TYPE"),
-                "height": employee_data.get("HEIGHT"),
-                "weight": employee_data.get("WEIGHT"),
-                "uniform_size": employee_data.get("UNIFORM SIZE"),
-                "shoe_size": employee_data.get("SHOE SIZE"),
-                "national_id_nik": employee_data.get("NATIONAL ID (NIK)"),
-                "kk_number": employee_data.get("KK NUMBER"),
-                "address": employee_data.get("ADDRESS"),
-                "family_members": employee_data.get("FAMILY MEMBERS", []),
-                "education_history": employee_data.get("EDUCATION HISTORY", []),
-                "work_experience": employee_data.get("WORK EXPERIENCE", []),
-                "certifications": employee_data.get("CERTIFICATIONS", []),
-                "skills": employee_data.get("SKILLS"),
-                "job_position": employee_data.get("Job Position *"),
-                "division_name": employee_data.get("Division Name *"),
-                "status": employee_data.get("Status *", "Active"),
-                "base_salary": float(str(employee_data.get("Gaji Pokok *", 0)).replace(",", "")) if employee_data.get("Gaji Pokok *") else 0,
-                "join_date": employee_data.get("JOIN DATE"),
-                "contract_end_date": employee_data.get("Contract End Date"),
-                "bank_branch": employee_data.get("Bank Branch"),
-                "payroll_method": employee_data.get("Payroll Method"),
-                "npwp_16_digit": employee_data.get("NPWP 16 Digit"),
-                "tax_method": employee_data.get("Tax Method"),
-                "kpp_name": employee_data.get("KPP Name"),
-                "faskes_tk1": employee_data.get("Faskes TK1"),
-                "employment_type": employee_data.get("Employment Type"),
-                "probation_end_date": employee_data.get("Probation End Date"),
-                "working_location": employee_data.get("Working Location"),
-                "overtime_eligible": employee_data.get("Overtime Eligible"),
-                "resign_date": employee_data.get("Resign Date"),
+                "id": employee_data.get("id", employee_data.get("employee_id", employee_data.get("EMPLOYEE ID"))),
+                "name": employee_data.get("name", employee_data.get("employee_name", employee_data.get("EMPLOYEE NAME"))),
+                "nickname": employee_data.get("nickname", employee_data.get("NICKNAME")),
+                "email": employee_data.get("email", employee_data.get("EMAIL")),
+                "phone_number": employee_data.get("phone_number", employee_data.get("PHONE NUMBER")),
+                "whatsapp_number": employee_data.get("whatsapp_number", employee_data.get("WHATSAPP NUMBER")),
+                "gender": employee_data.get("gender", employee_data.get("GENDER")),
+                "place_of_birth": employee_data.get("place_of_birth", employee_data.get("PLACE OF BIRTH")),
+                "date_of_birth": employee_data.get("date_of_birth", employee_data.get("DATE OF BIRTH")),
+                "religion": employee_data.get("religion", employee_data.get("RELIGION")),
+                "marital_status": employee_data.get("marital_status", employee_data.get("MARITAL STATUS")),
+                "residence_status": employee_data.get("residence_status", employee_data.get("RESIDENCE STATUS")),
+                "blood_type": employee_data.get("blood_type", employee_data.get("BLOOD TYPE")),
+                "height": employee_data.get("height", employee_data.get("HEIGHT")),
+                "weight": employee_data.get("weight", employee_data.get("WEIGHT")),
+                "uniform_size": employee_data.get("uniform_size", employee_data.get("UNIFORM SIZE")),
+                "shoe_size": employee_data.get("shoe_size", employee_data.get("SHOE SIZE")),
+                "national_id_nik": employee_data.get("national_id_nik", employee_data.get("nik", employee_data.get("NATIONAL ID (NIK)"))),
+                "kk_number": employee_data.get("kk_number", employee_data.get("KK NUMBER")),
+                "address": employee_data.get("address", employee_data.get("ADDRESS")),
+                "family_members": employee_data.get("family_members", employee_data.get("FAMILY MEMBERS", [])),
+                "education_history": employee_data.get("education_history", employee_data.get("EDUCATION HISTORY", [])),
+                "work_experience": employee_data.get("work_experience", employee_data.get("WORK EXPERIENCE", [])),
+                "certifications": employee_data.get("certifications", employee_data.get("CERTIFICATIONS", [])),
+                "skills": employee_data.get("skills", employee_data.get("SKILLS")),
+                "job_position": employee_data.get("job_position", employee_data.get("Job Position *")),
+                "division_name": employee_data.get("division_name", employee_data.get("Division Name *")),
+                "division_id": employee_data.get("division_id"),
+                "department_id": employee_data.get("department_id"),
+                "position_id": employee_data.get("position_id"),
+                "status": employee_data.get("status", employee_data.get("Status *", "Active")),
+                "base_salary": float(str(employee_data.get("gaji_pokok", employee_data.get("Gaji Pokok *", 0))).replace(",", "")) if employee_data.get("gaji_pokok") or employee_data.get("Gaji Pokok *") else 0,
+                "join_date": employee_data.get("join_date", employee_data.get("JOIN DATE")),
+                "contract_end_date": employee_data.get("contract_end_date", employee_data.get("Contract End Date")),
+                "bank_branch": employee_data.get("bank_branch", employee_data.get("Bank Branch")),
+                "payroll_method": employee_data.get("payroll_method", employee_data.get("Payroll Method")),
+                "npwp_16_digit": employee_data.get("npwp_16_digit", employee_data.get("NPWP 16 Digit")),
+                "tax_method": employee_data.get("tax_method", employee_data.get("Tax Method")),
+                "kpp_name": employee_data.get("kpp_name", employee_data.get("KPP Name")),
+                "faskes_tk1": employee_data.get("faskes_tk1", employee_data.get("Faskes TK1")),
+                "employment_type": employee_data.get("employment_type", employee_data.get("Employment Type")),
+                "probation_end_date": employee_data.get("probation_end_date", employee_data.get("Probation End Date")),
+                "working_location": employee_data.get("working_location", employee_data.get("Working Location")),
+                "overtime_eligible": employee_data.get("overtime_eligible", employee_data.get("Overtime Eligible", True)),
+                "resign_date": employee_data.get("resign_date", employee_data.get("Resign Date")),
                 "is_resigned": employee_data.get("is_resigned", False)
             }
             self.client.table("employees").insert(db_data).execute()
@@ -268,47 +276,50 @@ class WKNSupabaseClient:
         if not self.client: return False
         try:
             db_data = {
-                "name": employee_data.get("EMPLOYEE NAME"),
-                "nickname": employee_data.get("NICKNAME"),
-                "email": employee_data.get("EMAIL"),
-                "phone_number": employee_data.get("PHONE NUMBER"),
-                "whatsapp_number": employee_data.get("WHATSAPP NUMBER"),
-                "gender": employee_data.get("GENDER"),
-                "place_of_birth": employee_data.get("PLACE OF BIRTH"),
-                "date_of_birth": employee_data.get("DATE OF BIRTH"),
-                "religion": employee_data.get("RELIGION"),
-                "marital_status": employee_data.get("MARITAL STATUS"),
-                "residence_status": employee_data.get("RESIDENCE STATUS"),
-                "blood_type": employee_data.get("BLOOD TYPE"),
-                "height": employee_data.get("HEIGHT"),
-                "weight": employee_data.get("WEIGHT"),
-                "uniform_size": employee_data.get("UNIFORM SIZE"),
-                "shoe_size": employee_data.get("SHOE SIZE"),
-                "national_id_nik": employee_data.get("NATIONAL ID (NIK)"),
-                "kk_number": employee_data.get("KK NUMBER"),
-                "address": employee_data.get("ADDRESS"),
-                "family_members": employee_data.get("FAMILY MEMBERS", []),
-                "education_history": employee_data.get("EDUCATION HISTORY", []),
-                "work_experience": employee_data.get("WORK EXPERIENCE", []),
-                "certifications": employee_data.get("CERTIFICATIONS", []),
-                "skills": employee_data.get("SKILLS"),
-                "job_position": employee_data.get("Job Position *"),
-                "division_name": employee_data.get("Division Name *"),
-                "status": employee_data.get("Status *"),
-                "base_salary": float(str(employee_data.get("Gaji Pokok *", 0)).replace(",", "")) if employee_data.get("Gaji Pokok *") else 0,
-                "contract_end_date": employee_data.get("Contract End Date"),
-                "bank_branch": employee_data.get("Bank Branch"),
-                "payroll_method": employee_data.get("Payroll Method"),
-                "npwp_16_digit": employee_data.get("NPWP 16 Digit"),
-                "tax_method": employee_data.get("Tax Method"),
-                "kpp_name": employee_data.get("KPP Name"),
-                "faskes_tk1": employee_data.get("Faskes TK1"),
-                "employment_type": employee_data.get("Employment Type"),
-                "probation_end_date": employee_data.get("Probation End Date"),
-                "working_location": employee_data.get("Working Location"),
-                "overtime_eligible": employee_data.get("Overtime Eligible"),
-                "resign_date": employee_data.get("Resign Date"),
-                "is_resigned": employee_data.get("is_resigned")
+                "name": employee_data.get("name", employee_data.get("employee_name", employee_data.get("EMPLOYEE NAME"))),
+                "nickname": employee_data.get("nickname", employee_data.get("NICKNAME")),
+                "email": employee_data.get("email", employee_data.get("EMAIL")),
+                "phone_number": employee_data.get("phone_number", employee_data.get("PHONE NUMBER")),
+                "whatsapp_number": employee_data.get("whatsapp_number", employee_data.get("WHATSAPP NUMBER")),
+                "gender": employee_data.get("gender", employee_data.get("GENDER")),
+                "place_of_birth": employee_data.get("place_of_birth", employee_data.get("PLACE OF BIRTH")),
+                "date_of_birth": employee_data.get("date_of_birth", employee_data.get("DATE OF BIRTH")),
+                "religion": employee_data.get("religion", employee_data.get("RELIGION")),
+                "marital_status": employee_data.get("marital_status", employee_data.get("MARITAL STATUS")),
+                "residence_status": employee_data.get("residence_status", employee_data.get("RESIDENCE STATUS")),
+                "blood_type": employee_data.get("blood_type", employee_data.get("BLOOD TYPE")),
+                "height": employee_data.get("height", employee_data.get("HEIGHT")),
+                "weight": employee_data.get("weight", employee_data.get("WEIGHT")),
+                "uniform_size": employee_data.get("uniform_size", employee_data.get("UNIFORM SIZE")),
+                "shoe_size": employee_data.get("shoe_size", employee_data.get("SHOE SIZE")),
+                "national_id_nik": employee_data.get("national_id_nik", employee_data.get("nik", employee_data.get("NATIONAL ID (NIK)"))),
+                "kk_number": employee_data.get("kk_number", employee_data.get("KK NUMBER")),
+                "address": employee_data.get("address", employee_data.get("ADDRESS")),
+                "family_members": employee_data.get("family_members", employee_data.get("FAMILY MEMBERS", [])),
+                "education_history": employee_data.get("education_history", employee_data.get("EDUCATION HISTORY", [])),
+                "work_experience": employee_data.get("work_experience", employee_data.get("WORK EXPERIENCE", [])),
+                "certifications": employee_data.get("certifications", employee_data.get("CERTIFICATIONS", [])),
+                "skills": employee_data.get("skills", employee_data.get("SKILLS")),
+                "job_position": employee_data.get("job_position", employee_data.get("Job Position *")),
+                "division_name": employee_data.get("division_name", employee_data.get("Division Name *")),
+                "division_id": employee_data.get("division_id"),
+                "department_id": employee_data.get("department_id"),
+                "position_id": employee_data.get("position_id"),
+                "status": employee_data.get("status", employee_data.get("Status *")),
+                "base_salary": float(str(employee_data.get("gaji_pokok", employee_data.get("Gaji Pokok *", 0))).replace(",", "")) if employee_data.get("gaji_pokok") or employee_data.get("Gaji Pokok *") else 0,
+                "contract_end_date": employee_data.get("contract_end_date", employee_data.get("Contract End Date")),
+                "bank_branch": employee_data.get("bank_branch", employee_data.get("Bank Branch")),
+                "payroll_method": employee_data.get("payroll_method", employee_data.get("Payroll Method")),
+                "npwp_16_digit": employee_data.get("npwp_16_digit", employee_data.get("NPWP 16 Digit")),
+                "tax_method": employee_data.get("tax_method", employee_data.get("Tax Method")),
+                "kpp_name": employee_data.get("kpp_name", employee_data.get("KPP Name")),
+                "faskes_tk1": employee_data.get("faskes_tk1", employee_data.get("Faskes TK1")),
+                "employment_type": employee_data.get("employment_type", employee_data.get("Employment Type")),
+                "probation_end_date": employee_data.get("probation_end_date", employee_data.get("Probation End Date")),
+                "working_location": employee_data.get("working_location", employee_data.get("Working Location")),
+                "overtime_eligible": employee_data.get("overtime_eligible", employee_data.get("Overtime Eligible", True)),
+                "resign_date": employee_data.get("resign_date", employee_data.get("Resign Date")),
+                "is_resigned": employee_data.get("is_resigned", False)
             }
             self.client.table("employees").update(db_data).eq("id", employee_id).execute()
             return True
@@ -343,10 +354,10 @@ class WKNSupabaseClient:
             emp_response = await self.get_employees(page_size=1000)
             employees = emp_response.get("data", [])
             total = emp_response.get("total", 0)
-            active = len([e for e in employees if e.get("Status *") == "Active"])
+            active = len([e for e in employees if e.get("status", e.get("Status *")) == "Active"])
             
             # Count departments
-            depts = set([e.get("Division Name *") for e in employees if e.get("Division Name *")])
+            depts = set([e.get("division_name", e.get("Division Name *")) for e in employees if e.get("division_name", e.get("Division Name *"))])
             
             return {
                 "total_employees": total,

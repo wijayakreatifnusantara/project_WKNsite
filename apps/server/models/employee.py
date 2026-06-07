@@ -45,8 +45,11 @@ class EmployeeBase(BaseModel):
     skills: Optional[str] = None
     
     # Employment (Q-T)
-    division_name: str
-    job_position: str
+    division_id: Optional[str] = None
+    department_id: Optional[str] = None
+    position_id: Optional[str] = None
+    division_name: Optional[str] = None  # Deprecated
+    job_position: Optional[str] = None   # Deprecated
     job_level: str
     status: str = "Active"
     

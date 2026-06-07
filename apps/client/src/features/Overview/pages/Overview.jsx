@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zap, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { apiClient } from '@/lib/apiClient';
+import { Skeleton } from "@/components/ui/Skeleton";
 import AnalyticsGrid from './components/AnalyticsGrid';
 import { generateExecutiveReport } from './utils/exportReport';
 import { toast } from 'sonner';
@@ -88,9 +89,9 @@ const Overview = () => {
           {/* Interactive Analytics Hub */}
           <div className="md:col-span-3 space-y-4">
             {loading ? (
-              <div className="h-96 w-full flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl shadow-sm">
-                <Loader2 size={32} className="text-[#E31E24] animate-spin mb-4" />
-                <p className="text-sm font-medium text-slate-500">Loading Analytics Data...</p>
+              <div className="h-96 w-full bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-4">
+                <Skeleton className="h-8 w-1/3" />
+                <Skeleton className="h-[280px] w-full rounded-xl" />
               </div>
             ) : (
               <AnalyticsGrid employees={employees} />

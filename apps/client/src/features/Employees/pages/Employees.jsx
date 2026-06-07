@@ -27,8 +27,11 @@ import {
   IconHistory,
   IconCalculator,
   IconSchool,
-  IconBolt
+  IconBolt,
+  IconUsersGroup
 } from "@tabler/icons-react";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -529,8 +532,12 @@ const Employees = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="py-20 text-center text-slate-350 font-bold text-[12px] uppercase tracking-widest bg-white rounded-xl border border-slate-200 shadow-sm">
-                    Tidak Ada Data Karyawan
+                  <div className="py-12">
+                    <EmptyState 
+                      icon={IconUsersGroup} 
+                      title="Tidak Ada Data Karyawan" 
+                      description="Tidak ada karyawan yang sesuai dengan filter saat ini, atau departemen masih kosong."
+                    />
                   </div>
                 )}
 
@@ -595,11 +602,25 @@ const Employees = () => {
                   <table className="w-full text-left border-separate border-spacing-0 table-fixed">
                     <tbody className="divide-y divide-slate-100">
                       {loading ? (
-                        <tr>
-                          <td colSpan="7" className="py-24 text-center">
-                            <IconLoader2 className="mx-auto animate-spin text-[#E31E24]" size={40} />
-                          </td>
-                        </tr>
+                        Array.from({ length: 5 }).map((_, i) => (
+                          <tr key={`skel-${i}`}>
+                            <td className="p-4"><Skeleton className="h-4 w-4 rounded mx-auto" /></td>
+                            <td className="p-4"><Skeleton className="h-4 w-20" /></td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                                <div className="space-y-2">
+                                  <Skeleton className="h-4 w-32" />
+                                  <Skeleton className="h-3 w-24" />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-4"><Skeleton className="h-4 w-24" /></td>
+                            <td className="p-4"><Skeleton className="h-4 w-24" /></td>
+                            <td className="p-4"><Skeleton className="h-6 w-20 rounded-full mx-auto" /></td>
+                            <td className="p-4"><Skeleton className="h-8 w-24 rounded-lg ml-auto" /></td>
+                          </tr>
+                        ))
                       ) : filteredEmployees.length > 0 ? (
                         filteredEmployees.map((emp, idx) => (
                           <tr key={idx} className={`group hover:bg-slate-50/50 transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
@@ -674,8 +695,12 @@ const Employees = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="7" className="py-32 text-center text-slate-350 font-bold text-[12px] uppercase tracking-widest">
-                            Tidak Ada Data Karyawan
+                          <td colSpan="7" className="py-16">
+                            <EmptyState 
+                              icon={IconUsersGroup} 
+                              title="Tidak Ada Data Karyawan" 
+                              description="Tidak ada karyawan yang sesuai dengan filter saat ini, atau departemen masih kosong."
+                            />
                           </td>
                         </tr>
                       )}

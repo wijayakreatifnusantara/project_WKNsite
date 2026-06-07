@@ -92,7 +92,7 @@ const initialFormData = {
   division_name: '',
   organization_id: '',
   department_id: '',
-  job_position: '',
+  position_id: '',
   job_level: 'Staff',
   status: 'PERMANENT',
   employment_type: 'Permanent',
@@ -239,7 +239,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         "phone_number": "phone",
         "whatsapp_number": "phone",
         "Division Name *": "division_name",
-        "Job Position *": "job_position",
+        "job_position": "position_id",
+        "Job Position *": "position_id",
         "Job Level *": "job_level",
         "Status *": "status",
         "Basic Salary": "base_salary",
@@ -348,7 +349,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
           username: formData.email,
           full_name: formData.name,
           password: 'admin', // Default password for new users
-          role: formData.is_field_team ? 'staff' : (formData.job_position?.toLowerCase().includes('manager') ? 'manager' : 'staff'),
+          role: formData.is_field_team ? 'staff' : 'staff',
           is_active: true
         });
       } catch (err) {
@@ -358,6 +359,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       const submissionData = { ...formData };
       // Map form's employee_id to database's primary 'id' column for both add and edit
       submissionData.id = formData.employee_id;
+      submissionData.division_id = formData.organization_id;
       delete submissionData.employee_id;
 
       // Jika password mobile kosong, beri default 12345
@@ -824,15 +826,15 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   </InputWrapper>
                   <InputWrapper label="Position" icon={IconBriefcase}>
                     <select 
-                      name="job_position" 
-                      value={formData.job_position || ''} 
+                      name="position_id" 
+                      value={formData.position_id || ''} 
                       onChange={handleChange} 
                       className={getFieldStyle(isFieldsLocked || !formData.department_id)} 
                       disabled={isFieldsLocked || !formData.department_id}
                     >
                       <option value="">PILIH POSISI</option>
                       {positions.map(pos => (
-                        <option key={pos.id} value={pos.name}>{pos.name.toUpperCase()}</option>
+                        <option key={pos.id} value={pos.id}>{pos.name.toUpperCase()}</option>
                       ))}
                     </select>
                   </InputWrapper>
