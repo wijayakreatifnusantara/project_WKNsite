@@ -149,14 +149,49 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
         if status not in ["Approved", "Rejected"]:
             raise HTTPException(status_code=400, detail="Status persetujuan tidak valid.")
 
+        # 1a. Fetch existing request for Cross-Validation
+        req_res = supabase_client.client.table("overtime_requests").select("*").eq("id", request_id).execute()
+        if not req_res.data:
+            raise HTTPException(status_code=404, detail="Pengajuan lembur tidak ditemukan.")
+        request_data = req_res.data[0]
+
+        # Validasi Silang Absensi (Cross-Validation)
+        if status == "Approved":
+            employee_id = request_data.get("employee_id")
+            ot_date = request_data.get("date")
+            ot_start = request_data.get("start_time")
+            ot_end = request_data.get("end_time")
+
+            att_res = supabase_client.client.table("attendance").select("clock_out").eq("employee_id", employee_id).eq("date", ot_date).execute()
+            if not att_res.data:
+                raise HTTPException(status_code=400, detail="Karyawan tidak memiliki data absensi pada tanggal tersebut.")
+            
+            clock_out = att_res.data[0].get("clock_out")
+            if not clock_out:
+                raise HTTPException(status_code=400, detail="Karyawan belum melakukan Clock-Out absensi. Persetujuan lembur ditolak.")
+            
+            try:
+                t_start = datetime.strptime(ot_start[:5], "%H:%M")
+                t_end = datetime.strptime(ot_end[:5], "%H:%M")
+                t_out = datetime.strptime(clock_out[:5], "%H:%M")
+                
+                if t_end < t_start: t_end += timedelta(days=1)
+                if t_out < t_start: t_out += timedelta(days=1)
+                
+                # Tambahkan toleransi 5 menit (kadang clock_out di 18:59 dianggap invalid untuk lembur sd 19:00)
+                if t_end > (t_out + timedelta(minutes=5)):
+                    raise HTTPException(status_code=400, detail=f"Validasi Gagal: Jam Clock-Out absensi ({clock_out[:5]}) lebih awal dari jam selesai lembur ({ot_end[:5]}).")
+            except Exception as e:
+                if isinstance(e, HTTPException):
+                    raise
+                # Jika parsing gagal, lewati validasi (fallback aman)
+                pass
+
         res = supabase_client.client.table("overtime_requests").update({
             "status": status,
             "approved_by": admin_id,
             "updated_at": datetime.now().isoformat()
         }).eq("id", request_id).execute()
-
-        if not res.data:
-            raise HTTPException(status_code=404, detail="Pengajuan lembur tidak ditemukan.")
 
         request_data = res.data[0]
 
