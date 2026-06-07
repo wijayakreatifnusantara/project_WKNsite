@@ -376,7 +376,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   ),
                   if (_isFakeGps)
                     Container(
-                      margin: const EdgeInsets.top: 8,
+                      margin: const EdgeInsets.only(top: 8),
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.redAccent.withValues(alpha: 0.9),

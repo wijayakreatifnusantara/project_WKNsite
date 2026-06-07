@@ -578,7 +578,7 @@ const Employees = () => {
                 <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="w-[5%] pl-6 py-3.5 bg-slate-50">
+                      <th className="w-[4%] pl-6 py-3.5 bg-slate-50">
                         <div 
                           onClick={() => {
                             const allIds = filteredEmployees.map(emp => emp["EMPLOYEE ID"]);
@@ -598,12 +598,12 @@ const Employees = () => {
                         </div>
                       </th>
                       <TableHead label="ID KARYAWAN" width="10%" />
-                      <TableHead label="NAMA LENGKAP" width="25%" />
-                      <TableHead label="DEPARTEMEN" width="15%" />
-                      <TableHead label="JABATAN" width="15%" />
-                      <TableHead label="LEVEL" width="10%" />
-                      <TableHead label="STATUS" center width="10%" />
-                      <TableHead label="AKSI" right width="10%" />
+                      <TableHead label="NAMA LENGKAP" width="24%" />
+                      <TableHead label="DEPARTEMEN" width="14%" />
+                      <TableHead label="JABATAN" width="13%" />
+                      <TableHead label="LEVEL" width="9%" />
+                      <TableHead label="STATUS" center width="11%" />
+                      <TableHead label="AKSI" right width="15%" />
                     </tr>
                   </thead>
                 </table>
@@ -635,7 +635,7 @@ const Employees = () => {
                       ) : filteredEmployees.length > 0 ? (
                         filteredEmployees.map((emp, idx) => (
                           <tr key={idx} className={`group hover:bg-slate-50/50 transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
-                            <td className="w-[5%] pl-6 py-2.5">
+                            <td className="w-[4%] pl-6 py-2.5">
                               <div 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -653,7 +653,7 @@ const Employees = () => {
                             <td className="w-[10%] px-4 py-2.5">
                               <span className="text-xs font-semibold text-slate-500 font-mono tracking-tighter uppercase">{emp["EMPLOYEE ID"] || 'N/A'}</span>
                             </td>
-                            <td className="w-[25%] px-4 py-2.5">
+                            <td className="w-[24%] px-4 py-2.5">
                               <div className="flex items-center gap-3">
                                 <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                                   {emp["Photo"] || emp.photo ? (
@@ -668,16 +668,16 @@ const Employees = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="w-[15%] px-4 py-2.5">
+                            <td className="w-[14%] px-4 py-2.5">
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Department Name *"] || emp["Division Name *"]}</span>
                             </td>
-                            <td className="w-[15%] px-4 py-2.5">
+                            <td className="w-[13%] px-4 py-2.5">
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Position *"]}</span>
                             </td>
-                            <td className="w-[10%] px-4 py-2.5">
+                            <td className="w-[9%] px-4 py-2.5">
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Level *"] || '-'}</span>
                             </td>
-                            <td className="w-[10%] px-4 py-2.5 text-center">
+                            <td className="w-[11%] px-4 py-2.5 text-center">
                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
                                 emp["Status *"] === 'Permanent' 
                                   ? 'bg-blue-50 text-blue-600 border-blue-100' 
@@ -688,7 +688,7 @@ const Employees = () => {
                                 {emp["Status *"]?.toUpperCase()}
                               </span>
                             </td>
-                            <td className="w-[10%] px-4 py-2.5 text-right">
+                            <td className="w-[15%] px-4 py-2.5 text-right">
                               <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 <ActionButton onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} icon={<IconEye size={14} />} hover="hover:text-blue-600 hover:bg-blue-50" label="LIHAT" />
                                 <ActionButton onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} icon={<IconEdit size={14} />} hover="hover:text-green-600 hover:bg-green-50" label="EDIT" />
