@@ -263,54 +263,64 @@ const ShiftManager = () => {
                   <p className="text-xs text-slate-400">Silakan tambahkan shift kerja pertama Anda.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {shifts.map(shift => (
-                    <div key={shift.id} className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-xs hover:shadow-md transition-all group">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <span className="bg-[#E31E24]/10 text-[#E31E24] font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-lg border border-[#E31E24]/15 shadow-2xs mb-2 inline-block">
-                            {shift.code}
-                          </span>
-                          <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">{shift.name}</h3>
-                        </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => handleOpenShiftModal(shift)} className="h-7 w-7 rounded-lg bg-slate-50 text-slate-500 hover:text-[#E31E24] hover:bg-red-50 flex items-center justify-center transition-colors">
-                            <IconEdit size={14} />
-                          </button>
-                          <button className="h-7 w-7 rounded-lg bg-red-50 text-red-500 hover:text-white hover:bg-red-500 flex items-center justify-center transition-colors">
-                            <IconTrash size={14} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-1">Jam Masuk</span>
-                          <span className="text-lg font-black text-slate-700">{shift.time_in?.substring(0, 5)}</span>
-                        </div>
-                        <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-1">Jam Keluar</span>
-                          <span className="text-lg font-black text-slate-700">{shift.time_out?.substring(0, 5)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        {shift.is_cross_day && (
-                          <div className="flex items-center gap-1 bg-indigo-50 text-indigo-600 px-2 py-1 rounded border border-indigo-100">
-                            <IconMoon size={10} />
-                            <span className="text-[8px] font-bold uppercase tracking-wider">Lintas Hari</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded border border-amber-100">
-                          <IconSun size={10} />
-                          <span className="text-[8px] font-bold uppercase tracking-wider">Toleransi {shift.grace_period}m</span>
-                        </div>
-                        <span className={`text-[8px] font-black px-2 py-1 rounded uppercase tracking-wider border ${shift.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
-                          {shift.is_active ? 'Aktif' : 'Non-aktif'}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-hidden bg-white rounded-2xl border border-slate-200/60 shadow-xs">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200/60">
+                        <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Kode & Nama Shift</th>
+                        <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Jam Kerja</th>
+                        <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Info Tambahan</th>
+                        <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                        <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-xs text-slate-600 divide-y divide-slate-100">
+                      {shifts.map(shift => (
+                        <tr key={shift.id} className="hover:bg-slate-50/50 transition-colors group">
+                          <td className="px-5 py-3">
+                            <div className="flex items-center gap-3">
+                              <span className="bg-[#E31E24]/10 text-[#E31E24] font-bold text-[9px] uppercase tracking-wider px-2 py-1 rounded-lg border border-[#E31E24]/15">
+                                {shift.code}
+                              </span>
+                              <span className="font-bold text-slate-800 uppercase tracking-tight">{shift.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3 font-semibold text-slate-700">
+                            {shift.time_in?.substring(0, 5)} - {shift.time_out?.substring(0, 5)}
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {shift.is_cross_day && (
+                                <div className="flex items-center gap-1 bg-indigo-50 text-indigo-600 px-2 py-1 rounded border border-indigo-100">
+                                  <IconMoon size={10} />
+                                  <span className="text-[8px] font-bold uppercase tracking-wider">Lintas Hari</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded border border-amber-100">
+                                <IconSun size={10} />
+                                <span className="text-[8px] font-bold uppercase tracking-wider">Toleransi {shift.grace_period}m</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <span className={`text-[8px] font-black px-2 py-1 rounded uppercase tracking-wider border ${shift.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                              {shift.is_active ? 'Aktif' : 'Non-aktif'}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3 text-right">
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => handleOpenShiftModal(shift)} className="h-7 w-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-[#E31E24] hover:bg-red-50 flex items-center justify-center transition-colors">
+                                <IconEdit size={14} />
+                              </button>
+                              <button className="h-7 w-7 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors">
+                                <IconTrash size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

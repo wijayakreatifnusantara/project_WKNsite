@@ -94,7 +94,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       '/master/shifts': ['Data Master', 'Shift & Libur Nasional'],
       
       // Time & Attendance
-      '/attendance/log': ['Time & Attendance', 'Log Kehadiran'],
+      '/attendance/report': ['Time & Attendance', 'Log Kehadiran'],
       '/attendance/location': ['Time & Attendance', 'Lokasi Kerja'],
       '/attendance/schedule': ['Time & Attendance', 'Jadwal & Shift'],
       '/attendance/correction': ['Time & Attendance', 'Koreksi Absen'],
@@ -156,7 +156,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     if (path.includes('/master/positions')) return 'JABATAN & GOLONGAN';
     if (path.includes('/master/shifts')) return 'SHIFT & LIBUR NASIONAL';
     
-    if (path.includes('/attendance/log')) return 'LOG KEHADIRAN';
+    if (path.includes('/attendance/report')) return 'LOG KEHADIRAN';
     if (path.includes('/attendance/location')) return 'LOKASI KERJA';
     if (path.includes('/attendance/schedule')) return 'JADWAL & SHIFT';
     if (path.includes('/attendance/correction')) return 'KOREKSI ABSEN';
@@ -237,7 +237,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           {/* Time & Attendance Group */}
           <NavGroup label="Time & Attendance" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-              <NavItem icon={<IconClock size={15} />} label="Log Kehadiran" to="/attendance/log" />
+              <NavItem icon={<IconClock size={15} />} label="Log Kehadiran" to="/attendance/report" />
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
               <NavItem icon={<IconMapPin size={15} />} label="Lokasi Kerja" to="/attendance/location" />
