@@ -77,7 +77,8 @@ class WKNSupabaseClient:
                     "Contract End Date": e.get("contract_end_date"),
                     "Resign Date": e.get("resign_date"),
                     "Working Location": e.get("working_location"),
-                    "isFieldTeam": e.get("is_field_team")
+                    "isFieldTeam": e.get("is_field_team"),
+                    "shift_id": e.get("shift_id")
                 })
             
             result = {
@@ -271,7 +272,8 @@ class WKNSupabaseClient:
                 "working_location": employee_data.get("working_location", employee_data.get("Working Location")),
                 "overtime_eligible": employee_data.get("overtime_eligible", employee_data.get("Overtime Eligible", True)),
                 "resign_date": employee_data.get("resign_date", employee_data.get("Resign Date")),
-                "is_resigned": employee_data.get("is_resigned", False)
+                "is_resigned": employee_data.get("is_resigned", False),
+                "shift_id": employee_data.get("shift_id")
             }
             self.client.table("employees").insert(db_data).execute()
             return True
@@ -327,7 +329,8 @@ class WKNSupabaseClient:
                 "working_location": employee_data.get("working_location", employee_data.get("Working Location")),
                 "overtime_eligible": employee_data.get("overtime_eligible", employee_data.get("Overtime Eligible", True)),
                 "resign_date": employee_data.get("resign_date", employee_data.get("Resign Date")),
-                "is_resigned": employee_data.get("is_resigned", False)
+                "is_resigned": employee_data.get("is_resigned", False),
+                "shift_id": employee_data.get("shift_id")
             }
             self.client.table("employees").update(db_data).eq("id", employee_id).execute()
             return True

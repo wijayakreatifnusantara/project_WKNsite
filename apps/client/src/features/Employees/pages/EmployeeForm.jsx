@@ -123,6 +123,7 @@ const EmployeeForm = () => {
   const [divisions, setdivisions] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [shifts, setShifts] = useState([]);
 
   const isOwnerOrSuperAdmin = user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'superadmin';
 
@@ -131,6 +132,10 @@ const EmployeeForm = () => {
     axios.get(`${API_URL}/divisions?active_only=true`)
       .then(res => { if (res.data.status === 'success') setdivisions(res.data.data || []); })
       .catch(err => console.error('Failed to load orgs', err));
+      
+    axios.get(`${API_URL}/shifts?active_only=true`)
+      .then(res => { if (res.data.status === 'success') setShifts(res.data.data || []); })
+      .catch(err => console.error('Failed to load shifts', err));
   }, []);
 
   const fetchDepartments = (orgId) => {
@@ -408,6 +413,12 @@ const EmployeeForm = () => {
                 <option value="Head Office">HEAD OFFICE</option>
                 <option value="Branch A">BRANCH A</option>
                 <option value="Remote">REMOTE</option>
+              </select>
+            </InputWrapper>
+            <InputWrapper label="Jadwal Shift" icon={IconCalendarEvent}>
+              <select name="shift_id" value={formData.shift_id || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id}>
+                <option value="">DEFAULT (08:00 - 17:00)</option>
+                {shifts.map(s => <option key={s.id} value={s.id}>{s.name.toUpperCase()} ({s.time_in} - {s.time_out})</option>)}
               </select>
             </InputWrapper>
           </div>

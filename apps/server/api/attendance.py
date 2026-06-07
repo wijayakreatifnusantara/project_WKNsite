@@ -271,8 +271,20 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
     check_in_time = now.isoformat()
     today = now.date().isoformat()
 
-    late_mins = calculate_late_minutes(check_in_time)
-    attendance_status = "Late" if late_mins > 0 else "Present"
+    # Dynamic Shift Handling
+    shift_data = None
+    shift_id = employee.get("shift_id")
+    if shift_id:
+        # Fetch shift data if not cached
+        shift_res = supabase_client.client.table("shifts").select("*").eq("id", shift_id).execute()
+        if shift_res.data:
+            shift_data = shift_res.data[0]
+
+    from utils.attendance_calc import calculate_attendance_metrics
+    metrics = calculate_attendance_metrics(clock_in=now, clock_out=None, shift_data=shift_data)
+    
+    late_mins = metrics["late_minutes"]
+    attendance_status = metrics["status"]
 
     # Insert attendance record (handles double check-in)
     result = await supabase_client.add_attendance_record(

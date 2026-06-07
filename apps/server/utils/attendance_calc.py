@@ -1,15 +1,28 @@
 from datetime import datetime, time, timedelta
 from typing import Dict, Any, Optional
 
-def calculate_attendance_metrics(clock_in: Optional[datetime], clock_out: Optional[datetime]) -> Dict[str, Any]:
+def calculate_attendance_metrics(clock_in: Optional[datetime], clock_out: Optional[datetime], shift_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Calculate late minutes and overtime based on shift rules.
-    Shift: 08:00 AM - 05:00 PM
-    Grace Period: 5 minutes
+    Default Shift: 08:00 AM - 05:00 PM, Grace Period: 5 minutes.
+    If shift_data is provided, it dynamically overrides these defaults.
     """
-    SHIFT_START = time(8, 0)
-    SHIFT_END = time(17, 0)
-    GRACE_PERIOD = 5
+    if shift_data and shift_data.get("time_in") and shift_data.get("time_out"):
+        try:
+            # Parse time "HH:MM"
+            in_parts = shift_data["time_in"].split(":")
+            out_parts = shift_data["time_out"].split(":")
+            SHIFT_START = time(int(in_parts[0]), int(in_parts[1]))
+            SHIFT_END = time(int(out_parts[0]), int(out_parts[1]))
+            GRACE_PERIOD = int(shift_data.get("grace_period", 5))
+        except Exception:
+            SHIFT_START = time(8, 0)
+            SHIFT_END = time(17, 0)
+            GRACE_PERIOD = 5
+    else:
+        SHIFT_START = time(8, 0)
+        SHIFT_END = time(17, 0)
+        GRACE_PERIOD = 5
     
     metrics = {
         "late_minutes": 0,
