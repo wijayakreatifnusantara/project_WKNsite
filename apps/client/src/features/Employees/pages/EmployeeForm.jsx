@@ -153,7 +153,38 @@ const EmployeeForm = () => {
     if ((type === 'text' || e.target.tagName === 'TEXTAREA') && name !== 'email' && name !== 'mobile_password') {
       finalValue = value.toUpperCase();
     }
-    setFormData(prev => ({ ...prev, [name]: name === 'base_salary' ? parseFloat(value) || 0 : finalValue }));
+    
+    if (name === 'base_salary') {
+      const salary = parseFloat(value) || 0;
+      const jpLimit = 10042300; // Limit JP 2024
+      const kesLimit = 12000000; // Limit Kesehatan
+      const basisJP = Math.min(salary, jpLimit);
+      const basisKes = Math.min(salary, kesLimit);
+
+      setFormData(prev => ({
+        ...prev,
+        base_salary: salary,
+        payroll_components: {
+          ...prev.payroll_components,
+          fixed_income: {
+            ...(prev.payroll_components?.fixed_income || {}),
+            bpjs_tk_jkk: Math.round(salary * 0.0024), // 0.24% Default
+            bpjs_tk_jkm: Math.round(salary * 0.0030), // 0.30%
+            bpjs_tk_jht: Math.round(salary * 0.037),  // 3.7% Perusahaan
+            bpjs_tk_jp: Math.round(basisJP * 0.02),   // 2% Perusahaan
+            bpjs_kesehatan: Math.round(basisKes * 0.04), // 4% Perusahaan
+          },
+          deductions: {
+            ...(prev.payroll_components?.deductions || {}),
+            bpjs_tk_jht: Math.round(salary * 0.02),   // 2% Karyawan
+            bpjs_tk_jp: Math.round(basisJP * 0.01),   // 1% Karyawan
+            bpjs_kesehatan: Math.round(basisKes * 0.01), // 1% Karyawan
+          }
+        }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: finalValue }));
+    }
   };
 
   const handlePayrollChange = (category, field, value) => {
