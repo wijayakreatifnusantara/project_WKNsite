@@ -371,8 +371,22 @@ const Employees = () => {
           <div className="flex flex-col md:flex-row gap-3 items-center">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full md:w-[680px] shrink-0">
               <MiniStat label="Total Karyawan" value={employees.length} color="text-slate-800" icon={<IconUsers size={16} />} />
-              <MiniStat label="Aktif" value={employees.filter(e => !(e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date)).length} color="text-emerald-600" icon={<IconUserCheck size={16} />} />
-              <MiniStat label="Resigned" value={employees.filter(e => e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date).length} color="text-rose-500" icon={<IconUserX size={16} />} />
+              <MiniStat 
+                label="Aktif" 
+                value={employees.filter(e => !(e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date)).length} 
+                color="text-emerald-600" 
+                icon={<IconUserCheck size={16} />} 
+                onClick={() => setActiveTab('active')}
+                isActive={activeTab === 'active'}
+              />
+              <MiniStat 
+                label="Resigned" 
+                value={employees.filter(e => e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date).length} 
+                color="text-rose-500" 
+                icon={<IconUserX size={16} />} 
+                onClick={() => setActiveTab('resigned')}
+                isActive={activeTab === 'resigned'}
+              />
               <MiniStat label="Unit / Departemen" value={new Set(employees.map(e => e?.["Department Name *"] || e?.["Division Name *"]).filter(Boolean)).size} color="text-blue-600" icon={<IconBuildingSkyscraper size={16} />} />
             </div>
             
@@ -395,11 +409,7 @@ const Employees = () => {
               )}
             </div>
 
-            <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg shrink-0">
-              <TabButton active={activeTab === 'active'} onClick={() => { setActiveTab('active'); }} label="AKTIF" />
-              <TabButton active={activeTab === 'resigned'} onClick={() => { setActiveTab('resigned'); }} label="RESIGNED" />
             </div>
-          </div>
 
           {/* FILTER DECK - ULTRA COMPACT */}
           <div className="flex items-end gap-3">
@@ -813,13 +823,26 @@ const ViewToggle = ({ active, onClick, label, icon }) => (
   </button>
 );
 
-const MiniStat = ({ label, value, color, icon }) => (
-  <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between w-full">
+const MiniStat = ({ label, value, color, icon, onClick, isActive }) => (
+  <div 
+    onClick={onClick}
+    className={`p-3 rounded-xl border flex items-center justify-between w-full transition-all ${
+      onClick ? 'cursor-pointer hover:border-slate-300 hover:shadow-md' : 'shadow-sm'
+    } ${
+      isActive 
+        ? 'bg-blue-50/50 border-blue-200 shadow-sm ring-1 ring-blue-100' 
+        : 'bg-white border-slate-200'
+    }`}
+  >
     <div className="space-y-1 min-w-0">
-      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider truncate">{label}</p>
+      <p className={`text-[9px] font-bold uppercase tracking-wider truncate ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>{label}</p>
       <p className={`text-xl font-bold leading-none ${color}`}>{value}</p>
     </div>
-    <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-slate-400 shrink-0">
+    <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+      isActive 
+        ? 'bg-blue-100 text-blue-600 border border-blue-200' 
+        : 'bg-slate-50 border border-slate-100 text-slate-400'
+    }`}>
       {icon}
     </div>
   </div>

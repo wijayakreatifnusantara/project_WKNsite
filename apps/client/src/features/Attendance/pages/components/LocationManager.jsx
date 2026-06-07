@@ -387,59 +387,65 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {locations.map((loc, idx) => (
-            <div key={idx} className="bg-[#f8fafc] border border-slate-100 rounded-2xl p-4 flex flex-col gap-3 hover:border-slate-200 hover:shadow-sm transition-all group">
-              {/* Card Header */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-[#E31E24]/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-[#E31E24]/20 transition-all">
-                    <IconMapPin size={15} className="text-[#E31E24]" />
-                  </div>
-                  <p className="text-[10px] font-black text-slate-800 leading-tight">{loc.name}</p>
-                </div>
-                <span className="shrink-0 bg-white border border-slate-200 text-slate-500 font-black text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-full">{loc.radius}m</span>
-              </div>
-
-              {/* Coordinates */}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-white rounded-xl px-2.5 py-2 border border-slate-100">
-                  <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Lat</p>
-                  <p className="text-[9px] font-black text-slate-700 font-mono mt-0.5">{loc.lat}</p>
-                </div>
-                <div className="bg-white rounded-xl px-2.5 py-2 border border-slate-100">
-                  <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Lon</p>
-                  <p className="text-[9px] font-black text-slate-700 font-mono mt-0.5">{loc.lon}</p>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
-                <button
-                  id={`view-loc-${idx}`}
-                  onClick={() => setModal({ mode: 'view', index: idx })}
-                  className="flex-1 h-7 rounded-lg bg-blue-50 text-blue-600 font-black text-[8px] uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-blue-100 transition-all"
-                >
-                  <IconMapPin size={11} /> Lihat
-                </button>
-                <button
-                  id={`edit-loc-${idx}`}
-                  onClick={() => setModal({ mode: 'edit', index: idx })}
-                  className="flex-1 h-7 rounded-lg bg-amber-50 text-amber-600 font-black text-[8px] uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-amber-100 transition-all"
-                >
-                  <IconEdit size={11} /> Edit
-                </button>
-                <button
-                  id={`delete-loc-${idx}`}
-                  onClick={() => onDeleteLocation(idx)}
-                  disabled={saving}
-                  className="flex-1 h-7 rounded-lg bg-rose-50 text-rose-600 font-black text-[8px] uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-rose-100 transition-all disabled:opacity-50"
-                >
-                  <IconTrash size={11} /> Hapus
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto rounded-2xl border border-slate-100">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50 border-b border-slate-100">
+              <tr>
+                {['Location Name', 'Coordinates', 'Radius', 'Actions'].map(h => (
+                  <th key={h} className="px-4 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {locations.map((loc, idx) => (
+                <tr key={idx} className="hover:bg-slate-50 transition-all group">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 bg-[#E31E24]/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-[#E31E24]/20 transition-all">
+                        <IconMapPin size={15} className="text-[#E31E24]" />
+                      </div>
+                      <p className="text-[11px] font-black text-slate-800 leading-tight uppercase">{loc.name}</p>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-[9px] font-mono text-slate-600 font-bold"><span className="text-[8px] text-slate-400 uppercase tracking-widest mr-1">Lat:</span>{loc.lat}</p>
+                      <p className="text-[9px] font-mono text-slate-600 font-bold"><span className="text-[8px] text-slate-400 uppercase tracking-widest mr-1">Lon:</span>{loc.lon}</p>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 font-black text-[9px] uppercase tracking-widest">{loc.radius}m</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setModal({ mode: 'view', index: idx })}
+                        className="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-all"
+                        title="View Map"
+                      >
+                        <IconCompass size={14} />
+                      </button>
+                      <button
+                        onClick={() => setModal({ mode: 'edit', index: idx })}
+                        className="h-8 w-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center hover:bg-amber-100 transition-all"
+                        title="Edit Location"
+                      >
+                        <IconEdit size={14} />
+                      </button>
+                      <button
+                        onClick={() => onDeleteLocation(idx)}
+                        disabled={saving}
+                        className="h-8 w-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-all disabled:opacity-50"
+                        title="Delete Location"
+                      >
+                        <IconTrash size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

@@ -281,7 +281,11 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
         check_in_time=check_in_time,
         late_minutes=late_mins,
         notes=body.notes or f"Geofencing check-in @ {target_name}",
-        photo_url=body.photo_url or body.photo_base64
+        photo_url=body.photo_url or body.photo_base64,
+        location_lat=user_lat,
+        location_lng=user_lon,
+        distance_meters=int(distance_m),
+        target_name=target_name
     )
 
     if result.get("already_checked_in") and body.clock_type != "OUT":

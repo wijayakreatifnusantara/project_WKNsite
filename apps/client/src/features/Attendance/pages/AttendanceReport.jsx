@@ -12,12 +12,14 @@ import {
   IconAlertTriangle,
   IconUser,
   IconCalendarStats,
-  IconChevronDown
+  IconChevronDown,
+  IconMapPin
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { apiClient } from '@/lib/apiClient';
 import { useNavigate } from 'react-router-dom';
+import MiniMapModal from './components/MiniMapModal';
 
 const AttendanceReport = () => {
   const navigate = useNavigate();
@@ -49,6 +51,8 @@ const AttendanceReport = () => {
   const [endDate, setEndDate] = useState(getDefaultDates().end);
   const [selectedEmployee, setSelectedEmployee] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [selectedMapData, setSelectedMapData] = useState(null);
 
   const handleMonthChange = (monthStr) => {
     setSelectedMonth(monthStr);
@@ -113,8 +117,8 @@ const AttendanceReport = () => {
   };
 
   const handleExport = () => {
-    const headers = ["Date", "Employee ID", "Name", "Clock In", "Clock Out", "Status", "Notes"];
-    const rows = filteredData.map(row => [row.date, row.employees?.id, row.employees?.name, row.clock_in, row.clock_out, row.status, row.notes || ""]);
+    const headers = ["Date", "Employee ID", "Name", "Clock In", "Clock Out", "Status", "Location", "Distance", "Notes"];
+    const rows = filteredData.map(row => [row.date, row.employees?.id, row.employees?.name, row.clock_in, row.clock_out, row.status, row.target_name || "HQ", row.distance_meters != null ? `${row.distance_meters}m` : "-", row.notes || ""]);
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
@@ -237,13 +241,15 @@ const AttendanceReport = () => {
                   <th className="px-6 py-4 text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] w-24">In</th>
                   <th className="px-6 py-4 text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] w-24">Out</th>
                   <th className="px-6 py-4 text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] w-32">Status</th>
+                  <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Location</th>
+                  <th className="px-6 py-4 text-center text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] w-24">Distance</th>
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Notes</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="py-20 text-center">
+                    <td colSpan="9" className="py-20 text-center">
                        <div className="flex flex-col items-center gap-4">
                           <IconClock className="animate-spin text-slate-200" size={32} />
                           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] animate-pulse">Syncing disciplinary logs...</p>
@@ -252,7 +258,7 @@ const AttendanceReport = () => {
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="py-20 text-center text-slate-300 uppercase font-black text-[10px] tracking-[0.2em]">No records matching current filters</td>
+                    <td colSpan="9" className="py-20 text-center text-slate-300 uppercase font-black text-[10px] tracking-[0.2em]">No records matching current filters</td>
                   </tr>
                 ) : (
                   filteredData.map((row) => (
@@ -288,6 +294,34 @@ const AttendanceReport = () => {
                           {row.status}
                         </span>
                       </td>
+                      <td className="px-6 py-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black text-slate-600 uppercase truncate max-w-[100px]">
+                            {row.target_name || "HQ"}
+                          </span>
+                          {(row.location_lat && row.location_lng) && (
+                            <button 
+                              onClick={() => {
+                                setSelectedMapData(row);
+                                setIsMapOpen(true);
+                              }}
+                              className="text-slate-400 hover:text-[#E31E24] transition-colors p-1"
+                              title="View Map"
+                            >
+                              <IconMapPin size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-2 text-center">
+                        {row.distance_meters != null ? (
+                          <span className={`text-[10px] font-black tracking-tight ${row.distance_meters > 100 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                            {row.distance_meters}m
+                          </span>
+                        ) : (
+                          <span className="text-slate-300">-</span>
+                        )}
+                      </td>
                       <td className="px-6 py-2 max-w-[180px] truncate">
                         <span className="text-[9px] font-medium text-slate-400 italic">
                           {row.notes || '-'}
@@ -301,6 +335,11 @@ const AttendanceReport = () => {
           </div>
         </div>
       </div>
+      <MiniMapModal 
+        isOpen={isMapOpen} 
+        onClose={() => setIsMapOpen(false)} 
+        data={selectedMapData} 
+      />
     </div>
   );
 };

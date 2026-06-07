@@ -613,7 +613,9 @@ class WKNSupabaseClient:
 
     async def add_attendance_record(self, employee_id: str, date: str, status: str,
                                     check_in_time: str, late_minutes: int = 0,
-                                    notes: str = "", photo_url: str = None) -> Dict[str, Any]:
+                                    notes: str = "", photo_url: str = None,
+                                    location_lat: float = None, location_lng: float = None,
+                                    distance_meters: int = None, target_name: str = None) -> Dict[str, Any]:
         """
         Insert attendance record, handling unique constraint (double check-in prevention).
         
@@ -630,7 +632,11 @@ class WKNSupabaseClient:
                 "check_in_time": check_in_time,
                 "late_minutes": late_minutes,
                 "notes": notes,
-                "photo_url": photo_url
+                "photo_url": photo_url,
+                "location_lat": location_lat,
+                "location_lng": location_lng,
+                "distance_meters": distance_meters,
+                "target_name": target_name
             }
             self.client.table("attendance").insert(data).execute()
             return {"success": True, "already_checked_in": False}

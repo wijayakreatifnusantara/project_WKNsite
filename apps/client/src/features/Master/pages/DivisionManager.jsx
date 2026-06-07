@@ -30,10 +30,6 @@ const DivisionManager = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   // Auto sync states
-  const [isAutoSyncEnabled, setIsAutoSyncEnabled] = useState(() => {
-    const saved = localStorage.getItem('wkn_org_auto_sync');
-    return saved !== 'false'; // default is true
-  });
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Modals state
@@ -163,14 +159,7 @@ const DivisionManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Background interval for Auto Sync
-  useEffect(() => {
-    if (!isAutoSyncEnabled) return;
-    const intervalId = setInterval(() => {
-      runAutoSync(true);
-    }, 30000); // 30 seconds
-    return () => clearInterval(intervalId);
-  }, [isAutoSyncEnabled, runAutoSync]);
+
 
   // Expand Division Card to show Departments
   const handleExpandOrg = (orgId) => {
@@ -450,41 +439,6 @@ const DivisionManager = () => {
             </div>
           
           <div className="flex flex-wrap items-center gap-3">
-            {/* Auto-Sync status toggle badge */}
-            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 h-10 shadow-2xs">
-              <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
-                Auto Sync
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  const newValue = !isAutoSyncEnabled;
-                  setIsAutoSyncEnabled(newValue);
-                  localStorage.setItem('wkn_org_auto_sync', String(newValue));
-                  showToast('success', `Auto Sync ${newValue ? 'Diaktifkan' : 'Dinonaktifkan'}`);
-                }}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isAutoSyncEnabled ? 'bg-[#E31E24]' : 'bg-slate-200'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${
-                    isAutoSyncEnabled ? 'translate-x-4' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-              <div className="flex items-center gap-1.5 ml-1">
-                {isSyncing ? (
-                  <IconLoader2 size={12} className="animate-spin text-[#E31E24]" />
-                ) : (
-                  <span className={`h-2 w-2 rounded-full ${isAutoSyncEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-                )}
-                <span className="text-[8px] font-bold text-slate-600 uppercase tracking-wider">
-                  {isSyncing ? 'Syncing...' : isAutoSyncEnabled ? 'Aktif' : 'Off'}
-                </span>
-              </div>
-            </div>
-
             <button
               onClick={handleRunMigration}
               disabled={isLoading || isSyncing}
@@ -535,84 +489,62 @@ const DivisionManager = () => {
 
               return (
                 <div key={org.id} className="bg-white rounded-2xl border border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.03),0_1px_2px_0_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.06)] hover:border-slate-200/60 transition-all duration-300 overflow-hidden">
-                  <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-start gap-4">
-                      <div className="h-14 w-14 bg-gradient-to-br from-[#E31E24]/5 to-[#E31E24]/10 border border-[#E31E24]/10 rounded-2xl flex items-center justify-center text-[#E31E24] shadow-2xs shrink-0">
-                        <IconBuilding size={26} />
+                  <div className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-gradient-to-br from-[#E31E24]/5 to-[#E31E24]/10 border border-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24] shadow-2xs shrink-0">
+                        <IconBuilding size={20} />
                       </div>
-                      <div className="space-y-1.5">
+                      <div className="space-y-0.5">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="bg-[#E31E24]/10 text-[#E31E24] font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-lg border border-[#E31E24]/15 shadow-2xs">
+                          <span className="bg-[#E31E24]/10 text-[#E31E24] font-black text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded-md border border-[#E31E24]/15 shadow-2xs">
                             {org.code}
                           </span>
-                          <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
+                          <h2 className="text-xs font-black text-slate-800 uppercase tracking-tight leading-none">
                             {org.name}
                           </h2>
-                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider border ${org.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-100/60' : 'bg-slate-100 text-slate-500 border-slate-200/60'}`}>
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider border ${org.is_active ? 'bg-emerald-50 text-emerald-600 border-emerald-100/60' : 'bg-slate-100 text-slate-500 border-slate-200/60'}`}>
                             {org.is_active ? 'Active' : 'Inactive'}
                           </span>
                         </div>
-                        {org.description && (
-                          <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-xl">
-                            {org.description}
-                          </p>
-                        )}
-                        {(org.pic_name || org.pic_email || org.pic_phone) && (
-                          <div className="flex flex-wrap items-center gap-2 pt-2.5 mt-2.5 border-t border-slate-100">
-                            {org.pic_name && (
-                              <div className="flex items-center gap-1.5 text-[10px] text-slate-600 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100 font-semibold">
-                                <IconUser size={12} className="text-slate-400" />
-                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">PIC:</span>
-                                <span>{org.pic_name}</span>
-                              </div>
-                            )}
-                            {org.pic_email && (
-                              <a 
-                                href={`mailto:${org.pic_email}`} 
-                                className="flex items-center gap-1.5 text-[10px] text-slate-600 bg-slate-50 hover:bg-white hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:shadow-2xs px-2 py-0.5 rounded-lg border border-slate-100 font-semibold transition-all"
-                              >
-                                <IconMail size={12} className="text-slate-400" />
-                                <span>{org.pic_email}</span>
-                              </a>
-                            )}
-                            {org.pic_phone && (
-                              <a 
-                                href={`tel:${org.pic_phone}`} 
-                                className="flex items-center gap-1.5 text-[10px] text-slate-600 bg-slate-50 hover:bg-white hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:shadow-2xs px-2 py-0.5 rounded-lg border border-slate-100 font-semibold transition-all"
-                              >
-                                <IconPhone size={12} className="text-slate-400" />
-                                <span>{org.pic_phone}</span>
-                              </a>
-                            )}
-                          </div>
-                        )}
+                        
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-medium">
+                          {org.description && <span className="truncate max-w-sm">{org.description}</span>}
+                          {org.description && (org.pic_name || org.pic_email || org.pic_phone) && <span className="text-slate-300">•</span>}
+                          {(org.pic_name || org.pic_email || org.pic_phone) && (
+                            <div className="flex items-center gap-2">
+                              {org.pic_name && <span className="font-bold text-slate-600">{org.pic_name}</span>}
+                              {org.pic_email && <a href={`mailto:${org.pic_email}`} className="hover:text-[#E31E24] flex items-center gap-1 transition-colors"><IconMail size={12}/>{org.pic_email}</a>}
+                              {org.pic_phone && <a href={`tel:${org.pic_phone}`} className="hover:text-[#E31E24] flex items-center gap-1 transition-colors"><IconPhone size={12}/>{org.pic_phone}</a>}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+                    <div className="flex items-center gap-2 self-end md:self-auto shrink-0 mt-2 md:mt-0">
                       <button
                         onClick={() => handleToggleOrgStatus(org)}
-                        className={`h-9 px-3 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border active:scale-95 ${org.is_active ? 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100' : 'bg-emerald-50 text-green-600 border-emerald-100 hover:bg-emerald-100'}`}
+                        className={`h-8 px-3 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all border active:scale-95 ${org.is_active ? 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100' : 'bg-emerald-50 text-green-600 border-emerald-100 hover:bg-emerald-100'}`}
                       >
                         {org.is_active ? 'Disable' : 'Enable'}
                       </button>
                       <button
                         onClick={() => handleOpenOrgModal(org)}
-                        className="h-9 w-9 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center transition-all active:scale-95"
+                        className="h-8 w-8 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center transition-all active:scale-95"
                         title="Edit Divisi"
                       >
-                        <IconEdit size={16} />
+                        <IconEdit size={14} />
                       </button>
                       <button
                         onClick={() => handleDeleteOrg(org.id)}
-                        className="h-9 w-9 rounded-xl border border-red-200 bg-red-50/30 text-red-500 hover:text-red-700 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition-all active:scale-95"
+                        className="h-8 w-8 rounded-lg border border-red-200 bg-red-50/30 text-red-500 hover:text-red-700 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition-all active:scale-95"
                         title="Hapus Divisi"
                       >
-                        <IconTrash size={16} />
+                        <IconTrash size={14} />
                       </button>
                       <button
                         onClick={() => handleExpandOrg(org.id)}
-                        className="h-9 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+                        className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
                       >
                         <span>DEPT ({orgDepts.length})</span>
                         {isExpanded ? <IconChevronUp size={12} /> : <IconChevronDown size={12} />}
