@@ -240,26 +240,6 @@ const Employees = () => {
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return;
-    if (window.confirm(`PERMANENTLY DELETE ${selectedIds.size} employees? This cannot be undone.`)) {
-      const idArray = Array.from(selectedIds);
-      const previousEmployees = [...employees];
-
-      setEmployees(prev => prev.filter(emp => !idArray.includes(emp.id) && !idArray.includes(emp["EMPLOYEE ID"])));
-
-      try {
-        await apiClient.delete(`/api/employees/bulk-delete`, { data: { ids: idArray } });
-        setSelectedIds(new Set());
-        fetchEmployees();
-      } catch (error) {
-        setEmployees(previousEmployees);
-        console.error('Error in bulk delete:', error);
-        alert('Delete failed: ' + error.message);
-      }
-    }
-  };
-
   const handleActivateEmployee = async (id) => {
     if (window.confirm('RESTORE EMPLOYEE TO ACTIVE STATUS?')) {
       const previousEmployees = [...employees];
@@ -284,23 +264,6 @@ const Employees = () => {
         setEmployees(previousEmployees);
         console.error('ERROR ACTIVATING EMPLOYEE:', error);
         alert('Activation failed: ' + error.message);
-      }
-    }
-  };
-
-  const handleDeleteEmployee = async (id) => {
-    if (window.confirm('PERMANENTLY DELETE THIS RECORD? This cannot be undone.')) {
-      const previousEmployees = [...employees];
-      setEmployees(prev => prev.filter(emp => emp.id !== id && emp["EMPLOYEE ID"] !== id));
-
-      try {
-        await apiClient.delete(`/api/employees/bulk-delete`, { data: { ids: [id] } });
-        fetchEmployees();
-        alert('Employee record deleted permanently');
-      } catch (error) {
-        setEmployees(previousEmployees);
-        console.error('Error in delete:', error);
-        alert('Delete failed: ' + error.message);
       }
     }
   };
@@ -700,7 +663,6 @@ const Employees = () => {
                                     ) : (
                                       <ActionButton onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} icon={<IconUserX size={14} />} hover="hover:text-rose-600 hover:bg-rose-50" label="RESIGN" />
                                     )}
-                                    <ActionButton onClick={() => handleDeleteEmployee(emp.id || emp["EMPLOYEE ID"])} icon={<IconTrash size={14} />} hover="hover:text-slate-800 hover:bg-slate-100" label="HAPUS" />
                                   </>
                                 )}
                               </div>
@@ -764,12 +726,6 @@ const Employees = () => {
                           className="px-2.5 py-1 bg-slate-800 text-white text-[9px] font-bold uppercase tracking-wider rounded-md hover:bg-slate-700 transition-all flex items-center gap-1"
                         >
                           <IconUserX size={12} /> Bulk Resign
-                        </button>
-                        <button 
-                          onClick={handleBulkDelete}
-                          className="px-2.5 py-1 bg-[#E31E24] text-white text-[9px] font-bold uppercase tracking-wider rounded-md hover:bg-[#C1181E] transition-all flex items-center gap-1"
-                        >
-                          <IconTrash size={12} /> Bulk Hapus
                         </button>
                       </div>
                     )}
