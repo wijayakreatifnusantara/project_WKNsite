@@ -216,6 +216,13 @@ async def approve_leave_request(request_id: str, payload: Dict[str, Any], curren
 @router.put("/leave/direct/{request_id}")
 async def update_leave_direct(request_id: int, data: dict, current_user: dict = Depends(require_admin)):
     try:
+        # Check Payroll Lock
+        record_res = supabase_client.client.table("leave_requests").select("employee_id, start_date").eq("id", request_id).execute()
+        if record_res.data:
+            rec = record_res.data[0]
+            if await supabase_client.is_data_locked_by_payroll(rec["employee_id"], rec["start_date"]):
+                raise HTTPException(status_code=403, detail="Akses Ditolak: Data telah dikunci oleh Payroll")
+                
         res = supabase_client.client.table("leave_requests").update(data).eq("id", request_id).execute()
         return {"status": "success", "data": res.data}
     except Exception as e:
@@ -224,6 +231,13 @@ async def update_leave_direct(request_id: int, data: dict, current_user: dict = 
 @router.delete("/leave/direct/{request_id}")
 async def delete_leave_direct(request_id: int, current_user: dict = Depends(require_admin)):
     try:
+        # Check Payroll Lock
+        record_res = supabase_client.client.table("leave_requests").select("employee_id, start_date").eq("id", request_id).execute()
+        if record_res.data:
+            rec = record_res.data[0]
+            if await supabase_client.is_data_locked_by_payroll(rec["employee_id"], rec["start_date"]):
+                raise HTTPException(status_code=403, detail="Akses Ditolak: Data telah dikunci oleh Payroll")
+                
         res = supabase_client.client.table("leave_requests").delete().eq("id", request_id).execute()
         return {"status": "success", "data": res.data}
     except Exception as e:

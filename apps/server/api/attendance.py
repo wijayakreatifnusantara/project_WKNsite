@@ -113,6 +113,13 @@ async def get_attendance_report(start_date: str, end_date: str, employee_id: str
 async def resolve_discrepancy(record_id: int, decision: str, current_user: dict = Depends(require_admin)):
     """T015: Manager resolves an attendance discrepancy."""
     try:
+        # Check Payroll Lock
+        record_res = supabase_client.client.table("attendance").select("employee_id, date").eq("id", record_id).execute()
+        if record_res.data:
+            rec = record_res.data[0]
+            if await supabase_client.is_data_locked_by_payroll(rec["employee_id"], rec["date"]):
+                raise HTTPException(status_code=403, detail="Akses Ditolak: Data telah dikunci oleh Payroll")
+                
         from datetime import datetime
         now = datetime.now().isoformat()
         res = supabase_client.client.table("attendance").update({
@@ -136,6 +143,13 @@ async def create_attendance_direct(data: dict, current_user: dict = Depends(requ
 @router.put("/attendance/direct/{attendance_id}")
 async def update_attendance_direct(attendance_id: int, data: dict, current_user: dict = Depends(require_admin)):
     try:
+        # Check Payroll Lock
+        record_res = supabase_client.client.table("attendance").select("employee_id, date").eq("id", attendance_id).execute()
+        if record_res.data:
+            rec = record_res.data[0]
+            if await supabase_client.is_data_locked_by_payroll(rec["employee_id"], rec["date"]):
+                raise HTTPException(status_code=403, detail="Akses Ditolak: Data telah dikunci oleh Payroll")
+                
         response = supabase_client.client.table("attendance").update(data).eq("id", attendance_id).execute()
         return {"status": "success", "data": response.data}
     except Exception as e:
@@ -152,6 +166,13 @@ async def bulk_insert_attendance(data: list, current_user: dict = Depends(requir
 @router.delete("/attendance/direct/{attendance_id}")
 async def delete_attendance_direct(attendance_id: int, current_user: dict = Depends(require_admin)):
     try:
+        # Check Payroll Lock
+        record_res = supabase_client.client.table("attendance").select("employee_id, date").eq("id", attendance_id).execute()
+        if record_res.data:
+            rec = record_res.data[0]
+            if await supabase_client.is_data_locked_by_payroll(rec["employee_id"], rec["date"]):
+                raise HTTPException(status_code=403, detail="Akses Ditolak: Data telah dikunci oleh Payroll")
+                
         response = supabase_client.client.table("attendance").delete().eq("id", attendance_id).execute()
         return {"status": "success", "data": response.data}
     except Exception as e:
@@ -531,6 +552,13 @@ async def get_overtime_requests(current_user: dict = Depends(require_admin)):
 async def update_overtime_status(request_id: int, payload: dict, current_user: dict = Depends(require_admin)):
     """Approve or reject overtime request"""
     try:
+        # Check Payroll Lock
+        record_res = supabase_client.client.table("overtime_requests").select("employee_id, date").eq("id", request_id).execute()
+        if record_res.data:
+            rec = record_res.data[0]
+            if await supabase_client.is_data_locked_by_payroll(rec["employee_id"], rec["date"]):
+                raise HTTPException(status_code=403, detail="Akses Ditolak: Data telah dikunci oleh Payroll")
+                
         from datetime import datetime
         update_data = {
             "status": payload.get("status"),

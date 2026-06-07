@@ -997,6 +997,18 @@ class WKNSupabaseClient:
             print(f"Error deleting position: {str(e)}")
             return False
 
+    async def is_data_locked_by_payroll(self, employee_id: str, date_str: str) -> bool:
+        """Check if transactional data is locked because payroll has been finalized for the period."""
+        if not self.client or not date_str or not employee_id: 
+            return False
+        try:
+            # Extract YYYY-MM from date_str (e.g. 2026-05-15 -> 2026-05)
+            period = date_str[:7]
+            res = self.client.table("payroll_history").select("id").eq("employee_id", str(employee_id)).eq("period", period).execute()
+            return len(res.data) > 0
+        except Exception as e:
+            print(f"Error checking payroll lock: {str(e)}")
+            return False
+
 # Singleton instance
 supabase_client = WKNSupabaseClient()
-
