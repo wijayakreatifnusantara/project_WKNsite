@@ -568,7 +568,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildFloatingAttendanceCard(context),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 8),
                     
                     if (_pendingOfflineCount > 0)
                       Container(
@@ -605,7 +605,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       
                     Padding(
-                      padding: const EdgeInsets.only(left: 8.0, bottom: 16.0, top: 16.0, right: 8.0),
+                      padding: const EdgeInsets.only(left: 8.0, bottom: 16.0, top: 4.0, right: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
