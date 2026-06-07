@@ -100,9 +100,14 @@ const AttendanceRecap = () => {
 
       const employees = response.data.employees || [];
       const attendance = response.data.attendance || [];
+      const overtime = response.data.overtime || [];
 
       const processed = employees.map(emp => {
         const logs = attendance.filter(a => a.employee_id === emp.id);
+        const empOt = overtime.filter(o => o.employee_id === emp.id);
+        const otMinutes = empOt.reduce((sum, req) => sum + (req.duration_minutes || 0), 0);
+        const otHours = Math.round((otMinutes / 60) * 10) / 10; // 1 decimal
+
         return {
           id: emp.id,
           name: emp.name,
@@ -113,7 +118,8 @@ const AttendanceRecap = () => {
           sick: logs.filter(l => l.status?.toLowerCase() === 'sick').length,
           leave: logs.filter(l => l.status?.toLowerCase() === 'leave').length,
           absent: logs.filter(l => l.status?.toLowerCase() === 'absent').length,
-          total_days: logs.length
+          total_days: logs.length,
+          overtime_hours: otHours
         };
       });
 
@@ -305,6 +311,7 @@ const AttendanceRecap = () => {
                   <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Late</th>
                   <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Sick/Leave</th>
                   <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Absent</th>
+                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Overtime (Jam)</th>
                   <th className="px-6 py-3 text-right text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Achievement</th>
                 </tr>
               </thead>
@@ -342,6 +349,7 @@ const AttendanceRecap = () => {
                         <td className="px-6 py-2 text-center text-[10px] font-black text-amber-500">{emp.late}</td>
                         <td className="px-6 py-2 text-center text-[10px] font-black text-indigo-500">{emp.sick + emp.leave}</td>
                         <td className="px-6 py-2 text-center text-[10px] font-black text-rose-500">{emp.absent}</td>
+                        <td className="px-6 py-2 text-center text-[10px] font-black text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
                         <td className="px-6 py-2 text-right">
                           <div className="flex flex-col items-end gap-1">
                             <span className={`text-[10px] font-black ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>

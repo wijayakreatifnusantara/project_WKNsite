@@ -247,22 +247,28 @@ const OvertimeManagementPage = () => {
                             </a>
                           )}
                           {row.status === 'Pending' ? (
-                            <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
-                              <button 
-                                onClick={() => handleApprove(row, 'Approved')}
-                                className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
-                              >
-                                <IconCheck size={12} />
-                                Setujui
-                              </button>
-                              <button 
-                                onClick={() => handleApprove(row, 'Rejected')}
-                                className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
-                              >
-                                <IconX size={12} />
-                                Tolak
-                              </button>
-                            </div>
+                            isAdmin ? (
+                              <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                                <button 
+                                  onClick={() => handleApprove(row, 'Approved')}
+                                  className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                                >
+                                  <IconCheck size={12} />
+                                  Setujui
+                                </button>
+                                <button 
+                                  onClick={() => handleApprove(row, 'Rejected')}
+                                  className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                                >
+                                  <IconX size={12} />
+                                  Tolak
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest">
+                                Menunggu Review
+                              </span>
+                            )
                           ) : (
                             <span className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">
                               {row.status !== 'Pending' ? `Diproses oleh ${row.approved_by || 'HR Admin'}` : 'Menunggu Persetujuan'}

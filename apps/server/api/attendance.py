@@ -86,12 +86,31 @@ async def get_attendance_recap(start_date: str, end_date: str, current_user: dic
     try:
         emp_res = supabase_client.client.table("employees").select("id, name, division_name, job_position").eq("is_resigned", False).execute()
         att_res = supabase_client.client.table("attendance").select("*").gte("date", start_date).lte("date", end_date).execute()
+        ot_res = supabase_client.client.table("overtime_requests").select("*").gte("date", start_date).lte("date", end_date).eq("status", "Approved").execute()
         
         return {
             "status": "success",
             "data": {
                 "employees": emp_res.data,
-                "attendance": att_res.data
+                "attendance": att_res.data,
+                "overtime": ot_res.data
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/attendance/pending-tasks")
+async def get_pending_tasks(current_user: dict = Depends(require_admin)):
+    """Fetch counts of pending overtime and corrections"""
+    try:
+        ot_res = supabase_client.client.table("overtime_requests").select("id", count="exact").eq("status", "Pending").execute()
+        corr_res = supabase_client.client.table("attendance_corrections").select("id", count="exact").eq("status", "Pending").execute()
+        
+        return {
+            "status": "success",
+            "data": {
+                "overtime": ot_res.count if ot_res.count is not None else 0,
+                "corrections": corr_res.count if corr_res.count is not None else 0
             }
         }
     except Exception as e:

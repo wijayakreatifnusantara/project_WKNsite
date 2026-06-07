@@ -38,19 +38,36 @@ const AttendanceHub = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(new Date().toISOString().slice(0, 7));
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [pendingTasks, setPendingTasks] = useState({ overtime: 0, corrections: 0 });
+
+  const fetchPendingTasks = async () => {
+    try {
+      const { apiClient } = await import('@/lib/apiClient');
+      const res = await apiClient.get('/api/attendance/pending-tasks');
+      if (res.status === 'success') {
+        setPendingTasks(res.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch pending tasks', e);
+    }
+  };
 
   useEffect(() => {
     fetchTodaySummary();
     fetchTrends(selectedPeriod);
+    fetchPendingTasks();
 
     // Polling every 10 seconds for real-time dashboard updates
     const interval = setInterval(() => {
       fetchTodaySummary();
       fetchTrends(selectedPeriod);
+      fetchPendingTasks();
     }, 10000);
 
     return () => clearInterval(interval);
   }, [selectedPeriod]);
+
+  const totalPending = pendingTasks.overtime + pendingTasks.corrections;
 
   return (
     <div className="flex-1 overflow-y-auto p-3 bg-[#f8fafc] custom-scrollbar animate-fade-in">
@@ -74,6 +91,19 @@ const AttendanceHub = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+             {totalPending > 0 && (
+               <div 
+                 onClick={() => navigate('/attendance/correction')}
+                 className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors shadow-sm animate-pulse"
+                 title="Terdapat pengajuan menunggu persetujuan"
+               >
+                 <IconAlertTriangle size={14} className="text-amber-500" />
+                 <span className="text-[8px] font-black text-amber-700 uppercase tracking-widest">
+                   Pending Approvals: <span className="text-amber-600 text-[10px]">{totalPending}</span>
+                 </span>
+               </div>
+             )}
+
              {/* Period Selector */}
              <div className="h-8 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 transition-all focus-within:border-[#E31E24]/20">
                 <IconCalendarEvent size={12} className="text-[#E31E24]" />

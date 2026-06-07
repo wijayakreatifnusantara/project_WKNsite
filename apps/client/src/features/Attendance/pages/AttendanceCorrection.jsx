@@ -17,7 +17,7 @@ import { useAuth } from '@/context/AuthContext';
 
 const AttendanceCorrection = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [corrections, setCorrections] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -183,20 +183,26 @@ const AttendanceCorrection = () => {
                       </td>
                       <td className="px-6 py-3 text-right">
                         {row.status === 'PENDING' && (
-                          <div className="flex items-center justify-end gap-2">
-                            <button 
-                              onClick={() => handleProcess(row.id, 'APPROVED')}
-                              className="h-8 px-3 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors font-black text-[9px] tracking-wider uppercase gap-1"
-                            >
-                              <IconCheck size={14} /> Setuju
-                            </button>
-                            <button 
-                              onClick={() => handleProcess(row.id, 'REJECTED')}
-                              className="h-8 px-3 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-colors font-black text-[9px] tracking-wider uppercase gap-1"
-                            >
-                              <IconX size={14} /> Tolak
-                            </button>
-                          </div>
+                          isAdmin ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <button 
+                                onClick={() => handleProcess(row.id, 'APPROVED')}
+                                className="h-8 px-3 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors font-black text-[9px] tracking-wider uppercase gap-1"
+                              >
+                                <IconCheck size={14} /> Setuju
+                              </button>
+                              <button 
+                                onClick={() => handleProcess(row.id, 'REJECTED')}
+                                className="h-8 px-3 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-colors font-black text-[9px] tracking-wider uppercase gap-1"
+                              >
+                                <IconX size={14} /> Tolak
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest">
+                              Menunggu Review
+                            </span>
+                          )
                         )}
                         {row.status !== 'PENDING' && (
                           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
