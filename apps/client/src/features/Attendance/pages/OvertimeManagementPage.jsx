@@ -202,6 +202,25 @@ const OvertimeManagementPage = () => {
                              {formatTime(row.start_time)} - {formatTime(row.end_time)}
                            </span>
                            <span className="text-[8px] font-bold text-[#E31E24] uppercase mt-0.5">{row.duration_hours} Jam Kerja</span>
+                           
+                           {row.attendance && row.attendance.clock_out ? (
+                              <div className="flex items-center gap-1 mt-1.5 bg-slate-50 border border-slate-100 rounded-md px-1.5 py-0.5 w-fit" title={`Clock In: ${formatTime(row.attendance.clock_in)} | Clock Out: ${formatTime(row.attendance.clock_out)}`}>
+                                <IconClock size={10} className="text-slate-400" />
+                                <span className="text-[7px] font-bold text-slate-500 uppercase">
+                                  Absen: {formatTime(row.attendance.clock_in)} - {formatTime(row.attendance.clock_out)}
+                                </span>
+                                {row.end_time > row.attendance.clock_out && (
+                                  <IconAlertCircle size={10} className="text-[#E31E24] ml-1 animate-pulse" title="Peringatan Anomali: Jam selesai lembur melebihi jam Clock-Out aktual!" />
+                                )}
+                              </div>
+                           ) : (
+                              <div className="flex items-center gap-1 mt-1.5 bg-rose-50 border border-rose-100 rounded-md px-1.5 py-0.5 w-fit">
+                                <IconAlertCircle size={10} className="text-[#E31E24]" />
+                                <span className="text-[7px] font-bold text-rose-600 uppercase">
+                                  Absensi Tidak Ditemukan
+                                </span>
+                              </div>
+                           )}
                         </div>
                       </td>
                       <td className="px-5 py-2">

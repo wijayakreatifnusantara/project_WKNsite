@@ -25,7 +25,21 @@ async def get_overtime_requests(status: str = None, current_user: dict = Depends
             query = query.eq("status", status)
         
         res = query.execute()
-        return {"status": "success", "data": res.data}
+        data = res.data
+
+        # Ambil data absensi untuk mendeteksi anomali (Cross-Validation UI)
+        if data:
+            dates = list(set([r.get("date") for r in data if r.get("date")]))
+            emp_ids = list(set([r.get("employee_id") for r in data if r.get("employee_id")]))
+            
+            if dates and emp_ids:
+                att_res = supabase_client.client.table("attendance").select("employee_id, date, clock_in, clock_out").in_("employee_id", emp_ids).in_("date", dates).execute()
+                att_map = {(a["employee_id"], a["date"]): a for a in att_res.data}
+                
+                for req in data:
+                    req["attendance"] = att_map.get((req.get("employee_id"), req.get("date")))
+
+        return {"status": "success", "data": data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
