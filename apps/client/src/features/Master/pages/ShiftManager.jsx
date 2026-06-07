@@ -308,7 +308,7 @@ const ShiftManager = () => {
                             </span>
                           </td>
                           <td className="px-5 py-3 text-right">
-                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => handleOpenShiftModal(shift)} className="h-7 w-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-[#E31E24] hover:bg-red-50 flex items-center justify-center transition-colors">
                                 <IconEdit size={14} />
                               </button>
@@ -369,7 +369,7 @@ const ShiftManager = () => {
                             </span>
                           </td>
                           <td className="px-5 py-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => handleOpenHolidayModal(hol)} className="h-7 w-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition-colors">
                                 <IconEdit size={14} />
                               </button>
