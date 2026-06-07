@@ -977,6 +977,7 @@ const DivisionManager = () => {
                 </div>
               </form>
             </div>
+          </div>
         )}
       </div>
     </div>
