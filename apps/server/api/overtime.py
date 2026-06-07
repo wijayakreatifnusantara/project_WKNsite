@@ -208,6 +208,53 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
         }).eq("id", request_id).execute()
 
         request_data = res.data[0]
+        
+        # 2. Sinkronisasi Otomatis ke Payroll (Tunjangan Lembur)
+        if status == "Approved":
+            try:
+                employee_id_sync = request_data.get("employee_id")
+                duration = float(request_data.get("duration_hours", 0))
+                if duration > 0:
+                    sal_res = supabase_client.client.table("employee_salaries").select("id, basic_salary, overtime_allowance").eq("employee_id", employee_id_sync).execute()
+                    if sal_res.data:
+                        salary_data = sal_res.data[0]
+                        basic_salary = float(salary_data.get("basic_salary") or 0)
+                        current_ot_allowance = float(salary_data.get("overtime_allowance") or 0)
+                        
+                        # Rumus lembur standar Kemenaker: (Gaji Pokok / 173) * Jam * 1.5
+                        ot_pay = (basic_salary / 173.0) * duration * 1.5
+                        new_ot_allowance = current_ot_allowance + round(ot_pay)
+                        
+                        supabase_client.client.table("employee_salaries").update({
+                            "overtime_allowance": new_ot_allowance
+                        }).eq("id", salary_data["id"]).execute()
+                    else:
+                        ot_pay = 0 # Fallback jika belum migrasi ke employee_salaries
+                        
+                    # Update juga di JSON payroll_components (employees) untuk backward compatibility
+                    emp_res = supabase_client.client.table("employees").select("id, payroll_components").eq("id", employee_id_sync).execute()
+                    if not emp_res.data:
+                        emp_res = supabase_client.client.table("employees").select("id, payroll_components").eq("employee_id", employee_id_sync).execute()
+                        
+                    if emp_res.data:
+                        emp_id_db = emp_res.data[0]["id"]
+                        pc = emp_res.data[0].get("payroll_components") or {}
+                        if "variable_income" not in pc:
+                            pc["variable_income"] = {}
+                            
+                        if not sal_res.data:
+                            b_sal = float(pc.get("basic_salary", 0))
+                            ot_pay = (b_sal / 173.0) * duration * 1.5
+                            
+                        current_json_ot = float(pc["variable_income"].get("overtime_allowance", 0) or 0)
+                        pc["variable_income"]["overtime_allowance"] = current_json_ot + round(ot_pay)
+                        
+                        supabase_client.client.table("employees").update({
+                            "payroll_components": pc
+                        }).eq("id", emp_id_db).execute()
+
+            except Exception as sync_err:
+                print(f"[Payroll Sync] Error syncing overtime to payroll: {sync_err}")
 
         # 1b. Fetch approver signature and employee details to regenerate PDF
         try:
