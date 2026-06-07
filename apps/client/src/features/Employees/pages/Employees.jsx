@@ -453,7 +453,7 @@ const Employees = () => {
         </div>
       </div>
       <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-h-0">
-        <div className={`flex-1 p-4 md:p-6 w-full flex flex-col pb-0 min-h-0 ${isMobile ? '' : 'min-w-[1000px]'}`}>
+        <div className={`flex-1 w-full flex flex-col min-h-0 ${isMobile ? '' : 'min-w-[1000px]'}`}>
           {viewMode === 'registry' ? (
             isMobile ? (
               <div className="flex-1 flex flex-col min-h-0 space-y-3 overflow-y-auto pb-24 px-1">
@@ -573,7 +573,7 @@ const Employees = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden flex flex-col flex-1 min-h-0">
+              <div className="bg-white flex flex-col flex-1 min-h-0 border-t-0">
                 {/* 📌 STATIONARY HEADER TABLE */}
                 <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0">
                   <thead className="bg-slate-50 border-b border-slate-200">
