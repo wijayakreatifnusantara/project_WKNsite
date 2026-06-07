@@ -14,6 +14,7 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import '../../attendance/data/offline_attendance_service.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -464,7 +465,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 children: [
                                   Text(_greeting, style: const TextStyle(color: Colors.white70, fontSize: 13)),
                                   const SizedBox(height: 4),
-                                  Text(user?['name'] ?? 'Karyawan', overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
+                                  TextScroll(
+                                    user?['name'] ?? 'Karyawan',
+                                    mode: TextScrollMode.bouncing,
+                                    velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
+                                    delayBefore: const Duration(milliseconds: 500),
+                                    pauseBetween: const Duration(milliseconds: 1000),
+                                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+                                  ),
                                 ],
                               ),
                             ),
