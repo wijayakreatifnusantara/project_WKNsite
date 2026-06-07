@@ -54,7 +54,7 @@ const AttendanceHub = () => {
 
   return (
     <div className="flex-1 overflow-y-auto p-3 bg-[#f8fafc] custom-scrollbar animate-fade-in">
-      <div className="max-w-[1600px] mx-auto space-y-3">
+      <div className="w-full mx-auto space-y-3">
         
         {/* 🚀 ULTRA-COMPACT HEADER & NAV BAR */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">

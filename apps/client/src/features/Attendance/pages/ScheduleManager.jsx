@@ -122,7 +122,7 @@ const ScheduleManager = () => {
 
   return (
     <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
-      <div className="max-w-[1600px] mx-auto space-y-4">
+      <div className="w-full mx-auto space-y-4">
         
         {/* HEADER */}
         <div className="flex items-center justify-between bg-white p-3 px-6 rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] backdrop-blur-md">

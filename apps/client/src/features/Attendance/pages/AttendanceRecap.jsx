@@ -164,7 +164,7 @@ const AttendanceRecap = () => {
 
   return (
     <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
-      <div className="max-w-[1400px] mx-auto space-y-4">
+      <div className="w-full mx-auto space-y-4">
         
         {/* 🚀 ULTRA-COMPACT HEADER */}
         <div className="flex items-center justify-between bg-white p-3 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">

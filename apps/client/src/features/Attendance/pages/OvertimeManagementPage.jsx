@@ -82,7 +82,7 @@ const OvertimeManagementPage = () => {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 bg-[#f8fafc] custom-scrollbar animate-fade-in text-[10px]">
-      <div className="max-w-[1600px] mx-auto space-y-4">
+      <div className="w-full mx-auto space-y-4">
         
         {/* 🚀 HEADER & FILTER BAR */}
         <div className="flex items-center justify-between bg-white p-2 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">

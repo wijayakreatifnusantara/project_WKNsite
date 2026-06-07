@@ -192,7 +192,7 @@ const ShiftManager = () => {
     <div className="flex-1 flex flex-col min-h-0 bg-[#f8fafc] font-inter animate-fade-in">
       {/* HEADER SECTION */}
       <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-slate-200 z-10 shrink-0">
-        <div className="max-w-[1400px] mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="w-full mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
               <IconClock size={22} stroke={2.5} />
@@ -228,7 +228,7 @@ const ShiftManager = () => {
 
       {/* FEEDBACK TOAST */}
       {message.text && (
-        <div className="px-4 pt-4 max-w-[1400px] mx-auto w-full">
+        <div className="px-4 pt-4 w-full mx-auto">
           <div className={`p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 shadow-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
             {message.type === 'success' ? <IconCircleCheck size={16} /> : <IconAlertCircle size={16} />}
             <span className="text-[10px] font-black uppercase tracking-widest">{message.text}</span>
@@ -238,7 +238,7 @@ const ShiftManager = () => {
 
       {/* CONTENT AREA */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-[1400px] mx-auto">
+        <div className="w-full mx-auto">
           {isLoading ? (
             <div className="h-64 flex flex-col items-center justify-center gap-4">
               <IconLoader2 className="animate-spin text-[#E31E24]" size={32} />
