@@ -97,6 +97,7 @@ const initialFormData = {
   status: 'PERMANENT',
   employment_type: 'Permanent',
   working_location: 'Head Office',
+  shift_id: '',
   base_salary: 0,
   join_date: new Date().toISOString().split('T')[0],
   contract_end_date: '',
@@ -127,6 +128,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
   const [organizations, setOrganizations] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [shifts, setShifts] = useState([]);
   const fileInputRef = React.useRef(null);
   const { user } = useAuth();
   const isOwnerOrSuperAdmin = user?.role?.toLowerCase() === 'owner' || user?.role?.toLowerCase() === 'superadmin';
@@ -146,6 +148,15 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         }
       })
       .catch(err => console.error('Failed to load working locations:', err));
+
+    axios.get(`${API_URL}/master/shifts`)
+      .then(res => {
+        const d = res.data;
+        if (d.status === 'success') {
+          setShifts(d.data || []);
+        }
+      })
+      .catch(err => console.error('Failed to load shifts:', err));
   }, []);
 
   React.useEffect(() => {
@@ -246,7 +257,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         "Basic Salary": "base_salary",
         "Join Date": "join_date",
         "Photo": "photo",
-        "photo": "photo"
+        "photo": "photo",
+        "shift_id": "shift_id"
       };
 
       // Apply mapping
@@ -871,6 +883,20 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   </InputWrapper>
                   <InputWrapper label="Base Salary (Monthly)" icon={IconWallet}>
                     <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
+                  </InputWrapper>
+                  <InputWrapper label="Assigned Shift" icon={IconCalendar}>
+                    <select 
+                      name="shift_id" 
+                      value={formData.shift_id || ''} 
+                      onChange={handleChange} 
+                      className={getFieldStyle(isFieldsLocked)} 
+                      disabled={isFieldsLocked}
+                    >
+                      <option value="">PILIH SHIFT</option>
+                      {shifts.map(shift => (
+                        <option key={shift.id} value={shift.id}>{shift.name.toUpperCase()} ({shift.time_in?.substring(0,5)} - {shift.time_out?.substring(0,5)})</option>
+                      ))}
+                    </select>
                   </InputWrapper>
                 </div>
               </div>
