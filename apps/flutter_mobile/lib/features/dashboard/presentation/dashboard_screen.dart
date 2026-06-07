@@ -538,7 +538,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       const SizedBox(width: 8),
                                       Transform.rotate(
                                         angle: ((_compassHeading ?? 0) * (math.pi / 180) * -1),
-                                        child: const Icon(Icons.explore, color: Colors.white, size: 20),
+                                        child: SizedBox(
+                                          width: 24, height: 24,
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              const Icon(Icons.circle_outlined, color: Colors.white54, size: 24),
+                                              const Positioned(top: 1, child: Text('U', style: TextStyle(fontSize: 7, color: Colors.redAccent, fontWeight: FontWeight.bold))),
+                                              const Positioned(bottom: 1, child: Text('S', style: TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold))),
+                                              const Positioned(right: 2, child: Text('T', style: TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold))),
+                                              const Positioned(left: 2, child: Text('B', style: TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold))),
+                                              const Icon(Icons.navigation, color: Colors.white70, size: 10),
+                                            ]
+                                          )
+                                        ),
                                       )
                                     ],
                                   )
