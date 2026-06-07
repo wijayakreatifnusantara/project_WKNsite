@@ -507,6 +507,7 @@ const DivisionManager = () => {
           </div>
         </div>
       </div>
+    </div>
 
       {/* NOTIFICATION FEEDBACK */}
       {message.text && (
@@ -981,7 +982,8 @@ const DivisionManager = () => {
         )}
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DivisionManager;
