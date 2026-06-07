@@ -45,13 +45,15 @@ class EmployeeBase(BaseModel):
     skills: Optional[str] = None
     
     # Employment (Q-T)
+    organization_name: Optional[str] = None
+    job_position: Optional[str] = None
+    job_level: Optional[str] = None
+    status: str = "Active"
+    
+    # Master Data Relations (UUIDs)
     division_id: Optional[str] = None
     department_id: Optional[str] = None
     position_id: Optional[str] = None
-    division_name: Optional[str] = None  # Deprecated
-    job_position: Optional[str] = None   # Deprecated
-    job_level: str
-    status: str = "Active"
     
     # Financial & Banking (U-Y)
     gaji_pokok: float = 0

@@ -66,7 +66,7 @@ async def get_my_profile(current_user: dict = Depends(get_current_user)):
         if not employee_id:
             raise HTTPException(status_code=400, detail="No employee_id in token")
             
-        res = supabase_client.client.table("employees").select("*, departments(name)").eq("id", employee_id).execute()
+        res = supabase_client.client.table("employees").select("*, divisions(name), departments(name), positions(name)").eq("id", employee_id).execute()
         if not res.data:
             raise HTTPException(status_code=404, detail="Employee not found")
             

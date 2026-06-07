@@ -308,9 +308,22 @@ const EmployeeForm = () => {
               </select>
             </InputWrapper>
             <InputWrapper label="Jabatan" icon={IconAward}>
-              <select name="job_position" value={formData.job_position} onChange={handleChange} className={inputStyle} disabled={!formData.department_id || !formData.employee_id}>
+              <select 
+                name="position_id" 
+                value={formData.position_id || ''} 
+                onChange={(e) => {
+                  const pos = positions.find(p => p.id === e.target.value);
+                  setFormData(prev => ({
+                    ...prev,
+                    position_id: pos ? pos.id : '',
+                    job_position: pos ? pos.name : ''
+                  }));
+                }} 
+                className={inputStyle} 
+                disabled={!formData.department_id || !formData.employee_id}
+              >
                 <option value="">PILIH JABATAN</option>
-                {positions.map(p => <option key={p.id} value={p.name}>{p.name.toUpperCase()}</option>)}
+                {positions.map(p => <option key={p.id} value={p.id}>{p.name.toUpperCase()}</option>)}
               </select>
             </InputWrapper>
             <InputWrapper label="Status Pegawai" icon={IconUserCircle}>

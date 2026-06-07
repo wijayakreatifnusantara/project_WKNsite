@@ -178,7 +178,7 @@ class WKNSupabaseClient:
             clean_email = email.strip()
             
             res = self.client.table("employees") \
-                .select("id, name, email, mobile_password, status, is_resigned, job_position, is_field_team, working_location") \
+                .select("id, name, email, mobile_password, status, is_resigned, job_position, division_name, is_field_team, working_location, positions(name)") \
                 .ilike("email", clean_email) \
                 .execute()
                 
@@ -194,6 +194,14 @@ class WKNSupabaseClient:
                 clean_employee = employee.copy()
                 if "mobile_password" in clean_employee:
                     del clean_employee["mobile_password"]
+                    
+                # Backward compatibility for mobile app
+                if not clean_employee.get("job_position") and clean_employee.get("positions"):
+                    clean_employee["job_position"] = clean_employee["positions"].get("name")
+                    
+                if "positions" in clean_employee:
+                    del clean_employee["positions"]
+                    
                 return clean_employee
                 
             return None
