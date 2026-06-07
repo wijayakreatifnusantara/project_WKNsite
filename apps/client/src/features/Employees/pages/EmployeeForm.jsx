@@ -75,6 +75,42 @@ const DOC_TYPES = [
   { id: 'lain_lain', label: 'Dokumen Lainnya' }
 ];
 
+
+const RupiahInput = ({ value, onChange, name, disabled, className, placeholder }) => {
+  const formatRupiah = (val) => {
+    if (val === null || val === undefined || val === '') return '';
+    const numberString = val.toString().replace(/[^,\d]/g, '');
+    const split = numberString.split(',');
+    const sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+      const separator = sisa ? '.' : '';
+      rupiah += separator + ribuan.join('.');
+    }
+    rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+    return rupiah ? `Rp ${rupiah}` : '';
+  };
+
+  const [displayValue, setDisplayValue] = React.useState(formatRupiah(value));
+
+  React.useEffect(() => {
+    setDisplayValue(formatRupiah(value));
+  }, [value]);
+
+  const handleChange = (e) => {
+    const rawValue = e.target.value.replace(/[^,\d]/g, '');
+    setDisplayValue(formatRupiah(rawValue));
+    if (onChange) {
+      onChange({ target: { name, value: rawValue ? parseInt(rawValue, 10) : 0, type: 'number', tagName: 'INPUT' } });
+    }
+  };
+
+  return (
+    <input type="text" name={name} value={displayValue} onChange={handleChange} className={className} disabled={disabled} placeholder={placeholder || "Rp 0"} />
+  );
+};
+
 const EmployeeForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -624,37 +660,37 @@ const EmployeeForm = () => {
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Fixed Income</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="Gaji Pokok (Base Salary)" icon={IconCreditCard}>
-            <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Tunjangan Jabatan" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.fixed_income?.tunjangan_jabatan || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_jabatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.fixed_income?.tunjangan_jabatan || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_jabatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Tunjangan Keahlian" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.fixed_income?.tunjangan_keahlian || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_keahlian', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.fixed_income?.tunjangan_keahlian || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_keahlian', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Tunjangan Komunikasi" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.fixed_income?.tunjangan_komunikasi || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_komunikasi', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.fixed_income?.tunjangan_komunikasi || ''} onChange={(e) => handlePayrollChange('fixed_income', 'tunjangan_komunikasi', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           
           <div className="col-span-full mt-2">
             <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Tunjangan BPJS Ketenagakerjaan (Dibayarkan Perusahaan)</label>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-lg border border-slate-200">
               <InputWrapper label="JKK" icon={IconCreditCard}>
-                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jkk || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkk', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                <RupiahInput value={formData.payroll_components?.fixed_income?.bpjs_tk_jkk || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkk', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
               <InputWrapper label="JKM" icon={IconCreditCard}>
-                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jkm || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkm', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                <RupiahInput value={formData.payroll_components?.fixed_income?.bpjs_tk_jkm || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkm', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
               <InputWrapper label="JHT" icon={IconCreditCard}>
-                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                <RupiahInput value={formData.payroll_components?.fixed_income?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
               <InputWrapper label="JP" icon={IconCreditCard}>
-                <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_tk_jp || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jp', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                <RupiahInput value={formData.payroll_components?.fixed_income?.bpjs_tk_jp || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jp', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
             </div>
           </div>
           <InputWrapper label="Tunjangan BPJS Kesehatan" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.fixed_income?.bpjs_kesehatan || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_kesehatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.fixed_income?.bpjs_kesehatan || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_kesehatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
       </div>
@@ -664,16 +700,16 @@ const EmployeeForm = () => {
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Variable Income</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="Work Order Allowance" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.variable_income?.work_order_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'work_order_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.variable_income?.work_order_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'work_order_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Meals Allowance" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.variable_income?.meals_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'meals_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.variable_income?.meals_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'meals_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Transport Allowance" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.variable_income?.transport_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'transport_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.variable_income?.transport_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'transport_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Overtime Allowance" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.variable_income?.overtime_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'overtime_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.variable_income?.overtime_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'overtime_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
       </div>
@@ -683,16 +719,16 @@ const EmployeeForm = () => {
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Non-Wage Income</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="THR" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.non_wage_income?.thr || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'thr', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.non_wage_income?.thr || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'thr', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Bonus" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.non_wage_income?.bonus || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'bonus', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.non_wage_income?.bonus || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'bonus', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Incentive" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.non_wage_income?.incentive || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'incentive', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.non_wage_income?.incentive || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'incentive', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Miscellaneous Earnings" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.non_wage_income?.miscellaneous_earnings || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'miscellaneous_earnings', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.non_wage_income?.miscellaneous_earnings || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'miscellaneous_earnings', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
       </div>
@@ -702,29 +738,29 @@ const EmployeeForm = () => {
         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Deduction (Potongan)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="PPh21" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.deductions?.pph21 || ''} onChange={(e) => handlePayrollChange('deductions', 'pph21', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.deductions?.pph21 || ''} onChange={(e) => handlePayrollChange('deductions', 'pph21', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           
           <div className="col-span-full mt-2">
             <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Potongan BPJS Ketenagakerjaan</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50/50 rounded-lg border border-slate-200">
               <InputWrapper label="JHT" icon={IconCreditCard}>
-                <input type="number" value={formData.payroll_components?.deductions?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                <RupiahInput value={formData.payroll_components?.deductions?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
               <InputWrapper label="JP" icon={IconCreditCard}>
-                <input type="number" value={formData.payroll_components?.deductions?.bpjs_tk_jp || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jp', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                <RupiahInput value={formData.payroll_components?.deductions?.bpjs_tk_jp || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jp', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
             </div>
           </div>
           
           <InputWrapper label="Potongan BPJS Kesehatan" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.deductions?.bpjs_kesehatan || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_kesehatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.deductions?.bpjs_kesehatan || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_kesehatan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Loan" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.deductions?.loan || ''} onChange={(e) => handlePayrollChange('deductions', 'loan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.deductions?.loan || ''} onChange={(e) => handlePayrollChange('deductions', 'loan', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Miscellaneous Deduction" icon={IconCreditCard}>
-            <input type="number" value={formData.payroll_components?.deductions?.miscellaneous_deduction || ''} onChange={(e) => handlePayrollChange('deductions', 'miscellaneous_deduction', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+            <RupiahInput value={formData.payroll_components?.deductions?.miscellaneous_deduction || ''} onChange={(e) => handlePayrollChange('deductions', 'miscellaneous_deduction', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
         </div>
       </div>
