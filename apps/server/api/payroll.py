@@ -19,6 +19,7 @@ async def simulate_payroll(period: str, current_user: dict = Depends(require_adm
         
         # Fetch attendance summary for the period
         attendance_summary = await supabase_client.get_attendance_for_payroll(period)
+        expected_working_days = attendance_summary.pop("__expected_working_days__", 25)
         
         results = []
         total_net = 0
@@ -27,8 +28,14 @@ async def simulate_payroll(period: str, current_user: dict = Depends(require_adm
         for emp in employees:
             # Get specific attendance for this employee
             emp_attendance = attendance_summary.get(emp.get("employee_id") or str(emp.get("id")))
+            if not emp_attendance:
+                emp_attendance = {
+                    "late_minutes": 0,
+                    "absences": expected_working_days,
+                    "unpaid_leaves": 0
+                }
             
-            calc = calculate_payroll(emp, emp_attendance)
+            calc = calculate_payroll(emp, emp_attendance, expected_working_days)
             calc["employee_name"] = emp.get("name")
             calc["employee_id"] = emp.get("employee_id") or emp.get("id")
             calc["period"] = period

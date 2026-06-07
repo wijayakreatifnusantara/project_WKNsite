@@ -78,9 +78,9 @@ def calculate_bpjs(base_salary: float) -> Dict[str, float]:
         "jkm_company": base_salary * 0.003
     }
 
-def calculate_payroll(employee_data: Dict[str, Any], attendance_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def calculate_payroll(employee_data: Dict[str, Any], attendance_data: Dict[str, Any] = None, expected_working_days: int = 25) -> Dict[str, Any]:
     """
-    Main calculation engine with Attendance Integration
+    Calculate comprehensive payroll including tax (TER) and BPJS
     """
     base = float(employee_data.get("base_salary", 0))
     # Add allowances
@@ -104,10 +104,10 @@ def calculate_payroll(employee_data: Dict[str, Any], attendance_data: Optional[D
     if attendance_data:
         # Example: 1000 IDR per minute late
         late_deduction = attendance_data.get("late_minutes", 0) * 1000
-        # Example: Pro-rata daily deduction (assuming 25 working days)
-        absence_deduction = (base / 25) * attendance_data.get("absences", 0)
+        # Example: Pro-rata daily deduction
+        absence_deduction = (base / expected_working_days) * attendance_data.get("absences", 0)
         # Unpaid Leave deduction (assuming same pro-rata rule as absence)
-        unpaid_leave_deduction = (base / 25) * attendance_data.get("unpaid_leaves", 0)
+        unpaid_leave_deduction = (base / expected_working_days) * attendance_data.get("unpaid_leaves", 0)
     
     # Tax (PPh 21 TER)
 

@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date, time
+import urllib.request
+import json
 from utils.supabase_client import supabase_client
 
 router = APIRouter()
@@ -117,6 +119,38 @@ def update_holiday(holiday_id: str, holiday: HolidayUpdate):
         return {"status": "success", "data": response.data[0] if response.data else None}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/holidays/sync")
+def sync_holidays():
+    supabase = supabase_client.client
+    try:
+        url = "https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            
+        synced = 0
+        for key, value in data.items():
+            if len(key) == 8 and key.isdigit():
+                year = key[:4]
+                month = key[4:6]
+                day = key[6:8]
+                holiday_date = f"{year}-{month}-{day}"
+                
+                existing = supabase.table("national_holidays").select("id").eq("start_date", holiday_date).execute()
+                if not existing.data:
+                    supabase.table("national_holidays").insert({
+                        "name": "Libur Nasional",
+                        "start_date": holiday_date,
+                        "end_date": holiday_date,
+                        "type": "Libur Nasional"
+                    }).execute()
+                    synced += 1
+                    
+        return {"status": "success", "message": f"Berhasil sinkronisasi {synced} hari libur nasional."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gagal sinkronisasi API Libur: {str(e)}")
 
 # ---------------------------------------------------------
 # SCHEDULE MODELS & ROUTES

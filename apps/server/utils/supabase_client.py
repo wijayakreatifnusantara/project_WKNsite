@@ -455,19 +455,44 @@ class WKNSupabaseClient:
             return []
 
     async def get_attendance_for_payroll(self, period: str) -> Dict[str, Any]:
-        """Aggregate attendance metrics per employee for payroll calculation"""
+        """Aggregate attendance metrics per employee for payroll calculation, including auto-Alpha computation based on holidays."""
         if not self.client: return {}
         try:
             import calendar
+            from datetime import date, timedelta
+            
             try:
                 year, month = map(int, period.split('-'))
                 last_day = calendar.monthrange(year, month)[1]
                 start_date = f"{period}-01"
                 end_date = f"{period}-{last_day:02d}"
+                start_dt = date(year, month, 1)
+                end_dt = date(year, month, last_day)
             except Exception:
                 start_date = f"{period}-01"
                 end_date = f"{period}-31"
+                return {"__expected_working_days__": 25}
 
+            # 1. Hitung Expected Working Days (Senin - Jumat)
+            working_days = 0
+            current_dt = start_dt
+            while current_dt <= end_dt:
+                if current_dt.weekday() < 5: # 0=Mon, 4=Fri
+                    working_days += 1
+                current_dt += timedelta(days=1)
+                
+            # 2. Kurangi dengan Hari Libur Nasional (yang jatuh pada hari kerja)
+            holidays_res = self.client.table("national_holidays").select("start_date").gte("start_date", start_date).lte("start_date", end_date).execute()
+            holiday_dates = set([h.get("start_date") for h in holidays_res.data])
+            for hd_str in holiday_dates:
+                try:
+                    hd = date.fromisoformat(hd_str)
+                    if hd.weekday() < 5:
+                        working_days -= 1
+                except:
+                    pass
+
+            # 3. Ambil data absen aktual
             res = self.client.table("attendance") \
                 .select("employee_id, status, late_minutes") \
                 .gte("date", start_date) \
@@ -479,15 +504,25 @@ class WKNSupabaseClient:
             for r in data:
                 eid = r.get("employee_id")
                 if eid not in summary:
-                    summary[eid] = {"late_minutes": 0, "absences": 0, "unpaid_leaves": 0}
+                    summary[eid] = {"late_minutes": 0, "absences": 0, "unpaid_leaves": 0, "actual_present_or_paid_leave": 0}
                 
                 summary[eid]["late_minutes"] += r.get("late_minutes", 0)
                 status_lower = str(r.get("status", "")).lower()
-                if status_lower == "absent":
+                
+                if status_lower in ["present", "late", "leave"]: # leave = paid leave
+                    summary[eid]["actual_present_or_paid_leave"] += 1
+                elif status_lower == "absent":
                     summary[eid]["absences"] += 1
                 elif status_lower == "unpaid leave":
                     summary[eid]["unpaid_leaves"] += 1
-            
+
+            # 4. Finalize Alpha calculations
+            for eid, metrics in summary.items():
+                expected_minus_attended = working_days - (metrics["actual_present_or_paid_leave"] + metrics["unpaid_leaves"])
+                auto_absences = max(0, expected_minus_attended)
+                metrics["absences"] = max(metrics["absences"], auto_absences)
+
+            summary["__expected_working_days__"] = working_days
             return summary
 
 
