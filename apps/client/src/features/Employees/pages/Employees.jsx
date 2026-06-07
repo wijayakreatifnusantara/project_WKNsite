@@ -340,7 +340,7 @@ const Employees = () => {
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
       <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">
-        <div className="max-w-[1400px] mx-auto p-4 space-y-3">
+        <div className="w-full mx-auto p-4 space-y-3 px-6">
           
           {/* HEADER ROW */}
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
@@ -453,7 +453,7 @@ const Employees = () => {
         </div>
       </div>
       <div className="flex-1 overflow-x-auto custom-scrollbar flex flex-col min-h-0">
-        <div className={`flex-1 p-4 md:p-6 max-w-[1400px] mx-auto w-full flex flex-col pb-0 min-h-0 ${isMobile ? '' : 'min-w-[1000px]'}`}>
+        <div className={`flex-1 p-4 md:p-6 w-full flex flex-col pb-0 min-h-0 ${isMobile ? '' : 'min-w-[1000px]'}`}>
           {viewMode === 'registry' ? (
             isMobile ? (
               <div className="flex-1 flex flex-col min-h-0 space-y-3 overflow-y-auto pb-24 px-1">
@@ -597,12 +597,13 @@ const Employees = () => {
                           {filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length && <IconCheck size={10} className="text-white" stroke={4} />}
                         </div>
                       </th>
-                      <TableHead label="ID KARYAWAN" width="12%" />
-                      <TableHead label="NAMA LENGKAP" width="28%" />
+                      <TableHead label="ID KARYAWAN" width="10%" />
+                      <TableHead label="NAMA LENGKAP" width="25%" />
                       <TableHead label="DEPARTEMEN" width="15%" />
                       <TableHead label="JABATAN" width="15%" />
-                      <TableHead label="STATUS" center width="15%" />
-                      <TableHead label="AKSI" right width="15%" />
+                      <TableHead label="LEVEL" width="10%" />
+                      <TableHead label="STATUS" center width="10%" />
+                      <TableHead label="AKSI" right width="10%" />
                     </tr>
                   </thead>
                 </table>
@@ -649,10 +650,10 @@ const Employees = () => {
                                 {selectedIds.has(emp["EMPLOYEE ID"]) && <IconCheck size={10} className="text-white" stroke={4} />}
                               </div>
                             </td>
-                            <td className="w-[12%] px-4 py-2.5">
+                            <td className="w-[10%] px-4 py-2.5">
                               <span className="text-xs font-semibold text-slate-500 font-mono tracking-tighter uppercase">{emp["EMPLOYEE ID"] || 'N/A'}</span>
                             </td>
-                            <td className="w-[28%] px-4 py-2.5">
+                            <td className="w-[25%] px-4 py-2.5">
                               <div className="flex items-center gap-3">
                                 <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                                   {emp["Photo"] || emp.photo ? (
@@ -673,7 +674,10 @@ const Employees = () => {
                             <td className="w-[15%] px-4 py-2.5">
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Position *"]}</span>
                             </td>
-                            <td className="w-[15%] px-4 py-2.5 text-center">
+                            <td className="w-[10%] px-4 py-2.5">
+                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Level *"] || '-'}</span>
+                            </td>
+                            <td className="w-[10%] px-4 py-2.5 text-center">
                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
                                 emp["Status *"] === 'Permanent' 
                                   ? 'bg-blue-50 text-blue-600 border-blue-100' 
@@ -684,7 +688,7 @@ const Employees = () => {
                                 {emp["Status *"]?.toUpperCase()}
                               </span>
                             </td>
-                            <td className="w-[15%] px-4 py-2.5 text-right">
+                            <td className="w-[10%] px-4 py-2.5 text-right">
                               <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 <ActionButton onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} icon={<IconEye size={14} />} hover="hover:text-blue-600 hover:bg-blue-50" label="LIHAT" />
                                 <ActionButton onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} icon={<IconEdit size={14} />} hover="hover:text-green-600 hover:bg-green-50" label="EDIT" />
