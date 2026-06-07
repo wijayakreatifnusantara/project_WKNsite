@@ -13,6 +13,7 @@ import '../data/attendance_service.dart';
 import '../data/offline_attendance_service.dart';
 import '../utils/liveness_checker.dart';
 import '../../../core/utils/biometric_helper.dart';
+import '../../../core/utils/watermark_service.dart';
 
 class CameraScreen extends StatefulWidget {
   final String clockType;
@@ -138,6 +139,21 @@ class _CameraScreenState extends State<CameraScreen> {
         throw Exception('Data sesi atau lokasi tidak valid');
       }
 
+      // ----------------------------------------------------
+      // TERAPKAN WATERMARK / TIMESTAMP WKN VERIFIED
+      // ----------------------------------------------------
+      final watermarkedFile = await WatermarkService.addWatermark(
+        imageFile: File(image.path),
+        employeeName: user['full_name'] ?? user['email'] ?? 'Unknown',
+        employeeId: user['id_karyawan'] ?? user['id']?.toString().substring(0, 8) ?? 'ID',
+        latitude: _currentPosition!.latitude,
+        longitude: _currentPosition!.longitude,
+        address: 'Titik Absen Terdeteksi GPS', 
+        isCheckOut: widget.clockType == 'OUT',
+      );
+      final finalPhotoPath = watermarkedFile.path;
+      // ----------------------------------------------------
+
       // We need to know if it's Clock IN or OUT. 
       final isWebOrWindows = kIsWeb || (!Platform.isAndroid && !Platform.isIOS);
       
@@ -156,7 +172,7 @@ class _CameraScreenState extends State<CameraScreen> {
           longitude: _currentPosition!.longitude,
           clockType: widget.clockType, 
           notes: 'Offline Mobile check-in',
-          photoPath: image.path,
+          photoPath: finalPhotoPath,
         );
         
         if (!mounted) return;
@@ -172,7 +188,7 @@ class _CameraScreenState extends State<CameraScreen> {
           longitude: _currentPosition!.longitude,
           clockType: widget.clockType, 
           notes: 'Mobile check-in',
-          photoPath: image.path,
+          photoPath: finalPhotoPath,
         );
 
         if (!mounted) return;
