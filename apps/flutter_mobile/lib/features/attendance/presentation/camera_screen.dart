@@ -4,7 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart'; // Added for kIsWeb
-import 'dart:io'; // Added for Platform
+import 'dart:io'; 
+import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../../../core/utils/constants.dart';
@@ -29,6 +30,7 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _isReady = false;
   bool _isProcessing = false;
   bool _isLivenessPassed = false;
+  bool _isFakeGps = false;
   Position? _currentPosition;
   final AttendanceService _service = AttendanceService();
   final OfflineAttendanceService _offlineService = OfflineAttendanceService();
@@ -58,7 +60,11 @@ class _CameraScreenState extends State<CameraScreen> {
       
       // Anti Fake GPS (Mock Location Detection)
       if (_currentPosition!.isMocked) {
-        throw Exception('⚠️ FAKE GPS TERDETEKSI!\nHarap matikan aplikasi Fake GPS (Mock Location) untuk dapat melakukan absensi.');
+        if (mounted) {
+          setState(() {
+            _isFakeGps = true;
+          });
+        }
       }
 
       // 2. Initialize Camera (Front camera usually preferred for attendance)
@@ -111,8 +117,8 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  Future<void> _takePictureAndSubmit() async {
-    if (!_controller!.value.isInitialized || _isProcessing) return;
+  Future<void> _takePictureAndPreview() async {
+    if (!_controller!.value.isInitialized || _isProcessing || _isFakeGps) return;
 
     // Ekstra Keamanan: Wajib verifikasi sidik jari/wajah sebelum absen
     final biometricHelper = BiometricHelper();
@@ -154,10 +160,102 @@ class _CameraScreenState extends State<CameraScreen> {
       final finalPhotoPath = watermarkedFile.path;
       // ----------------------------------------------------
 
-      // We need to know if it's Clock IN or OUT. 
+      if (mounted) {
+        _showImagePreviewDialog(watermarkedFile);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengambil gambar: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
+    }
+  }
+
+  void _showImagePreviewDialog(File imageFile) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.white.withValues(alpha: 0.7), 
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), 
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 30, offset: const Offset(0, 10)),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.file(
+                    imageFile,
+                    fit: BoxFit.contain,
+                    height: MediaQuery.of(context).size.height * 0.65,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text("ULANGI"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _submitAttendance(imageFile);
+                    },
+                    icon: const Icon(Icons.check_rounded),
+                    label: const Text("LANJUTKAN"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submitAttendance(File finalImage) async {
+    setState(() {
+      _isProcessing = true;
+    });
+    try {
+      final user = context.read<AuthProvider>().userData;
       final isWebOrWindows = kIsWeb || (!Platform.isAndroid && !Platform.isIOS);
       
-      // Check Connectivity (Only for Mobile where connectivity_plus is fully supported)
       bool isOffline = false;
       if (!isWebOrWindows) {
         final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
@@ -165,34 +263,30 @@ class _CameraScreenState extends State<CameraScreen> {
       }
 
       if (isOffline) {
-        // Save Offline
         await _offlineService.savePendingAttendance(
-          employeeId: user['id'] ?? 'unknown',
+          employeeId: user?['id'] ?? 'unknown',
           latitude: _currentPosition!.latitude,
           longitude: _currentPosition!.longitude,
           clockType: widget.clockType, 
           notes: 'Offline Mobile check-in',
-          photoPath: finalPhotoPath,
+          photoPath: finalImage.path,
         );
-        
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('📶 Sinyal Terputus. Absen disimpan secara OFFLINE (Lokal).'), backgroundColor: Colors.orange),
+          const SnackBar(content: Text('📶 Sinyal Terputus. Absen disimpan secara OFFLINE.'), backgroundColor: Colors.orange),
         );
         context.go('/main');
       } else {
-        // Online Submit
         final result = await _service.submitAttendance(
-          employeeId: user['id'] ?? 'unknown',
+          employeeId: user?['id'] ?? 'unknown',
           latitude: _currentPosition!.latitude,
           longitude: _currentPosition!.longitude,
           clockType: widget.clockType, 
           notes: 'Mobile check-in',
-          photoPath: finalPhotoPath,
+          photoPath: finalImage.path,
         );
 
         if (!mounted) return;
-
         if (result['status'] == 'success') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('✅ Absen berhasil disimpan'), backgroundColor: Colors.green),
@@ -207,7 +301,7 @@ class _CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengambil gambar: $e')),
+          SnackBar(content: Text('Gagal mengirim absen: $e')),
         );
       }
     } finally {
@@ -280,6 +374,27 @@ class _CameraScreenState extends State<CameraScreen> {
                     _currentPosition != null ? '${_currentPosition!.latitude}, ${_currentPosition!.longitude}' : 'Mencari...',
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
+                  if (_isFakeGps)
+                    Container(
+                      margin: const EdgeInsets.top: 8,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.gpp_bad_rounded, color: Colors.white, size: 16),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'FAKE GPS TERDETEKSI! Matikan Mock Location untuk absen.',
+                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -314,17 +429,17 @@ class _CameraScreenState extends State<CameraScreen> {
               child: _isProcessing 
                 ? const CircularProgressIndicator(color: AppConstants.primaryColor)
                 : GestureDetector(
-                    onTap: _isLivenessPassed ? _takePictureAndSubmit : null,
+                    onTap: (_isLivenessPassed && !_isFakeGps) ? _takePictureAndPreview : null,
                     child: Container(
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: _isLivenessPassed ? Colors.white : Colors.grey, width: 4),
-                        color: _isLivenessPassed ? AppConstants.primaryColor : Colors.grey.withValues(alpha: 0.5),
+                        border: Border.all(color: (_isLivenessPassed && !_isFakeGps) ? Colors.white : Colors.grey, width: 4),
+                        color: (_isLivenessPassed && !_isFakeGps) ? AppConstants.primaryColor : Colors.grey.withValues(alpha: 0.5),
                       ),
                       child: Icon(
-                        _isLivenessPassed ? Icons.camera_alt : Icons.lock_outline, 
+                        (_isLivenessPassed && !_isFakeGps) ? Icons.camera_alt : Icons.lock_outline, 
                         color: Colors.white, 
                         size: 36
                       ),
