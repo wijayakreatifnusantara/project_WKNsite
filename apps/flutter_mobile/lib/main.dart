@@ -14,11 +14,13 @@ import 'core/utils/notification_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/di/dependency_injection.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   setupLocator();
+  await initializeDateFormatting('id_ID', null);
 
   // Initialize Firebase
   try {

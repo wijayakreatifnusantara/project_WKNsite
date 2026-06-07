@@ -120,9 +120,10 @@ class _CameraScreenState extends State<CameraScreen> {
   Future<void> _takePictureAndPreview() async {
     if (!_controller!.value.isInitialized || _isProcessing || _isFakeGps) return;
 
-    // Ekstra Keamanan: Wajib verifikasi sidik jari/wajah sebelum absen
-    final biometricHelper = BiometricHelper();
-    bool authenticated = await biometricHelper.authenticate();
+    // Ekstra Keamanan dinonaktifkan sementara agar absen lebih cepat
+    // final biometricHelper = BiometricHelper();
+    // bool authenticated = await biometricHelper.authenticate();
+    bool authenticated = true;
     
     if (!authenticated) {
       if (mounted) {
