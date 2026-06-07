@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -20,11 +22,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isDarkMode = false;
   String _selectedLanguage = 'Bahasa Indonesia';
   String _gpsAccuracy = '--';
+  String _deviceName = 'Memuat perangkat...';
+  String _osVersion = '';
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _loadDeviceInfo();
+  }
+
+  Future<void> _loadDeviceInfo() async {
+    final deviceInfoPlugin = DeviceInfoPlugin();
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfoPlugin.androidInfo;
+        if (mounted) setState(() {
+          _deviceName = '${androidInfo.brand} ${androidInfo.model}'.toUpperCase();
+          _osVersion = 'Android ${androidInfo.version.release}';
+        });
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfoPlugin.iosInfo;
+        if (mounted) setState(() {
+          _deviceName = iosInfo.name;
+          _osVersion = '${iosInfo.systemName} ${iosInfo.systemVersion}';
+        });
+      } else {
+        if (mounted) setState(() {
+          _deviceName = 'Perangkat Lain';
+          _osVersion = Platform.operatingSystem;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _deviceName = 'Perangkat Saat Ini');
+    }
   }
 
   Future<void> _loadSettings() async {
@@ -108,9 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 8),
               const Text('Kelola perangkat yang mengakses akun Anda.', style: TextStyle(fontSize: 12, color: Colors.grey)),
               const SizedBox(height: 24),
-              _buildDeviceItem('iPhone 15 Pro Max', 'Perangkat Ini (Jakarta, ID)', Icons.phone_iphone, true),
-              const SizedBox(height: 16),
-              _buildDeviceItem('MacBook Air M2', 'Chrome Web (Bandung, ID)', Icons.laptop_mac, false),
+              _buildDeviceItem(_deviceName, 'Perangkat Ini ($_osVersion)', Platform.isIOS ? Icons.phone_iphone : Icons.phone_android, true),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -332,7 +361,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildDivider(),
               _buildSettingSwitch(Icons.security, 'Autentikasi 2 Langkah (2FA)', _is2faEnabled, (v) => _saveBoolSetting('twoFactorAuth', v, (val) => _is2faEnabled = val)),
               _buildDivider(),
-              _buildSettingItem(Icons.devices, 'Manajemen Perangkat', value: '2 Aktif', onTap: _showDevicesModal),
+              _buildSettingItem(Icons.devices, 'Manajemen Perangkat', value: '1 Aktif', onTap: _showDevicesModal),
               _buildDivider(),
               _buildSettingItem(Icons.lock_outline, 'Ubah Kata Sandi', onTap: () => context.push('/change-password')),
             ]),
