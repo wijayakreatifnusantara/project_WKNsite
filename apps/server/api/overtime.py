@@ -96,6 +96,35 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
         if not date or not start_time or not end_time or not reason:
             raise HTTPException(status_code=400, detail="Data pengajuan tidak lengkap.")
 
+        proof_base64 = payload.pop("proof_base64", None)
+        if proof_base64:
+            import base64
+            import uuid
+            try:
+                # Menghapus header data URL jika ada
+                if "," in proof_base64:
+                    proof_base64 = proof_base64.split(",")[1]
+                
+                image_data = base64.b64decode(proof_base64)
+                file_ext = "jpg"
+                file_name = f"overtime_proofs/{employee_id}_{datetime.now().strftime('%Y%md%H%M%S')}_{uuid.uuid4().hex[:6]}.{file_ext}"
+                
+                # Upload ke bucket documents
+                supabase_client.client.storage.from_("documents").upload(
+                    path=file_name,
+                    file=image_data,
+                    file_options={"content-type": f"image/{file_ext}"}
+                )
+                
+                # Dapatkan public URL
+                public_url = supabase_client.client.storage.from_("documents").get_public_url(file_name)
+                
+                # Tambahkan ke alasan
+                reason = f"{reason}\n\n[LAMPIRAN_BUKTI: {public_url}]"
+            except Exception as e:
+                print(f"[Upload Error] Gagal mengunggah foto bukti lembur: {str(e)}")
+                # Tetap lanjut proses meskipun gagal upload (opsional, atau bisa raise)
+
         # Calculate duration hours
         try:
             t1 = datetime.strptime(start_time, "%H:%M")

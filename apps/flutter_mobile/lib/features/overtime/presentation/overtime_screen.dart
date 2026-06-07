@@ -6,6 +6,11 @@ import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/overtime_service.dart';
 import '../data/overtime_model.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../../core/services/watermark_service.dart';
 
 class OvertimeScreen extends StatefulWidget {
   const OvertimeScreen({super.key});
@@ -27,6 +32,10 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
   final TextEditingController _startTimeCtrl = TextEditingController();
   final TextEditingController _endTimeCtrl = TextEditingController();
   final TextEditingController _reasonCtrl = TextEditingController();
+
+  String? _proofPhotoPath;
+  final ImagePicker _picker = ImagePicker();
+  Position? _currentPosition;
 
   @override
   void initState() {
@@ -79,9 +88,131 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
     _startTimeCtrl.text = '17:00';
     _endTimeCtrl.text = '19:00';
     _reasonCtrl.text = '';
+    _proofPhotoPath = null;
     setState(() {
       _showForm = true;
     });
+  }
+
+  Future<void> _takePhoto() async {
+    try {
+      final XFile? photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 70,
+      );
+      
+      if (photo != null) {
+        setState(() => _isSubmitLoading = true);
+        
+        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          throw Exception('GPS tidak aktif');
+        }
+        
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) throw Exception('Izin lokasi ditolak');
+        }
+        
+        _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        
+        final user = context.read<AuthProvider>().userData;
+        final employeeName = user?['name'] ?? 'Karyawan';
+        
+        final watermarkedPath = await WatermarkService.addWatermark(
+          photo.path,
+          employeeName,
+          'LEMBUR',
+          _currentPosition!,
+        );
+        
+        if (watermarkedPath != null) {
+          setState(() {
+            _proofPhotoPath = watermarkedPath;
+          });
+          _showPhotoPreview();
+        }
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil foto: $e'), backgroundColor: Colors.red));
+    } finally {
+      if (mounted) setState(() => _isSubmitLoading = false);
+    }
+  }
+
+  void _showPhotoPreview() {
+    if (_proofPhotoPath == null) return;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pratinjau Foto Lembur', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(File(_proofPhotoPath!)),
+            ),
+            const SizedBox(height: 12),
+            const Text('Pastikan wajah dan pekerjaan Anda terlihat jelas beserta keterangan waktu di dalam foto.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () {
+            setState(() => _proofPhotoPath = null);
+            Navigator.pop(context);
+          }, child: const Text('Hapus Foto', style: TextStyle(color: Colors.red))),
+          ElevatedButton(onPressed: () => Navigator.pop(context), style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor), child: const Text('Gunakan Foto', style: TextStyle(color: Colors.white))),
+        ],
+      )
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now().add(const Duration(days: 30)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(primary: AppConstants.primaryColor),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        controller.text = picked.toIso8601String().split('T')[0];
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(primary: AppConstants.primaryColor),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && context.mounted) {
+      setState(() {
+        final hour = picked.hour.toString().padLeft(2, '0');
+        final minute = picked.minute.toString().padLeft(2, '0');
+        controller.text = '$hour:$minute';
+      });
+    }
   }
 
   Future<void> _handleCreateRequest() async {
@@ -112,6 +243,11 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
       return;
     }
 
+    if (_proofPhotoPath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Wajib melampirkan foto bukti lembur!')));
+      return;
+    }
+
     setState(() => _isSubmitLoading = true);
 
     try {
@@ -125,6 +261,12 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
       }
       final double durationHours = (eMinutes - sMinutes) / 60.0;
 
+      String? base64Image;
+      if (_proofPhotoPath != null) {
+        final bytes = await File(_proofPhotoPath!).readAsBytes();
+        base64Image = base64Encode(bytes);
+      }
+
       final payload = {
         'employee_id': user['id'],
         'date': _dateCtrl.text,
@@ -132,7 +274,8 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         'end_time': _endTimeCtrl.text,
         'duration_hours': double.parse(durationHours.toStringAsFixed(2)),
         'reason': _reasonCtrl.text.trim(),
-        'status': 'Pending'
+        'status': 'Pending',
+        if (base64Image != null) 'proof_base64': base64Image,
       };
 
       await _overtimeService.submitOvertimeRequest(payload);
@@ -219,17 +362,44 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
           children: [
             const Text('Formulir Lembur Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            _buildTextField('TANGGAL (YYYY-MM-DD)', _dateCtrl, 'Contoh: 2026-05-24'),
+            _buildTextField('TANGGAL LEMBUR', _dateCtrl, 'Pilih Tanggal', readOnly: true, onTap: () => _selectDate(context, _dateCtrl)),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildTextField('JAM MULAI (HH:MM)', _startTimeCtrl, '17:00')),
+                Expanded(child: _buildTextField('JAM MULAI', _startTimeCtrl, 'Pilih Jam', readOnly: true, onTap: () => _selectTime(context, _startTimeCtrl))),
                 const SizedBox(width: 12),
-                Expanded(child: _buildTextField('JAM SELESAI (HH:MM)', _endTimeCtrl, '19:00')),
+                Expanded(child: _buildTextField('JAM SELESAI', _endTimeCtrl, 'Pilih Jam', readOnly: true, onTap: () => _selectTime(context, _endTimeCtrl))),
               ],
             ),
             const SizedBox(height: 16),
             _buildTextField('ALASAN / KEPERLUAN LEMBUR', _reasonCtrl, 'Sebutkan detail pekerjaan...', maxLines: 4),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+              child: Column(
+                children: [
+                  const Icon(Icons.camera_alt, color: Colors.grey, size: 32),
+                  const SizedBox(height: 8),
+                  const Text('FOTO BUKTI LEMBUR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+                  const SizedBox(height: 4),
+                  const Text('Wajib melampirkan foto diri sedang bekerja di lokasi', style: TextStyle(fontSize: 10, color: Colors.grey), textAlign: TextAlign.center),
+                  const SizedBox(height: 12),
+                  if (_proofPhotoPath != null) ...[
+                    ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.file(File(_proofPhotoPath!), height: 120, width: double.infinity, fit: BoxFit.cover)),
+                    const SizedBox(height: 8),
+                    TextButton.icon(onPressed: _showPhotoPreview, icon: const Icon(Icons.preview, size: 16), label: const Text('Lihat Pratinjau')),
+                  ],
+                  ElevatedButton.icon(
+                    onPressed: _isSubmitLoading ? null : _takePhoto,
+                    icon: const Icon(Icons.camera),
+                    label: Text(_proofPhotoPath == null ? 'Ambil Foto' : 'Ubah Foto'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: AppConstants.primaryColor, side: const BorderSide(color: AppConstants.primaryColor), elevation: 0),
+                  )
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -251,7 +421,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1}) {
+  Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1, bool readOnly = false, VoidCallback? onTap}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -260,6 +430,8 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          readOnly: readOnly,
+          onTap: onTap,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
