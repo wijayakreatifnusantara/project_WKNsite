@@ -7,6 +7,8 @@ import AttendanceHub from '../features/Attendance/pages/AttendanceHub';
 import AttendanceReport from '../features/Attendance/pages/AttendanceReport';
 import AttendanceRecap from '../features/Attendance/pages/AttendanceRecap';
 import AttendanceCalendar from '../features/Attendance/pages/AttendanceCalendar';
+import ScheduleManager from '../features/Attendance/pages/ScheduleManager';
+import AttendanceCorrection from '../features/Attendance/pages/AttendanceCorrection';
 import AdminHub from '../features/Admin/pages/AdminHub';
 import Overview from '../features/Overview/pages/Overview';
 import DivisionManager from '../features/Master/pages/DivisionManager';
@@ -69,6 +71,8 @@ const AppRoutes = () => {
         <Route path="/employees/onboarding" element={<OnboardingPage />} />
         <Route path="/attendance" element={<AttendanceHub />} />
         <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
+        <Route path="/attendance/schedule" element={<ScheduleManager />} />
+        <Route path="/attendance/correction" element={<AttendanceCorrection />} />
         <Route path="/attendance/location" element={<LocationManagerPage />} />
         <Route path="/attendance/report" element={<AttendanceReport />} />
         <Route path="/attendance/recap" element={<AttendanceRecap />} />

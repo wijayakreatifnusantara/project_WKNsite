@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, field_validator, ValidationInfo
-from typing import Optional
+from typing import Optional, List
+from datetime import time
 from utils.supabase_client import supabase_client
 from utils.geofencing import is_within_radius, calculate_late_minutes
 from utils.jwt_handler import get_current_user, require_admin
@@ -526,5 +527,76 @@ async def update_overtime_status(request_id: int, payload: dict, current_user: d
         }
         res = supabase_client.client.table("overtime_requests").update(update_data).eq("id", request_id).execute()
         return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─── New Endpoints: Attendance Corrections ─────────────────────────────────────
+
+class CorrectionRequest(BaseModel):
+    employee_id: str
+    attendance_id: Optional[int] = None
+    date: str
+    original_clock_in: Optional[str] = None
+    original_clock_out: Optional[str] = None
+    proposed_clock_in: str
+    proposed_clock_out: str
+    reason: str
+
+class CorrectionUpdate(BaseModel):
+    status: str # APPROVED or REJECTED
+    reviewed_by: str
+
+@router.get("/attendance/corrections")
+async def get_corrections(current_user: dict = Depends(require_admin)):
+    try:
+        res = supabase_client.client.table("attendance_corrections").select("*, employees(name, id, division_name, job_position)").order("created_at", desc=True).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/attendance/corrections")
+async def create_correction(payload: CorrectionRequest, current_user: dict = Depends(require_admin)):
+    try:
+        data = payload.dict()
+        res = supabase_client.client.table("attendance_corrections").insert(data).execute()
+        return {"status": "success", "data": res.data[0] if res.data else None}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/attendance/corrections/{correction_id}")
+async def process_correction(correction_id: str, payload: CorrectionUpdate, current_user: dict = Depends(require_admin)):
+    try:
+        from datetime import datetime
+        update_data = {
+            "status": payload.status,
+            "reviewed_by": payload.reviewed_by,
+            "reviewed_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+        res = supabase_client.client.table("attendance_corrections").update(update_data).eq("id", correction_id).execute()
+        
+        if payload.status == 'APPROVED' and res.data:
+            correction = res.data[0]
+            # Update the main attendance table
+            attendance_update = {
+                "clock_in": correction.get("proposed_clock_in"),
+                "clock_out": correction.get("proposed_clock_out"),
+                "notes": f"Revisi disetujui: {correction.get('reason')}"
+            }
+            if correction.get("attendance_id"):
+                supabase_client.client.table("attendance").update(attendance_update).eq("id", correction.get("attendance_id")).execute()
+            else:
+                # Insert new attendance record if it didn't exist
+                attendance_insert = {
+                    "employee_id": correction.get("employee_id"),
+                    "date": correction.get("date"),
+                    "clock_in": correction.get("proposed_clock_in"),
+                    "clock_out": correction.get("proposed_clock_out"),
+                    "status": "Present",
+                    "notes": f"Absen manual via koreksi: {correction.get('reason')}"
+                }
+                supabase_client.client.table("attendance").insert(attendance_insert).execute()
+
+        return {"status": "success", "data": res.data[0] if res.data else None}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

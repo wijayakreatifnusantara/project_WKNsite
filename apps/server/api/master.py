@@ -117,3 +117,35 @@ def update_holiday(holiday_id: str, holiday: HolidayUpdate):
         return {"status": "success", "data": response.data[0] if response.data else None}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ---------------------------------------------------------
+# SCHEDULE MODELS & ROUTES
+# ---------------------------------------------------------
+class ScheduleCreate(BaseModel):
+    employee_id: str
+    date: str
+    shift_id: Optional[str] = None
+
+class BulkScheduleCreate(BaseModel):
+    schedules: List[ScheduleCreate]
+
+@router.get("/schedules")
+def get_schedules(start_date: str, end_date: str):
+    supabase = supabase_client.client
+    try:
+        response = supabase.table("employee_schedules").select("*, shifts(*), employees(name, division_name, job_position)").gte("date", start_date).lte("date", end_date).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/schedules/bulk")
+def bulk_upsert_schedules(payload: BulkScheduleCreate):
+    supabase = supabase_client.client
+    try:
+        # Supabase Python SDK upsert supports lists
+        data = [s.dict() for s in payload.schedules]
+        # Use on_conflict parameter to update if the record already exists
+        response = supabase.table("employee_schedules").upsert(data, on_conflict="employee_id,date").execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
