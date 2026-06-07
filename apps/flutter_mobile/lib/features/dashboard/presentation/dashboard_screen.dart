@@ -401,7 +401,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         slivers: [
           // Dynamic Header with Scroll Transition
           SliverAppBar(
-            expandedHeight: 320.0,
+            expandedHeight: 220.0,
             floating: false,
             pinned: true,
             backgroundColor: AppConstants.primaryColor,
@@ -471,7 +471,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
                                     delayBefore: const Duration(milliseconds: 500),
                                     pauseBetween: const Duration(milliseconds: 1000),
-                                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+                                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
                                   ),
                                 ],
                               ),
@@ -484,10 +484,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         // Premium Glassmorphism Widget: Clock + Sensor
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20),
@@ -504,7 +504,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     children: [
                                       Text(
                                         _currentTime.isNotEmpty ? '${_currentTime.split(':')[0]}:${_currentTime.split(':')[1]}' : '00:00', 
-                                        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFeatures: [FontFeature.tabularFigures()])
+                                        style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, fontFeatures: [FontFeature.tabularFigures()])
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -515,7 +515,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       const Text('WIB', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
-                                  Text(_currentDate.isNotEmpty ? _currentDate : 'Memuat Tanggal...', style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                                  Text(_currentDate.isNotEmpty ? _currentDate : 'Memuat Tanggal...', style: const TextStyle(color: Colors.white70, fontSize: 10)),
                                 ],
                               ),
                               // Weather & Compass Wrap
@@ -561,7 +561,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Body Content
           SliverToBoxAdapter(
             child: Transform.translate(
-              offset: const Offset(0, -15), // Reduced floating overlapping effect
+              offset: const Offset(0, -45), // Increased floating overlapping effect
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
