@@ -49,6 +49,7 @@ const AttendanceRecap = () => {
 
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
   const [dateRange, setDateRange] = useState(getDefaultDates());
+  const [autoHolidays, setAutoHolidays] = useState(0);
   const [manualHolidays, setManualHolidays] = useState(0);
 
   const handleMonthChange = (monthStr) => {
@@ -87,7 +88,8 @@ const AttendanceRecap = () => {
     return Math.max(0, count - Number(holidaysCount));
   };
 
-  const workingDaysTarget = calculateWorkingDays(dateRange.start, dateRange.end, manualHolidays);
+  const totalHolidays = autoHolidays + Number(manualHolidays || 0);
+  const workingDaysTarget = calculateWorkingDays(dateRange.start, dateRange.end, totalHolidays);
 
   const fetchRecap = async () => {
     try {
@@ -116,6 +118,39 @@ const AttendanceRecap = () => {
       });
 
       setRecapData(processed);
+
+      // Auto-Sync Holidays
+      try {
+        const holidayResponse = await apiClient.get(`/api/master/holidays`);
+        if (holidayResponse.status === 'success' && holidayResponse.data) {
+          let autoCount = 0;
+          const rangeStart = new Date(dateRange.start);
+          const rangeEnd = new Date(dateRange.end);
+          // Set to start of day for comparison
+          rangeStart.setHours(0,0,0,0);
+          rangeEnd.setHours(23,59,59,999);
+          
+          holidayResponse.data.forEach(hol => {
+            const hStart = new Date(hol.start_date);
+            const hEnd = hol.end_date ? new Date(hol.end_date) : new Date(hol.start_date);
+            hStart.setHours(0,0,0,0);
+            hEnd.setHours(23,59,59,999);
+            
+            for (let d = new Date(hStart); d <= hEnd; d.setDate(d.getDate() + 1)) {
+              if (d >= rangeStart && d <= rangeEnd) {
+                const day = d.getDay();
+                if (day !== 0 && day !== 6) { // Count only weekdays
+                  autoCount++;
+                }
+              }
+            }
+          });
+          setAutoHolidays(autoCount);
+        }
+      } catch (holErr) {
+        console.warn("Failed to fetch master holidays, defaulting to 0", holErr);
+        setAutoHolidays(0);
+      }
     } catch (err) {
       console.error("Error generating recap:", err);
     } finally {
@@ -223,7 +258,9 @@ const AttendanceRecap = () => {
                     <IconSettings size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Holidays</h4>
+                    <h4 className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                      Holidays <span className="text-amber-500 font-bold">(Auto {autoHolidays} + Adj)</span>
+                    </h4>
                     <input 
                         type="number" 
                         value={manualHolidays}
@@ -282,7 +319,6 @@ const AttendanceRecap = () => {
                   </tr>
                 ) : (
                   filteredData.map((emp) => {
-                    const workingDaysTarget = calculateWorkingDays(dateRange.start, dateRange.end, manualHolidays);
                     const achievement = workingDaysTarget > 0 ? Math.round((emp.present / workingDaysTarget) * 100) : 0;
                     
                     return (
