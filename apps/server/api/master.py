@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date, time
-from utils.supabase_client import get_supabase
+from utils.supabase_client import supabase_client
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ class ShiftUpdate(ShiftCreate):
 
 @router.get("/shifts")
 def get_shifts(active_only: bool = False):
-    supabase = get_supabase()
+    supabase = supabase_client.client
     try:
         query = supabase.table("shifts").select("*")
         if active_only:
@@ -38,7 +38,7 @@ def get_shifts(active_only: bool = False):
 
 @router.post("/shifts")
 def create_shift(shift: ShiftCreate):
-    supabase = get_supabase()
+    supabase = supabase_client.client
     try:
         data = shift.dict()
         data["time_in"] = data["time_in"].strftime("%H:%M:%S")
@@ -55,7 +55,7 @@ def create_shift(shift: ShiftCreate):
 
 @router.put("/shifts/{shift_id}")
 def update_shift(shift_id: str, shift: ShiftUpdate):
-    supabase = get_supabase()
+    supabase = supabase_client.client
     try:
         data = shift.dict()
         data["time_in"] = data["time_in"].strftime("%H:%M:%S")
@@ -85,7 +85,7 @@ class HolidayUpdate(HolidayCreate):
 
 @router.get("/holidays")
 def get_holidays():
-    supabase = get_supabase()
+    supabase = supabase_client.client
     try:
         response = supabase.table("national_holidays").select("*").order("start_date", desc=False).execute()
         return {"status": "success", "data": response.data}
@@ -94,7 +94,7 @@ def get_holidays():
 
 @router.post("/holidays")
 def create_holiday(holiday: HolidayCreate):
-    supabase = get_supabase()
+    supabase = supabase_client.client
     try:
         data = holiday.dict()
         data["start_date"] = data["start_date"].isoformat()
@@ -107,7 +107,7 @@ def create_holiday(holiday: HolidayCreate):
 
 @router.put("/holidays/{holiday_id}")
 def update_holiday(holiday_id: str, holiday: HolidayUpdate):
-    supabase = get_supabase()
+    supabase = supabase_client.client
     try:
         data = holiday.dict()
         data["start_date"] = data["start_date"].isoformat()
