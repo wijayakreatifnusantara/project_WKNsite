@@ -32,7 +32,6 @@ class _LeaveScreenState extends State<LeaveScreen> {
   final TextEditingController _reasonCtrl = TextEditingController();
   final TextEditingController _startTimeCtrl = TextEditingController();
   final TextEditingController _endTimeCtrl = TextEditingController();
-  final TextEditingController _endTimeCtrl = TextEditingController();
   int _computedDays = 0;
   String? _proofPhotoPath;
   final ImagePicker _picker = ImagePicker();
@@ -177,6 +176,56 @@ class _LeaveScreenState extends State<LeaveScreen> {
       setState(() => _computedDays = count);
     } catch (e) {
       setState(() => _computedDays = 0);
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppConstants.primaryColor,
+              onPrimary: Colors.white,
+              onSurface: AppConstants.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        controller.text = picked.toIso8601String().split('T')[0];
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppConstants.primaryColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        final hour = picked.hour.toString().padLeft(2, '0');
+        final minute = picked.minute.toString().padLeft(2, '0');
+        controller.text = '$hour:$minute';
+      });
     }
   }
 
@@ -361,18 +410,18 @@ class _LeaveScreenState extends State<LeaveScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildTextField('TANGGAL MULAI', _startDateCtrl, 'YYYY-MM-DD')),
+                Expanded(child: _buildTextField('TANGGAL MULAI', _startDateCtrl, 'YYYY-MM-DD', readOnly: true, onTap: () => _selectDate(context, _startDateCtrl))),
                 const SizedBox(width: 12),
-                Expanded(child: _buildTextField('TANGGAL SELESAI', _endDateCtrl, 'YYYY-MM-DD')),
+                Expanded(child: _buildTextField('TANGGAL SELESAI', _endDateCtrl, 'YYYY-MM-DD', readOnly: true, onTap: () => _selectDate(context, _endDateCtrl))),
               ],
             ),
             if (_leaveType == 'Emergency') ...[
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildTextField('JAM MULAI', _startTimeCtrl, 'HH:MM')),
+                  Expanded(child: _buildTextField('JAM MULAI', _startTimeCtrl, 'HH:MM', readOnly: true, onTap: () => _selectTime(context, _startTimeCtrl))),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildTextField('JAM SELESAI', _endTimeCtrl, 'HH:MM')),
+                  Expanded(child: _buildTextField('JAM SELESAI', _endTimeCtrl, 'HH:MM', readOnly: true, onTap: () => _selectTime(context, _endTimeCtrl))),
                 ],
               ),
             ],
@@ -466,7 +515,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1}) {
+  Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1, VoidCallback? onTap, bool readOnly = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -475,6 +524,8 @@ class _LeaveScreenState extends State<LeaveScreen> {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          readOnly: readOnly,
+          onTap: onTap,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
