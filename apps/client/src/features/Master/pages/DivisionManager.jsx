@@ -64,7 +64,7 @@ const DivisionManager = () => {
   const fetchDivisions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/Divisions?active_only=false`);
+      const response = await fetch(`${API_URL}/divisions?active_only=false`);
       const data = await response.json();
       if (data.status === 'success') {
         const orgs = data.data || [];
@@ -73,7 +73,7 @@ const DivisionManager = () => {
         if (orgs.length > 0) {
           Promise.all(
             orgs.map(org =>
-              fetch(`${API_URL}/Divisions/${org.id}/departments?active_only=false`)
+              fetch(`${API_URL}/divisions/${org.id}/departments?active_only=false`)
                 .then(r => r.json())
                 .then(d => ({ orgId: org.id, depts: d.status === 'success' ? (d.data || []) : [] }))
                 .catch(() => ({ orgId: org.id, depts: [] }))
@@ -97,7 +97,7 @@ const DivisionManager = () => {
   // Fetch Departments for an Division
   const fetchDepartments = async (orgId) => {
     try {
-      const response = await fetch(`${API_URL}/Divisions/${orgId}/departments?active_only=false`);
+      const response = await fetch(`${API_URL}/divisions/${orgId}/departments?active_only=false`);
       const data = await response.json();
       if (data.status === 'success') {
         setDepartments(prev => ({ ...prev, [orgId]: data.data || [] }));
@@ -128,7 +128,7 @@ const DivisionManager = () => {
       } else {
         setIsLoading(true);
       }
-      const response = await fetch(`${API_URL}/Divisions/migrate-employees`, {
+      const response = await fetch(`${API_URL}/divisions/migrate-employees`, {
         method: 'POST'
       });
       const data = await response.json();
@@ -208,8 +208,8 @@ const DivisionManager = () => {
     setIsSubmitting(true);
     try {
       const url = selectedOrg 
-        ? `${API_URL}/Divisions/${selectedOrg.id}` 
-        : `${API_URL}/Divisions`;
+        ? `${API_URL}/divisions/${selectedOrg.id}` 
+        : `${API_URL}/divisions`;
       const method = selectedOrg ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -277,7 +277,7 @@ const DivisionManager = () => {
     try {
       const url = selectedDept 
         ? `${API_URL}/departments/${selectedDept.id}` 
-        : `${API_URL}/Divisions/${currentOrgId}/departments`;
+        : `${API_URL}/divisions/${currentOrgId}/departments`;
       const method = selectedDept ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -367,7 +367,7 @@ const DivisionManager = () => {
   // Toggle Division Active Status
   const handleToggleOrgStatus = async (org) => {
     try {
-      const response = await fetch(`${API_URL}/Divisions/${org.id}`, {
+      const response = await fetch(`${API_URL}/divisions/${org.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !org.is_active })
@@ -390,7 +390,7 @@ const DivisionManager = () => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus Divisi ini secara permanen?\nSemua departemen di bawah Divisi ini juga akan terhapus.')) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/Divisions/${orgId}`, {
+      const response = await fetch(`${API_URL}/divisions/${orgId}`, {
         method: 'DELETE'
       });
       const data = await response.json();

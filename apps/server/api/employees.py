@@ -48,7 +48,7 @@ async def create_employee(employee: EmployeeCreate, current_user: dict = Depends
             "work_experience": "WORK EXPERIENCE",
             "certifications": "CERTIFICATIONS",
             "skills": "SKILLS",
-            "division_name": "division Name *",
+            "division_name": "Division Name *",
             "job_position": "Job Position *",
             "job_level": "Job Level *",
             "status": "Status *",

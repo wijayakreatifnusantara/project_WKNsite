@@ -340,8 +340,9 @@ class WKNSupabaseClient:
         """Calculate dashboard statistics from Supabase"""
         if not self.client: return {}
         try:
-            employees = await self.get_employees()
-            total = len(employees)
+            emp_response = await self.get_employees(page_size=1000)
+            employees = emp_response.get("data", [])
+            total = emp_response.get("total", 0)
             active = len([e for e in employees if e.get("Status *") == "Active"])
             
             # Count departments
@@ -480,7 +481,8 @@ class WKNSupabaseClient:
         if not self.client: return {}
         try:
             # Individual calls in Supabase are very fast
-            employees = await self.get_employees()
+            emp_response = await self.get_employees(page_size=1000)
+            employees = emp_response.get("data", [])
             admins = await self.get_admins()
             
             # Attendance

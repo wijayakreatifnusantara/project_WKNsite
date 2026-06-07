@@ -45,7 +45,7 @@ class EmployeeBase(BaseModel):
     skills: Optional[str] = None
     
     # Employment (Q-T)
-    organization_name: str
+    division_name: str
     job_position: str
     job_level: str
     status: str = "Active"
