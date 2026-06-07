@@ -12,7 +12,7 @@ from api.leave import router as leave_router
 from api.documents import router as documents_router
 from api.assets import router as assets_router
 from api.performance import router as performance_router
-from api.organizations import router as organizations_router
+from api.divisions import router as divisions_router
 from api.database import router as database_router
 from api.overtime import router as overtime_router
 from api.submissions import router as submissions_router
@@ -86,7 +86,7 @@ app.include_router(leave_router, prefix="/api")
 app.include_router(documents_router, prefix="/api")
 app.include_router(assets_router, prefix="/api")
 app.include_router(performance_router, prefix="/api")
-app.include_router(organizations_router, prefix="/api")
+app.include_router(divisions_router, prefix="/api")
 app.include_router(database_router, prefix="/api", tags=["database"])
 app.include_router(overtime_router, prefix="/api", tags=["overtime"])
 app.include_router(submissions_router, prefix="/api", tags=["submissions"])

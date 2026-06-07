@@ -21,8 +21,8 @@ import {
 const _rawApi = import.meta.env.VITE_API_URL;
 const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(/\/$/, '') + '/api') : 'http://localhost:8000/api';
 
-const OrganizationManager = () => {
-  const [organizations, setOrganizations] = useState([]);
+const DivisionManager = () => {
+  const [Divisions, setDivisions] = useState([]);
   const [departments, setDepartments] = useState({});
   const [expandedOrg, setExpandedOrg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,20 +60,20 @@ const OrganizationManager = () => {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
-  // Fetch Organizations
-  const fetchOrganizations = useCallback(async () => {
+  // Fetch Divisions
+  const fetchDivisions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/organizations?active_only=false`);
+      const response = await fetch(`${API_URL}/Divisions?active_only=false`);
       const data = await response.json();
       if (data.status === 'success') {
         const orgs = data.data || [];
-        setOrganizations(orgs);
+        setDivisions(orgs);
         // Auto-fetch departments for ALL orgs so DEPT count shows immediately (no click needed)
         if (orgs.length > 0) {
           Promise.all(
             orgs.map(org =>
-              fetch(`${API_URL}/organizations/${org.id}/departments?active_only=false`)
+              fetch(`${API_URL}/Divisions/${org.id}/departments?active_only=false`)
                 .then(r => r.json())
                 .then(d => ({ orgId: org.id, depts: d.status === 'success' ? (d.data || []) : [] }))
                 .catch(() => ({ orgId: org.id, depts: [] }))
@@ -85,7 +85,7 @@ const OrganizationManager = () => {
           });
         }
       } else {
-        showToast('error', data.detail || 'Gagal memuat organisasi');
+        showToast('error', data.detail || 'Gagal memuat Divisi');
       }
     } catch (err) {
       showToast('error', 'Koneksi ke server gagal');
@@ -94,10 +94,10 @@ const OrganizationManager = () => {
     }
   }, []);
 
-  // Fetch Departments for an Organization
+  // Fetch Departments for an Division
   const fetchDepartments = async (orgId) => {
     try {
-      const response = await fetch(`${API_URL}/organizations/${orgId}/departments?active_only=false`);
+      const response = await fetch(`${API_URL}/Divisions/${orgId}/departments?active_only=false`);
       const data = await response.json();
       if (data.status === 'success') {
         setDepartments(prev => ({ ...prev, [orgId]: data.data || [] }));
@@ -128,14 +128,14 @@ const OrganizationManager = () => {
       } else {
         setIsLoading(true);
       }
-      const response = await fetch(`${API_URL}/organizations/migrate-employees`, {
+      const response = await fetch(`${API_URL}/Divisions/migrate-employees`, {
         method: 'POST'
       });
       const data = await response.json();
       if (data.status === 'success') {
         if (data.data && data.data.migrated > 0) {
           showToast('success', `Auto-Sync: ${data.data.migrated} Karyawan disinkronkan`);
-          await fetchOrganizations();
+          await fetchDivisions();
         } else if (!silent) {
           showToast('success', 'Semua data karyawan sudah tersinkronisasi.');
         }
@@ -151,11 +151,11 @@ const OrganizationManager = () => {
       setIsSyncing(false);
       setIsLoading(false);
     }
-  }, [fetchOrganizations]);
+  }, [fetchDivisions]);
 
   useEffect(() => {
     const initData = async () => {
-      await fetchOrganizations();
+      await fetchDivisions();
       await runAutoSync(true);
     };
     initData();
@@ -172,7 +172,7 @@ const OrganizationManager = () => {
     return () => clearInterval(intervalId);
   }, [isAutoSyncEnabled, runAutoSync]);
 
-  // Expand Organization Card to show Departments
+  // Expand Division Card to show Departments
   const handleExpandOrg = (orgId) => {
     if (expandedOrg === orgId) {
       setExpandedOrg(null);
@@ -208,8 +208,8 @@ const OrganizationManager = () => {
     setIsSubmitting(true);
     try {
       const url = selectedOrg 
-        ? `${API_URL}/organizations/${selectedOrg.id}` 
-        : `${API_URL}/organizations`;
+        ? `${API_URL}/Divisions/${selectedOrg.id}` 
+        : `${API_URL}/Divisions`;
       const method = selectedOrg ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -220,12 +220,12 @@ const OrganizationManager = () => {
       const data = await response.json();
 
       if (data.status === 'success') {
-        showToast('success', selectedOrg ? 'Organisasi diperbarui' : 'Organisasi ditambahkan');
+        showToast('success', selectedOrg ? 'Divisi diperbarui' : 'Divisi ditambahkan');
         setIsOrgModalOpen(false);
-        await fetchOrganizations();
+        await fetchDivisions();
         await runAutoSync(true);
       } else {
-        showToast('error', data.detail || 'Gagal menyimpan organisasi');
+        showToast('error', data.detail || 'Gagal menyimpan Divisi');
       }
     } catch (err) {
       showToast('error', 'Koneksi ke server gagal');
@@ -277,7 +277,7 @@ const OrganizationManager = () => {
     try {
       const url = selectedDept 
         ? `${API_URL}/departments/${selectedDept.id}` 
-        : `${API_URL}/organizations/${currentOrgId}/departments`;
+        : `${API_URL}/Divisions/${currentOrgId}/departments`;
       const method = selectedDept ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -364,42 +364,42 @@ const OrganizationManager = () => {
     }
   };
 
-  // Toggle Organization Active Status
+  // Toggle Division Active Status
   const handleToggleOrgStatus = async (org) => {
     try {
-      const response = await fetch(`${API_URL}/organizations/${org.id}`, {
+      const response = await fetch(`${API_URL}/Divisions/${org.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !org.is_active })
       });
       const data = await response.json();
       if (data.status === 'success') {
-        showToast('success', `Status organisasi diubah menjadi ${!org.is_active ? 'Aktif' : 'Non-aktif'}`);
-        await fetchOrganizations();
+        showToast('success', `Status Divisi diubah menjadi ${!org.is_active ? 'Aktif' : 'Non-aktif'}`);
+        await fetchDivisions();
         await runAutoSync(true);
       } else {
-        showToast('error', data.detail || 'Gagal mengubah status organisasi');
+        showToast('error', data.detail || 'Gagal mengubah status Divisi');
       }
     } catch (err) {
       showToast('error', 'Koneksi ke server gagal');
     }
   };
 
-  // Delete Organization
+  // Delete Division
   const handleDeleteOrg = async (orgId) => {
-    if (!window.confirm('Apakah Anda yakin ingin menghapus organisasi ini secara permanen?\nSemua departemen di bawah organisasi ini juga akan terhapus.')) return;
+    if (!window.confirm('Apakah Anda yakin ingin menghapus Divisi ini secara permanen?\nSemua departemen di bawah Divisi ini juga akan terhapus.')) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/organizations/${orgId}`, {
+      const response = await fetch(`${API_URL}/Divisions/${orgId}`, {
         method: 'DELETE'
       });
       const data = await response.json();
       if (data.status === 'success') {
-        showToast('success', data.message || 'Organisasi berhasil dihapus');
-        await fetchOrganizations();
+        showToast('success', data.message || 'Divisi berhasil dihapus');
+        await fetchDivisions();
         await runAutoSync(true);
       } else {
-        showToast('error', data.detail || 'Gagal menghapus organisasi');
+        showToast('error', data.detail || 'Gagal menghapus Divisi');
       }
     } catch (err) {
       showToast('error', 'Koneksi ke server gagal');
@@ -410,7 +410,7 @@ const OrganizationManager = () => {
 
   // Run database employee migration manually from UI
   const handleRunMigration = async () => {
-    if (!window.confirm('Jalankan migrasi database pemetaan Karyawan ke Organisasi?')) return;
+    if (!window.confirm('Jalankan migrasi database pemetaan Karyawan ke Divisi?')) return;
     await runAutoSync(false);
   };
 
@@ -444,7 +444,7 @@ const OrganizationManager = () => {
                 <IconBuilding size={22} stroke={2} />
               </div>
               <div>
-                <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">Manajemen Organisasi</h1>
+                <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">Manajemen Divisi</h1>
                 <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1.5">Multi-Enterprise & Unit Configurations</p>
               </div>
             </div>
@@ -502,7 +502,7 @@ const OrganizationManager = () => {
               className="h-10 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95"
             >
               <IconPlus size={14} />
-              Tambah Organisasi
+              Tambah Divisi
             </button>
           </div>
         </div>
@@ -521,14 +521,14 @@ const OrganizationManager = () => {
       {/* CONTENT LOADING */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-[1400px] mx-auto space-y-4 pb-20">
-          {isLoading && organizations.length === 0 ? (
+          {isLoading && Divisions.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center gap-4">
               <IconLoader2 className="animate-spin text-[#E31E24]" size={32} />
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Loading database...</p>
             </div>
           ) : (
           <div className="grid grid-cols-1 gap-4">
-            {organizations.map((org) => {
+            {Divisions.map((org) => {
               const isExpanded = expandedOrg === org.id;
               const orgDepts = departments[org.id] || [];
 
@@ -598,14 +598,14 @@ const OrganizationManager = () => {
                       <button
                         onClick={() => handleOpenOrgModal(org)}
                         className="h-9 w-9 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center transition-all active:scale-95"
-                        title="Edit Organisasi"
+                        title="Edit Divisi"
                       >
                         <IconEdit size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteOrg(org.id)}
                         className="h-9 w-9 rounded-xl border border-red-200 bg-red-50/30 text-red-500 hover:text-red-700 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition-all active:scale-95"
-                        title="Hapus Organisasi"
+                        title="Hapus Divisi"
                       >
                         <IconTrash size={16} />
                       </button>
@@ -748,7 +748,7 @@ const OrganizationManager = () => {
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
                   <IconBuilding className="text-[#E31E24]" size={18} />
-                  {selectedOrg ? 'Edit Organisasi' : 'Tambah Organisasi'}
+                  {selectedOrg ? 'Edit Divisi' : 'Tambah Divisi'}
                 </h3>
                 <button onClick={() => setIsOrgModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                   <IconX size={16} />
@@ -983,4 +983,4 @@ const OrganizationManager = () => {
   );
 };
 
-export default OrganizationManager;
+export default DivisionManager;

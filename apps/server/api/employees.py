@@ -48,7 +48,7 @@ async def create_employee(employee: EmployeeCreate, current_user: dict = Depends
             "work_experience": "WORK EXPERIENCE",
             "certifications": "CERTIFICATIONS",
             "skills": "SKILLS",
-            "organization_name": "Organization Name *",
+            "division_name": "division Name *",
             "job_position": "Job Position *",
             "job_level": "Job Level *",
             "status": "Status *",
@@ -201,7 +201,7 @@ async def upload_file(
 
 @router.get("/employees/generate-id")
 async def generate_employee_id(org_code: str = "WKN", current_user: dict = Depends(require_admin)):
-    """Generate the next employee ID for a given organization code"""
+    """Generate the next employee ID for a given division code"""
     try:
         # Example logic: WKN-0001
         res = supabase_client.client.table("employees").select("id").like("id", f"{org_code.upper()}-%").not_.ilike("id", f"{org_code.upper()}-TMP-%").order("id", desc=True).limit(1).execute()
@@ -272,7 +272,7 @@ async def update_employee(employee_id: str, employee: EmployeeCreate, current_us
             "work_experience": "WORK EXPERIENCE",
             "certifications": "CERTIFICATIONS",
             "skills": "SKILLS",
-            "organization_name": "Organization Name *",
+            "division_name": "division Name *",
             "job_position": "Job Position *",
             "job_level": "Job Level *",
             "status": "Status *",

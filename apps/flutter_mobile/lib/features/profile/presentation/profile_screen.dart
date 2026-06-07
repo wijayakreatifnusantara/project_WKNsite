@@ -304,7 +304,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 const Text('UNIT/DIVISI', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
                                 const SizedBox(height: 2),
-                                Text(user?['organization_name'] ?? 'WKN Corp', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                Text(user?['division_name'] ?? 'WKN Corp', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
                               ],
                             ),
                           ),

@@ -110,7 +110,7 @@ const Employees = () => {
         "EMPLOYEE ID": e["EMPLOYEE ID"] || e.id || "N/A",
         "EMPLOYEE NAME": e["EMPLOYEE NAME"] || e.name || "Unnamed",
         "EMAIL": e["EMAIL"] || e.email || "-",
-        "Organization Name *": e["Organization Name *"] || e.organization_name || "Unassigned",
+        "Division Name *": e["Division Name *"] || e.division_name || "Unassigned",
         "Department Name *": e["Department Name *"] || e.departments?.name || "",
         "Job Position *": e["Job Position *"] || e.job_position || "Staff",
         "Job Level *": e["Job Level *"] || e.job_level || "-",
@@ -140,7 +140,7 @@ const Employees = () => {
       let match = matchesTab;
 
       if (filterDept !== 'ALL DEPARTMENTS') {
-        match = match && (emp["Department Name *"] || emp["Organization Name *"]) === filterDept;
+        match = match && (emp["Department Name *"] || emp["Division Name *"]) === filterDept;
       }
       if (filterPos !== 'ALL POSITIONS') {
         match = match && emp["Job Position *"] === filterPos;
@@ -370,7 +370,7 @@ const Employees = () => {
               <MiniStat label="Total Karyawan" value={employees.length} color="text-slate-800" icon={<IconUsers size={16} />} />
               <MiniStat label="Aktif" value={employees.filter(e => !(e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date)).length} color="text-emerald-600" icon={<IconUserCheck size={16} />} />
               <MiniStat label="Resigned" value={employees.filter(e => e.is_resigned === true || String(e.status || "").toUpperCase() === 'RESIGNED' || !!e.resign_date).length} color="text-rose-500" icon={<IconUserX size={16} />} />
-              <MiniStat label="Unit / Departemen" value={new Set(employees.map(e => e?.["Department Name *"] || e?.["Organization Name *"]).filter(Boolean)).size} color="text-blue-600" icon={<IconBuildingSkyscraper size={16} />} />
+              <MiniStat label="Unit / Departemen" value={new Set(employees.map(e => e?.["Department Name *"] || e?.["Division Name *"]).filter(Boolean)).size} color="text-blue-600" icon={<IconBuildingSkyscraper size={16} />} />
             </div>
             
             <div className="flex-1 w-full relative">
@@ -404,7 +404,7 @@ const Employees = () => {
               <FilterSelect 
                 label="UNIT" 
                 value={filterDept} 
-                options={['ALL DEPARTMENTS', ...Array.from(new Set(employees.map(e => e["Department Name *"] || e["Organization Name *"])))]} 
+                options={['ALL DEPARTMENTS', ...Array.from(new Set(employees.map(e => e["Department Name *"] || e["Division Name *"])))]} 
                 onChange={setFilterDept} 
               />
               <FilterSelect 
@@ -479,7 +479,7 @@ const Employees = () => {
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[10px]">
                         <div>
                           <span className="text-slate-400 font-bold uppercase block">Departemen</span>
-                          <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Department Name *"] || emp["Organization Name *"]}</span>
+                          <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Department Name *"] || emp["Division Name *"]}</span>
                         </div>
                         <div>
                           <span className="text-slate-400 font-bold uppercase block">Jabatan</span>
@@ -637,7 +637,7 @@ const Employees = () => {
                               </div>
                             </td>
                             <td className="w-[15%] px-4 py-2.5">
-                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Department Name *"] || emp["Organization Name *"]}</span>
+                              <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Department Name *"] || emp["Division Name *"]}</span>
                             </td>
                             <td className="w-[15%] px-4 py-2.5">
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Position *"]}</span>

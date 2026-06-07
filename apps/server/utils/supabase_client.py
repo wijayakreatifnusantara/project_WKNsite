@@ -63,7 +63,7 @@ class WKNSupabaseClient:
                     "PHONE NUMBER": e.get("phone_number"),
                     "WHATSAPP NUMBER": e.get("whatsapp_number"),
                     "Job Position *": e.get("job_position"),
-                    "Organization Name *": e.get("organization_name"),
+                    "Division Name *": e.get("division_name"),
                     "Status *": e.get("status"),
                     "Gaji Pokok *": str(e.get("base_salary", 0)),
                     "JOIN DATE": e.get("join_date"),
@@ -239,7 +239,7 @@ class WKNSupabaseClient:
                 "certifications": employee_data.get("CERTIFICATIONS", []),
                 "skills": employee_data.get("SKILLS"),
                 "job_position": employee_data.get("Job Position *"),
-                "organization_name": employee_data.get("Organization Name *"),
+                "division_name": employee_data.get("Division Name *"),
                 "status": employee_data.get("Status *", "Active"),
                 "base_salary": float(str(employee_data.get("Gaji Pokok *", 0)).replace(",", "")) if employee_data.get("Gaji Pokok *") else 0,
                 "join_date": employee_data.get("JOIN DATE"),
@@ -293,7 +293,7 @@ class WKNSupabaseClient:
                 "certifications": employee_data.get("CERTIFICATIONS", []),
                 "skills": employee_data.get("SKILLS"),
                 "job_position": employee_data.get("Job Position *"),
-                "organization_name": employee_data.get("Organization Name *"),
+                "division_name": employee_data.get("Division Name *"),
                 "status": employee_data.get("Status *"),
                 "base_salary": float(str(employee_data.get("Gaji Pokok *", 0)).replace(",", "")) if employee_data.get("Gaji Pokok *") else 0,
                 "contract_end_date": employee_data.get("Contract End Date"),
@@ -345,7 +345,7 @@ class WKNSupabaseClient:
             active = len([e for e in employees if e.get("Status *") == "Active"])
             
             # Count departments
-            depts = set([e.get("Organization Name *") for e in employees if e.get("Organization Name *")])
+            depts = set([e.get("Division Name *") for e in employees if e.get("Division Name *")])
             
             return {
                 "total_employees": total,
@@ -716,71 +716,81 @@ class WKNSupabaseClient:
             return 0
 
     # -----------------------------------------------------------------------
-    # Organizations & Departments CRUD
+    # Divisions & Departments CRUD
     # -----------------------------------------------------------------------
 
-    async def get_organizations(self, active_only: bool = True) -> List[Dict[str, Any]]:
-        """Get all organizations, optionally filtered by active status."""
-        if not self.client: return []
+    async def get_divisions(self, active_only: bool = True) -> List[Dict[str, Any]]:
+        """Fetch all divisions from Supabase"""
+        if not self.client:
+            return []
         try:
-            query = self.client.table("organizations").select("*").order("name")
+            query = self.client.table("divisions").select("*")
             if active_only:
                 query = query.eq("is_active", True)
-            res = query.execute()
+            res = query.order("name").execute()
             return res.data
         except Exception as e:
-            print(f"Error fetching organizations: {str(e)}")
+            print(f"Error getting divisions: {str(e)}")
             return []
 
-    async def get_organization_by_id(self, org_id: str) -> Optional[Dict[str, Any]]:
-        """Get a single organization by ID."""
-        if not self.client: return None
+    async def get_division_by_id(self, division_id: str) -> Optional[Dict[str, Any]]:
+        """Fetch a single division by ID"""
+        if not self.client:
+            return None
         try:
-            res = self.client.table("organizations").select("*").eq("id", org_id).execute()
-            return res.data[0] if res.data else None
+            res = self.client.table("divisions").select("*").eq("id", division_id).execute()
+            if res.data:
+                return res.data[0]
+            return None
         except Exception as e:
-            print(f"Error fetching organization: {str(e)}")
+            print(f"Error getting division: {str(e)}")
             return None
 
-    async def create_organization(self, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Create a new organization."""
-        if not self.client: return None
+    async def create_division(self, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Insert a new division"""
+        if not self.client:
+            return None
         try:
-            res = self.client.table("organizations").insert(data).execute()
-            return res.data[0] if res.data else None
+            res = self.client.table("divisions").insert(data).execute()
+            if res.data:
+                return res.data[0]
+            return None
         except Exception as e:
-            print(f"Error creating organization: {str(e)}")
+            print(f"Error creating division: {str(e)}")
             return None
 
-    async def update_organization(self, org_id: str, data: Dict[str, Any]) -> bool:
-        """Update an organization."""
-        if not self.client: return False
+    async def update_division(self, division_id: str, data: Dict[str, Any]) -> bool:
+        """Update an existing division"""
+        if not self.client:
+            return False
         try:
-            from datetime import datetime, timezone
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
-            self.client.table("organizations").update(data).eq("id", org_id).execute()
-            return True
+            # We don't want to update updated_at here if Supabase trigger handles it, 
+            # but if not, we can add it. Assuming trigger handles it.
+            res = self.client.table("divisions").update(data).eq("id", division_id).execute()
+            return len(res.data) > 0
         except Exception as e:
-            print(f"Error updating organization: {str(e)}")
+            print(f"Error updating division: {str(e)}")
             return False
 
-    async def delete_organization(self, org_id: str) -> bool:
-        """Delete an organization from the database."""
-        if not self.client: return False
+    async def delete_division(self, division_id: str) -> bool:
+        """Hard delete a division. Fails if there are linked departments/employees."""
+        if not self.client:
+            return False
         try:
-            self.client.table("organizations").delete().eq("id", org_id).execute()
-            return True
+            res = self.client.table("divisions").delete().eq("id", division_id).execute()
+            return len(res.data) > 0
         except Exception as e:
-            print(f"Error deleting organization: {str(e)}")
-            raise e
+            print(f"Error deleting division: {str(e)}")
+            raise
 
-    async def get_departments(self, org_id: Optional[str] = None, active_only: bool = True) -> List[Dict[str, Any]]:
-        """Get departments, optionally filtered by organization."""
-        if not self.client: return []
+    async def get_departments(self, division_id: str = None, active_only: bool = True) -> List[Dict[str, Any]]:
+        """Fetch departments. Optionally filter by division_id."""
+        if not self.client:
+            return []
         try:
-            query = self.client.table("departments").select("*, organizations(name, code)").order("name")
-            if org_id:
-                query = query.eq("organization_id", org_id)
+            query = self.client.table("departments").select("*, divisions(name, code)").order("name")
+            if division_id:
+                query = query.eq("division_id", division_id)
             if active_only:
                 query = query.eq("is_active", True)
             res = query.execute()

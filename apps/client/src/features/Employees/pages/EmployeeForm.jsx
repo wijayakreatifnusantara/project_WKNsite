@@ -37,7 +37,7 @@ const initialFormData = {
   date_of_birth: '', place_of_birth: '', religion: 'Islam', marital_status: 'Belum Kawin',
   residence_status: 'Milik Sendiri', blood_type: 'O', height: '', weight: '', uniform_size: '', shoe_size: '',
   nik: '', kk_number: '', ktp_address: '', domicile_address: '', photo: '',
-  organization_name: '', organization_id: '', department_id: '', job_position: '',
+  division_name: '', division_id: '', department_id: '', job_position: '',
   job_level: 'Staff', status: 'Aktif', employment_type: 'Permanent', working_location: 'Head Office',
   base_salary: 0, join_date: new Date().toISOString().split('T')[0],
   emergency_contact_1_name: '', emergency_contact_1_rel: '', emergency_contact_1_phone: '',
@@ -84,7 +84,7 @@ const EmployeeForm = () => {
   const [loading, setLoading] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
-  const [organizations, setOrganizations] = useState([]);
+  const [divisions, setdivisions] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
 
@@ -92,14 +92,14 @@ const EmployeeForm = () => {
 
   // Load Master Data
   useEffect(() => {
-    axios.get(`${API_URL}/organizations?active_only=true`)
-      .then(res => { if (res.data.status === 'success') setOrganizations(res.data.data || []); })
+    axios.get(`${API_URL}/divisions?active_only=true`)
+      .then(res => { if (res.data.status === 'success') setdivisions(res.data.data || []); })
       .catch(err => console.error('Failed to load orgs', err));
   }, []);
 
   const fetchDepartments = (orgId) => {
     if (!orgId) { setDepartments([]); return; }
-    axios.get(`${API_URL}/organizations/${orgId}/departments?active_only=true`)
+    axios.get(`${API_URL}/divisions/${orgId}/departments?active_only=true`)
       .then(res => setDepartments(res.data.data || []))
       .catch(() => setDepartments([]));
   };
@@ -136,7 +136,7 @@ const EmployeeForm = () => {
               payroll_components: mergedPayroll
             };
             setFormData(normalized);
-            if (normalized.organization_id) fetchDepartments(normalized.organization_id);
+            if (normalized.division_id) fetchDepartments(normalized.division_id);
             if (normalized.department_id) fetchPositions(normalized.department_id);
           }
         })
@@ -144,7 +144,7 @@ const EmployeeForm = () => {
     }
   }, [id]);
 
-  useEffect(() => { fetchDepartments(formData.organization_id); }, [formData.organization_id]);
+  useEffect(() => { fetchDepartments(formData.division_id); }, [formData.division_id]);
   useEffect(() => { fetchPositions(formData.department_id); }, [formData.department_id]);
 
   const handleChange = (e) => {
@@ -170,16 +170,16 @@ const EmployeeForm = () => {
   };
 
   const handleOrgChange = async (e) => {
-    const org = organizations.find(o => o.name === e.target.value);
+    const org = divisions.find(o => o.name === e.target.value);
     if (org) {
-      setFormData(prev => ({ ...prev, organization_name: org.name, organization_id: org.id, department_id: '' }));
+      setFormData(prev => ({ ...prev, division_name: org.name, division_id: org.id, department_id: '' }));
       if (!id && !formData.employee_id) {
         apiClient.get(`/api/employees/generate-id?org_code=${org.code || 'TMP'}`)
           .then(res => { if (res.data.status === 'success') setFormData(prev => ({ ...prev, employee_id: res.data.data })); })
           .catch(() => setFormData(prev => ({ ...prev, employee_id: `${org.code}-TMP-${Math.floor(Math.random() * 1000)}` })));
       }
     } else {
-      setFormData(prev => ({ ...prev, organization_name: '', organization_id: '', department_id: '' }));
+      setFormData(prev => ({ ...prev, division_name: '', division_id: '', department_id: '' }));
     }
   };
 
@@ -296,13 +296,13 @@ const EmployeeForm = () => {
               <input name="employee_id" value={formData.employee_id} readOnly placeholder="Otomatis setelah pilih Organisasi" className={`${inputStyle} bg-slate-100 text-slate-500 cursor-not-allowed`} />
             </InputWrapper>
             <InputWrapper label="Organisasi" icon={IconBuildingSkyscraper}>
-              <select required name="organization_name" value={formData.organization_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
+              <select required name="division_name" value={formData.division_name} onChange={handleOrgChange} className={inputStyle} disabled={!!id && !isOwnerOrSuperAdmin}>
                 <option value="">PILIH ORGANISASI</option>
-                {organizations.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
+                {divisions.map(o => <option key={o.id} value={o.name}>{o.name.toUpperCase()}</option>)}
               </select>
             </InputWrapper>
             <InputWrapper label="Departemen" icon={IconBriefcase}>
-              <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.organization_id || !formData.employee_id}>
+              <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} disabled={!formData.division_id || !formData.employee_id}>
                 <option value="">PILIH DEPARTEMEN</option>
                 {departments.map(d => <option key={d.id} value={d.id}>{d.name.toUpperCase()}</option>)}
               </select>

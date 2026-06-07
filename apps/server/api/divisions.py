@@ -8,8 +8,8 @@ router = APIRouter()
 
 # ─── Request Models ────────────────────────────────────────────────────────────
 
-class OrganizationCreateRequest(BaseModel):
-    """Request body for creating an organization"""
+class divisionCreateRequest(BaseModel):
+    """Request body for creating an division"""
     code: str
     name: str
     description: Optional[str] = None
@@ -18,8 +18,8 @@ class OrganizationCreateRequest(BaseModel):
     pic_phone: Optional[str] = None
 
 
-class OrganizationUpdateRequest(BaseModel):
-    """Request body for updating an organization"""
+class divisionUpdateRequest(BaseModel):
+    """Request body for updating an division"""
     code: Optional[str] = None
     name: Optional[str] = None
     description: Optional[str] = None
@@ -57,21 +57,21 @@ class PositionUpdateRequest(BaseModel):
     is_active: Optional[bool] = None
 
 
-# ─── Organization Endpoints ────────────────────────────────────────────────────
+# ─── division Endpoints ────────────────────────────────────────────────────
 
-@router.get("/organizations")
-async def list_organizations(active_only: bool = True):
-    """Get all organizations"""
+@router.get("/divisions")
+async def list_divisions(active_only: bool = True):
+    """Get all divisions"""
     try:
-        data = await supabase_client.get_organizations(active_only=active_only)
+        data = await supabase_client.get_divisions(active_only=active_only)
         return {"status": "success", "data": data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/organizations")
-async def create_organization(body: OrganizationCreateRequest):
-    """Create a new organization"""
+@router.post("/divisions")
+async def create_division(body: divisionCreateRequest):
+    """Create a new division"""
     try:
         insert_data = {"code": body.code, "name": body.name}
         if body.description is not None:
@@ -83,7 +83,7 @@ async def create_organization(body: OrganizationCreateRequest):
         if body.pic_phone is not None:
             insert_data["pic_phone"] = body.pic_phone
 
-        result = await supabase_client.create_organization(insert_data)
+        result = await supabase_client.create_division(insert_data)
         if not result:
             raise HTTPException(status_code=500, detail="Gagal membuat organisasi")
         return {
@@ -97,15 +97,15 @@ async def create_organization(body: OrganizationCreateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/organizations/{org_id}")
-async def update_organization(org_id: str, body: OrganizationUpdateRequest):
-    """Update an existing organization"""
+@router.put("/divisions/{division_id}")
+async def update_division(division_id: str, body: divisionUpdateRequest):
+    """Update an existing division"""
     try:
         update_data = body.model_dump(exclude_none=True)
         if not update_data:
             raise HTTPException(status_code=400, detail="Tidak ada data yang diperbarui")
 
-        success = await supabase_client.update_organization(org_id, update_data)
+        success = await supabase_client.update_division(division_id, update_data)
         if not success:
             raise HTTPException(status_code=500, detail="Gagal memperbarui organisasi")
         return {
@@ -118,11 +118,11 @@ async def update_organization(org_id: str, body: OrganizationUpdateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/organizations/{org_id}")
-async def delete_organization(org_id: str):
-    """Delete an organization"""
+@router.delete("/divisions/{division_id}")
+async def delete_division(division_id: str):
+    """Delete an division"""
     try:
-        await supabase_client.delete_organization(org_id)
+        await supabase_client.delete_division(division_id)
         return {
             "status": "success",
             "message": "Organisasi berhasil dihapus secara permanen.",
@@ -139,27 +139,27 @@ async def delete_organization(org_id: str):
 
 # ─── Department Endpoints ──────────────────────────────────────────────────────
 
-@router.get("/organizations/{org_id}/departments")
-async def list_departments(org_id: str, active_only: bool = True):
-    """Get departments belonging to an organization"""
+@router.get("/divisions/{division_id}/departments")
+async def list_departments(division_id: str, active_only: bool = True):
+    """Get departments belonging to an division"""
     try:
-        data = await supabase_client.get_departments(org_id=org_id, active_only=active_only)
+        data = await supabase_client.get_departments(division_id=division_id, active_only=active_only)
         return {"status": "success", "data": data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/organizations/{org_id}/departments")
-async def create_department(org_id: str, body: DepartmentCreateRequest):
-    """Create a new department under an organization"""
+@router.post("/divisions/{division_id}/departments")
+async def create_department(division_id: str, body: DepartmentCreateRequest):
+    """Create a new department under an division"""
     try:
-        # Verify organization exists
-        org = await supabase_client.get_organization_by_id(org_id)
+        # Verify division exists
+        org = await supabase_client.get_division_by_id(division_id)
         if not org:
             raise HTTPException(status_code=404, detail="Organisasi tidak ditemukan")
 
         insert_data = {
-            "organization_id": org_id,
+            "division_id": division_id,
             "code": body.code,
             "name": body.name,
         }
@@ -293,7 +293,7 @@ async def delete_position(pos_id: str):
 
 
 
-@router.post("/organizations/migrate-positions")
+@router.post("/divisions/migrate-positions")
 async def migrate_positions_from_employees():
     """
     One-time data migration: create positions rows from employees.job_position
@@ -360,23 +360,23 @@ async def migrate_positions_from_employees():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/organizations/migrate-employees")
-async def migrate_employees_to_org_id():
+@router.post("/divisions/migrate-employees")
+async def migrate_employees_to_division_id():
     """
-    One-time migration: match employees' organization_name text field
-    to the organizations table and set organization_id FK.
+    One-time migration: match employees' division_name text field
+    to the divisions table and set division_id FK.
     """
     try:
         if not supabase_client.client:
             raise HTTPException(status_code=503, detail="Database tidak tersedia")
 
-        # Fetch all organizations for name matching
-        orgs = await supabase_client.get_organizations(active_only=False)
+        # Fetch all divisions for name matching
+        orgs = await supabase_client.get_divisions(active_only=False)
         org_lookup = {o["name"].strip().lower(): o["id"] for o in orgs if o.get("name")}
 
-        # Fetch employees that still have organization_name but no organization_id
+        # Fetch employees that still have division_name but no division_id
         emp_res = supabase_client.client.table("employees") \
-            .select("id, organization_name, organization_id") \
+            .select("id, division_name, division_id") \
             .execute()
 
         migrated = 0
@@ -384,25 +384,25 @@ async def migrate_employees_to_org_id():
         unmatched = []
 
         for emp in emp_res.data:
-            # Skip if already has organization_id
-            if emp.get("organization_id"):
+            # Skip if already has division_id
+            if emp.get("division_id"):
                 skipped += 1
                 continue
 
-            org_name = (emp.get("organization_name") or "").strip().lower()
+            org_name = (emp.get("division_name") or "").strip().lower()
             if not org_name:
                 skipped += 1
                 continue
 
-            matched_org_id = org_lookup.get(org_name)
-            if matched_org_id:
+            matched_division_id = org_lookup.get(org_name)
+            if matched_division_id:
                 supabase_client.client.table("employees") \
-                    .update({"organization_id": matched_org_id}) \
+                    .update({"division_id": matched_division_id}) \
                     .eq("id", emp["id"]) \
                     .execute()
                 migrated += 1
             else:
-                unmatched.append(emp.get("organization_name", ""))
+                unmatched.append(emp.get("division_name", ""))
 
         return {
             "status": "success",
