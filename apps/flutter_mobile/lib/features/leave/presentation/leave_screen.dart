@@ -5,6 +5,11 @@ import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/leave_service.dart';
 import '../data/leave_model.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../../core/utils/watermark_service.dart';
 
 class LeaveScreen extends StatefulWidget {
   const LeaveScreen({super.key});
@@ -27,7 +32,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
   final TextEditingController _reasonCtrl = TextEditingController();
   final TextEditingController _startTimeCtrl = TextEditingController();
   final TextEditingController _endTimeCtrl = TextEditingController();
+  final TextEditingController _endTimeCtrl = TextEditingController();
   int _computedDays = 0;
+  String? _proofPhotoPath;
+  final ImagePicker _picker = ImagePicker();
+  Position? _currentPosition;
 
   @override
   void initState() {
@@ -36,7 +45,79 @@ class _LeaveScreenState extends State<LeaveScreen> {
     _endDateCtrl.addListener(_calculateDaysCount);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchLeaveRequests();
+      _fetchLocation();
     });
+  }
+
+  Future<void> _fetchLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+        _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      }
+    } catch (e) {
+      debugPrint("Gagal fetch lokasi: $e");
+    }
+  }
+
+  Future<void> _takeProofPhoto() async {
+    try {
+      final XFile? photo = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
+      if (photo != null) {
+        setState(() => _isSubmitLoading = true);
+        if (_currentPosition == null) await _fetchLocation();
+        
+        final user = context.read<AuthProvider>().userData;
+        final watermarkedFile = await WatermarkService.addWatermark(
+          imageFile: File(photo.path),
+          employeeName: user?['name'] ?? user?['email'] ?? 'Karyawan',
+          employeeId: user?['employee_code'] ?? user?['id']?.toString().substring(0, 8) ?? 'ID',
+          latitude: _currentPosition?.latitude ?? 0.0,
+          longitude: _currentPosition?.longitude ?? 0.0,
+          address: 'Lampiran Izin / Cuti',
+          isCheckOut: false,
+          customLabel: 'LAMPIRAN IZIN'
+        );
+        
+        setState(() {
+          _proofPhotoPath = watermarkedFile.path;
+          _isSubmitLoading = false;
+        });
+        
+        _showImagePreviewDialog(watermarkedFile);
+      }
+    } catch (e) {
+      setState(() => _isSubmitLoading = false);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal ambil foto: $e')));
+    }
+  }
+
+  void _showImagePreviewDialog(File imageFile) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(imageFile, fit: BoxFit.contain, height: MediaQuery.of(context).size.height * 0.6),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.check),
+              label: const Text('Simpan Foto'),
+              style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor, foregroundColor: Colors.white),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -105,6 +186,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
     _endDateCtrl.text = today;
     _leaveType = 'Annual';
     _reasonCtrl.text = '';
+    _proofPhotoPath = null;
     setState(() {
       _showForm = true;
     });
@@ -148,6 +230,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
         payload['start_time'] = _startTimeCtrl.text;
         payload['end_time'] = _endTimeCtrl.text;
       }
+      
+      if (_proofPhotoPath != null) {
+        final fileBytes = await File(_proofPhotoPath!).readAsBytes();
+        payload['proof_base64'] = base64Encode(fileBytes);
+      }
 
       final result = await _leaveService.submitLeaveRequest(payload);
       if (!mounted) return;
@@ -158,6 +245,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
         );
         setState(() {
           _showForm = false;
+          _proofPhotoPath = null;
         });
         _fetchLeaveRequests();
       } else {
@@ -308,6 +396,42 @@ class _LeaveScreenState extends State<LeaveScreen> {
               ),
             const SizedBox(height: 16),
             _buildTextField('ALASAN / DETAIL PENGAJUAN', _reasonCtrl, 'Tulis keterangan lengkap...', maxLines: 4),
+            
+            const SizedBox(height: 16),
+            const Text('LAMPIRAN FOTO (OPSIONAL)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: _takeProofPhoto,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: _proofPhotoPath != null ? Colors.green.withValues(alpha: 0.1) : Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _proofPhotoPath != null ? Colors.green.shade300 : Colors.grey.shade300),
+                ),
+                child: Row(
+                  children: [
+                    Icon(_proofPhotoPath != null ? Icons.check_circle : Icons.camera_alt, color: _proofPhotoPath != null ? Colors.green : AppConstants.primaryColor),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _proofPhotoPath != null ? 'Foto berhasil dilampirkan (Ketuk ganti)' : 'Ambil foto bukti (Surat dokter, dll)',
+                        style: TextStyle(color: _proofPhotoPath != null ? Colors.green : AppConstants.textPrimary, fontSize: 12, fontWeight: _proofPhotoPath != null ? FontWeight.bold : FontWeight.normal),
+                      ),
+                    ),
+                    if (_proofPhotoPath != null)
+                      IconButton(
+                        icon: const Icon(Icons.remove_red_eye, size: 20, color: Colors.blue),
+                        onPressed: () => _showImagePreviewDialog(File(_proofPhotoPath!)),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,

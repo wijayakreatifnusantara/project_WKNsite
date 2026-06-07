@@ -75,6 +75,24 @@ async def create_leave_request(payload: Dict[str, Any], current_user: dict = Dep
         payload.pop("status", None)
         payload.pop("applied_at", None)
         
+        proof_base64 = payload.pop("proof_base64", None)
+        if proof_base64:
+            try:
+                import base64
+                import uuid
+                file_bytes = base64.b64decode(proof_base64)
+                file_ext = "png"
+                file_path = f"leave_proofs/{employee_id}_{uuid.uuid4().hex}.{file_ext}"
+                supabase_client.client.storage.from_("documents").upload(
+                    path=file_path,
+                    file=file_bytes,
+                    file_options={"content-type": f"image/{file_ext}", "upsert": "true"}
+                )
+                proof_url = supabase_client.client.storage.from_("documents").get_public_url(file_path)
+                payload["reason"] = f"{payload.get('reason', '')}\n\n[LAMPIRAN_BUKTI: {proof_url}]"
+            except Exception as e:
+                print(f"[Leave Proof] Error uploading proof: {e}")
+        
         record = {
             **payload,
             "days_count": days,
