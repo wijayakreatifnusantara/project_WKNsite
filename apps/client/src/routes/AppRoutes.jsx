@@ -9,7 +9,7 @@ import AttendanceRecap from '../features/Attendance/pages/AttendanceRecap';
 import AttendanceCalendar from '../features/Attendance/pages/AttendanceCalendar';
 import AdminHub from '../features/Admin/pages/AdminHub';
 import Overview from '../features/Overview/pages/Overview';
-import DivisionManager from '../features/Admin/pages/DivisionManager';
+import DivisionManager from '../features/Master/pages/DivisionManager';
 import ShiftManager from '../features/Master/pages/ShiftManager';
 import LeaveManagementHub from '../features/Leave/pages/LeaveManagementHub';
 import Payroll from '../features/Payroll/pages/Payroll';
