@@ -73,7 +73,7 @@ class RequestPDFGenerator:
         draw_row("Nama Lengkap", employee_data.get("name", "N/A"))
         draw_row("ID Karyawan", employee_data.get("employee_id") or employee_data.get("id", "N/A"))
         draw_row("Jabatan", employee_data.get("job_position", "N/A"))
-        draw_row("Organisasi / Divisi", employee_data.get("organization_name", "N/A"))
+        draw_row("Organisasi / Divisi", employee_data.get("division_name", "N/A"))
         pdf.ln(8)
         
         pdf.set_font("Helvetica", "B", 11)
@@ -254,7 +254,7 @@ class RequestPDFGenerator:
         draw_row("Nama Lengkap", employee_data.get("name", "N/A"))
         draw_row("ID Karyawan", employee_data.get("employee_id") or employee_data.get("id", "N/A"))
         draw_row("Jabatan", employee_data.get("job_position", "N/A"))
-        draw_row("Organisasi / Divisi", employee_data.get("organization_name", "N/A"))
+        draw_row("Organisasi / Divisi", employee_data.get("division_name", "N/A"))
         pdf.ln(8)
         
         pdf.set_font("Helvetica", "B", 11)

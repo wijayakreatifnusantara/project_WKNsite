@@ -126,7 +126,7 @@ const AttendanceCalendar = () => {
         id: e['EMPLOYEE ID'],
         name: e['EMPLOYEE NAME'],
         is_resigned: e.is_resigned,
-        organization_name: e['Organization Name *'],
+        division_name: e['Division Name *'],
         organization_id: e.organization_id,
         department_id: e.department_id,
         departments: e.departments
@@ -161,12 +161,12 @@ const AttendanceCalendar = () => {
     }
   };
 
-  const uniqueOrgs = [...new Set(employees.map(e => e.organization_name))].filter(Boolean).sort();
-  const filteredForDept = employees.filter(e => e.organization_name === selectedOrg);
+  const uniqueOrgs = [...new Set(employees.map(e => e.division_name))].filter(Boolean).sort();
+  const filteredForDept = employees.filter(e => e.division_name === selectedOrg);
   const uniqueDepts = [...new Set(filteredForDept.map(e => e.department_name))].filter(Boolean).sort();
 
   const filteredEmployees = employees.filter(e => {
-    if (!selectedOrg || e.organization_name !== selectedOrg) return false;
+    if (!selectedOrg || e.division_name !== selectedOrg) return false;
     if (!selectedDept || e.department_name !== selectedDept) return false;
     return true;
   });

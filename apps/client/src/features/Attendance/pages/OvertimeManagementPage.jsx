@@ -187,7 +187,7 @@ const OvertimeManagementPage = () => {
                           </div>
                           <div>
                             <p className="text-[10px] font-black text-slate-800 uppercase leading-none mb-1 group-hover:text-[#E31E24] transition-colors">{row.employees?.name || 'Karyawan'}</p>
-                            <p className="text-[8px] font-bold text-slate-400 tracking-widest uppercase">{row.employees?.organization_name || 'Staff'}</p>
+                            <p className="text-[8px] font-bold text-slate-400 tracking-widest uppercase">{row.employees?.division_name || 'Staff'}</p>
                           </div>
                         </div>
                       </td>

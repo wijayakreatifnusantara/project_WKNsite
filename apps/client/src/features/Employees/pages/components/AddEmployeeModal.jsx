@@ -89,7 +89,7 @@ const initialFormData = {
   ktp_address: '',
   domicile_address: '',
   photo: '',
-  organization_name: '',
+  division_name: '',
   organization_id: '',
   department_id: '',
   job_position: '',
@@ -207,8 +207,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
 
   // Match organization_id when organizations are loaded or edited organization name is set
   React.useEffect(() => {
-    if (organizations.length > 0 && formData.organization_name && !formData.organization_id) {
-      const matchedOrg = organizations.find(o => o.name === formData.organization_name);
+    if (organizations.length > 0 && formData.division_name && !formData.organization_id) {
+      const matchedOrg = organizations.find(o => o.name === formData.division_name);
       if (matchedOrg) {
         setFormData(prev => ({
           ...prev,
@@ -220,7 +220,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         }
       }
     }
-  }, [organizations, formData.organization_name, editData]);
+  }, [organizations, formData.division_name, editData]);
 
   React.useEffect(() => {
     if (isOpen && editData) {
@@ -238,7 +238,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
         "EMAIL": "email",
         "phone_number": "phone",
         "whatsapp_number": "phone",
-        "Organization Name *": "organization_name",
+        "Division Name *": "division_name",
         "Job Position *": "job_position",
         "Job Level *": "job_level",
         "Status *": "status",
@@ -319,7 +319,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
     if (org) {
       setFormData(prev => ({
         ...prev,
-        organization_name: org.name,
+        division_name: org.name,
         organization_id: org.id,
         department_id: '' // reset department
       }));
@@ -328,7 +328,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
     } else {
       setFormData(prev => ({
         ...prev,
-        organization_name: '',
+        division_name: '',
         organization_id: '',
         department_id: ''
       }));
@@ -784,8 +784,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   <InputWrapper label={editData && !isOwnerOrSuperAdmin ? "Org Name (Locked)" : "Org Name"} icon={IconBuildingSkyscraper}>
                     <select 
                       required 
-                      name="organization_name" 
-                      value={formData.organization_name} 
+                      name="division_name" 
+                      value={formData.division_name} 
                       onChange={handleOrgChange} 
                       className={`${inputStyle} ${editData && !isOwnerOrSuperAdmin ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : ''}`}
                       disabled={editData && !isOwnerOrSuperAdmin}

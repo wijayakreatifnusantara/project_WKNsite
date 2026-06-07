@@ -104,7 +104,7 @@ const AttendanceRecap = () => {
         return {
           id: emp.id,
           name: emp.name,
-          organization: emp.organization_name,
+          organization: emp.division_name,
           position: emp.job_position,
           present: logs.filter(l => l.status?.toLowerCase() === 'present').length,
           late: logs.filter(l => l.status?.toLowerCase() === 'late').length,

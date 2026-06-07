@@ -65,7 +65,7 @@ async def export_today_attendance(current_user: dict = Depends(require_admin)):
     try:
         from datetime import datetime, timezone
         today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-        res = supabase_client.client.table("attendance").select("*, employees(name, organization_name, job_position)").gte("created_at", f"{today}T00:00:00Z").lte("created_at", f"{today}T23:59:59Z").order("created_at", desc=True).execute()
+        res = supabase_client.client.table("attendance").select("*, employees(name, division_name, job_position)").gte("created_at", f"{today}T00:00:00Z").lte("created_at", f"{today}T23:59:59Z").order("created_at", desc=True).execute()
         return {"status": "success", "data": res.data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -83,7 +83,7 @@ async def get_live_attendance(current_user: dict = Depends(require_admin)):
 async def get_attendance_recap(start_date: str, end_date: str, current_user: dict = Depends(require_admin)):
     """Fetch attendance recap for a specific date range"""
     try:
-        emp_res = supabase_client.client.table("employees").select("id, name, organization_name, job_position").eq("is_resigned", False).execute()
+        emp_res = supabase_client.client.table("employees").select("id, name, division_name, job_position").eq("is_resigned", False).execute()
         att_res = supabase_client.client.table("attendance").select("*").gte("date", start_date).lte("date", end_date).execute()
         
         return {
@@ -100,7 +100,7 @@ async def get_attendance_recap(start_date: str, end_date: str, current_user: dic
 async def get_attendance_report(start_date: str, end_date: str, employee_id: str = None, current_user: dict = Depends(require_admin)):
     """Fetch attendance report with employee details"""
     try:
-        query = supabase_client.client.table("attendance").select("*, employees(name, id, organization_name, job_position)").gte("date", start_date).lte("date", end_date).order("date", desc=True)
+        query = supabase_client.client.table("attendance").select("*, employees(name, id, division_name, job_position)").gte("date", start_date).lte("date", end_date).order("date", desc=True)
         if employee_id and employee_id != 'ALL':
             query = query.eq("employee_id", employee_id)
         res = query.execute()
@@ -505,7 +505,7 @@ async def get_late_alerts(days: int = 30, threshold: int = 3, current_user: dict
 async def get_overtime_requests(current_user: dict = Depends(require_admin)):
     """Fetch all overtime requests"""
     try:
-        res = supabase_client.client.table("overtime_requests").select("*, employees(name, employee_id, organization_name, job_position)").order("date", desc=True).execute()
+        res = supabase_client.client.table("overtime_requests").select("*, employees(name, employee_id, division_name, job_position)").order("date", desc=True).execute()
         return {"status": "success", "data": res.data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

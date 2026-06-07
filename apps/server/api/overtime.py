@@ -17,7 +17,7 @@ async def get_overtime_requests(status: str = None, current_user: dict = Depends
                 employee_id,
                 name,
                 job_position,
-                organization_name
+                division_name
             )
         """).order("created_at", { "ascending": False })
         

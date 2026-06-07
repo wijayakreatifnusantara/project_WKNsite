@@ -82,7 +82,7 @@ const Overview = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard title="Total Workforce" value={employees.length || "0"} icon={<IconUsers size={24} />} trend="+2.4%" positive={true} />
           <StatCard title="Avg Attendance" value="98.5%" icon={<IconClock size={24} />} trend="+0.5%" positive={true} />
-          <StatCard title="Dept Coverage" value={`${new Set(employees.map(e => e.organization_name)).size || 0}`} icon={<Zap size={24} />} trend="Active" positive={true} />
+          <StatCard title="Dept Coverage" value={`${new Set(employees.map(e => e.division_name)).size || 0}`} icon={<Zap size={24} />} trend="Active" positive={true} />
           <StatCard title="System Integrity" value="Optimal" icon={<ShieldCheck size={24} />} trend="Secure" positive={true} />
 
           {/* Interactive Analytics Hub */}

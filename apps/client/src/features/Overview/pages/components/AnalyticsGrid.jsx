@@ -16,7 +16,7 @@ const AnalyticsGrid = ({ employees }) => {
     if (!employees.length) return [];
     const counts = {};
     employees.forEach(emp => {
-      const dept = emp["Organization Name *"] || 'Other';
+      const dept = emp["Division Name *"] || 'Other';
       counts[dept] = (counts[dept] || 0) + 1;
     });
     return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 5);

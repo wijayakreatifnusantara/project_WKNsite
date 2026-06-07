@@ -19,7 +19,7 @@ export const exportDailyAttendance = async () => {
 
     const exportData = data.map(record => ({
       "Employee Name": record.employees?.name || "Unknown",
-      "Department": record.employees?.organization_name || "-",
+      "Department": record.employees?.division_name || "-",
       "Position": record.employees?.job_position || "-",
       "Time": dayjs(record.created_at).format('HH:mm:ss'),
       "Status": record.status,

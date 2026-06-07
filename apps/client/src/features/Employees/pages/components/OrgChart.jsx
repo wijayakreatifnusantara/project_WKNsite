@@ -44,7 +44,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
     const departments = {};
     const empList = Array.isArray(employees) ? employees : [];
     empList.forEach(emp => {
-      const dept = emp?.["Organization Name *"] || 'Unassigned';
+      const dept = emp?.["Division Name *"] || 'Unassigned';
       if (!departments[dept]) departments[dept] = [];
       departments[dept].push(emp);
     });

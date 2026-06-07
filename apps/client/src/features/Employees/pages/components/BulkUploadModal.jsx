@@ -58,7 +58,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
               marital_status: row['Marital Status'] || 'Belum Kawin',
               nik: row['NIK'] || row['National ID'],
               address: row['Address'],
-              organization_name: row['Organization'] || row['Unit'] || 'WIJAYA KREATIF NUSANTARA',
+              division_name: row['Organization'] || row['Unit'] || 'WIJAYA KREATIF NUSANTARA',
               job_position: row['Position'],
               job_level: row['Level'] || 'Staff',
               status: row['Status'] || 'Active',

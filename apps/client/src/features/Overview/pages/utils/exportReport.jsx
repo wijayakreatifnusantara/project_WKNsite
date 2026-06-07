@@ -10,7 +10,7 @@ export const generateExecutiveReport = (employees) => {
       { Metric: "Total Workforce", Value: employees.length },
       { Metric: "Active Personnel", Value: activeEmployees.length },
       { Metric: "Resigned Personnel", Value: employees.length - activeEmployees.length },
-      { Metric: "Total Departments", Value: new Set(employees.map(e => e.organization_name)).size },
+      { Metric: "Total Departments", Value: new Set(employees.map(e => e.division_name)).size },
       { Metric: "Report Generated At", Value: dayjs().format('DD MMM YYYY HH:mm') }
     ];
 
@@ -18,7 +18,7 @@ export const generateExecutiveReport = (employees) => {
       "ID": emp.employee_id || emp.id,
       "Name": emp.name,
       "Email": emp.email,
-      "Department": emp.organization_name || emp.departments?.name || "-",
+      "Department": emp.division_name || emp.departments?.name || "-",
       "Position": emp.job_position || "-",
       "Level": emp.job_level || "-",
       "Status": emp.status,

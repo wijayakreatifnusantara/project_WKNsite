@@ -273,7 +273,7 @@ const AttendanceReport = () => {
                       </td>
                       <td className="px-6 py-2">
                         <div className="flex flex-col">
-                           <p className="text-[10px] font-black text-slate-600 uppercase leading-none mb-1 tracking-tight">{row.employees?.organization_name}</p>
+                           <p className="text-[10px] font-black text-slate-600 uppercase leading-none mb-1 tracking-tight">{row.employees?.division_name}</p>
                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest opacity-80">{row.employees?.job_position}</p>
                         </div>
                       </td>
