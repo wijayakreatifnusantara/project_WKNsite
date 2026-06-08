@@ -229,21 +229,7 @@ const UserManager = () => {
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
         <div className="max-w-[1200px] mx-auto space-y-2 pb-32">
           
-          <style>{`
-            .custom-scrollbar::-webkit-scrollbar {
-              width: 5px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-              background: transparent;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-              background: #d1d9e6;
-              border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-              background: #E31E24;
-            }
-          `}</style>
+
           
           {message.text && (
             <div className={`p-3 rounded-xl flex items-center gap-3 mb-2 animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { 
   IconUsers, 
   IconSearch, 
@@ -56,11 +57,8 @@ const Employees = () => {
   const viewMode = 'registry';
 
   const [activeTab, setActiveTab] = useState('active');
-  const [employees, setEmployees] = useState([]);
-  const [totalEmployees, setTotalEmployees] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterDept, setFilterDept] = useState('ALL DEPARTMENTS');
@@ -91,44 +89,42 @@ const Employees = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  useEffect(() => {
-    fetchEmployees();
-  }, [currentPage, pageSize, debouncedSearch, viewMode]);
-
-  const fetchEmployees = async () => {
-    try {
-      setLoading(true);
-      const fetchSize = viewMode === 'neural' ? 1000 : pageSize;
-      let url = `/api/employees?page=${currentPage}&size=${fetchSize}`;
-      if (debouncedSearch) {
-        url += `&q=${encodeURIComponent(debouncedSearch)}`;
-      }
-      
-      const response = await apiClient.get(url);
-      const data = response.data.data || [];
-      const count = response.data.total || 0;
-
-      const mappedData = data.map(e => ({
-        ...e,
-        "EMPLOYEE ID": e["EMPLOYEE ID"] || e.id || "N/A",
-        "EMPLOYEE NAME": e["EMPLOYEE NAME"] || e.name || "Unnamed",
-        "EMAIL": e["EMAIL"] || e.email || "-",
-        "Division Name *": e["Division Name *"] || e.division_name || "Unassigned",
-        "Department Name *": e["Department Name *"] || e.departments?.name || "",
-        "Job Position *": e["Job Position *"] || e.job_position || "Staff",
-        "Job Level *": e["Job Level *"] || e.job_level || "-",
-        "Status *": e["Status *"] || e.status || "Contract",
-        "Photo": e["Photo"] || e.photo || null
-      }));
-
-      setEmployees(mappedData);
-      setTotalEmployees(count);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-    } finally {
-      setLoading(false);
+  const fetchEmployeesData = async (page, size, search) => {
+    let url = `/api/employees?page=${page}&size=${size}`;
+    if (search) {
+      url += `&q=${encodeURIComponent(search)}`;
     }
+    
+    const response = await apiClient.get(url);
+    const data = response.data.data || [];
+    const count = response.data.total || 0;
+
+    const mappedData = data.map(e => ({
+      ...e,
+      "EMPLOYEE ID": e["EMPLOYEE ID"] || e.id || "N/A",
+      "EMPLOYEE NAME": e["EMPLOYEE NAME"] || e.name || "Unnamed",
+      "EMAIL": e["EMAIL"] || e.email || "-",
+      "Division Name *": e["Division Name *"] || e.division_name || "Unassigned",
+      "Department Name *": e["Department Name *"] || e.departments?.name || "",
+      "Job Position *": e["Job Position *"] || e.job_position || "Staff",
+      "Job Level *": e["Job Level *"] || e.job_level || "-",
+      "Status *": e["Status *"] || e.status || "Contract",
+      "Photo": e["Photo"] || e.photo || null
+    }));
+
+    return { data: mappedData, total: count };
   };
+
+  const fetchSize = viewMode === 'neural' ? 1000 : pageSize;
+
+  const { data: queryData, isLoading: loading, refetch: fetchEmployees } = useQuery({
+    queryKey: ['employees', currentPage, fetchSize, debouncedSearch],
+    queryFn: () => fetchEmployeesData(currentPage, fetchSize, debouncedSearch),
+    placeholderData: keepPreviousData,
+  });
+
+  const employees = queryData?.data || [];
+  const totalEmployees = queryData?.total || 0;
 
   const filteredEmployees = useMemo(() => {
     if (!Array.isArray(employees)) return [];
@@ -179,28 +175,12 @@ const Employees = () => {
   };
 
   const handleResignEmployee = async (id) => {
-    const resignDate = new Date().toISOString().split('T')[0];
     if (window.confirm('MARK EMPLOYEE AS RESIGNED?')) {
-      const previousEmployees = [...employees];
-      setEmployees(prev => prev.map(emp => {
-        if (emp.id === id || emp["EMPLOYEE ID"] === id) {
-          return { 
-            ...emp, 
-            status: 'RESIGNED', 
-            "Status *": 'RESIGNED',
-            is_resigned: true, 
-            resign_date: resignDate 
-          };
-        }
-        return emp;
-      }));
-
       try {
         await apiClient.put(`/api/employees/bulk-resign`, { ids: [id] });
         fetchEmployees();
         alert('Employee marked as RESIGNED');
       } catch (error) {
-        setEmployees(previousEmployees);
         console.error('ERROR UPDATING RESIGN STATUS:', error);
         alert('Update failed: ' + error.message);
       }
@@ -211,29 +191,12 @@ const Employees = () => {
     if (selectedIds.size === 0) return;
     if (window.confirm(`Mark ${selectedIds.size} employees as Resigned?`)) {
       const idArray = Array.from(selectedIds);
-      const previousEmployees = [...employees];
-      const resignDate = new Date().toISOString().split('T')[0];
-
-      setEmployees(prev => prev.map(emp => {
-        if (idArray.includes(emp.id) || idArray.includes(emp["EMPLOYEE ID"])) {
-          return { 
-            ...emp, 
-            status: 'RESIGNED', 
-            "Status *": 'RESIGNED',
-            is_resigned: true, 
-            resign_date: resignDate 
-          };
-        }
-        return emp;
-      }));
-
       try {
         await apiClient.put(`/api/employees/bulk-resign`, { ids: idArray });
         setSelectedIds(new Set());
         fetchEmployees();
         alert('Bulk Resign completed');
       } catch (error) {
-        setEmployees(previousEmployees);
         console.error('Error in bulk resign:', error);
         alert('Bulk update failed: ' + error.message);
       }
@@ -242,26 +205,11 @@ const Employees = () => {
 
   const handleActivateEmployee = async (id) => {
     if (window.confirm('RESTORE EMPLOYEE TO ACTIVE STATUS?')) {
-      const previousEmployees = [...employees];
-      setEmployees(prev => prev.map(emp => {
-        if (emp.id === id || emp["EMPLOYEE ID"] === id) {
-          return { 
-            ...emp, 
-            status: 'Permanent', 
-            "Status *": 'Permanent',
-            is_resigned: false, 
-            resign_date: null 
-          };
-        }
-        return emp;
-      }));
-
       try {
         await apiClient.put(`/api/employees/bulk-activate`, { ids: [id] });
         fetchEmployees();
         alert('Employee restored to ACTIVE status');
       } catch (error) {
-        setEmployees(previousEmployees);
         console.error('ERROR ACTIVATING EMPLOYEE:', error);
         alert('Activation failed: ' + error.message);
       }
@@ -284,22 +232,6 @@ const Employees = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #E31E24;
-        }
-      `}</style>
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
       <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">

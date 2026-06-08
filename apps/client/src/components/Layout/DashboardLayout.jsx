@@ -189,7 +189,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-inter animate-fade-in text-[11px]">
+    <div className="flex h-screen bg-slate-50 overflow-hidden font-inter animate-fade-in text-sm">
       {/* Sidebar Backdrop on Mobile */}
       {!isSidebarCollapsed && (
         <div 
@@ -204,12 +204,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           ? '-translate-x-full lg:w-20' 
           : 'translate-x-0 w-72'
       }`}>
-        <div className={`h-16 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-6 gap-2.5'}`}>
+        <div className={`h-20 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-8 gap-4'}`}>
           <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
           {!isSidebarCollapsed && (
             <div className="flex flex-col animate-fade-in">
               <h1 className="font-outfit font-black text-base text-slate-800 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
-              <span className="text-[7px] font-bold text-slate-400 tracking-widest uppercase mt-0.5">Corporate Management System</span>
+              <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-0.5">Corporate Management System</span>
             </div>
           )}
         </div>
@@ -344,10 +344,10 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <button 
             onClick={onLogout}
             title={isSidebarCollapsed ? "Sign Out Session" : undefined}
-            className={`flex items-center justify-center bg-slate-50 text-slate-500 font-bold uppercase tracking-wider hover:text-[#E31E24] hover:bg-red-50/50 border border-slate-200/60 transition-all active:scale-98 group ${
+            className={`flex items-center justify-center bg-slate-50 text-slate-600 font-semibold tracking-wide hover:text-[#E31E24] hover:bg-red-50/50 border border-slate-200/60 transition-all active:scale-98 group ${
               isSidebarCollapsed 
                 ? 'w-10 h-10 rounded-lg mx-auto' 
-                : 'w-full h-11 gap-2.5 px-4 rounded-lg text-[9.5px]'
+                : 'w-full h-12 gap-3 px-6 rounded-lg text-sm'
             }`}
           >
             <IconPower size={16} className="text-slate-400 group-hover:text-[#E31E24] transition-colors" />
@@ -358,13 +358,13 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10">
+        <header className="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-6 sm:px-10 shrink-0 z-10">
           <div className="flex flex-col justify-center min-w-0">
             <div className="flex items-center gap-3">
               {/* Toggle Sidebar Button */}
               <button 
                 onClick={toggleSidebar}
-                className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-500 hover:text-[#E31E24] hover:bg-slate-100 transition-all select-none active:scale-95 shrink-0"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-500 hover:text-[#E31E24] hover:bg-slate-100 transition-all select-none active:scale-95 shrink-0"
                 title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               >
                 <IconMenu2 size={16} />
@@ -402,7 +402,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
               <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
                 <div className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span className="text-[8px] font-semibold text-emerald-700 uppercase tracking-wider">System Healthy</span>
+                <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">System Healthy</span>
               </div>
             </div>
           </div>
@@ -413,14 +413,14 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 p-1 rounded-xl">
               <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
-                className="h-8 w-8 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
+                className="h-10 w-10 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
                 title="AI Diagnostics"
               >
-                <IconBrain size={16} />
-                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 bg-red-500 rounded-full border border-white"></span>
+                <IconBrain size={20} />
+                <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-white"></span>
               </button>
-              <button className="h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-all" title="Notifications">
-                <IconBell size={16} />
+              <button className="h-10 w-10 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-all" title="Notifications">
+                <IconBell size={20} />
               </button>
             </div>
             
@@ -429,9 +429,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <div className="flex items-center gap-2.5 pl-1">
               <div className="hidden md:flex flex-col items-end">
                 <span className="text-xs font-semibold text-slate-700 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
-                <span className="text-[9px] font-bold text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
+                <span className="text-[10px] font-bold text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
               </div>
-              <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/85 flex items-center justify-center text-xs font-bold text-slate-700">
+              <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200/85 flex items-center justify-center text-sm font-bold text-slate-700">
                 {(user?.fullName || user?.full_name)?.split(' ').map(n => n[0]).join('') || 'A'}
               </div>
             </div>
@@ -472,7 +472,7 @@ const NavGroup = ({ label, isCollapsed, children }) => {
   return (
     <div className="mb-2">
       <div 
-        className="px-4 py-2 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest select-none cursor-pointer hover:text-slate-600 transition-colors group"
+        className="px-6 py-3 flex items-center justify-between text-xs font-semibold text-slate-500 tracking-wider select-none cursor-pointer hover:text-slate-700 transition-colors group"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <span>{label}</span>
@@ -492,7 +492,7 @@ const NavItem = ({ icon, label, to, isCollapsed, end = true }) => (
     title={isCollapsed ? label : undefined}
     className={({ isActive }) => `
       relative flex items-center rounded-lg text-sm font-medium transition-all duration-200 group
-      ${isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'w-full px-4 py-2 gap-3'}
+      ${isCollapsed ? 'w-12 h-12 justify-center mx-auto' : 'w-full px-6 py-3 gap-4'}
       ${isActive 
         ? 'bg-red-50 text-[#E31E24]' 
         : 'text-slate-600 hover:text-[#E31E24] hover:bg-slate-50'}

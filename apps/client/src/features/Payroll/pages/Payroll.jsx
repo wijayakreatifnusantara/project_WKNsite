@@ -245,7 +245,7 @@ const KPICard = ({ title, value, subtitle, icon, trend, positive, color = "blue"
   );
 };
 
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 import PayslipTemplate from './components/PayslipTemplate';
 
 const PayrollRow = ({ data, formatIDR }) => {
@@ -262,6 +262,32 @@ const PayrollRow = ({ data, formatIDR }) => {
     net_salary 
   } = data;
   
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleDownloadPDF = async (e) => {
+    e.stopPropagation();
+    setIsGenerating(true);
+    try {
+      const doc = <PayslipTemplate data={data} />;
+      const asPdf = pdf([]);
+      asPdf.updateContainer(doc);
+      const blob = await asPdf.toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Payslip_${name}_${data.period}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error('Failed to generate PDF', err);
+      alert('Gagal membuat PDF: ' + err.message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const totalDeductions = tax_deduction + 
     (bpjs_health_employee || 0) + 
     (bpjs_employment_employee || 0) + 
@@ -296,15 +322,13 @@ const PayrollRow = ({ data, formatIDR }) => {
         <span className="text-[12px] font-black text-slate-900 font-outfit">{formatIDR(net_salary)}</span>
       </td>
       <td className="px-8 py-4 border-b border-white/20 text-center">
-        <PDFDownloadLink 
-          document={<PayslipTemplate data={data} />} 
-          fileName={`Payslip_${name}_${data.period}.pdf`}
-          className="h-10 w-10 flex items-center justify-center text-slate-300 hover:text-[#E31E24] transition-colors"
+        <button 
+          onClick={handleDownloadPDF}
+          disabled={isGenerating}
+          className="h-10 w-10 mx-auto flex items-center justify-center text-slate-300 hover:text-[#E31E24] transition-colors disabled:opacity-50"
         >
-          {({ loading }) => (
-            loading ? <IconLoader2 size={18} className="animate-spin" /> : <IconDownload size={20} />
-          )}
-        </PDFDownloadLink>
+          {isGenerating ? <IconLoader2 size={18} className="animate-spin" /> : <IconDownload size={20} />}
+        </button>
       </td>
     </tr>
   );

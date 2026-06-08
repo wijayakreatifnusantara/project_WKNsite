@@ -139,27 +139,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
         </div>
       </div>
 
-      {/* PRINT LAYOUT (Hidden from UI, visible for printer) */}
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          .print-area, .print-area * { visibility: visible; }
-          .print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            display: flex !important;
-            gap: 20mm;
-            padding: 20mm;
-            background: white !important;
-          }
-          .print-card {
-            border: 1px solid #ddd !important;
-            box-shadow: none !important;
-            -webkit-print-color-adjust: exact;
-          }
-        }
-      `}</style>
+
       <div className="hidden print-area flex-row gap-10">
         {/* Simplified Front for Print */}
         <div className="print-card w-[54mm] h-[86mm] border rounded-lg overflow-hidden flex flex-col items-center text-center p-4 bg-white">

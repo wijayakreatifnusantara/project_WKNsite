@@ -405,22 +405,7 @@ const DivisionManager = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #E31E24;
-        }
-      `}</style>
+
 
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
       <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">

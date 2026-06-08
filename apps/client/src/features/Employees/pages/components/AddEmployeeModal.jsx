@@ -735,21 +735,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
           onSubmit={handleSubmit} 
           className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-80px)] custom-scrollbar"
         >
-          <style>{`
-            .custom-scrollbar::-webkit-scrollbar {
-              width: 5px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-              background: transparent;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-              background: #e2e8f0;
-              border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-              background: #cbd5e1;
-            }
-          `}</style>
+
           {success ? (
             <div className="py-20 flex flex-col items-center justify-center gap-4 animate-in zoom-in-95 duration-500">
               <div className="h-16 w-16 bg-green-500 shadow-md rounded-full flex items-center justify-center text-white">

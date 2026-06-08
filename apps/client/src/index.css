@@ -73,6 +73,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.6;
   }
 }
 
@@ -236,7 +237,7 @@
 .shadow-\[12px_12px_24px_\#d1d9e6\,-12px_-10px_20px_\#ffffff\],
 .shadow-\[20px_20px_60px_\#d1d9e6\,-20px_-20px_60px_\#ffffff\],
 .shadow-\[2px_2px_4px_\#d1d9e6\,-2px_-2px_4px_\#ffffff\] {
-  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.02) !important;
   background-color: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
 }

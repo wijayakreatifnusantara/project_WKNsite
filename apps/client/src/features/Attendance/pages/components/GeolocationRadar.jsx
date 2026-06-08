@@ -26,28 +26,7 @@ const GeolocationRadar = () => {
 
   return (
     <div className="bg-[#0f172a] rounded-2xl p-4 shadow-xl flex flex-col justify-between items-center text-center relative overflow-hidden border border-slate-800 h-full">
-      <style>{`
-        .radar-sweep {
-          position: absolute;
-          width: 50%;
-          height: 50%;
-          bottom: 50%;
-          right: 50%;
-          transform-origin: bottom right;
-          background: conic-gradient(from 90deg, transparent 270deg, rgba(227, 30, 36, 0.4) 360deg);
-          animation: sweep 4s linear infinite;
-          border-radius: 100% 0 0 0;
-        }
-        @keyframes sweep {
-          to { transform: rotate(360deg); }
-        }
-        .ping {
-          animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) forwards;
-        }
-        @keyframes ping {
-          75%, 100% { transform: scale(2); opacity: 0; }
-        }
-      `}</style>
+
       
       {/* Header */}
       <div className="z-10 w-full flex justify-between items-center mb-2">
