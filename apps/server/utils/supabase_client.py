@@ -172,8 +172,8 @@ class WKNSupabaseClient:
             print(f"[CRITICAL] System Error: {str(e)}")
             return None
 
-    async def authenticate_employee(self, email: str, hashed_password: str) -> Optional[Dict[str, Any]]:
-        """Authenticate employee for mobile app"""
+    async def authenticate_employee(self, email: str, password: str) -> Optional[Dict[str, Any]]:
+        """Authenticate employee for mobile app using password hashing"""
         if not self.client: return None
         try:
             clean_email = email.strip()
@@ -190,7 +190,10 @@ class WKNSupabaseClient:
             if employee.get("is_resigned") or employee.get("status") == "RESIGNED":
                 return None
                 
-            if employee.get("mobile_password") == hashed_password:
+            from utils.security import verify_password
+            db_password = employee.get("mobile_password") or ""
+            
+            if verify_password(password, db_password):
                 # Remove password from return dict
                 clean_employee = employee.copy()
                 if "mobile_password" in clean_employee:
@@ -210,11 +213,13 @@ class WKNSupabaseClient:
             print(f"Error authenticating employee: {str(e)}")
             return None
 
-    async def update_employee_password(self, employee_id: str, new_hashed_password: str) -> bool:
-        """Update employee password"""
+    async def update_employee_password(self, employee_id: str, new_password: str) -> bool:
+        """Update employee password with secure Bcrypt hashing"""
         if not self.client: return False
         try:
-            self.client.table("employees").update({"mobile_password": new_hashed_password}).eq("id", employee_id).execute()
+            from utils.security import get_password_hash
+            hashed_password = get_password_hash(new_password)
+            self.client.table("employees").update({"mobile_password": hashed_password}).eq("id", employee_id).execute()
             return True
         except Exception as e:
             print(f"Error updating employee password: {str(e)}")

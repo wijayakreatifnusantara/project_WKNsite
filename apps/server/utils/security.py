@@ -10,8 +10,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         )
     except Exception as e:
         print(f"[SECURITY ERROR] Gagal melakukan verifikasi password: {str(e)}")
-        # Fallback darurat jika password di database masih plain-text
-        return plain_password == hashed_password
+        return False
 
 def get_password_hash(password: str) -> str:
     """Menghasilkan hash Bcrypt standar dari password plain-text secara langsung"""

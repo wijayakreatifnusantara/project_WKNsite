@@ -10,7 +10,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../../core/services/watermark_service.dart';
+import '../../../core/utils/watermark_service.dart';
 
 class OvertimeScreen extends StatefulWidget {
   const OvertimeScreen({super.key});
@@ -122,16 +122,21 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         final user = context.read<AuthProvider>().userData;
         final employeeName = user?['name'] ?? 'Karyawan';
         
-        final watermarkedPath = await WatermarkService.addWatermark(
-          photo.path,
-          employeeName,
-          'LEMBUR',
-          _currentPosition!,
+        final watermarkedFile = await WatermarkService.addWatermark(
+          imageFile: File(photo.path),
+          employeeName: employeeName,
+          employeeId: user?['employee_id'] ?? '-',
+          latitude: _currentPosition!.latitude,
+          longitude: _currentPosition!.longitude,
+          address: 'Lokasi Anda',
+          isCheckOut: false,
+          customLabel: 'LEMBUR',
         );
         
-        if (watermarkedPath != null) {
+        if (watermarkedFile != null) {
           setState(() {
-            _proofPhotoPath = watermarkedPath;
+            _proofPhotoPath = watermarkedFile.path;
+
           });
           _showPhotoPreview();
         }
