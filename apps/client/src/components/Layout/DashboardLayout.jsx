@@ -160,9 +160,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     if (path.includes('/attendance/location')) return 'LOKASI KERJA';
     if (path.includes('/attendance/schedule')) return 'JADWAL & SHIFT';
     if (path.includes('/attendance/correction')) return 'KOREKSI ABSEN';
-    if (path.includes('/attendance/reports')) return 'REKAP LAPORAN BULANAN';
+    if (path.includes('/attendance/recap')) return 'REKAP LAPORAN BULANAN';
     if (path.includes('/leave')) return 'CUTI & IZIN';
-    if (path.includes('/overtime')) return 'MANAJEMEN LEMBUR';
+    if (path.includes('/attendance/overtime')) return 'MANAJEMEN LEMBUR';
     
     if (path.includes('/employees/onboarding')) return 'ONBOARDING KARYAWAN';
     if (path.includes('/performance')) return 'KINERJA KARYAWAN (KPI)';
@@ -252,10 +252,10 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               <NavItem icon={<IconClipboardCheck size={15} />} label="Cuti & Izin" to="/leave" />
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
-              <NavItem icon={<IconClockPlay size={15} />} label="Manajemen Lembur" to="/overtime" />
+              <NavItem icon={<IconClockPlay size={15} />} label="Manajemen Lembur" to="/attendance/overtime" />
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
-              <NavItem icon={<IconChartBar size={15} />} label="Rekap Laporan" to="/attendance/reports" />
+              <NavItem icon={<IconChartBar size={15} />} label="Rekap Laporan" to="/attendance/recap" />
             )}
           </NavGroup>
 
