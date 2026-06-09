@@ -12,8 +12,8 @@ class WatermarkService {
   /// Menambahkan stempel permanen ke foto:
   /// - Atas Kiri: Tanggal, Jam, ID, Nama
   /// - Atas Kanan: "Check In" atau "Check Out"
-  /// - Bawah Kiri: Koordinat GPS
-  /// - Bawah Kanan: Logo WKN + Teks "WKN VERIFIED"
+  /// - Bawah Kiri: Nama Toko, Alamat, LongLat
+  /// - Bawah Kanan: Logo WKN + Teks "WKN Enterprise Verified"
   static Future<File> addWatermark({
     required File imageFile,
     required String employeeName,
@@ -38,7 +38,7 @@ class WatermarkService {
 
     canvas.drawImage(originalImage, Offset.zero, Paint());
 
-    // 1. Load Merek Baru (Logo WKN)
+    // 1. Load Merek Baru (Logo Watermark)
     ui.Image? logoImage;
     try {
       final ByteData data = await rootBundle.load('assets/wkn_logo_square.png');
@@ -49,11 +49,11 @@ class WatermarkService {
       debugPrint("Gagal memuat logo: $e");
     }
 
-    // 2. Parameter Styling 
-    final double padding = imgWidth * 0.02; 
-    final double fontSize = imgWidth * 0.028; 
+    // 2. Parameter Styling (Dipadatkan ke sudut & diperbesar)
+    final double padding = imgWidth * 0.02; // Lebih rapat ke tepi (0.02)
+    final double fontSize = imgWidth * 0.028; // Diperbesar dari 0.024
     final double smallFontSize = fontSize * 0.85;
-    final double logoSize = imgWidth * 0.14; 
+    final double logoSize = imgWidth * 0.14; // Logo diperbesar proporsional
 
     final textStyle = TextStyle(
       color: Colors.white,
@@ -125,12 +125,12 @@ class WatermarkService {
     tpStatus.layout();
     tpStatus.paint(canvas, Offset(imgWidth - tpStatus.width - padding, padding));
 
-    // --- BAWAH KIRI: Koordinat & Info Lokasi ---
-    final String locationName = (storeName ?? "WKN - Absen Umum").toUpperCase();
+    // --- BAWAH KIRI: Nama Toko, Alamat, LongLat ---
+    final String locationName = (storeName ?? "WKN - TITIK ABSEN UMUM").toUpperCase();
     final String coords = "GPS: ${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}";
     
-    final List<String> bottomLines = [locationName, coords];
-    double bottomY = imgHeight - (smallFontSize * 3) - padding;
+    final List<String> bottomLines = [locationName, address, coords];
+    double bottomY = imgHeight - (smallFontSize * 4) - padding;
     
     drawTextBlock(
       bottomLines,
@@ -140,10 +140,11 @@ class WatermarkService {
       smallTextStyle.copyWith(fontWeight: FontWeight.w600),
     );
 
-    // --- BAWAH KANAN: Logo + "WKN VERIFIED" ---
+    // --- BAWAH KANAN: Logo + "WKN Mobile Verified" ---
+    // Layout teks terlebih dahulu untuk menghitung lebar & posisi
     final tpVerify = TextPainter(
       text: TextSpan(
-        text: "WKN VERIFIED",
+        text: "WKN Mobile Verified",
         style: textStyle.copyWith(
           fontSize: smallFontSize * 0.9,
           letterSpacing: 1.2,
@@ -155,13 +156,17 @@ class WatermarkService {
     );
     tpVerify.layout();
 
+    // Hitung posisi: Teks rata kanan dengan padding
     final double textRightEdge = imgWidth - padding;
     final double textX = textRightEdge - tpVerify.width;
     final double textY = imgHeight - tpVerify.height - padding;
 
+    // Gambar teks
     tpVerify.paint(canvas, Offset(textX, textY));
 
+    // Gambar Logo TEPAT di tengah teks — tanpa filter monochrome (full color)
     if (logoImage != null) {
+      // Tengah horizontal teks = textX + (tpVerify.width / 2)
       final double textCenterX = textX + (tpVerify.width / 2);
       final double logoCenterX = textCenterX - (logoSize / 2);
       final double logoY = textY - logoSize - (padding * 0.4);
@@ -170,7 +175,7 @@ class WatermarkService {
         logoImage,
         Rect.fromLTWH(0, 0, logoImage.width.toDouble(), logoImage.height.toDouble()),
         Rect.fromLTWH(logoCenterX, logoY, logoSize, logoSize),
-        Paint()..filterQuality = ui.FilterQuality.high, 
+        Paint()..filterQuality = ui.FilterQuality.high, // Full color, no monochrome
       );
     }
 

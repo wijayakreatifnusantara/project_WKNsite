@@ -24,6 +24,8 @@ const AttendanceRecap = () => {
   const [loading, setLoading] = useState(false);
   const [recapData, setRecapData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   
   // Default to 21st of last month to 20th of current month (typical salary period)
   const getDefaultDates = () => {
@@ -107,12 +109,15 @@ const AttendanceRecap = () => {
         const empOt = overtime.filter(o => o.employee_id === emp.id);
         const otMinutes = empOt.reduce((sum, req) => sum + (req.duration_minutes || 0), 0);
         const otHours = Math.round((otMinutes / 60) * 10) / 10; // 1 decimal
+        const lateMinutes = logs.reduce((sum, log) => sum + (log.late_minutes || 0), 0);
 
         return {
           id: emp.id,
           name: emp.name,
           organization: emp.division_name,
           position: emp.job_position,
+          logs: logs, // Save raw logs for Expandable Row
+          late_minutes: lateMinutes,
           present: logs.filter(l => l.status?.toLowerCase() === 'present').length,
           late: logs.filter(l => l.status?.toLowerCase() === 'late').length,
           sick: logs.filter(l => l.status?.toLowerCase() === 'sick').length,
@@ -240,15 +245,47 @@ const AttendanceRecap = () => {
              </div>
              <Button 
                 onClick={handleExportCSV}
-                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[8px] uppercase tracking-widest hover:bg-slate-900 shadow-md flex gap-2 items-center"
+                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[8px] uppercase tracking-widest hover:bg-slate-900 shadow-md flex gap-2 items-center print:hidden"
               >
                 <IconDownload size={12} />
-                Export
+                CSV
+              </Button>
+              <Button 
+                onClick={() => setIsPreviewMode(true)}
+                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest hover:bg-[#c8191f] shadow-md flex gap-2 items-center print:hidden"
+              >
+                <IconClipboardList size={12} />
+                PDF
               </Button>
           </div>
         </div>
+        
+        {/* 👁️ PREVIEW MODE FLOATING BAR */}
+        {isPreviewMode && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 border border-slate-700 print:hidden animate-fade-in-down">
+            <span className="text-xs font-bold flex items-center gap-2"><IconClipboardList size={16}/> Mode Pratinjau Cetak</span>
+            <div className="h-4 w-[1px] bg-slate-600"></div>
+            <div className="flex gap-2">
+              <Button onClick={() => setIsPreviewMode(false)} variant="ghost" className="h-8 text-slate-300 hover:text-white hover:bg-slate-700 text-[10px] font-bold">
+                BATAL
+              </Button>
+              <Button onClick={() => window.print()} className="h-8 bg-[#E31E24] hover:bg-[#c8191f] text-white text-[10px] font-bold shadow-lg">
+                <IconDownload size={14} className="mr-1" />
+                UNDUH PDF
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* 🖨️ PRINT HEADER (Visible when printing or in preview mode) */}
+        <div className={`${isPreviewMode ? 'block' : 'hidden'} print:block mb-8 border-b-2 border-slate-800 pb-4`}>
+            <h1 className="text-2xl font-black uppercase text-slate-800">PT Wijaya Kreatif Nusantara</h1>
+            <h2 className="text-lg font-bold text-slate-600">Laporan Rekapitulasi Kehadiran (Attendance Recap)</h2>
+            <p className="text-sm text-slate-500 mt-2">Periode: {dateRange.start} s/d {dateRange.end}</p>
+        </div>
+
         {/* 📊 COMPACT STATS BAR */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className={`flex flex-wrap items-center gap-3 print:hidden ${isPreviewMode ? 'hidden' : ''}`}>
             <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-[#E31E24] shadow-sm">
                     <IconCalendarStats size={16} />
@@ -327,43 +364,83 @@ const AttendanceRecap = () => {
                 ) : (
                   filteredData.map((emp) => {
                     const achievement = workingDaysTarget > 0 ? Math.round((emp.present / workingDaysTarget) * 100) : 0;
+                    const isExpanded = expandedRow === emp.id;
                     
                     return (
-                      <tr key={emp.id} className="hover:bg-slate-50/50 transition-all group border-b border-transparent hover:border-slate-100">
-                        <td className="px-6 py-2">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 border border-[#E31E24]/5 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
-                              {emp.name?.charAt(0)}
+                      <React.Fragment key={emp.id}>
+                        <tr 
+                          onClick={() => setExpandedRow(isExpanded ? null : emp.id)}
+                          className="hover:bg-slate-50/50 transition-all group border-b border-transparent hover:border-slate-100 cursor-pointer"
+                        >
+                          <td className="px-6 py-2">
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 border border-[#E31E24]/5 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
+                                {emp.name?.charAt(0)}
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-black text-slate-800 uppercase tracking-tight leading-none">{emp.name}</p>
+                                <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">{emp.id}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-[10px] font-black text-slate-800 uppercase tracking-tight leading-none">{emp.name}</p>
-                              <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">{emp.id}</p>
+                          </td>
+                          <td className="px-6 py-2">
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{emp.organization}</span>
+                          </td>
+                          <td className="px-6 py-2 text-center text-[10px] font-black text-slate-400">{workingDaysTarget}</td>
+                          <td className="px-6 py-2 text-center text-[10px] font-black text-emerald-600">{emp.present}</td>
+                          <td className="px-6 py-2 text-center text-[10px] font-black text-amber-500">
+                            {emp.late}
+                            {emp.late_minutes > 0 && (
+                              <span className="block text-[7px] text-rose-500 mt-0.5">({emp.late_minutes}m)</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-2 text-center text-[10px] font-black text-indigo-500">{emp.sick + emp.leave}</td>
+                          <td className="px-6 py-2 text-center text-[10px] font-black text-rose-500">{emp.absent}</td>
+                          <td className="px-6 py-2 text-center text-[10px] font-black text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
+                          <td className="px-6 py-2 text-right">
+                            <div className="flex flex-col items-end gap-1">
+                              <span className={`text-[10px] font-black ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>
+                                {achievement}%
+                              </span>
+                              <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full rounded-full ${achievement >= 95 ? 'bg-emerald-500' : achievement >= 80 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                                  style={{ width: `${Math.min(100, achievement)}%` }}
+                                ></div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-2">
-                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{emp.organization}</span>
-                        </td>
-                        <td className="px-6 py-2 text-center text-[10px] font-black text-slate-400">{workingDaysTarget}</td>
-                        <td className="px-6 py-2 text-center text-[10px] font-black text-emerald-600">{emp.present}</td>
-                        <td className="px-6 py-2 text-center text-[10px] font-black text-amber-500">{emp.late}</td>
-                        <td className="px-6 py-2 text-center text-[10px] font-black text-indigo-500">{emp.sick + emp.leave}</td>
-                        <td className="px-6 py-2 text-center text-[10px] font-black text-rose-500">{emp.absent}</td>
-                        <td className="px-6 py-2 text-center text-[10px] font-black text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
-                        <td className="px-6 py-2 text-right">
-                          <div className="flex flex-col items-end gap-1">
-                            <span className={`text-[10px] font-black ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>
-                              {achievement}%
-                            </span>
-                            <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full rounded-full ${achievement >= 95 ? 'bg-emerald-500' : achievement >= 80 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                                style={{ width: `${Math.min(100, achievement)}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr className="bg-slate-50/50">
+                            <td colSpan="9" className="px-6 py-4 border-b border-slate-100">
+                              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                                <h4 className="text-[9px] font-black text-slate-800 uppercase tracking-widest mb-3">Detail Pelanggaran Kehadiran</h4>
+                                {emp.logs && emp.logs.filter(l => l.status !== 'Present').length > 0 ? (
+                                  <div className="grid grid-cols-3 gap-3">
+                                    {emp.logs.filter(l => l.status !== 'Present').map((log, idx) => (
+                                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-slate-100 bg-slate-50">
+                                        <div>
+                                          <p className="text-[10px] font-black text-slate-700">{log.date}</p>
+                                          <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{log.status}</p>
+                                        </div>
+                                        {log.late_minutes > 0 && (
+                                          <div className="text-right">
+                                            <span className="text-[9px] font-black text-rose-500">Telat {log.late_minutes}m</span>
+                                            <p className="text-[7px] text-slate-400 uppercase">{log.clock_in?.slice(0,5)}</p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-[9px] text-slate-400 italic">Tidak ada catatan telat, izin, atau alpa.</p>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     );
                   })
                 )}
@@ -371,6 +448,19 @@ const AttendanceRecap = () => {
             </table>
           </div>
         </div>
+
+        {/* 🖨️ PRINT FOOTER (Signature placeholders) */}
+        <div className={`${isPreviewMode ? 'flex' : 'hidden'} print:flex mt-16 justify-between px-10`}>
+           <div className="text-center">
+              <p className="text-sm text-slate-500 mb-20">Disetujui Oleh,</p>
+              <p className="text-sm font-bold text-slate-800 border-b border-slate-400 inline-block px-4">HR Manager</p>
+           </div>
+           <div className="text-center">
+              <p className="text-sm text-slate-500 mb-20">Mengetahui,</p>
+              <p className="text-sm font-bold text-slate-800 border-b border-slate-400 inline-block px-4">Direktur Utama</p>
+           </div>
+        </div>
+
       </div>
     </div>
   );

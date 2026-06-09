@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primaryColor),
-        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
+        textTheme: GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
         useMaterial3: true,
         scaffoldBackgroundColor: AppConstants.backgroundColor,
         pageTransitionsTheme: const PageTransitionsTheme(

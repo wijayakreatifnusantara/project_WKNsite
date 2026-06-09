@@ -209,7 +209,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           {!isSidebarCollapsed && (
             <div className="flex flex-col animate-fade-in">
               <h1 className="font-outfit font-black text-base text-slate-800 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
-              <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-0.5">Corporate Management System</span>
+              <span className="text-[9px] font-bold text-slate-400 tracking-widest uppercase mt-0.5 whitespace-nowrap">Corporate Management System</span>
             </div>
           )}
         </div>

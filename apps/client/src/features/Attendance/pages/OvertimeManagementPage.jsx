@@ -227,6 +227,14 @@ const OvertimeManagementPage = () => {
                          <p className="text-[9px] text-slate-600 font-semibold max-w-sm truncate" title={row.reason}>
                            {row.reason}
                          </p>
+                         {row.compensation_type && (
+                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[7px] font-black uppercase tracking-widest bg-slate-50 border-slate-200 text-slate-500">
+                               {row.compensation_type == 'Paid' ? '💰 Dibayar (Uang)' : '🏝️ Ditukar Cuti (Time-off)'}
+                               {row.multiplier && row.multiplier > 1.5 && (
+                                 <span className="text-rose-500 ml-1">• {row.multiplier}x (Libur)</span>
+                               )}
+                            </div>
+                         )}
                       </td>
                       <td className="px-5 py-2 text-center">
                         <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest border shadow-sm ${getStatusStyle(row.status)}`}>

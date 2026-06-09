@@ -32,6 +32,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
   final TextEditingController _startTimeCtrl = TextEditingController();
   final TextEditingController _endTimeCtrl = TextEditingController();
   final TextEditingController _reasonCtrl = TextEditingController();
+  String _compensationType = 'Paid';
 
   String? _proofPhotoPath;
   final ImagePicker _picker = ImagePicker();
@@ -88,6 +89,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
     _startTimeCtrl.text = '17:00';
     _endTimeCtrl.text = '19:00';
     _reasonCtrl.text = '';
+    _compensationType = 'Paid';
     _proofPhotoPath = null;
     setState(() {
       _showForm = true;
@@ -279,6 +281,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         'end_time': _endTimeCtrl.text,
         'duration_hours': double.parse(durationHours.toStringAsFixed(2)),
         'reason': _reasonCtrl.text.trim(),
+        'compensation_type': _compensationType,
         'status': 'Pending',
         if (base64Image != null) 'proof_base64': base64Image,
       };
@@ -378,6 +381,31 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
             ),
             const SizedBox(height: 16),
             _buildTextField('ALASAN / KEPERLUAN LEMBUR', _reasonCtrl, 'Sebutkan detail pekerjaan...', maxLines: 4),
+            const SizedBox(height: 16),
+            const Text('PILIHAN KOMPENSASI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _compensationType,
+                  isExpanded: true,
+                  icon: const Icon(Icons.arrow_drop_down, color: AppConstants.primaryColor),
+                  items: const [
+                    DropdownMenuItem(value: 'Paid', child: Text('Dibayar Uang (Sesuai Kemenaker)', style: TextStyle(fontSize: 12))),
+                    DropdownMenuItem(value: 'Time-off', child: Text('Ditukar Cuti (Time-off in Lieu)', style: TextStyle(fontSize: 12))),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) setState(() => _compensationType = val);
+                  },
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
             Container(
               width: double.infinity,

@@ -76,7 +76,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
       _controller = CameraController(
         frontCamera,
-        ResolutionPreset.medium,
+        ResolutionPreset.high,
         enableAudio: false,
       );
 
@@ -180,6 +180,8 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   void _showImagePreviewDialog(File imageFile) {
+    final TextEditingController notesController = TextEditingController();
+    
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -189,67 +191,86 @@ class _CameraScreenState extends State<CameraScreen> {
         child: Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 30, offset: const Offset(0, 10)),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 30, offset: const Offset(0, 10)),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.file(
+                      imageFile,
+                      fit: BoxFit.contain,
+                      height: MediaQuery.of(context).size.height * 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: TextField(
+                    controller: notesController,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      hintText: 'Tambahkan catatan (opsional)...',
+                      border: InputBorder.none,
+                      icon: Icon(Icons.edit_note, color: Colors.grey),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text("ULANGI"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _submitAttendance(imageFile, notesController.text.trim());
+                      },
+                      icon: const Icon(Icons.check_rounded),
+                      label: const Text("LANJUTKAN"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
                   ],
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.file(
-                    imageFile,
-                    fit: BoxFit.contain,
-                    height: MediaQuery.of(context).size.height * 0.65,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text("ULANGI"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _submitAttendance(imageFile);
-                    },
-                    icon: const Icon(Icons.check_rounded),
-                    label: const Text("LANJUTKAN"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Future<void> _submitAttendance(File finalImage) async {
+  Future<void> _submitAttendance(File finalImage, [String customNotes = '']) async {
     setState(() {
       _isProcessing = true;
     });
@@ -269,7 +290,7 @@ class _CameraScreenState extends State<CameraScreen> {
           latitude: _currentPosition!.latitude,
           longitude: _currentPosition!.longitude,
           clockType: widget.clockType, 
-          notes: 'Offline Mobile check-in',
+          notes: customNotes.isNotEmpty ? customNotes : 'Offline Mobile check-in',
           photoPath: finalImage.path,
         );
         if (!mounted) return;
@@ -283,7 +304,7 @@ class _CameraScreenState extends State<CameraScreen> {
           latitude: _currentPosition!.latitude,
           longitude: _currentPosition!.longitude,
           clockType: widget.clockType, 
-          notes: 'Mobile check-in',
+          notes: customNotes.isNotEmpty ? customNotes : 'Mobile check-in',
           photoPath: finalImage.path,
         );
 
@@ -350,10 +371,15 @@ class _CameraScreenState extends State<CameraScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: CameraPreview(_controller!),
+          SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: _controller!.value.previewSize?.height ?? 100,
+                height: _controller!.value.previewSize?.width ?? 100 * _controller!.value.aspectRatio,
+                child: CameraPreview(_controller!),
+              ),
+            ),
           ),
           
           // Overlay overlay to show location/time

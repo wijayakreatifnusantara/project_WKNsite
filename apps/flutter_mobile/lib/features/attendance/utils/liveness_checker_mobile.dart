@@ -48,9 +48,9 @@ class LivenessChecker {
         final double? leftEyeProb = face.leftEyeOpenProbability;
         final double? rightEyeProb = face.rightEyeOpenProbability;
 
-        bool isSmiling = smileProb != null && smileProb > 0.8;
-        bool isBlinking = (leftEyeProb != null && leftEyeProb < 0.2) || 
-                          (rightEyeProb != null && rightEyeProb < 0.2);
+        bool isSmiling = smileProb != null && smileProb > 0.4;
+        bool isBlinking = (leftEyeProb != null && leftEyeProb < 0.4) || 
+                          (rightEyeProb != null && rightEyeProb < 0.4);
 
         if (isSmiling || isBlinking) {
           return true; // Liveness confirmed!

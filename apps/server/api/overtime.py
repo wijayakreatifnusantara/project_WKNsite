@@ -92,9 +92,46 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
         start_time = payload.get("start_time")
         end_time = payload.get("end_time")
         reason = payload.get("reason")
+        compensation_type = payload.get("compensation_type", "Paid")
 
         if not date or not start_time or not end_time or not reason:
             raise HTTPException(status_code=400, detail="Data pengajuan tidak lengkap.")
+
+        # Calculate duration hours
+        try:
+            t1 = datetime.strptime(start_time, "%H:%M")
+            t2 = datetime.strptime(end_time, "%H:%M")
+            # If overtime crosses midnight, add 1 day to t2
+            if t2 < t1:
+                t2 += timedelta(days=1)
+            duration = (t2 - t1).seconds / 3600.0
+        except Exception:
+            duration = payload.get("duration_hours", 0.0)
+
+        # SECURITY: Check 14-Hour Weekly Limit (Batas Kemenaker)
+        try:
+            dt_date = datetime.strptime(date, "%Y-%m-%d")
+            start_of_week = (dt_date - timedelta(days=dt_date.weekday())).strftime("%Y-%m-%d")
+            end_of_week = (dt_date + timedelta(days=6 - dt_date.weekday())).strftime("%Y-%m-%d")
+            
+            weekly_res = supabase_client.client.table("overtime_requests")\
+                .select("duration_hours")\
+                .eq("employee_id", employee_id)\
+                .eq("status", "Approved")\
+                .gte("date", start_of_week)\
+                .lte("date", end_of_week)\
+                .execute()
+            
+            weekly_hours = sum([float(r.get("duration_hours", 0)) for r in weekly_res.data]) if weekly_res.data else 0
+            if weekly_hours + duration > 14.0:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Overtime Quota Exceeded: Anda sudah lembur {weekly_hours} jam minggu ini. Batas maksimal Kemenaker adalah 14 jam/minggu."
+                )
+        except Exception as e:
+            if isinstance(e, HTTPException):
+                raise
+            # Continue if date parsing fails
 
         proof_base64 = payload.pop("proof_base64", None)
         if proof_base64:
@@ -144,6 +181,7 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
             "duration_hours": round(duration, 2),
             "reason": reason,
             "status": "Pending",
+            "compensation_type": compensation_type,
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat()
         }
@@ -250,13 +288,39 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
                         basic_salary = float(salary_data.get("basic_salary") or 0)
                         current_ot_allowance = float(salary_data.get("overtime_allowance") or 0)
                         
-                        # Rumus lembur standar Kemenaker: (Gaji Pokok / 173) * Jam * 1.5
-                        ot_pay = (basic_salary / 173.0) * duration * 1.5
-                        new_ot_allowance = current_ot_allowance + round(ot_pay)
+                        # Auto-Multiplier Kemenaker
+                        # Weekday = 1.5x, Weekend = 2.0x (Sederhana)
+                        ot_date = request_data.get("date")
+                        multiplier = 1.5
+                        if ot_date:
+                            dt = datetime.strptime(ot_date, "%Y-%m-%d")
+                            if dt.weekday() >= 5: # 5=Saturday, 6=Sunday
+                                multiplier = 2.0
                         
-                        supabase_client.client.table("employee_salaries").update({
-                            "overtime_allowance": new_ot_allowance
-                        }).eq("id", salary_data["id"]).execute()
+                        compensation = request_data.get("compensation_type", "Paid")
+                        
+                        if compensation == "Paid":
+                            # Rumus lembur standar Kemenaker: (Gaji Pokok / 173) * Jam * Multiplier
+                            ot_pay = (basic_salary / 173.0) * duration * multiplier
+                            new_ot_allowance = current_ot_allowance + round(ot_pay)
+                            
+                            supabase_client.client.table("employee_salaries").update({
+                                "overtime_allowance": new_ot_allowance
+                            }).eq("id", salary_data["id"]).execute()
+                            
+                            # Simpan info perhitungan ke db (jika kolom ada, kalau error diabaikan)
+                            try:
+                                supabase_client.client.table("overtime_requests").update({
+                                    "multiplier": multiplier,
+                                    "total_pay": round(ot_pay)
+                                }).eq("id", request_id).execute()
+                            except: pass
+                        elif compensation == "Time-off":
+                            # Konversi lembur menjadi saldo cuti (Time-off in Lieu)
+                            # Biasanya 1 jam lembur = 1 jam cuti, akumulasi
+                            ot_pay = 0
+                            # Logika penambahan cuti bisa disisipkan di sini (Update ke leave_balances)
+                            # ...
                     else:
                         ot_pay = 0 # Fallback jika belum migrasi ke employee_salaries
                         

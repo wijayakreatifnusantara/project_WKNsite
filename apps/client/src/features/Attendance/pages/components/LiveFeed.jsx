@@ -20,7 +20,8 @@ const LiveFeed = ({ loading: parentLoading }) => {
         id: item.employees?.id || '-',
         time: item.created_at ? new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--',
         status: item.status,
-        raw_date: item.created_at
+        raw_date: item.created_at,
+        notes: item.notes
       }));
 
       setActivities(mapped);
@@ -76,6 +77,7 @@ const LiveFeed = ({ loading: parentLoading }) => {
                   <div className="min-w-0">
                     <h5 className="text-[10px] font-black text-slate-700 group-hover:text-[#E31E24] transition-colors uppercase truncate tracking-tight leading-none mb-1">{item.name}</h5>
                     <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest leading-none">{item.id}</p>
+                    {item.notes && <p className="text-[8px] text-slate-400 italic truncate mt-1">{item.notes}</p>}
                   </div>
                 </div>
                 <div className="text-right">

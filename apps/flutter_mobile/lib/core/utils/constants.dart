@@ -9,8 +9,8 @@ class AppConstants {
   static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? '';
 
   // App Colors (WKN Theme)
-  static const Color primaryColor = Color(0xFFF97316); // Orange
-  static const Color secondaryColor = Color(0xFFE31E24); // Red
+  static const Color primaryColor = Color(0xFFE31E24); // Red
+  static const Color secondaryColor = Color(0xFF0F172A); // Slate 900
   static const Color backgroundColor = Color(0xFFF8FAFC); // Slate-50
   static const Color darkBackground = Color(0xFF0F172A);
   static const Color textPrimary = Color(0xFF1E293B); // Slate-800

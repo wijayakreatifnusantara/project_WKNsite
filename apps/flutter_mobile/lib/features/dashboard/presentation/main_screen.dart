@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: _screens[_currentIndex],
       floatingActionButton: Container(
         decoration: BoxDecoration(
@@ -51,14 +52,28 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 10,
-        color: Colors.white,
-        elevation: 20,
-        child: SizedBox(
-          height: 65,
-          child: Row(
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: AppConstants.secondaryColor.withValues(alpha: 0.05),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            )
+          ]
+        ),
+        child: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 8,
+          color: Colors.transparent,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: SizedBox(
+            height: 60,
+            child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
@@ -78,6 +93,7 @@ class _MainScreenState extends State<MainScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

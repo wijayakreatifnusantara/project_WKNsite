@@ -62,13 +62,22 @@ async def login(login_data: LoginRequest, request: Request):
         if user:
             role = user.get("Role")
             
-            # Fetch permissions for this role
+            # Fetch permissions for this role (Optimized with Cache)
             permissions = []
             if role:
                 try:
-                    res = supabase_client.client.table("role_permissions").select("permission_name").eq("role_name", role.lower()).execute()
-                    if res.data:
-                        permissions = [p["permission_name"] for p in res.data]
+                    cache_key = f"role_perms_{role.lower()}"
+                    # Simple in-memory cache for 1 hour to speed up login
+                    if cache_key in supabase_client._cache:
+                        cached_perms, timestamp = supabase_client._cache[cache_key]
+                        if time.time() - timestamp < 3600:
+                            permissions = cached_perms
+                    
+                    if not permissions:
+                        res = supabase_client.client.table("role_permissions").select("permission_name").eq("role_name", role.lower()).execute()
+                        if res.data:
+                            permissions = [p["permission_name"] for p in res.data]
+                            supabase_client._cache[cache_key] = (permissions, time.time())
                 except Exception as e:
                     print(f"Error fetching permissions: {e}")
 
