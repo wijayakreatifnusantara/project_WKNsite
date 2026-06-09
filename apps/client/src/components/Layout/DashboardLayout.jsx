@@ -51,12 +51,16 @@ import {
 import { Card } from "@/components/ui/card";
 import { Clock, Users, CreditCard, Settings, Calendar, Bell } from "lucide-react";
 import AIDiagnosticCenter from '../AI/AIDiagnosticCenter';
+import CommandPalette from '../CommandPalette';
 import { useAuth } from '@/context/AuthContext';
 
 const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   const { profile, can, PERMISSIONS } = useAuth();
   const location = useLocation();
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const user = profile || legacyUser;
 
@@ -81,6 +85,47 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       setIsSidebarCollapsed(true);
     }
   }, [location.pathname]);
+
+  // Command Palette global listener (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Close Notification Dropdown on Click Outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isNotificationOpen && !e.target.closest('#notification-container')) {
+        setIsNotificationOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isNotificationOpen]);
+
+  // Close Profile Dropdown on Click Outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isProfileOpen && !e.target.closest('#profile-container')) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileOpen]);
+
+  // Dummy Notifications Data
+  const notifications = [
+    { id: 1, title: 'Pengajuan Lembur Baru', desc: 'Ahmad M. mengajukan lembur 4 jam.', time: '10 mnt lalu', type: 'overtime', isRead: false },
+    { id: 2, title: 'Koreksi Absen Menunggu', desc: 'Budi S. mengajukan koreksi clock-in.', time: '1 jam lalu', type: 'correction', isRead: false },
+    { id: 3, title: 'Peringatan Sistem', desc: 'Jadwal Payroll bulan ini akan ditutup dalam 3 hari.', time: '1 hari lalu', type: 'system', isRead: true },
+  ];
 
   const getBreadcrumbs = () => {
     const path = location.pathname;
@@ -407,33 +452,130 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             </div>
           </div>
 
-          <div className="flex-1"></div>
+          <div className="flex-1 flex justify-center px-4">
+            {/* Visual Trigger for Command Palette */}
+            <button 
+              onClick={() => setIsCommandPaletteOpen(true)}
+              className="hidden lg:flex items-center w-full max-w-sm bg-slate-50 border border-slate-200/80 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl px-3 py-2 text-slate-400 group shadow-sm"
+            >
+              <IconSearch size={16} className="text-slate-400 group-hover:text-slate-500 mr-2" />
+              <span className="text-xs font-medium mr-auto">Cari menu, halaman, dsb...</span>
+              <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 font-mono text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded shadow-sm">
+                <span className="text-[10px]">Ctrl</span>K
+              </kbd>
+            </button>
+          </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 p-1 rounded-xl">
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 p-1 rounded-xl relative" id="notification-container">
               <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
                 className="h-10 w-10 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
                 title="AI Diagnostics"
               >
                 <IconBrain size={20} />
-                <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-white"></span>
               </button>
-              <button className="h-10 w-10 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-all" title="Notifications">
+              <button 
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className={`h-10 w-10 flex items-center justify-center rounded-lg transition-all relative ${
+                  isNotificationOpen ? 'bg-slate-200 text-slate-800' : 'text-slate-400 hover:bg-slate-100'
+                }`}
+                title="Notifications"
+              >
                 <IconBell size={20} />
+                <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
               </button>
+
+              {/* Notification Dropdown */}
+              {isNotificationOpen && (
+                <div className="absolute top-14 right-0 w-80 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-slate-200 overflow-hidden animate-fade-in-down z-50">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Notifikasi</h3>
+                    <button className="text-[10px] font-bold text-slate-400 hover:text-[#E31E24]">Tandai Dibaca</button>
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                    {notifications.map(notif => (
+                      <div key={notif.id} className={`p-4 border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-red-50/20' : ''}`}>
+                        <div className="flex gap-3">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                            notif.type === 'overtime' ? 'bg-blue-100 text-blue-600' :
+                            notif.type === 'correction' ? 'bg-amber-100 text-amber-600' :
+                            'bg-slate-100 text-slate-600'
+                          }`}>
+                            {notif.type === 'overtime' ? <IconClockPlay size={14} /> : 
+                             notif.type === 'correction' ? <IconEditCircle size={14} /> : 
+                             <IconBell size={14} />}
+                          </div>
+                          <div>
+                            <h4 className={`text-[11px] font-bold ${!notif.isRead ? 'text-slate-800' : 'text-slate-600'}`}>{notif.title}</h4>
+                            <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">{notif.desc}</p>
+                            <span className="text-[9px] font-semibold text-slate-400 mt-1 block">{notif.time}</span>
+                          </div>
+                          {!notif.isRead && (
+                            <div className="h-2 w-2 bg-[#E31E24] rounded-full shrink-0 mt-1"></div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-2 bg-slate-50 border-t border-slate-100 text-center">
+                    <button className="text-[10px] font-bold text-[#E31E24] uppercase tracking-widest w-full py-1.5 hover:bg-[#E31E24]/10 rounded-lg transition-colors">
+                      Lihat Semua
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
             
-            <div className="flex items-center gap-2.5 pl-1">
-              <div className="hidden md:flex flex-col items-end">
-                <span className="text-xs font-semibold text-slate-700 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
-                <span className="text-[10px] font-bold text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200/85 flex items-center justify-center text-sm font-bold text-slate-700">
-                {(user?.fullName || user?.full_name)?.split(' ').map(n => n[0]).join('') || 'A'}
-              </div>
+            <div className="relative" id="profile-container">
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-2.5 pl-1 hover:bg-slate-50 p-1.5 rounded-xl transition-colors"
+              >
+                <div className="hidden md:flex flex-col items-end">
+                  <span className="text-xs font-semibold text-slate-700 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
+                  <span className="text-[10px] font-bold text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
+                </div>
+                <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200/85 flex items-center justify-center text-sm font-bold text-slate-700">
+                  {(user?.fullName || user?.full_name)?.split(' ').map(n => n[0]).join('') || 'A'}
+                </div>
+              </button>
+
+              {/* Profile Dropdown */}
+              {isProfileOpen && (
+                <div className="absolute top-14 right-0 w-64 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-slate-200 overflow-hidden animate-fade-in-down z-50">
+                  <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+                    <p className="text-sm font-bold text-slate-800">{user?.fullName || user?.full_name || 'Administrator'}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{user?.email || 'admin@wijayakn.com'}</p>
+                  </div>
+                  <div className="p-2 space-y-1">
+                    <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
+                      <IconId size={16} className="text-slate-400" />
+                      My Profile
+                    </button>
+                    <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
+                      <IconSettings size={16} className="text-slate-400" />
+                      Preferences
+                    </button>
+                    <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
+                      <IconMoon size={16} className="text-slate-400" />
+                      Dark Mode
+                      <span className="ml-auto text-[9px] font-bold bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded uppercase">Soon</span>
+                    </button>
+                  </div>
+                  <div className="p-2 border-t border-slate-100">
+                    <button 
+                      onClick={onLogout}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-[#E31E24] hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <IconLogout size={16} />
+                      Log Out Securely
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -444,6 +586,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       </main>
 
       <AIDiagnosticCenter isOpen={isDiagnosticsOpen} onClose={() => setIsDiagnosticsOpen(false)} />
+      <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
     </div>
   );
 };

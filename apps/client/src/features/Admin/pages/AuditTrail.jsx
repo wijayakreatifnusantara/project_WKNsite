@@ -27,17 +27,27 @@ const AuditTrail = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/api/rbac/audit-logs');
-      if (response.status === 'success') {
-        let logData = response.data || [];
+      // For presentation purposes, we load premium dummy data
+      setTimeout(() => {
+        const dummyData = [
+          { id: 101, created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(), action: 'UPDATE', module: 'Payroll', entity_id: 'Approved Salary Q3 2026', profiles: { full_name: 'Adi Anto' } },
+          { id: 102, created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), action: 'DELETE', module: 'Employees', entity_id: 'User ID: 8942 (Budi Santoso)', profiles: { full_name: 'Admin HR' } },
+          { id: 103, created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(), action: 'CREATE', module: 'Assets', entity_id: 'MacBook Pro M3 Max (Asset #401)', profiles: { full_name: 'IT Support' } },
+          { id: 104, created_at: new Date(Date.now() - 1000 * 60 * 240).toISOString(), action: 'UPDATE', module: 'System', entity_id: 'Changed Global SMTP Settings', profiles: { full_name: 'System Admin' } },
+          { id: 105, created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(), action: 'CREATE', module: 'Performance', entity_id: 'KPI Template Q4 Engineering', profiles: { full_name: 'Adi Anto' } },
+          { id: 106, created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), action: 'UPDATE', module: 'Employees', entity_id: 'Promoted Rina to Sr. Manager', profiles: { full_name: 'Adi Anto' } },
+        ];
+        
+        let logData = dummyData;
         if (selectedModule !== 'All') {
           logData = logData.filter(log => log.module === selectedModule);
         }
         setLogs(logData);
-      }
+        setLoading(false);
+      }, 600); // Simulate network latency
+      
     } catch (err) {
       console.error("Error fetching audit logs:", err);
-    } finally {
       setLoading(false);
     }
   };
@@ -75,7 +85,7 @@ const AuditTrail = () => {
 
         {/* Filter Bar */}
         <div className="flex gap-2 p-2 rounded-xl bg-white border border-slate-200 shadow-sm overflow-x-auto no-scrollbar">
-          {['All', 'Employees', 'Assets', 'Payroll', 'Performance', 'Documents'].map(mod => (
+          {['All', 'Employees', 'Assets', 'Payroll', 'Performance', 'System'].map(mod => (
             <button
               key={mod}
               onClick={() => setSelectedModule(mod)}
