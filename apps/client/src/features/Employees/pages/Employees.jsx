@@ -29,7 +29,8 @@ import {
   IconCalculator,
   IconSchool,
   IconBolt,
-  IconUsersGroup
+  IconUsersGroup,
+  IconKey
 } from "@tabler/icons-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";

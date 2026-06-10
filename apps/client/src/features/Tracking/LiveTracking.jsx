@@ -25,7 +25,9 @@ const LiveTracking = () => {
   const fetchLocations = async () => {
     try {
       const res = await apiClient.get('/api/tracking/active');
-      if (res.data) {
+      if (res.data && Array.isArray(res.data.data)) {
+        setEmployees(res.data.data);
+      } else if (Array.isArray(res.data)) {
         setEmployees(res.data);
       }
       setLastUpdated(new Date());
