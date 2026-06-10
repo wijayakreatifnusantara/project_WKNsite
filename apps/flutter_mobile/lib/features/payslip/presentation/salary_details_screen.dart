@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -69,12 +70,12 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Rincian Gaji', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Rincian Gaji', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -102,9 +103,9 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Take Home Pay (THP)', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            Text(_formatCurrency(netSalary), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                            Text('Take Home Pay (THP)', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 8),
+                            Text(_formatCurrency(netSalary), style: TextStyle(color: context.surfaceColor, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: -1)),
                             const SizedBox(height: 16),
                             const Divider(color: Colors.white24, height: 1),
                             const SizedBox(height: 16),
@@ -114,8 +115,8 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Total Penerimaan', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold)),
-                                      Text(_formatCurrency(totalEarnings), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                                      Text('Total Penerimaan', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold)),
+                                      Text(_formatCurrency(totalEarnings), style: TextStyle(color: context.surfaceColor, fontSize: 16, fontWeight: FontWeight.w800)),
                                     ],
                                   ),
                                 ),
@@ -123,7 +124,7 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Total Potongan', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold)),
+                                      Text('Total Potongan', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold)),
                                       Text(_formatCurrency(totalDeductions), style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 16, fontWeight: FontWeight.w800)),
                                     ],
                                   ),
@@ -204,15 +205,15 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             elevation: 5,
                           ),
-                          icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
-                          label: const Text('AJUKAN KOREKSI GAJI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                          icon: Icon(Icons.warning_amber_rounded, color: context.surfaceColor),
+                          label: Text('AJUKAN KOREKSI GAJI', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      const Text(
+                      SizedBox(height: 20),
+                      Text(
                         'Ini adalah rincian gaji resmi Anda yang diinput oleh HR/Admin. Karyawan tidak dapat mengubah rincian ini. Jika ada ketidaksesuaian nominal, segera ajukan form koreksi gaji.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 11, color: AppConstants.textSecondary, height: 1.5),
+                        style: TextStyle(fontSize: 11, color: context.textSecondary, height: 1.5),
                       ),
                       const SizedBox(height: 40),
                     ],
@@ -229,11 +230,11 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.document_scanner, size: 64, color: Colors.grey),
-            const SizedBox(height: 20),
-            const Text('Data Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
-            const SizedBox(height: 10),
-            const Text('Admin belum menginput data gaji Anda ke dalam sistem.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: AppConstants.textSecondary)),
+            Icon(Icons.document_scanner, size: 64, color: Colors.grey),
+            SizedBox(height: 20),
+            Text('Data Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
+            SizedBox(height: 10),
+            Text('Admin belum menginput data gaji Anda ke dalam sistem.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: context.textSecondary)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _fetchData,
@@ -263,7 +264,7 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
       padding: const EdgeInsets.all(14),
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
       ),
@@ -273,10 +274,10 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
 
   Widget _buildInputRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppConstants.textPrimary))),
+          Expanded(child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary))),
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -284,7 +285,7 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey.shade300),
             ),
-            child: Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+            child: Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
           )
         ],
       ),
@@ -295,7 +296,7 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+        Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: context.textPrimary)),
         Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: valueColor)),
       ],
     );

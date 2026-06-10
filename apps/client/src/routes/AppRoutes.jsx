@@ -35,6 +35,7 @@ import Offboarding from '../features/Company/pages/Offboarding';
 import OnboardingPage from '../features/Employees/pages/OnboardingPage';
 import LocationManagerPage from '../features/Attendance/pages/LocationManagerPage';
 import OvertimeManagementPage from '../features/Attendance/pages/OvertimeManagementPage';
+import LiveTracking from '../features/Tracking/LiveTracking';
 import CareerPortal from '../features/Careers/pages/CareerPortal';
 import AuthenticatedApp from '../layouts/AuthenticatedApp';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
@@ -74,6 +75,7 @@ const AppRoutes = () => {
         <Route path="/attendance/schedule" element={<ScheduleManager />} />
         <Route path="/attendance/correction" element={<AttendanceCorrection />} />
         <Route path="/attendance/location" element={<LocationManagerPage />} />
+        <Route path="/attendance/tracking" element={<LiveTracking />} />
         <Route path="/attendance/report" element={<AttendanceReport />} />
         <Route path="/attendance/recap" element={<AttendanceRecap />} />
         <Route path="/attendance/overtime" element={<OvertimeManagementPage />} />

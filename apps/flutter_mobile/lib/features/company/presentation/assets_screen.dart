@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 
@@ -8,10 +9,10 @@ class AssetsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Aset Perusahaan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Aset Perusahaan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         actions: [
           IconButton(icon: const Icon(Icons.qr_code_scanner, color: AppConstants.primaryColor), onPressed: () {}),
@@ -39,6 +40,7 @@ class AssetsScreen extends StatelessWidget {
             const SizedBox(height: 12),
             
             _buildAssetItem(
+              context,
               name: 'MacBook Pro M2 14"',
               assetCode: 'WKN-AST-IT-0012',
               dateAssigned: '15 Jan 2024',
@@ -46,6 +48,7 @@ class AssetsScreen extends StatelessWidget {
               icon: Icons.laptop_mac
             ),
             _buildAssetItem(
+              context,
               name: 'Monitor LG 27"',
               assetCode: 'WKN-AST-IT-0089',
               dateAssigned: '15 Jan 2024',
@@ -53,6 +56,7 @@ class AssetsScreen extends StatelessWidget {
               icon: Icons.monitor
             ),
             _buildAssetItem(
+              context,
               name: 'ID Card & Access Key',
               assetCode: 'WKN-AST-HR-0442',
               dateAssigned: '10 Jan 2024',
@@ -80,11 +84,11 @@ class AssetsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAssetItem({required String name, required String assetCode, required String dateAssigned, required String status, required IconData icon}) {
+  Widget _buildAssetItem(BuildContext context, {required String name, required String assetCode, required String dateAssigned, required String status, required IconData icon}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))]),
+      decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))]),
       child: Row(
         children: [
           Container(
@@ -97,7 +101,7 @@ class AssetsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppConstants.textPrimary)),
+                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: context.textPrimary)),
                 const SizedBox(height: 4),
                 Text(assetCode, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                 const SizedBox(height: 8),

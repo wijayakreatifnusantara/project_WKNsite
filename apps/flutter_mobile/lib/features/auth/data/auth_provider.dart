@@ -4,6 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
+import '../../../core/utils/constants.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -34,6 +37,26 @@ class AuthProvider extends ChangeNotifier {
         
         if (elapsed < tenHoursMs) {
           _userData = jsonDecode(sessionStr);
+          
+          // Sinkronisasi FCM Token jika sesi aktif
+          try {
+            String? authToken = await _secureStorage.read(key: 'authToken');
+            if (authToken != null) {
+              String? fcmToken = await FirebaseMessaging.instance.getToken();
+              if (fcmToken != null) {
+                 await http.put(
+                   Uri.parse('${AppConstants.apiUrl}/employees/fcm-token'),
+                   headers: {
+                     'Content-Type': 'application/json',
+                     'Authorization': 'Bearer $authToken',
+                   },
+                   body: jsonEncode({'token': fcmToken}),
+                 );
+              }
+            }
+          } catch(e) {
+             debugPrint('Gagal sync FCM Token saat resume: $e');
+          }
         } else {
           await logout();
         }
@@ -93,8 +116,29 @@ class AuthProvider extends ChangeNotifier {
         await prefs.setString('userSession', jsonEncode(_userData));
         await prefs.setString('loginTimestamp', DateTime.now().millisecondsSinceEpoch.toString());
 
+        // Simpan kredensial biometrik (Opsi A: tersimpan terus untuk fast login)
+        await _secureStorage.write(key: 'saved_email', value: email);
+        await _secureStorage.write(key: 'saved_password', value: password);
+
         if (response.session != null) {
           await _secureStorage.write(key: 'authToken', value: response.session!.accessToken);
+          
+          // Sinkronisasi FCM Token ke Backend
+          try {
+            String? fcmToken = await FirebaseMessaging.instance.getToken();
+            if (fcmToken != null) {
+               await http.put(
+                 Uri.parse('${AppConstants.apiUrl}/employees/fcm-token'),
+                 headers: {
+                   'Content-Type': 'application/json',
+                   'Authorization': 'Bearer ${response.session!.accessToken}',
+                 },
+                 body: jsonEncode({'token': fcmToken}),
+               );
+            }
+          } catch(e) {
+             debugPrint('Gagal sync FCM Token: $e');
+          }
         }
 
         _isLoading = false;
@@ -129,5 +173,20 @@ class AuthProvider extends ChangeNotifier {
     await _secureStorage.delete(key: 'authToken');
     _userData = null;
     notifyListeners();
+  }
+
+  Future<bool> hasSavedCredentials() async {
+    final email = await _secureStorage.read(key: 'saved_email');
+    final password = await _secureStorage.read(key: 'saved_password');
+    return email != null && email.isNotEmpty && password != null && password.isNotEmpty;
+  }
+
+  Future<String?> biometricLogin() async {
+    final email = await _secureStorage.read(key: 'saved_email');
+    final password = await _secureStorage.read(key: 'saved_password');
+    if (email != null && password != null) {
+      return await login(email, password);
+    }
+    return 'Kredensial tidak ditemukan. Silakan login manual terlebih dahulu.';
   }
 }

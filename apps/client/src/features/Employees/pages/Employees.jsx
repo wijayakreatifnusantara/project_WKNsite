@@ -44,6 +44,7 @@ import AuditTrail from './components/AuditTrail';
 import SalarySimulator from './components/SalarySimulator';
 import AddEmployeeModal from './components/AddEmployeeModal';
 import BulkUploadModal from './components/BulkUploadModal';
+import ResetPasswordModal from './components/ResetPasswordModal';
 import { apiClient } from '@/lib/apiClient';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -79,6 +80,19 @@ const Employees = () => {
   const [isSalarySimulatorOpen, setIsSalarySimulatorOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [resetPasswordEmployee, setResetPasswordEmployee] = useState(null);
+
+  const handleResetDevice = async (emp) => {
+    if (window.confirm(`Reset Device (Biometrik) untuk ${emp["EMPLOYEE NAME"]}?`)) {
+      try {
+        await apiClient.put(`/api/employees/${emp.id || emp["EMPLOYEE ID"]}/reset-device`);
+        alert('Device berhasil di-reset!');
+        fetchEmployees();
+      } catch (err) {
+        alert(err.message || 'Gagal reset device');
+      }
+    }
+  };
 
   // Handle Search Debouncing
   useEffect(() => {
@@ -431,6 +445,18 @@ const Employees = () => {
                                 Resign
                               </button>
                             )}
+                            <button 
+                                onClick={() => setResetPasswordEmployee(emp)} 
+                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-100 rounded-md hover:bg-blue-100/50 transition-colors"
+                            >
+                                PWD
+                            </button>
+                            <button 
+                                onClick={() => handleResetDevice(emp)} 
+                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 border border-purple-100 rounded-md hover:bg-purple-100/50 transition-colors"
+                            >
+                                DEV
+                            </button>
                           </>
                         )}
                       </div>
@@ -595,6 +621,8 @@ const Employees = () => {
                                     ) : (
                                       <ActionButton onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} icon={<IconUserX size={14} />} hover="hover:text-rose-600 hover:bg-rose-50" label="RESIGN" />
                                     )}
+                                    <ActionButton onClick={() => setResetPasswordEmployee(emp)} icon={<IconKey size={14} />} hover="hover:text-blue-600 hover:bg-blue-50" label="RESET PWD" />
+                                    <ActionButton onClick={() => handleResetDevice(emp)} icon={<IconRotate size={14} />} hover="hover:text-purple-600 hover:bg-purple-50" label="RESET DEVICE" />
                                   </>
                                 )}
                               </div>
@@ -697,6 +725,7 @@ const Employees = () => {
       <AuditTrail isOpen={isAuditOpen} onClose={() => setIsAuditOpen(false)} employee={auditTargetEmployee} />
       <SalarySimulator isOpen={isSalarySimulatorOpen} onClose={() => setIsSalarySimulatorOpen(false)} employees={employees} />
       <BulkUploadModal isOpen={isBulkModalOpen} onClose={() => setIsBulkModalOpen(false)} onRefresh={fetchEmployees} />
+      <ResetPasswordModal isOpen={!!resetPasswordEmployee} onClose={() => setResetPasswordEmployee(null)} employee={resetPasswordEmployee} onSuccess={fetchEmployees} />
     </div>
   );
 };

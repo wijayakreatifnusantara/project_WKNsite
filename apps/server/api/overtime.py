@@ -380,6 +380,17 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
         except Exception as pdf_err:
             print(f"[PDF Generator] Error during overtime approval PDF regeneration: {pdf_err}")
 
+        # 3. Send Push Notification (FCM)
+        try:
+            from utils.fcm_service import send_fcm_notification
+            fcm_token = employee_data.get("fcm_token")
+            if fcm_token:
+                title = f"Status Lembur: {status}"
+                body = f"Pengajuan lembur Anda telah {'disetujui' if status == 'Approved' else 'ditolak'}."
+                send_fcm_notification(fcm_token, title, body, {"type": "overtime", "request_id": str(request_id), "status": status})
+        except Exception as fcm_err:
+            print(f"[FCM] Error sending notification for overtime: {fcm_err}")
+
         return {"status": "success", "data": res.data[0]}
     except HTTPException:
         raise

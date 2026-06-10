@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/services.dart';
 import '../../profile/presentation/profile_screen.dart';
 import '../../inbox/presentation/inbox_screen.dart';
 import '../../helpdesk/presentation/helpdesk_screen.dart';
-import '../../../core/utils/biometric_helper.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/utils/tracking_service.dart';
 import 'dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -27,6 +27,18 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    TrackingService.startTracking();
+  }
+
+  @override
+  void dispose() {
+    TrackingService.stopTracking();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
@@ -46,16 +58,16 @@ class _MainScreenState extends State<MainScreen> {
         child: FloatingActionButton(
           onPressed: () => context.push('/assistant'),
           backgroundColor: AppConstants.secondaryColor,
-          shape: const CircleBorder(),
+          shape: CircleBorder(),
           elevation: 0,
-          child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+          child: Icon(Icons.auto_awesome, color: context.surfaceColor, size: 28),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(

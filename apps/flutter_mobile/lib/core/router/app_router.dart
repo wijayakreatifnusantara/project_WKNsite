@@ -26,6 +26,7 @@ import '../../features/company/presentation/performance_screen.dart';
 import '../../features/company/presentation/assets_screen.dart';
 import '../../features/company/presentation/approval_screen.dart';
 import '../../features/reports/presentation/report_screen.dart';
+import '../../features/gamification/presentation/leaderboard_screen.dart';
 import '../utils/auth_guard.dart';
 
 GoRouter createAppRouter(AuthProvider authProvider) {
@@ -67,6 +68,7 @@ GoRouter createAppRouter(AuthProvider authProvider) {
     GoRoute(path: '/assets', builder: (context, state) => const AssetsScreen()),
     GoRoute(path: '/approval', builder: (context, state) => const ApprovalScreen()),
     GoRoute(path: '/reports', builder: (context, state) => const ReportScreen()),
+    GoRoute(path: '/leaderboard', builder: (context, state) => const LeaderboardScreen()),
   ],
   redirect: authGuard,
   );

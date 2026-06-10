@@ -1,11 +1,59 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) async {
+  debugPrint('notificationTapBackground: ${notificationResponse.actionId}');
+  if (notificationResponse.actionId == 'approve' || notificationResponse.actionId == 'reject') {
+    bool isApprove = notificationResponse.actionId == 'approve';
+    
+    // Simulasi proses API di background
+    await Future.delayed(const Duration(seconds: 1));
+    
+    // Munculkan popup/notifikasi sukses setelah berhasil diproses
+    String statusStr = isApprove ? 'Disetujui' : 'Ditolak';
+    await flutterLocalNotificationsPlugin.show(
+      id: 999, // ID notifikasi sukses
+      title: 'Aksi Berhasil',
+      body: 'Pengajuan berhasil $statusStr.',
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'wkn_success_channel',
+          'Notifikasi Sukses',
+          channelDescription: 'Kanal untuk notifikasi berhasil',
+          importance: Importance.max,
+          priority: Priority.high,
+          color: Colors.green,
+        ),
+      ),
+    );
+  }
+}
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   Future<void> initNotifications() async {
-    // 1. Request permission
+    // 1. Inisialisasi Local Notifications
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/launcher_icon');
+    const DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings();
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+    );
+    
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+         debugPrint('onDidReceiveNotificationResponse: ${response.actionId}');
+      },
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+    );
+
+    // 2. Request permission Firebase
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
@@ -14,37 +62,65 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('User granted notification permission');
-      
-      // 2. Get FCM token
       String? token = await _firebaseMessaging.getToken();
       debugPrint('FCM Token: $token');
-      // Kirim token ini ke backend via API nantinya (saat integrasi push notification siap)
       
-      // 3. Handle foreground messages
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        debugPrint('Got a message whilst in the foreground!');
-        debugPrint('Message data: ${message.data}');
-
         if (message.notification != null) {
-          debugPrint('Message also contained a notification: ${message.notification}');
-          // Note: FlutterLocalNotificationsPlugin can be used here to show a Heads-up notification
+          debugPrint('Got foreground message: ${message.notification?.title}');
         }
       });
       
-      // 4. Handle background / terminated messages when user taps them
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        debugPrint('A new onMessageOpenedApp event was published!');
+        debugPrint('Opened app from FCM message!');
       });
     }
 
-    // 5. Setup background message handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  // Fungsi untuk memicu notifikasi 'Satu Ketukan' secara manual/lokal
+  Future<void> showApprovalNotification(String title, String body, String payload) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'wkn_approval_channel',
+      'Persetujuan Pengajuan',
+      channelDescription: 'Kanal untuk notifikasi persetujuan (Approve/Reject)',
+      importance: Importance.max,
+      priority: Priority.high,
+      color: Color(0xFFE31E24), // WKN Primary Color
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          'reject',
+          'Tolak',
+          cancelNotification: true,
+          showsUserInterface: false,
+          titleColor: Colors.red,
+        ),
+        AndroidNotificationAction(
+          'approve',
+          'Setujui',
+          cancelNotification: true,
+          showsUserInterface: false,
+          titleColor: Colors.green,
+        ),
+      ],
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      id: 0,
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
+    );
   }
 }
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
   debugPrint("Handling a background message: ${message.messageId}");
 }

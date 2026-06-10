@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
@@ -68,6 +69,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
       if (photo != null) {
         setState(() => _isSubmitLoading = true);
         if (_currentPosition == null) await _fetchLocation();
+        if (!mounted) return;
         
         final user = context.read<AuthProvider>().userData;
         final watermarkedFile = await WatermarkService.addWatermark(
@@ -89,8 +91,10 @@ class _LeaveScreenState extends State<LeaveScreen> {
         _showImagePreviewDialog(watermarkedFile);
       }
     } catch (e) {
-      setState(() => _isSubmitLoading = false);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal ambil foto: $e')));
+      if (mounted) {
+        setState(() => _isSubmitLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal ambil foto: $e')));
+      }
     }
   }
 
@@ -111,7 +115,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.check),
               label: const Text('Simpan Foto'),
-              style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor, foregroundColor: context.surfaceColor),
             )
           ],
         ),
@@ -135,6 +139,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
       final user = context.read<AuthProvider>().userData;
       if (user != null) {
         final data = await _leaveService.getMyRequests(user['id']);
+        if (!mounted) return;
         setState(() {
           _requests = data;
         });
@@ -142,7 +147,9 @@ class _LeaveScreenState extends State<LeaveScreen> {
     } catch (e) {
       debugPrint('Error fetching leaves: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -188,10 +195,10 @@ class _LeaveScreenState extends State<LeaveScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppConstants.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: AppConstants.textPrimary,
+              onPrimary: context.surfaceColor,
+              onSurface: context.textPrimary,
             ),
           ),
           child: child!,
@@ -353,12 +360,12 @@ class _LeaveScreenState extends State<LeaveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Izin & Cuti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Izin & Cuti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
         actions: [
@@ -384,7 +391,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
@@ -393,9 +400,9 @@ class _LeaveScreenState extends State<LeaveScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Formulir Izin & Cuti Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            const Text('JENIS ABSEN / CUTI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+            Text('Formulir Izin & Cuti Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
+            Text('JENIS ABSEN / CUTI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -443,11 +450,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
                   ],
                 ),
               ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildTextField('ALASAN / DETAIL PENGAJUAN', _reasonCtrl, 'Tulis keterangan lengkap...', maxLines: 4),
             
-            const SizedBox(height: 16),
-            const Text('LAMPIRAN FOTO (OPSIONAL)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+            SizedBox(height: 16),
+            Text('LAMPIRAN FOTO (OPSIONAL)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
             const SizedBox(height: 8),
             InkWell(
               onTap: _takeProofPhoto,
@@ -466,7 +473,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                     Expanded(
                       child: Text(
                         _proofPhotoPath != null ? 'Foto berhasil dilampirkan (Ketuk ganti)' : 'Ambil foto bukti (Surat dokter, dll)',
-                        style: TextStyle(color: _proofPhotoPath != null ? Colors.green : AppConstants.textPrimary, fontSize: 12, fontWeight: _proofPhotoPath != null ? FontWeight.bold : FontWeight.normal),
+                        style: TextStyle(color: _proofPhotoPath != null ? Colors.green : context.textPrimary, fontSize: 12, fontWeight: _proofPhotoPath != null ? FontWeight.bold : FontWeight.normal),
                       ),
                     ),
                     if (_proofPhotoPath != null)
@@ -489,11 +496,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
                 onPressed: _isSubmitLoading ? null : _handleCreateRequest,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppConstants.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: context.surfaceColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                icon: _isSubmitLoading ? const SizedBox() : const Icon(Icons.send),
-                label: _isSubmitLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('KIRIM PENGAJUAN', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: _isSubmitLoading ? SizedBox() : Icon(Icons.send),
+                label: _isSubmitLoading ? CircularProgressIndicator(color: context.surfaceColor) : Text('KIRIM PENGAJUAN', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -505,7 +512,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
   Widget _buildTypeChip(String key, String label) {
     final isSelected = _leaveType == key;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(color: isSelected ? Colors.white : AppConstants.textPrimary, fontSize: 12)),
+      label: Text(label, style: TextStyle(color: isSelected ? context.surfaceColor : context.textPrimary, fontSize: 12)),
       selected: isSelected,
       selectedColor: AppConstants.primaryColor,
       backgroundColor: Colors.grey[100],
@@ -519,7 +526,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -550,11 +557,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
       color: AppConstants.primaryColor,
       child: _requests.isEmpty
           ? SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: AlwaysScrollableScrollPhysics(),
               child: Container(
                 height: 400,
                 alignment: Alignment.center,
-                child: const Text('Belum ada riwayat pengajuan cuti/izin.', style: TextStyle(color: AppConstants.textSecondary)),
+                child: Text('Belum ada riwayat pengajuan cuti/izin.', style: TextStyle(color: context.textSecondary)),
               ),
             )
           : ListView.separated(
@@ -566,7 +573,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
@@ -599,20 +606,20 @@ class _LeaveScreenState extends State<LeaveScreen> {
                           )
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text('${item.startDate} s/d ${item.endDate}', style: const TextStyle(fontSize: 12, color: AppConstants.textSecondary)),
+                      SizedBox(height: 6),
+                      Text('${item.startDate} s/d ${item.endDate}', style: TextStyle(fontSize: 12, color: context.textSecondary)),
                       if (item.leaveType == 'Emergency' && item.startTime != null)
-                        Text('Jam: ${item.startTime} - ${item.endTime}', style: const TextStyle(fontSize: 12, color: AppConstants.textSecondary, fontWeight: FontWeight.bold)),
-                      const Divider(height: 24),
+                        Text('Jam: ${item.startTime} - ${item.endTime}', style: TextStyle(fontSize: 12, color: context.textSecondary, fontWeight: FontWeight.bold)),
+                      Divider(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Keperluan:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
-                          Text('${item.daysCount} Hari Kerja', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.primaryColor)),
+                          Text('Keperluan:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.textSecondary)),
+                          Text('${item.daysCount} Hari Kerja', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.primaryColor)),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(item.reason, style: const TextStyle(fontSize: 12, color: AppConstants.textPrimary)),
+                      SizedBox(height: 4),
+                      Text(item.reason, style: TextStyle(fontSize: 12, color: context.textPrimary)),
                       if (item.pdfUrl != null && item.pdfUrl!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Align(

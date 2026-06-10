@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/utils/constants.dart';
+import '../../../core/utils/notification_service.dart';
 
 class ApprovalScreen extends StatefulWidget {
   const ApprovalScreen({super.key});
@@ -38,16 +39,32 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Persetujuan Tim', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Persetujuan Tim', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notifikasi tes akan muncul dalam 3 detik. Silakan tutup aplikasi/kembali ke Home.')),
+          );
+          await Future.delayed(const Duration(seconds: 3));
+          await NotificationService().showApprovalNotification(
+            'Pengajuan Cuti: Ahmad Fauzi', 
+            'Cuti Tahunan (Acara Keluarga) - 12 Jun s.d 14 Jun 2026', 
+            'approval_1'
+          );
+        },
+        icon: const Icon(Icons.notification_add, color: Colors.white),
+        label: const Text('Test Notif', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blue,
       ),
       body: _pendingApprovals.isEmpty
         ? _buildEmptyState()
         : ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16).copyWith(bottom: 80),
             itemCount: _pendingApprovals.length,
             itemBuilder: (context, index) {
               final item = _pendingApprovals[index];
@@ -61,7 +78,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
+                  decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: context.borderColor)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -91,7 +108,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppConstants.textPrimary)),
+                                Text(item['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: context.textPrimary)),
                                 const SizedBox(height: 2),
                                 Text(item['date'], style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
                               ],
@@ -100,7 +117,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Text(item['desc'], style: const TextStyle(fontSize: 12, color: AppConstants.textSecondary)),
+                      Text(item['desc'], style: TextStyle(fontSize: 12, color: context.textSecondary)),
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -115,7 +132,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () => _handleApprove(index, true),
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: context.surfaceColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                               child: const Text('Setujui'),
                             ),
                           ),
@@ -139,9 +156,9 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 32),
-          const SizedBox(height: 4),
-          Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+          Icon(icon, color: context.surfaceColor, size: 32),
+          SizedBox(height: 4),
+          Text(text, style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, fontSize: 12)),
         ],
       ),
     );

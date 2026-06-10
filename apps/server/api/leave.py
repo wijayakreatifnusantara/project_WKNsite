@@ -208,6 +208,17 @@ async def approve_leave_request(request_id: str, payload: Dict[str, Any], curren
                         "annual_leave_balance": new_balance
                     }).eq("employee_id", eid).execute()
         
+        # 3. Send Push Notification (FCM)
+        try:
+            from utils.fcm_service import send_fcm_notification
+            fcm_token = employee_data.get("fcm_token")
+            if fcm_token:
+                title = f"Status Cuti: {status}"
+                body = f"Pengajuan cuti Anda telah {'disetujui' if status == 'Approved' else 'ditolak'}."
+                send_fcm_notification(fcm_token, title, body, {"type": "leave", "request_id": str(request_id), "status": status})
+        except Exception as fcm_err:
+            print(f"[FCM] Error sending notification for leave: {fcm_err}")
+
         return {"status": "success", "data": request_data}
 
     except Exception as e:

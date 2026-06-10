@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 
@@ -36,17 +37,17 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         title: Container(
           decoration: const BoxDecoration(border: Border(left: BorderSide(color: AppConstants.primaryColor, width: 4))),
-          padding: const EdgeInsets.only(left: 12),
+          padding: EdgeInsets.only(left: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('Menu Eksplorasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+            children: [
+              Text('Menu Eksplorasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
               Text('Kelola pekerjaan dan informasi perusahaan', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -61,7 +62,7 @@ class _MenuScreenState extends State<MenuScreen> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(14),
                 border: const Border(left: BorderSide(color: AppConstants.primaryColor, width: 4), top: BorderSide(color: Color(0xFFF1F5F9)), right: BorderSide(color: Color(0xFFF1F5F9)), bottom: BorderSide(color: Color(0xFFF1F5F9))),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]
@@ -69,9 +70,9 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Row(
                 children: [
                   _buildStatItem('12', 'Sisa Cuti'),
-                  Container(width: 1, height: 24, color: Colors.grey.shade200),
+                  Container(width: 1, height: 24, color: context.borderColor),
                   _buildStatItem('98%', 'Kehadiran'),
-                  Container(width: 1, height: 24, color: Colors.grey.shade200),
+                  Container(width: 1, height: 24, color: context.borderColor),
                   _buildStatItem('4.5h', 'Lembur (Bln ini)', color: AppConstants.primaryColor),
                 ],
               ),
@@ -102,14 +103,14 @@ class _MenuScreenState extends State<MenuScreen> {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text('WKN Academy', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        children: [
+                          Text('WKN Academy', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, fontSize: 16)),
                           SizedBox(height: 4),
                           Text('Pelajari modul dan sertifikasi baru secara mandiri.', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
-                    const Icon(Icons.arrow_circle_right, color: Colors.white, size: 32)
+                    Icon(Icons.arrow_circle_right, color: context.surfaceColor, size: 32)
                   ],
                 ),
               ),
@@ -125,7 +126,7 @@ class _MenuScreenState extends State<MenuScreen> {
     return Expanded(
       child: Column(
         children: [
-          Text(val, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color ?? AppConstants.textPrimary)),
+          Text(val, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color ?? context.textPrimary)),
           const SizedBox(height: 2),
           Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
         ],
@@ -136,9 +137,9 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget _buildAccordionSection(String title, IconData headerIcon, List<Map<String, dynamic>> items, {bool initiallyExpanded = false}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: context.borderColor),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 8, offset: const Offset(0, 2))]
       ),
       child: ClipRRect(
@@ -149,10 +150,10 @@ class _MenuScreenState extends State<MenuScreen> {
             initiallyExpanded: initiallyExpanded,
             iconColor: AppConstants.primaryColor,
             collapsedIconColor: Colors.grey.shade400,
-            leading: Icon(headerIcon, color: AppConstants.textPrimary, size: 24),
+            leading: Icon(headerIcon, color: context.textPrimary, size: 24),
             title: Text(
               title, 
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppConstants.textPrimary, letterSpacing: 0.5)
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: context.textPrimary, letterSpacing: 0.5)
             ),
             children: [
               Padding(
@@ -180,14 +181,14 @@ class _MenuScreenState extends State<MenuScreen> {
                             decoration: BoxDecoration(
                               color: Colors.grey.shade50,
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: Colors.grey.shade200)
+                              border: Border.all(color: context.borderColor)
                             ),
                             child: Icon(item['icon'], color: AppConstants.primaryColor, size: 24),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             item['title'], 
-                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppConstants.textSecondary), 
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: context.textSecondary), 
                             textAlign: TextAlign.center, 
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

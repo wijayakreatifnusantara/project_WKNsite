@@ -656,6 +656,24 @@ async def process_correction(correction_id: str, payload: CorrectionUpdate, curr
                 }
                 supabase_client.client.table("attendance").insert(attendance_insert).execute()
 
+        # Send Push Notification (FCM)
+        if res.data:
+            correction = res.data[0]
+            try:
+                from utils.fcm_service import send_fcm_notification
+                eid = correction.get("employee_id")
+                emp_for_fcm = supabase_client.client.table("employees").select("fcm_token").eq("id", eid).execute()
+                if not emp_for_fcm.data:
+                    emp_for_fcm = supabase_client.client.table("employees").select("fcm_token").eq("employee_id", eid).execute()
+                
+                if emp_for_fcm.data and emp_for_fcm.data[0].get("fcm_token"):
+                    fcm_token = emp_for_fcm.data[0]["fcm_token"]
+                    title = f"Koreksi Absen: {payload.status}"
+                    body = f"Koreksi absensi Anda telah {'disetujui' if payload.status == 'APPROVED' else 'ditolak'}."
+                    send_fcm_notification(fcm_token, title, body, {"type": "correction", "correction_id": str(correction_id), "status": payload.status})
+            except Exception as fcm_err:
+                print(f"[FCM] Error sending notification for correction: {fcm_err}")
+
         return {"status": "success", "data": res.data[0] if res.data else None}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import '../../auth/data/auth_provider.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/widgets/cached_avatar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../attendance/data/attendance_service.dart';
 import 'dart:async';
@@ -16,6 +18,7 @@ import 'package:http/http.dart' as http;
 import '../../attendance/data/offline_attendance_service.dart';
 import 'package:text_scroll/text_scroll.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -41,10 +44,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     {'id': 'announcements', 'icon': Icons.campaign, 'label': 'Pengumuman', 'route': '/announcements'},
     {'id': 'academy', 'icon': Icons.school_outlined, 'label': 'Academy', 'route': '/academy'},
     {'id': 'helpdesk', 'icon': Icons.help_outline, 'label': 'Helpdesk', 'route': '/helpdesk'},
+    {'id': 'assistant', 'icon': Icons.auto_awesome, 'label': 'AI HR', 'route': '/assistant'},
+    {'id': 'leaderboard', 'icon': Icons.emoji_events, 'label': 'Peringkat', 'route': '/leaderboard'},
   ];
 
   // Default active actions if user hasn't customized
-  List<String> _activeActionIds = ['leave', 'overtime', 'payslip', 'reimburse', 'documents', 'performance', 'reports'];
+  List<String> _activeActionIds = ['leave', 'overtime', 'payslip', 'reimburse', 'leaderboard', 'performance', 'assistant'];
   bool _isLoading = true;
   String _todayStatus = 'Memuat...';
   bool _hasClockedIn = false;
@@ -61,6 +66,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int? _weatherCode;
   double? _compassHeading;
   StreamSubscription<CompassEvent>? _compassSubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+
   @override
   void initState() {
     super.initState();
@@ -72,12 +79,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _updateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
     _initSensors();
+    _initConnectivityListener();
+  }
+
+  void _initConnectivityListener() {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      final isConnected = results.contains(ConnectivityResult.mobile) || results.contains(ConnectivityResult.wifi) || results.contains(ConnectivityResult.ethernet);
+      if (isConnected && _pendingOfflineCount > 0 && !_isSyncing) {
+        _syncOfflineData(isSilent: true);
+      }
+    });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _compassSubscription?.cancel();
+    _connectivitySubscription?.cancel();
     super.dispose();
   }
 
@@ -209,7 +227,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _syncOfflineData() async {
+  Future<void> _syncOfflineData({bool isSilent = false}) async {
     if (_isSyncing) return;
     setState(() => _isSyncing = true);
     
@@ -293,8 +311,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (context, setModalState) {
             return Container(
               height: MediaQuery.of(context).size.height * 0.85,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
@@ -302,7 +320,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey.shade200))
+                      border: Border(bottom: BorderSide(color: context.borderColor))
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -310,7 +328,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Kustomisasi Pintasan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+                            Text('Kustomisasi Pintasan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
                             Text('Pilih maksimal 7 fitur untuk layar utama. (${tempSelected.length}/7)', style: TextStyle(fontSize: 12, color: tempSelected.length > 7 ? Colors.red : Colors.grey)),
                           ],
                         ),
@@ -354,7 +372,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.surfaceColor,
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))],
                     ),
                     child: SafeArea(
@@ -370,7 +388,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppConstants.primaryColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: context.surfaceColor,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text('SIMPAN PERUBAHAN', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
@@ -393,7 +411,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: AppConstants.backgroundColor,
+        backgroundColor: context.backgroundColor,
         body: SafeArea(
           child: Shimmer.fromColors(
             baseColor: Colors.grey.shade300,
@@ -406,24 +424,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(width: 120, height: 20, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))),
-                      Container(width: 40, height: 40, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+                      Container(width: 120, height: 20, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(8))),
+                      Container(width: 40, height: 40, decoration: BoxDecoration(color: context.surfaceColor, shape: BoxShape.circle)),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Container(width: 200, height: 32, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))),
+                  Container(width: 200, height: 32, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(8))),
                   const SizedBox(height: 32),
-                  Container(width: double.infinity, height: 100, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20))),
+                  Container(width: double.infinity, height: 100, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20))),
                   const SizedBox(height: 24),
-                  Container(width: double.infinity, height: 160, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20))),
+                  Container(width: double.infinity, height: 160, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20))),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(width: 60, height: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
-                      Container(width: 60, height: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
-                      Container(width: 60, height: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
-                      Container(width: 60, height: 60, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+                      Container(width: 60, height: 60, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16))),
+                      Container(width: 60, height: 60, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16))),
+                      Container(width: 60, height: 60, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16))),
+                      Container(width: 60, height: 60, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16))),
                     ],
                   ),
                 ],
@@ -435,7 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -444,9 +462,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             expandedHeight: 210.0,
             floating: false,
             pinned: true,
-            backgroundColor: Colors.white,
+            backgroundColor: context.surfaceColor,
             elevation: 0,
-            iconTheme: const IconThemeData(color: AppConstants.textPrimary),
+            iconTheme: IconThemeData(color: context.textPrimary),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
               side: BorderSide(color: AppConstants.slate200, width: 1),
@@ -463,16 +481,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     opacity: t, 
                     child: Row(
                       children: [
-                        const Text('WKN Mobile', style: TextStyle(color: AppConstants.textPrimary, fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text('WKN Mobile', style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.bold, fontSize: 16)),
                         const Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0),
                           child: InkWell(
                             onTap: () => context.push('/id-card'),
-                            child: CircleAvatar(
+                            child: CachedAvatar(
+                              imageUrl: user?['avatar_url'],
+                              name: user?['name'] ?? 'User',
                               radius: 14,
+                              fontSize: 12,
                               backgroundColor: AppConstants.slate100,
-                              child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'A', style: const TextStyle(color: AppConstants.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ),
@@ -482,8 +502,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
               background: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: context.surfaceColor,
                 ),
                 child: SafeArea(
                   child: LayoutBuilder(
@@ -504,24 +524,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(_greeting, style: const TextStyle(color: AppConstants.textSecondary, fontSize: 13)),
+                                  Text(_greeting, style: TextStyle(color: context.textSecondary, fontSize: 13)),
                                   const SizedBox(height: 4),
                                   TextScroll(
                                     user?['name'] ?? 'Karyawan',
                                     mode: TextScrollMode.bouncing,
-                                    velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
-                                    delayBefore: const Duration(milliseconds: 500),
-                                    pauseBetween: const Duration(milliseconds: 1000),
-                                    style: const TextStyle(color: AppConstants.textPrimary, fontSize: 18, fontWeight: FontWeight.w900),
+                                    velocity: Velocity(pixelsPerSecond: Offset(30, 0)),
+                                    delayBefore: Duration(milliseconds: 500),
+                                    pauseBetween: Duration(milliseconds: 1000),
+                                    style: TextStyle(color: context.textPrimary, fontSize: 18, fontWeight: FontWeight.w900),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: 16),
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(color: AppConstants.slate50, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppConstants.slate200)),
-                              child: const Icon(Icons.notifications_outlined, color: AppConstants.textPrimary, size: 24),
+                              child: Icon(Icons.notifications_outlined, color: context.textPrimary, size: 24),
                             ),
                           ],
                         ),
@@ -546,18 +566,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     children: [
                                       Text(
                                         _currentTime.isNotEmpty ? '${_currentTime.split(':')[0]}:${_currentTime.split(':')[1]}' : '00:00', 
-                                        style: const TextStyle(color: AppConstants.textPrimary, fontSize: 26, fontWeight: FontWeight.w900, fontFeatures: [FontFeature.tabularFigures()])
+                                        style: TextStyle(color: context.textPrimary, fontSize: 26, fontWeight: FontWeight.w900, fontFeatures: [FontFeature.tabularFigures()])
                                       ),
-                                      const SizedBox(width: 4),
+                                      SizedBox(width: 4),
                                       Text(
                                         _currentTime.isNotEmpty ? ':${_currentTime.split(':')[2]}' : ':00', 
-                                        style: const TextStyle(color: AppConstants.textSecondary, fontSize: 16, fontWeight: FontWeight.w600)
+                                        style: TextStyle(color: context.textSecondary, fontSize: 16, fontWeight: FontWeight.w600)
                                       ),
-                                      const SizedBox(width: 6),
-                                      const Text('WIB', style: TextStyle(color: AppConstants.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      SizedBox(width: 6),
+                                      Text('WIB', style: TextStyle(color: context.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
-                                  Text(_currentDate.isNotEmpty ? _currentDate : 'Memuat Tanggal...', style: const TextStyle(color: AppConstants.textSecondary, fontSize: 10)),
+                                  Text(_currentDate.isNotEmpty ? _currentDate : 'Memuat Tanggal...', style: TextStyle(color: context.textSecondary, fontSize: 10)),
                                 ],
                               ),
                               // Weather & Compass Wrap
@@ -567,16 +587,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Row(
                                     children: [
                                       Icon(_getWeatherIcon(_weatherCode), color: AppConstants.primaryColor, size: 14),
-                                      const SizedBox(width: 4),
-                                      Text(_weatherTemp, style: const TextStyle(color: AppConstants.textPrimary, fontSize: 14, fontWeight: FontWeight.bold)),
-                                      const SizedBox(width: 8),
-                                      Text(_weatherCondition, style: const TextStyle(color: AppConstants.textSecondary, fontSize: 10)),
+                                      SizedBox(width: 4),
+                                      Text(_weatherTemp, style: TextStyle(color: context.textPrimary, fontSize: 14, fontWeight: FontWeight.bold)),
+                                      SizedBox(width: 8),
+                                      Text(_weatherCondition, style: TextStyle(color: context.textSecondary, fontSize: 10)),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      Text('Arah: ${_compassHeading?.toStringAsFixed(0) ?? '--'}°', style: const TextStyle(color: AppConstants.textSecondary, fontSize: 10)),
+                                      Text('Arah: ${_compassHeading?.toStringAsFixed(0) ?? '--'}°', style: TextStyle(color: context.textSecondary, fontSize: 10)),
                                       const SizedBox(width: 8),
                                       Transform.rotate(
                                         angle: ((_compassHeading ?? 0) * (math.pi / 180) * -1),
@@ -585,12 +605,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           child: Stack(
                                             alignment: Alignment.center,
                                             children: [
-                                              const Icon(Icons.circle_outlined, color: AppConstants.slate300, size: 24),
-                                              const Positioned(top: 1, child: Text('U', style: TextStyle(fontSize: 7, color: Colors.redAccent, fontWeight: FontWeight.bold))),
-                                              const Positioned(bottom: 1, child: Text('S', style: TextStyle(fontSize: 7, color: AppConstants.textSecondary, fontWeight: FontWeight.bold))),
-                                              const Positioned(right: 2, child: Text('T', style: TextStyle(fontSize: 7, color: AppConstants.textSecondary, fontWeight: FontWeight.bold))),
-                                              const Positioned(left: 2, child: Text('B', style: TextStyle(fontSize: 7, color: AppConstants.textSecondary, fontWeight: FontWeight.bold))),
-                                              const Icon(Icons.navigation, color: AppConstants.textPrimary, size: 10),
+                                              Icon(Icons.circle_outlined, color: AppConstants.slate300, size: 24),
+                                              Positioned(top: 1, child: Text('U', style: TextStyle(fontSize: 7, color: Colors.redAccent, fontWeight: FontWeight.bold))),
+                                              Positioned(bottom: 1, child: Text('S', style: TextStyle(fontSize: 7, color: context.textSecondary, fontWeight: FontWeight.bold))),
+                                              Positioned(right: 2, child: Text('T', style: TextStyle(fontSize: 7, color: context.textSecondary, fontWeight: FontWeight.bold))),
+                                              Positioned(left: 2, child: Text('B', style: TextStyle(fontSize: 7, color: context.textSecondary, fontWeight: FontWeight.bold))),
+                                              Icon(Icons.navigation, color: context.textPrimary, size: 10),
                                             ]
                                           )
                                         ),
@@ -644,13 +664,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             const SizedBox(width: 8),
                             ElevatedButton(
-                              onPressed: _isSyncing ? null : _syncOfflineData,
+                              onPressed: _isSyncing ? null : () => _syncOfflineData(isSilent: false),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
+                                foregroundColor: context.surfaceColor,
                               ),
                               child: _isSyncing 
-                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: context.surfaceColor, strokeWidth: 2))
                                 : const Text('Sync'),
                             ),
                           ],
@@ -666,13 +686,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           InkWell(
                             onTap: _showCustomizeModal,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
-                              child: const Row(
+                              child: Row(
                                 children: [
-                                  Icon(Icons.edit, size: 12, color: AppConstants.textPrimary),
+                                  Icon(Icons.edit, size: 12, color: context.textPrimary),
                                   SizedBox(width: 4),
-                                  Text('Atur Pintasan', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                                  Text('Atur Pintasan', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textPrimary)),
                                 ],
                               ),
                             ),
@@ -695,7 +715,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildFloatingAttendanceCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppConstants.slate200, width: 1),
         boxShadow: AppConstants.flatShadow,
@@ -714,11 +734,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(10)),
                     child: const Icon(Icons.location_on, color: Colors.blue, size: 20),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text('WKN Office Tower', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppConstants.textPrimary)),
+                    children: [
+                      Text('WKN Office Tower', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: context.textPrimary)),
                       Text('Sesuai dengan titik kordinat', style: TextStyle(fontSize: 10, color: Colors.grey)),
                     ],
                   ),
@@ -741,8 +761,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 context.push('/camera?type=${_hasClockedIn ? 'OUT' : 'IN'}');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppConstants.textPrimary,
-                foregroundColor: Colors.white,
+                backgroundColor: context.textPrimary,
+                foregroundColor: context.surfaceColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
@@ -810,7 +830,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 child: Icon(
                   action['icon'] as IconData,
-                  color: isAllButton ? AppConstants.primaryColor : AppConstants.textPrimary,
+                  color: isAllButton ? AppConstants.primaryColor : context.textPrimary,
                   size: 24,
                 ),
               ),
@@ -820,7 +840,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(
                   fontSize: 11, 
                   fontWeight: FontWeight.bold, 
-                  color: isAllButton ? AppConstants.primaryColor : AppConstants.textPrimary
+                  color: isAllButton ? AppConstants.primaryColor : context.textPrimary
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1, overflow: TextOverflow.ellipsis,

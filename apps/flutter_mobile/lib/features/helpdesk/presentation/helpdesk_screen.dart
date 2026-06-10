@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 
@@ -69,21 +70,21 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
   Widget build(BuildContext context) {
     final bool canPop = context.canPop();
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.surfaceColor,
         automaticallyImplyLeading: canPop,
-        title: const Text('Pusat Bantuan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        title: Text('Pusat Bantuan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20).copyWith(bottom: 100),
         child: Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
+          decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: Offset(0, 4))]),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Buat Tiket Baru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+              Text('Buat Tiket Baru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
               const SizedBox(height: 4),
               const Text('Sampaikan kendala IT, masalah perangkat, atau pertanyaan HRD Anda di sini.', style: TextStyle(fontSize: 12, color: Colors.grey)),
               const SizedBox(height: 24),
@@ -102,9 +103,9 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
                     onSelected: (val) => setState(() => _category = cat['id']!),
                     selectedColor: AppConstants.primaryColor,
                     backgroundColor: Colors.grey.shade50,
-                    labelStyle: TextStyle(color: isActive ? Colors.white : AppConstants.textPrimary, fontWeight: FontWeight.bold, fontSize: 12),
+                    labelStyle: TextStyle(color: isActive ? context.surfaceColor : context.textPrimary, fontWeight: FontWeight.bold, fontSize: 12),
                     showCheckmark: false,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: isActive ? AppConstants.primaryColor : Colors.grey.shade200)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: isActive ? AppConstants.primaryColor : context.borderColor)),
                   );
                 }).toList(),
               ),
@@ -141,8 +142,8 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
                     elevation: 4,
                     shadowColor: AppConstants.primaryColor.withValues(alpha: 0.5),
                   ),
-                  icon: const Icon(Icons.headset_mic_outlined, color: Colors.white),
-                  label: const Text('KIRIM TIKET', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  icon: Icon(Icons.headset_mic_outlined, color: context.surfaceColor),
+                  label: Text('KIRIM TIKET', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 ),
               )
             ],
@@ -158,8 +159,8 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
       hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
       filled: true,
       fillColor: const Color(0xFFF8F9FB),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppConstants.primaryColor)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );

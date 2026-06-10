@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -102,17 +103,17 @@ class _PayslipScreenState extends State<PayslipScreen> {
         : AppConstants.primaryColor;
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Slip Gaji Digital', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Slip Gaji Digital', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.document_scanner_outlined, color: AppConstants.textPrimary),
+            icon: Icon(Icons.document_scanner_outlined, color: context.textPrimary),
             onPressed: () {
               context.push('/salary-details');
             },
@@ -146,42 +147,42 @@ class _PayslipScreenState extends State<PayslipScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Total Gaji Bersih (Take Home Pay)', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            Text(_formatCurrency(netSalary), style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1)),
-                            const SizedBox(height: 20),
+                            Text('Total Gaji Bersih (Take Home Pay)', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 8),
+                            Text(_formatCurrency(netSalary), style: TextStyle(color: context.surfaceColor, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                            SizedBox(height: 20),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-                              child: Text(_selectedMonth, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(color: context.surfaceColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+                              child: Text(_selectedMonth, style: TextStyle(color: context.surfaceColor, fontSize: 12, fontWeight: FontWeight.bold)),
                             )
                           ],
                         ),
                       ),
-                      const SizedBox(height: 25),
+                      SizedBox(height: 25),
                       
                       // Earnings
-                      const Text('PENERIMAAN / EARNINGS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppConstants.textSecondary)),
+                      Text('PENERIMAAN / EARNINGS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: context.textSecondary)),
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))]),
+                        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))]),
                         child: Column(
                           children: [
-                            ...earnings.map((e) => _buildDetailRow(e['label'], _formatCurrency(e['value']), AppConstants.textPrimary)),
+                            ...earnings.map((e) => _buildDetailRow(e['label'], _formatCurrency(e['value']), context.textPrimary)),
                             const Divider(height: 10),
                             _buildTotalRow('Total Penerimaan Bruto', _formatCurrency(totalEarnings), Colors.green),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 25),
+                      SizedBox(height: 25),
 
                       // Deductions
-                      const Text('POTONGAN / DEDUCTIONS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppConstants.textSecondary)),
+                      Text('POTONGAN / DEDUCTIONS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: context.textSecondary)),
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))]),
+                        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))]),
                         child: Column(
                           children: [
                             ...deductions.map((d) => _buildDetailRow(d['label'], '- ${_formatCurrency(d['value'])}', Colors.red)),
@@ -201,19 +202,19 @@ class _PayslipScreenState extends State<PayslipScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur unduh PDF menggunakan package printing (segera ditambahkan)')));
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1E293B),
+                            backgroundColor: Color(0xFF1E293B),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                             elevation: 5,
                           ),
-                          icon: const Icon(Icons.download, color: Colors.white),
-                          label: const Text('UNDUH PDF (E-PAYSLIP)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                          icon: Icon(Icons.download, color: context.surfaceColor),
+                          label: Text('UNDUH PDF (E-PAYSLIP)', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                         ),
                       ),
-                      const SizedBox(height: 25),
-                      const Text(
+                      SizedBox(height: 25),
+                      Text(
                         'Dokumen ini dihasilkan secara otomatis oleh sistem WKNsite dan merupakan bukti pembayaran gaji yang sah sesuai dengan regulasi perusahaan.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 10, color: AppConstants.textSecondary, height: 1.5),
+                        style: TextStyle(fontSize: 10, color: context.textSecondary, height: 1.5),
                       ),
                       const SizedBox(height: 50),
                     ],
@@ -230,11 +231,11 @@ class _PayslipScreenState extends State<PayslipScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.document_scanner, size: 64, color: Colors.grey),
-            const SizedBox(height: 20),
-            const Text('Slip Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
-            const SizedBox(height: 10),
-            const Text('Admin belum mempublikasikan gaji Anda.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: AppConstants.textSecondary)),
+            Icon(Icons.document_scanner, size: 64, color: Colors.grey),
+            SizedBox(height: 20),
+            Text('Slip Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
+            SizedBox(height: 10),
+            Text('Admin belum mempublikasikan gaji Anda.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: context.textSecondary)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _fetchData,
@@ -248,11 +249,11 @@ class _PayslipScreenState extends State<PayslipScreen> {
 
   Widget _buildDetailRow(String label, String value, Color valueColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppConstants.textPrimary)),
+          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.textPrimary)),
           Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor)),
         ],
       ),
@@ -261,11 +262,11 @@ class _PayslipScreenState extends State<PayslipScreen> {
 
   Widget _buildTotalRow(String label, String value, Color valueColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
           Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: valueColor)),
         ],
       ),

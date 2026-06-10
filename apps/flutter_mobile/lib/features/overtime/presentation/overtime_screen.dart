@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -120,6 +121,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         }
         
         _currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        if (!mounted) return;
         
         final user = context.read<AuthProvider>().userData;
         final employeeName = user?['name'] ?? 'Karyawan';
@@ -135,14 +137,12 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
           customLabel: 'LEMBUR',
         );
         
-        if (watermarkedFile != null) {
-          setState(() {
-            _proofPhotoPath = watermarkedFile.path;
+        setState(() {
+          _proofPhotoPath = watermarkedFile.path;
 
-          });
-          _showPhotoPreview();
-        }
-      }
+        });
+        _showPhotoPreview();
+            }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil foto: $e'), backgroundColor: Colors.red));
     } finally {
@@ -171,8 +171,8 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
           TextButton(onPressed: () {
             setState(() => _proofPhotoPath = null);
             Navigator.pop(context);
-          }, child: const Text('Hapus Foto', style: TextStyle(color: Colors.red))),
-          ElevatedButton(onPressed: () => Navigator.pop(context), style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor), child: const Text('Gunakan Foto', style: TextStyle(color: Colors.white))),
+          }, child: Text('Hapus Foto', style: TextStyle(color: Colors.red))),
+          ElevatedButton(onPressed: () => Navigator.pop(context), style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor), child: Text('Gunakan Foto', style: TextStyle(color: context.surfaceColor))),
         ],
       )
     );
@@ -283,7 +283,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         'reason': _reasonCtrl.text.trim(),
         'compensation_type': _compensationType,
         'status': 'Pending',
-        if (base64Image != null) 'proof_base64': base64Image,
+        'proof_base64': ?base64Image,
       };
 
       await _overtimeService.submitOvertimeRequest(payload);
@@ -328,12 +328,12 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Pengajuan Lembur', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Pengajuan Lembur', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
         actions: [
@@ -359,7 +359,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
@@ -379,10 +379,10 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                 Expanded(child: _buildTextField('JAM SELESAI', _endTimeCtrl, 'Pilih Jam', readOnly: true, onTap: () => _selectTime(context, _endTimeCtrl))),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildTextField('ALASAN / KEPERLUAN LEMBUR', _reasonCtrl, 'Sebutkan detail pekerjaan...', maxLines: 4),
-            const SizedBox(height: 16),
-            const Text('PILIHAN KOMPENSASI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+            SizedBox(height: 16),
+            Text('PILIHAN KOMPENSASI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -413,9 +413,9 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
               decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
               child: Column(
                 children: [
-                  const Icon(Icons.camera_alt, color: Colors.grey, size: 32),
-                  const SizedBox(height: 8),
-                  const Text('FOTO BUKTI LEMBUR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+                  Icon(Icons.camera_alt, color: Colors.grey, size: 32),
+                  SizedBox(height: 8),
+                  Text('FOTO BUKTI LEMBUR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
                   const SizedBox(height: 4),
                   const Text('Wajib melampirkan foto diri sedang bekerja di lokasi', style: TextStyle(fontSize: 10, color: Colors.grey), textAlign: TextAlign.center),
                   const SizedBox(height: 12),
@@ -428,7 +428,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                     onPressed: _isSubmitLoading ? null : _takePhoto,
                     icon: const Icon(Icons.camera),
                     label: Text(_proofPhotoPath == null ? 'Ambil Foto' : 'Ubah Foto'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: AppConstants.primaryColor, side: const BorderSide(color: AppConstants.primaryColor), elevation: 0),
+                    style: ElevatedButton.styleFrom(backgroundColor: context.surfaceColor, foregroundColor: AppConstants.primaryColor, side: const BorderSide(color: AppConstants.primaryColor), elevation: 0),
                   )
                 ],
               ),
@@ -441,11 +441,11 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                 onPressed: _isSubmitLoading ? null : _handleCreateRequest,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppConstants.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: context.surfaceColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                icon: _isSubmitLoading ? const SizedBox() : const Icon(Icons.send),
-                label: _isSubmitLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('KIRIM PENGAJUAN', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: _isSubmitLoading ? SizedBox() : Icon(Icons.send),
+                label: _isSubmitLoading ? CircularProgressIndicator(color: context.surfaceColor) : Text('KIRIM PENGAJUAN', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -458,7 +458,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
+        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -499,9 +499,9 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.access_time, size: 48, color: Colors.grey),
-                    const SizedBox(height: 12),
-                    const Text('Belum ada riwayat pengajuan lembur.', style: TextStyle(color: AppConstants.textSecondary)),
+                    Icon(Icons.access_time, size: 48, color: Colors.grey),
+                    SizedBox(height: 12),
+                    Text('Belum ada riwayat pengajuan lembur.', style: TextStyle(color: context.textSecondary)),
                     const SizedBox(height: 16),
                     OutlinedButton(
                       onPressed: _setFormDefaults,
@@ -521,7 +521,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
@@ -537,9 +537,9 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.date, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                const SizedBox(height: 2),
-                                Text('${item.startTime} - ${item.endTime} (${item.durationHours} Jam)', style: const TextStyle(fontSize: 11, color: AppConstants.textSecondary, fontWeight: FontWeight.bold)),
+                                Text(item.date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                SizedBox(height: 2),
+                                Text('${item.startTime} - ${item.endTime} (${item.durationHours} Jam)', style: TextStyle(fontSize: 11, color: context.textSecondary, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -557,10 +557,10 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
                           )
                         ],
                       ),
-                      const Divider(height: 24),
-                      const Text('Alasan Kerja Lembur:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppConstants.textSecondary)),
-                      const SizedBox(height: 4),
-                      Text(item.reason, style: const TextStyle(fontSize: 12, color: AppConstants.textPrimary)),
+                      Divider(height: 24),
+                      Text('Alasan Kerja Lembur:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
+                      SizedBox(height: 4),
+                      Text(item.reason, style: TextStyle(fontSize: 12, color: context.textPrimary)),
                       if (item.pdfUrl != null && item.pdfUrl!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Align(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/widgets/cached_avatar.dart';
 
 class DirectoryScreen extends StatefulWidget {
   const DirectoryScreen({super.key});
@@ -37,7 +39,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     try {
       final data = await _supabase
           .from('employees')
-          .select('id, name, job_position, department_id, email, phone, departments(name)')
+          .select('id, name, job_position, department_id, email, phone, avatar_url, departments(name)')
           .order('name', ascending: true);
           
       if (mounted) {
@@ -94,12 +96,12 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Direktori Karyawan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Direktori Karyawan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -108,12 +110,12 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           // Search Bar
           Container(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            color: AppConstants.backgroundColor,
+            color: context.backgroundColor,
             child: Container(
               height: 54,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))],
               ),
@@ -129,7 +131,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
                         hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                         border: InputBorder.none,
                       ),
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppConstants.textPrimary),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.textPrimary),
                     ),
                   ),
                   if (_searchCtrl.text.isNotEmpty)
@@ -181,19 +183,19 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 4))],
       ),
       child: Row(
         children: [
           // Avatar
-          Container(
-            width: 54, height: 54,
-            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(27)),
-            child: Center(
-              child: Text(emp['name'].toString().substring(0, 1).toUpperCase(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppConstants.primaryColor)),
-            ),
+          CachedAvatar(
+            imageUrl: emp['avatar_url'],
+            name: emp['name'] ?? 'User',
+            radius: 27,
+            fontSize: 20,
+            backgroundColor: Colors.grey.shade100,
           ),
           const SizedBox(width: 15),
           
@@ -202,7 +204,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(emp['name'] ?? '', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                Text(emp['name'] ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: context.textPrimary)),
                 const SizedBox(height: 2),
                 Text(emp['job_position'] ?? 'Staff', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.primaryColor)),
                 const SizedBox(height: 4),

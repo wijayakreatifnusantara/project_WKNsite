@@ -18,6 +18,7 @@ import {
   IconSchool,
   IconSignature,
   IconArrowUpRight,
+  IconRadar,
   IconArrowDownRight,
   IconRefresh,
   IconChartBar,
@@ -286,6 +287,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
               <NavItem icon={<IconMapPin size={15} />} label="Lokasi Kerja" to="/attendance/location" />
+            )}
+            {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+              <NavItem icon={<IconRadar size={15} />} label="Live Tracking" to="/attendance/tracking" />
             )}
             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
               <NavItem icon={<IconCalendarTime size={15} />} label="Jadwal & Shift" to="/attendance/schedule" />

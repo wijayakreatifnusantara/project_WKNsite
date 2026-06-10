@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 
@@ -10,11 +11,11 @@ class DevelopmentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary), onPressed: () => context.pop()),
+        leading: IconButton(icon: Icon(Icons.arrow_back, color: context.textPrimary), onPressed: () => context.pop()),
       ),
       body: Center(
         child: Padding(
@@ -29,10 +30,10 @@ class DevelopmentScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [BoxShadow(color: Colors.orange.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10))],
                 ),
-                child: const Icon(Icons.handyman_outlined, size: 60, color: Colors.orange),
+                child: Icon(Icons.handyman_outlined, size: 60, color: Colors.orange),
               ),
-              const SizedBox(height: 30),
-              const Text('Fitur Sedang Dikembangkan', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppConstants.textPrimary), textAlign: TextAlign.center),
+              SizedBox(height: 30),
+              Text('Fitur Sedang Dikembangkan', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: context.textPrimary), textAlign: TextAlign.center),
               const SizedBox(height: 16),
               RichText(
                 textAlign: TextAlign.center,
@@ -51,7 +52,7 @@ class DevelopmentScreen extends StatelessWidget {
               Container(
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: 8,
-                decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: context.borderColor, borderRadius: BorderRadius.circular(4)),
                 child: FractionallySizedBox(
                   alignment: Alignment.centerLeft,
                   widthFactor: 0.65,
@@ -71,7 +72,7 @@ class DevelopmentScreen extends StatelessWidget {
                   elevation: 8,
                   shadowColor: AppConstants.primaryColor.withValues(alpha: 0.3)
                 ),
-                child: const Text('KEMBALI KE MENU', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                child: Text('KEMBALI KE MENU', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.w900, letterSpacing: 1)),
               )
             ],
           ),

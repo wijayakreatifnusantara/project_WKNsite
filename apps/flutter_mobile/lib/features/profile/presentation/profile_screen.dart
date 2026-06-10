@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import '../../../core/theme/theme_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -37,21 +39,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfoPlugin.androidInfo;
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _deviceName = '${androidInfo.brand} ${androidInfo.model}'.toUpperCase();
           _osVersion = 'Android ${androidInfo.version.release}';
         });
+        }
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfoPlugin.iosInfo;
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _deviceName = iosInfo.name;
           _osVersion = '${iosInfo.systemName} ${iosInfo.systemVersion}';
         });
+        }
       } else {
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _deviceName = 'Perangkat Lain';
           _osVersion = Platform.operatingSystem;
         });
+        }
       }
     } catch (e) {
       if (mounted) setState(() => _deviceName = 'Perangkat Saat Ini');
@@ -135,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Perangkat Terhubung', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+              Text('Perangkat Terhubung', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
               const SizedBox(height: 8),
               const Text('Kelola perangkat yang mengakses akun Anda.', style: TextStyle(fontSize: 12, color: Colors.grey)),
               const SizedBox(height: 24),
@@ -146,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: OutlinedButton(
                   onPressed: () => context.pop(),
                   style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                  child: const Text('Tutup', style: TextStyle(color: AppConstants.textPrimary)),
+                  child: Text('Tutup', style: TextStyle(color: context.textPrimary)),
                 ),
               )
             ],
@@ -162,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: AppConstants.textPrimary, size: 24),
+          child: Icon(icon, color: context.textPrimary, size: 24),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -242,10 +250,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = context.watch<AuthProvider>().userData;
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Pengaturan & Profil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Pengaturan & Profil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         automaticallyImplyLeading: false, 
       ),
       body: SingleChildScrollView(
@@ -258,7 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.all(20),
               margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 5))],
               ),
@@ -270,9 +278,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(color: AppConstants.primaryColor, borderRadius: BorderRadius.circular(6)),
-                            child: const Text('WKN', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                            child: Text('WKN', style: TextStyle(color: context.surfaceColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                           ),
                           const SizedBox(width: 10),
                           const Text('ENTERPRISE IDENTITY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1.5)),
@@ -300,9 +308,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(user?['name'] ?? 'User Name', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppConstants.textPrimary)),
-                            const SizedBox(height: 4),
-                            Text(user?['job_position'] ?? 'Staff', style: const TextStyle(fontSize: 13, color: AppConstants.textSecondary, fontWeight: FontWeight.w600)),
+                            Text(user?['name'] ?? 'User Name', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: context.textPrimary)),
+                            SizedBox(height: 4),
+                            Text(user?['job_position'] ?? 'Staff', style: TextStyle(fontSize: 13, color: context.textSecondary, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       )
@@ -311,16 +319,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppConstants.backgroundColor, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: context.backgroundColor, borderRadius: BorderRadius.circular(12)),
                     child: Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('SYSTEM ID', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
-                              const SizedBox(height: 2),
-                              Text(user?['employee_code'] ?? (((user?['id']?.toString().length ?? 0) > 8) ? user!['id'].toString().substring(0, 8).toUpperCase() : (user?['id']?.toString().toUpperCase() ?? 'WKN-0000')), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                              Text('SYSTEM ID', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
+                              SizedBox(height: 2),
+                              Text(user?['employee_code'] ?? (((user?['id']?.toString().length ?? 0) > 8) ? user!['id'].toString().substring(0, 8).toUpperCase() : (user?['id']?.toString().toUpperCase() ?? 'WKN-0000')), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.textPrimary)),
                             ],
                           ),
                         ),
@@ -331,9 +339,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('UNIT/DIVISI', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
-                                const SizedBox(height: 2),
-                                Text(user?['division_name'] ?? 'WKN Corp', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                Text('UNIT/DIVISI', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
+                                SizedBox(height: 2),
+                                Text(user?['division_name'] ?? 'WKN Corp', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
                               ],
                             ),
                           ),
@@ -373,7 +381,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildSectionContainer([
               _buildSettingItem(Icons.language, 'Bahasa (Language)', value: _selectedLanguage, onTap: _showLanguageModal),
               _buildDivider(),
-              _buildSettingSwitch(Icons.dark_mode_outlined, 'Mode Gelap (Dark Theme)', _isDarkMode, (v) => _saveBoolSetting('darkMode', v, (val) => _isDarkMode = val)),
+              _buildSettingSwitch(Icons.dark_mode_outlined, 'Mode Gelap (Dark Theme)', _isDarkMode, (v) async {
+                await _saveBoolSetting('darkMode', v, (val) => _isDarkMode = val);
+                if (context.mounted) {
+                  Provider.of<ThemeProvider>(context, listen: false).toggleTheme(v);
+                }
+              }),
               _buildDivider(),
               _buildSettingSwitch(Icons.notifications_none, 'Notifikasi Sistem', _isNotification, (v) => _saveBoolSetting('notifEnabled', v, (val) => _isNotification = val)),
             ]),
@@ -415,9 +428,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSectionContainer(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white, 
+        color: context.surfaceColor, 
         borderRadius: BorderRadius.circular(16), 
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: context.borderColor),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 8, offset: const Offset(0, 2))]
       ),
       child: Column(children: children),
@@ -427,11 +440,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSettingItem(IconData icon, String title, {String? value, VoidCallback? onTap}) {
     return ListTile(
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade100)),
         child: Icon(icon, color: AppConstants.primaryColor, size: 20),
       ),
-      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppConstants.textPrimary)),
+      title: Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.textPrimary)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -447,11 +460,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSettingSwitch(IconData icon, String title, bool value, ValueChanged<bool> onChanged) {
     return ListTile(
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade100)),
         child: Icon(icon, color: AppConstants.primaryColor, size: 20),
       ),
-      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppConstants.textPrimary)),
+      title: Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.textPrimary)),
       trailing: Switch(
         value: value,
         onChanged: onChanged,

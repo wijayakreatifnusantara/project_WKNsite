@@ -13,7 +13,8 @@ import {
   IconDownload,
   IconBell,
   IconAlertCircle,
-  IconClock
+  IconClock,
+  IconSettings
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,11 +22,13 @@ import { usePerformance, getPerformanceBadge, exportToPDF } from './hooks/usePer
 import ReviewFormModal from './components/ReviewFormModal';
 import PerformanceRadarChart from './components/PerformanceRadarChart';
 import RiskGauge from './components/RiskGauge';
+import KPIManagementModal from './components/KPIManagementModal';
 
 const PerformanceHub = () => {
-  const { reviews, fetchReviews, metrics, fetchMetrics, fetchBurnoutRisk, fetchPendingReviews, pendingReviews, loading } = usePerformance();
+  const { reviews, fetchReviews, metrics, fetchMetrics, fetchBurnoutRisk, fetchPendingReviews, pendingReviews, loading, addMetric, updateMetric, deleteMetric } = usePerformance();
   const [searchQuery, setSearchQuery] = useState('');
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isKpiModalOpen, setIsKpiModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [burnoutData, setBurnoutData] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -287,10 +290,19 @@ const PerformanceHub = () => {
             ) : (
               <>
                 <Card className="border-white border-[3px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] p-6">
-                <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.25em] mb-6 flex items-center gap-2">
-                  <IconTargetArrow size={16} className="text-[#E31E24]" />
-                  KPI Metrics & Weights
-                </h3>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.25em] flex items-center gap-2">
+                    <IconTargetArrow size={16} className="text-[#E31E24]" />
+                    KPI Metrics & Weights
+                  </h3>
+                  <button 
+                    onClick={() => setIsKpiModalOpen(true)}
+                    className="h-8 px-3 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-[#E31E24] transition-all"
+                  >
+                    <IconSettings size={14} />
+                    Kelola Master KPI
+                  </button>
+                </div>
               <div className="space-y-4">
                 {metrics.map(metric => (
                   <div key={metric.id} className="flex flex-col gap-1">
@@ -340,6 +352,15 @@ const PerformanceHub = () => {
         onClose={() => setIsReviewModalOpen(false)} 
         onSuccess={() => fetchReviews()} 
         metrics={metrics}
+      />
+
+      <KPIManagementModal
+        isOpen={isKpiModalOpen}
+        onClose={() => setIsKpiModalOpen(false)}
+        metrics={metrics}
+        addMetric={addMetric}
+        updateMetric={updateMetric}
+        deleteMetric={deleteMetric}
       />
     </div>
   );

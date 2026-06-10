@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signature/signature.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../core/utils/constants.dart';
@@ -104,10 +106,10 @@ class _SignatureScreenState extends State<SignatureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Tanda Tangan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Tanda Tangan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
       ),
       body: _isLoading 
@@ -122,12 +124,17 @@ class _SignatureScreenState extends State<SignatureScreen> {
                 Container(
                   height: 160,
                   width: double.infinity,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade200)),
-                  child: _currentSignatureUrl != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.network(_currentSignatureUrl!, fit: BoxFit.contain),
-                      )
+                  decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), border: Border.all(color: context.borderColor)),
+                    child: _currentSignatureUrl != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: CachedNetworkImage(
+                            imageUrl: _currentSignatureUrl!,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) => const Center(child: Icon(Icons.error_outline, color: Colors.red, size: 32)),
+                          ),
+                        )
                     : const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -173,14 +180,14 @@ class _SignatureScreenState extends State<SignatureScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: _isSaving ? null : _saveSignature,
-                        icon: _isSaving ? const SizedBox.shrink() : const Icon(Icons.cloud_upload_outlined, color: Colors.white),
+                        icon: _isSaving ? SizedBox.shrink() : Icon(Icons.cloud_upload_outlined, color: context.surfaceColor),
                         label: _isSaving 
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                          : const Text('Simpan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: context.surfaceColor, strokeWidth: 2)) 
+                          : Text('Simpan', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppConstants.primaryColor,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -194,7 +201,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                 const SizedBox(height: 30),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
+                  decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: context.borderColor)),
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

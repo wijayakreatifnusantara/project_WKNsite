@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 
@@ -8,12 +9,12 @@ class AcademyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppConstants.primaryColor,
         elevation: 0,
-        title: const Text('WKN Academy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => context.pop()),
+        title: Text('WKN Academy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.surfaceColor)),
+        leading: IconButton(icon: Icon(Icons.arrow_back, color: context.surfaceColor), onPressed: () => context.pop()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -29,14 +30,14 @@ class AcademyScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Tingkatkan Keterampilan Anda', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text('Tingkatkan Keterampilan Anda', style: TextStyle(color: context.surfaceColor, fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   const Text('Ikuti modul pelatihan dan sertifikasi internal secara mandiri.', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 24),
                   // Progress Card
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                    decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)),
                     child: Row(
                       children: [
                         SizedBox(
@@ -44,7 +45,7 @@ class AcademyScreen extends StatelessWidget {
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              CircularProgressIndicator(value: 0.4, backgroundColor: Colors.grey.shade200, color: Colors.orange, strokeWidth: 6),
+                              CircularProgressIndicator(value: 0.4, backgroundColor: context.borderColor, color: Colors.orange, strokeWidth: 6),
                               const Center(child: Text('40%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                             ],
                           ),
@@ -53,10 +54,10 @@ class AcademyScreen extends StatelessWidget {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text('Progress Belajar Bulan Ini', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
                               SizedBox(height: 4),
-                              Text('2 dari 5 Modul Selesai', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppConstants.textPrimary)),
+                              Text('2 dari 5 Modul Selesai', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: context.textPrimary)),
                             ],
                           ),
                         )
@@ -75,6 +76,7 @@ class AcademyScreen extends StatelessWidget {
                   const Text('MODUL WAJIB (OJT)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1)),
                   const SizedBox(height: 12),
                   _buildCourseCard(
+                    context,
                     title: 'Orientasi Karyawan Baru', 
                     duration: '45 Menit', 
                     progress: 1.0, 
@@ -82,6 +84,7 @@ class AcademyScreen extends StatelessWidget {
                     icon: Icons.business_center
                   ),
                   _buildCourseCard(
+                    context,
                     title: 'K3 Dasar Perusahaan', 
                     duration: '60 Menit', 
                     progress: 0.0, 
@@ -93,6 +96,7 @@ class AcademyScreen extends StatelessWidget {
                   const Text('PENGEMBANGAN DIRI', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1)),
                   const SizedBox(height: 12),
                   _buildCourseCard(
+                    context,
                     title: 'Effective Communication', 
                     duration: '2 Jam', 
                     progress: 0.3, 
@@ -100,6 +104,7 @@ class AcademyScreen extends StatelessWidget {
                     icon: Icons.record_voice_over
                   ),
                   _buildCourseCard(
+                    context,
                     title: 'Dasar-Dasar Manajemen Proyek', 
                     duration: '3 Jam', 
                     progress: 0.0, 
@@ -115,12 +120,12 @@ class AcademyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseCard({required String title, required String duration, required double progress, required bool isCompleted, required IconData icon}) {
+  Widget _buildCourseCard(BuildContext context, {required String title, required String duration, required double progress, required bool isCompleted, required IconData icon}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))]
       ),
@@ -151,7 +156,7 @@ class AcademyScreen extends StatelessWidget {
                     Expanded(
                       child: Container(
                         height: 6,
-                        decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                        decoration: BoxDecoration(color: context.borderColor, borderRadius: BorderRadius.circular(3)),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: progress,

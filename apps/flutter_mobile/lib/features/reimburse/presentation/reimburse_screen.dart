@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -101,7 +102,7 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
               _processSubmit();
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor),
-            child: const Text('Kirim', style: TextStyle(color: Colors.white)),
+            child: Text('Kirim', style: TextStyle(color: context.surfaceColor)),
           ),
         ],
       ),
@@ -145,12 +146,12 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Pengajuan Reimburse', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Pengajuan Reimburse', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -159,19 +160,19 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.surfaceColor,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Form Klaim Pengeluaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
-              const SizedBox(height: 4),
-              const Text('Silakan isi data pengeluaran operasional atau medis Anda di bawah ini beserta bukti struk/nota yang sah.', style: TextStyle(fontSize: 11, color: AppConstants.textSecondary, height: 1.5)),
-              const SizedBox(height: 24),
+              Text('Form Klaim Pengeluaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
+              SizedBox(height: 4),
+              Text('Silakan isi data pengeluaran operasional atau medis Anda di bawah ini beserta bukti struk/nota yang sah.', style: TextStyle(fontSize: 11, color: context.textSecondary, height: 1.5)),
+              SizedBox(height: 24),
               
-              const Text('NOMINAL (RP)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppConstants.textSecondary, letterSpacing: 0.5)),
+              Text('NOMINAL (RP)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
               const SizedBox(height: 6),
               TextField(
                 controller: _amountCtrl,
@@ -185,9 +186,9 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               
-              const Text('KETERANGAN PENGELUARAN', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppConstants.textSecondary, letterSpacing: 0.5)),
+              Text('KETERANGAN PENGELUARAN', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
               const SizedBox(height: 6),
               TextField(
                 controller: _descCtrl,
@@ -201,9 +202,9 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               
-              const Text('LAMPIRAN BUKTI (FOTO/PDF)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppConstants.textSecondary, letterSpacing: 0.5)),
+              Text('LAMPIRAN BUKTI (FOTO/PDF)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
               const SizedBox(height: 6),
               GestureDetector(
                 onTap: _showImageSourceActionSheet,
@@ -224,8 +225,8 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_selectedImage!.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
-                                const Text('Bukti Terlampir', style: TextStyle(fontSize: 10, color: AppConstants.textSecondary)),
+                                Text(_selectedImage!.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.textPrimary)),
+                                Text('Bukti Terlampir', style: TextStyle(fontSize: 10, color: context.textSecondary)),
                               ],
                             ),
                           ),
@@ -256,10 +257,10 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 4,
                   ),
-                  icon: _isSubmitting ? const SizedBox() : const Icon(Icons.send, color: Colors.white, size: 18),
+                  icon: _isSubmitting ? SizedBox() : Icon(Icons.send, color: context.surfaceColor, size: 18),
                   label: _isSubmitting
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('KIRIM KLAIM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    ? CircularProgressIndicator(color: context.surfaceColor)
+                    : Text('KIRIM KLAIM', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 ),
               )
             ],

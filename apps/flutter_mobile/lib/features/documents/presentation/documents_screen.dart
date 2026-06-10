@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -164,10 +165,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     final filteredDocs = _selectedCategoryFilter == 'Semua' ? _documents : _documents.where((d) => d['category'] == _selectedCategoryFilter).toList();
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Dokumen Saya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Dokumen Saya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         actions: [
           IconButton(
@@ -187,7 +188,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       padding: const EdgeInsets.all(20),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -201,7 +202,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               children: _categories.map((c) {
                 final isSelected = _docCategory == c;
                 return ChoiceChip(
-                  label: Text(c, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontSize: 11)),
+                  label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : Colors.black87, fontSize: 11)),
                   selected: isSelected,
                   selectedColor: AppConstants.primaryColor,
                   backgroundColor: Colors.grey.shade100,
@@ -251,8 +252,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               child: ElevatedButton.icon(
                 onPressed: _submitLoading ? null : _handleUpload,
                 style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                icon: _submitLoading ? const SizedBox.shrink() : const Icon(Icons.cloud_upload_outlined, color: Colors.white),
-                label: _submitLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('UNGGAH SEKARANG', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                icon: _submitLoading ? SizedBox.shrink() : Icon(Icons.cloud_upload_outlined, color: context.surfaceColor),
+                label: _submitLoading ? CircularProgressIndicator(color: context.surfaceColor) : Text('UNGGAH SEKARANG', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold)),
               ),
             )
           ],
@@ -273,10 +274,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: ChoiceChip(
-                  label: Text(c, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontSize: 12, fontWeight: FontWeight.bold)),
+                  label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : Colors.black87, fontSize: 12, fontWeight: FontWeight.bold)),
                   selected: isSelected,
                   selectedColor: AppConstants.primaryColor,
-                  backgroundColor: Colors.white,
+                  backgroundColor: context.surfaceColor,
                   onSelected: (v) => setState(() => _selectedCategoryFilter = c),
                   showCheckmark: false,
                 ),
@@ -295,7 +296,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                    decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -348,8 +349,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
       filled: true, fillColor: const Color(0xFFF8F9FB),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     );
   }

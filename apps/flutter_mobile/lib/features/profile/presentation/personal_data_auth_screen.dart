@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:local_auth/local_auth.dart';
@@ -62,7 +63,7 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
 
   Future<void> _handleVerify() async {
     if (_passwordCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Masukkan password Anda', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Masukkan password Anda', style: TextStyle(color: context.surfaceColor)), backgroundColor: Colors.red));
       return;
     }
 
@@ -77,7 +78,7 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''), style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''), style: TextStyle(color: context.surfaceColor)), backgroundColor: Colors.red));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -87,12 +88,12 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -103,12 +104,12 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
             Container(
               width: 80, height: 80,
               decoration: BoxDecoration(color: Colors.green.shade50, shape: BoxShape.circle),
-              child: const Icon(Icons.shield_outlined, size: 40, color: Colors.green),
+              child: Icon(Icons.shield_outlined, size: 40, color: Colors.green),
             ),
-            const SizedBox(height: 20),
-            const Text('Verifikasi Keamanan', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
-            const SizedBox(height: 10),
-            const Text('Sesuai standar keamanan, masukkan password Anda untuk melihat atau mengubah Data Pribadi & Rekening.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: AppConstants.textSecondary, height: 1.5)),
+            SizedBox(height: 20),
+            Text('Verifikasi Keamanan', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.textPrimary)),
+            SizedBox(height: 10),
+            Text('Sesuai standar keamanan, masukkan password Anda untuk melihat atau mengubah Data Pribadi & Rekening.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.5)),
             const SizedBox(height: 40),
 
             TextField(
@@ -119,9 +120,9 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
                 prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
                 hintText: 'Password Aplikasi',
                 filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade200)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade200)),
+                fillColor: context.surfaceColor,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.borderColor)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.borderColor)),
               ),
             ),
             const SizedBox(height: 20),
@@ -137,8 +138,8 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
                   elevation: 4,
                 ),
                 child: _isLoading 
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('VERIFIKASI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  ? CircularProgressIndicator(color: context.surfaceColor)
+                  : Text('VERIFIKASI', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
             ),
 

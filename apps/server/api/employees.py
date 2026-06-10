@@ -204,6 +204,62 @@ from pydantic import BaseModel
 class BulkActionRequest(BaseModel):
     ids: List[str]
 
+class FCMTokenRequest(BaseModel):
+    token: str
+
+@router.put("/employees/fcm-token")
+async def update_fcm_token(payload: FCMTokenRequest, current_user: dict = Depends(get_current_user)):
+    try:
+        employee_id = current_user.get("employee_id")
+        if not employee_id:
+            raise HTTPException(status_code=400, detail="No employee_id in token")
+            
+        res = supabase_client.client.table("employees").update({"fcm_token": payload.token}).eq("id", employee_id).execute()
+        return {"status": "success", "message": "FCM token updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+@router.put("/employees/{employee_id}/reset-password")
+async def reset_employee_password(employee_id: str, payload: ResetPasswordRequest, current_user: dict = Depends(require_admin)):
+    try:
+        # 1. Update in employees table (mobile_password)
+        success = await supabase_client.update_employee_password(employee_id, payload.new_password)
+        if not success:
+            raise HTTPException(status_code=404, detail="Gagal mengupdate password di database")
+            
+        # 2. Get employee email
+        res = supabase_client.client.table('employees').select('email').eq('id', employee_id).execute()
+        email = res.data[0].get('email') if res.data else None
+        
+        # 3. Update in Supabase Auth
+        if email:
+            auth_success = await supabase_client.update_auth_user_password(email, payload.new_password)
+            if not auth_success:
+                print(f"Warning: Failed to update auth user password for {email}")
+                
+        return {"status": "success", "message": "Password berhasil di-reset"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Reset password failed: {str(e)}")
+
+@router.put("/employees/{employee_id}/reset-device")
+async def reset_employee_device(employee_id: str, current_user: dict = Depends(require_admin)):
+    try:
+        # Reset device_id column to null
+        response = supabase_client.client.table('employees').update({'device_id': None}).eq('id', employee_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Karyawan tidak ditemukan")
+            
+        return {"status": "success", "message": "Device binding berhasil di-reset"}
+    except Exception as e:
+        # Since device_id might not exist yet, catch the specific postgrest error and gracefully fail or return success
+        err_str = str(e)
+        if "device_id" in err_str and "column" in err_str:
+             return {"status": "success", "message": "Device binding tidak diperlukan/belum aktif di database"}
+        raise HTTPException(status_code=500, detail=f"Reset device failed: {err_str}")
+
 @router.put("/employees/bulk-resign")
 async def bulk_resign_employees(data: BulkActionRequest, current_user: dict = Depends(require_admin)):
     try:

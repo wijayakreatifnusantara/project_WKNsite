@@ -9,6 +9,30 @@ class AttendanceService {
   // If running locally on emulator, 10.0.2.2 usually maps to localhost
   static String baseUrl = AppConstants.apiUrl; 
 
+  Future<Map<String, dynamic>> getAttendanceSettings() async {
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      final token = session?.accessToken ?? '';
+      
+      final url = Uri.parse('$baseUrl/attendance/settings');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {'status': 'success', 'data': jsonDecode(response.body)['data']};
+      } else {
+        return {'status': 'error', 'message': 'Gagal mengambil konfigurasi lokasi'};
+      }
+    } catch (e) {
+      return {'status': 'error', 'message': 'Gagal terhubung ke server: $e'};
+    }
+  }
+
   Future<Map<String, dynamic>> submitAttendance({
     required String employeeId,
     required double latitude,

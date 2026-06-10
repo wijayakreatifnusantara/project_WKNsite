@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 import '../data/profile_service.dart';
@@ -86,12 +87,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -102,17 +103,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             Container(
               width: 70, height: 70,
               decoration: BoxDecoration(color: Colors.orange.shade50, shape: BoxShape.circle),
-              child: const Icon(Icons.vpn_key_outlined, size: 36, color: Colors.orange),
+              child: Icon(Icons.vpn_key_outlined, size: 36, color: Colors.orange),
             ),
-            const SizedBox(height: 20),
-            const Text('Ubah Kata Sandi', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
-            const SizedBox(height: 10),
-            const Text('Gunakan kombinasi yang mudah Anda ingat namun sulit ditebak orang lain.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: AppConstants.textSecondary, height: 1.5)),
+            SizedBox(height: 20),
+            Text('Ubah Kata Sandi', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.textPrimary)),
+            SizedBox(height: 10),
+            Text('Gunakan kombinasi yang mudah Anda ingat namun sulit ditebak orang lain.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.5)),
             const SizedBox(height: 40),
 
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
+              decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -137,8 +138,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   elevation: 4,
                 ),
                 child: _isLoading 
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('SIMPAN PASSWORD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  ? CircularProgressIndicator(color: context.surfaceColor)
+                  : Text('SIMPAN PASSWORD', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
             ),
           ],
@@ -164,8 +165,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             filled: true,
             fillColor: const Color(0xFFF8F9FB),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppConstants.primaryColor)),
           ),
         ),

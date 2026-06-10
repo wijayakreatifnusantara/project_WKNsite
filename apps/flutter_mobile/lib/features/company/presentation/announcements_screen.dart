@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -94,10 +95,10 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Pengumuman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Pengumuman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
       ),
       body: _isLoading 
@@ -117,7 +118,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.surfaceColor,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
                       border: Border(left: BorderSide(color: color, width: 5))
@@ -139,7 +140,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(item['title'] ?? 'Pengumuman', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppConstants.textPrimary)),
+                                    Text(item['title'] ?? 'Pengumuman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: context.textPrimary)),
                                     const SizedBox(height: 2),
                                     Text(
                                       item['created_at'] != null ? item['created_at'].toString().substring(0, 10) : 'Hari ini',
@@ -150,10 +151,10 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               )
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Text(
                             item['content'] ?? '',
-                            style: const TextStyle(fontSize: 13, height: 1.5, color: AppConstants.textSecondary),
+                            style: TextStyle(fontSize: 13, height: 1.5, color: context.textSecondary),
                           )
                         ],
                       ),

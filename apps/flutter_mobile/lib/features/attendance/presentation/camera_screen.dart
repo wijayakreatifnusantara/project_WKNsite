@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:camera/camera.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,6 @@ import '../../auth/data/auth_provider.dart';
 import '../data/attendance_service.dart';
 import '../data/offline_attendance_service.dart';
 import '../utils/liveness_checker.dart';
-import '../../../core/utils/biometric_helper.dart';
 import '../../../core/utils/watermark_service.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -36,11 +36,36 @@ class _CameraScreenState extends State<CameraScreen> {
   final OfflineAttendanceService _offlineService = OfflineAttendanceService();
   final LivenessChecker _livenessChecker = LivenessChecker();
 
+  // Geo-Fencing Sync (Admin Control)
+  Map<String, dynamic>? _targetLocation;
+  double _distanceToLocation = 0.0;
+  bool _isInsideZone = false;
+  double _allowedRadius = 100.0; // Default until loaded
+
   @override
   void initState() {
     super.initState();
     _livenessChecker.initialize();
     _initCameraAndLocation();
+  }
+
+  void _calculateDistance() {
+    if (_currentPosition == null || _targetLocation == null) return;
+    
+    if (_targetLocation!['isFlexible']) {
+      _distanceToLocation = 0;
+      _isInsideZone = true;
+      return;
+    }
+
+    _distanceToLocation = Geolocator.distanceBetween(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+      _targetLocation!['lat'],
+      _targetLocation!['lng'],
+    );
+    
+    _isInsideZone = _distanceToLocation <= _allowedRadius;
   }
 
   Future<void> _initCameraAndLocation() async {
@@ -67,6 +92,65 @@ class _CameraScreenState extends State<CameraScreen> {
         }
       }
 
+      // Sinkronisasi Geo-Fence dari Web Admin
+      if (mounted) {
+        final userData = context.read<AuthProvider>().userData;
+        final settingsRes = await _service.getAttendanceSettings();
+        
+        if (settingsRes['status'] == 'success' && userData != null) {
+          final data = settingsRes['data'];
+          final hqConfig = data['hq_location'] ?? {'name': 'WKN HQ', 'lat': -6.2088, 'lon': 106.8456, 'radius': 100};
+          final allowFreeGlobal = data['allow_free_attendance'] == true;
+          final isFieldTeam = userData['is_field_team'] == true;
+          
+          if (allowFreeGlobal || isFieldTeam) {
+            _targetLocation = {
+              'name': allowFreeGlobal ? 'Bebas Absen Global' : 'Lokasi Lapangan Bebas',
+              'lat': 0.0, 
+              'lng': 0.0, 
+              'isFlexible': true
+            };
+          } else {
+            // Check specific working location
+            final workingLocName = userData['working_location'];
+            final locations = (data['working_locations'] as List<dynamic>?) ?? [];
+            
+            Map<String, dynamic>? matchedLoc;
+            for (var loc in locations) {
+              if (loc['name'] == workingLocName) {
+                matchedLoc = loc;
+                break;
+              }
+            }
+            
+            if (matchedLoc != null) {
+              _targetLocation = {
+                'name': matchedLoc['name'],
+                'lat': (matchedLoc['lat'] ?? 0).toDouble(),
+                'lng': (matchedLoc['lon'] ?? 0).toDouble(), // Supabase API uses 'lon'
+                'isFlexible': false
+              };
+              _allowedRadius = (matchedLoc['radius'] ?? 100).toDouble();
+            } else {
+              _targetLocation = {
+                'name': hqConfig['name'],
+                'lat': (hqConfig['lat'] ?? 0).toDouble(),
+                'lng': (hqConfig['lon'] ?? 0).toDouble(),
+                'isFlexible': false
+              };
+              _allowedRadius = (hqConfig['radius'] ?? 100).toDouble();
+            }
+          }
+        } else {
+          // Fallback if failed to fetch
+          _targetLocation = {'name': 'Gagal memuat konfigurasi. Pastikan internet menyala.', 'lat': 0.0, 'lng': 0.0, 'isFlexible': true};
+        }
+        
+        setState(() {}); // Trigger rebuild to show updated UI
+      }
+
+      _calculateDistance();
+
       // 2. Initialize Camera (Front camera usually preferred for attendance)
       cameras = await availableCameras();
       final frontCamera = cameras.firstWhere(
@@ -78,6 +162,7 @@ class _CameraScreenState extends State<CameraScreen> {
         frontCamera,
         ResolutionPreset.high,
         enableAudio: false,
+        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
       );
 
       await _controller!.initialize();
@@ -118,7 +203,7 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _takePictureAndPreview() async {
-    if (!_controller!.value.isInitialized || _isProcessing || _isFakeGps) return;
+    if (!_controller!.value.isInitialized || _isProcessing || _isFakeGps || !_isInsideZone) return;
 
     // Ekstra Keamanan dinonaktifkan sementara agar absen lebih cepat
     // final biometricHelper = BiometricHelper();
@@ -155,7 +240,7 @@ class _CameraScreenState extends State<CameraScreen> {
         employeeId: user['id_karyawan'] ?? user['id']?.toString().substring(0, 8) ?? 'ID',
         latitude: _currentPosition!.latitude,
         longitude: _currentPosition!.longitude,
-        address: 'Titik Absen Terdeteksi GPS', 
+        address: 'Titik Absen: ${_targetLocation?['name'] ?? 'Unknown'} (${_isInsideZone ? 'Dalam Zona' : 'Luar Zona'})', 
         isCheckOut: widget.clockType == 'OUT',
       );
       final finalPhotoPath = watermarkedFile.path;
@@ -185,7 +270,7 @@ class _CameraScreenState extends State<CameraScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.white.withValues(alpha: 0.7), 
+      barrierColor: context.surfaceColor.withValues(alpha: 0.7), 
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), 
         child: Dialog(
@@ -198,7 +283,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
+                    border: Border.all(color: context.surfaceColor.withValues(alpha: 0.2), width: 1),
                     boxShadow: [
                       BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 30, offset: const Offset(0, 10)),
                     ],
@@ -215,7 +300,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -240,7 +325,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       icon: const Icon(Icons.refresh_rounded),
                       label: const Text("ULANGI"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: context.surfaceColor,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -255,7 +340,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       label: const Text("LANJUTKAN"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2563EB),
-                        foregroundColor: Colors.white,
+                        foregroundColor: context.surfaceColor,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -342,13 +427,13 @@ class _CameraScreenState extends State<CameraScreen> {
         backgroundColor: Colors.black,
         body: Stack(
           children: [
-            const Center(
+            Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(color: AppConstants.primaryColor),
                   SizedBox(height: 16),
-                  Text('Menyiapkan Kamera & Lokasi...', style: TextStyle(color: Colors.white)),
+                  Text('Menyiapkan Kamera & Lokasi...', style: TextStyle(color: context.surfaceColor)),
                 ],
               ),
             ),
@@ -356,7 +441,7 @@ class _CameraScreenState extends State<CameraScreen> {
               top: 50,
               right: 16,
               child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                icon: Icon(Icons.close, color: context.surfaceColor, size: 30),
                 onPressed: () {
                   context.go('/main');
                 },
@@ -382,7 +467,7 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
           ),
           
-          // Overlay overlay to show location/time
+          // Overlay overlay to show location/time/geofence
           Positioned(
             top: 50,
             left: 16,
@@ -396,11 +481,48 @@ class _CameraScreenState extends State<CameraScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('📍 Lokasi Terkini', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                  Text(
-                    _currentPosition != null ? '${_currentPosition!.latitude}, ${_currentPosition!.longitude}' : 'Mencari...',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('📍 Titik Absen (Dikunci Admin)', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      if (_targetLocation != null)
+                         Text(
+                           _targetLocation!['name'],
+                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                         )
+                      else if (_currentPosition != null)
+                         const Text('Memuat konfigurasi...', style: TextStyle(color: Colors.amber, fontSize: 12)),
+                    ],
                   ),
+                  const SizedBox(height: 8),
+                  if (_currentPosition != null)
+                    Row(
+                      children: [
+                        Icon(
+                          _isInsideZone ? Icons.check_circle : Icons.cancel,
+                          color: _isInsideZone ? Colors.greenAccent : Colors.redAccent,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            (_targetLocation?['isFlexible'] ?? false)
+                                ? 'Zona Bebas Aktif' 
+                                : _isInsideZone 
+                                    ? 'Di Dalam Zona (Jarak: ${_distanceToLocation.toStringAsFixed(0)}m)'
+                                    : 'DI LUAR ZONA! Jarak: ${_distanceToLocation.toStringAsFixed(0)}m / ${_allowedRadius.toStringAsFixed(0)} m',
+                            style: TextStyle(
+                              color: _isInsideZone ? Colors.greenAccent : Colors.redAccent, 
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    const Text('Mencari sinyal GPS...', style: TextStyle(color: Colors.amber)),
+                  
                   if (_isFakeGps)
                     Container(
                       margin: const EdgeInsets.only(top: 8),
@@ -409,14 +531,14 @@ class _CameraScreenState extends State<CameraScreen> {
                         color: Colors.redAccent.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.gpp_bad_rounded, color: Colors.white, size: 16),
+                          Icon(Icons.gpp_bad_rounded, color: context.surfaceColor, size: 16),
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'FAKE GPS TERDETEKSI! Matikan Mock Location untuk absen.',
-                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: context.surfaceColor, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -439,10 +561,10 @@ class _CameraScreenState extends State<CameraScreen> {
                   color: Colors.redAccent.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: const Text(
+                child: Text(
                   'Arahkan wajah ke kamera, lalu Tersenyum atau Berkedip!',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
             ),
@@ -462,12 +584,12 @@ class _CameraScreenState extends State<CameraScreen> {
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: (_isLivenessPassed && !_isFakeGps) ? Colors.white : Colors.grey, width: 4),
+                        border: Border.all(color: (_isLivenessPassed && !_isFakeGps) ? context.surfaceColor : Colors.grey, width: 4),
                         color: (_isLivenessPassed && !_isFakeGps) ? AppConstants.primaryColor : Colors.grey.withValues(alpha: 0.5),
                       ),
                       child: Icon(
                         (_isLivenessPassed && !_isFakeGps) ? Icons.camera_alt : Icons.lock_outline, 
-                        color: Colors.white, 
+                        color: context.surfaceColor, 
                         size: 36
                       ),
                     ),
@@ -480,7 +602,7 @@ class _CameraScreenState extends State<CameraScreen> {
             top: 50,
             right: 16,
             child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white, size: 30),
+              icon: Icon(Icons.close, color: context.surfaceColor, size: 30),
               onPressed: () {
                 context.go('/main');
               },

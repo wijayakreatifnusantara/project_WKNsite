@@ -212,6 +212,48 @@ export const usePerformance = () => {
     }
   }, []);
 
+  const addMetric = async (payload) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(`${API_URL}/performance/metrics`, payload);
+      await fetchMetrics(); // Refresh data
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.detail || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateMetric = async (id, payload) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(`${API_URL}/performance/metrics/${id}`, payload);
+      await fetchMetrics();
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.detail || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteMetric = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(`${API_URL}/performance/metrics/${id}`);
+      await fetchMetrics();
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.detail || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     error,
@@ -222,7 +264,10 @@ export const usePerformance = () => {
     fetchReviews,
     submitReview,
     fetchBurnoutRisk,
-    fetchPendingReviews
+    fetchPendingReviews,
+    addMetric,
+    updateMetric,
+    deleteMetric
   };
 };
 

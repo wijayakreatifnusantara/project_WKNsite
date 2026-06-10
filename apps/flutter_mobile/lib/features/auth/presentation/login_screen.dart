@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../data/auth_provider.dart';
+import '../../../core/utils/biometric_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _canUseBiometric = false;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -29,6 +31,32 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       curve: Curves.easeOut,
     );
     _fadeController.forward();
+    _checkBiometric();
+  }
+
+  Future<void> _checkBiometric() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final hasBio = await BiometricHelper().hasBiometrics();
+    final hasCreds = await auth.hasSavedCredentials();
+    if (mounted) {
+      setState(() {
+        _canUseBiometric = hasBio && hasCreds;
+      });
+    }
+  }
+
+  void _handleBiometricLogin() async {
+    final success = await BiometricHelper().authenticate();
+    if (success) {
+      if (!mounted) return;
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final error = await auth.biometricLogin();
+      if (error != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override
@@ -84,15 +112,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 decoration: BoxDecoration(
                   color: bgColor,
                   borderRadius: BorderRadius.circular(40),
-                  border: Border.all(color: Colors.white, width: 4),
-                  boxShadow: const [
-                    BoxShadow(
+                  border: Border.all(color: context.surfaceColor, width: 4),
+                  boxShadow: [
+                    const BoxShadow(
                       color: Color(0xFFD1D9E6),
                       offset: Offset(12, 12),
                       blurRadius: 24,
                     ),
                     BoxShadow(
-                      color: Colors.white,
+                      color: context.surfaceColor,
                       offset: Offset(-12, -12),
                       blurRadius: 24,
                     ),
@@ -260,17 +288,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         onPressed: isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFE31E24),
-                          foregroundColor: Colors.white,
+                          foregroundColor: context.surfaceColor,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                child: CircularProgressIndicator(color: context.surfaceColor, strokeWidth: 2),
                               )
                             : const Text(
                                 'SIGN IN',
@@ -282,6 +310,38 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               ),
                       ),
                     ),
+                    
+                    if (_canUseBiometric) ...[
+                      const SizedBox(height: 24),
+                      Center(
+                        child: InkWell(
+                          onTap: isLoading ? null : _handleBiometricLogin,
+                          borderRadius: BorderRadius.circular(50),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: context.surfaceColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                              border: Border.all(color: const Color(0xFFE8EBF0), width: 2),
+                            ),
+                            child: const Icon(Icons.fingerprint, size: 40, color: Color(0xFFE31E24)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Fast Login',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black45),
+                      ),
+                    ],
+
                     const SizedBox(height: 32),
 
                     // Footer
@@ -315,9 +375,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: context.surfaceColor.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white),
+                        border: Border.all(color: context.surfaceColor),
                       ),
                       child: const Text(
                         'IMS VERSION 1.2.0 • OPTIMIZED FOR MOBILE',

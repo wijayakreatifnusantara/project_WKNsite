@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
@@ -144,11 +145,11 @@ class _InboxScreenState extends State<InboxScreen> {
     final bool canPop = context.canPop();
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.surfaceColor,
         automaticallyImplyLeading: canPop,
-        title: const Text('Kotak Masuk', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        title: Text('Kotak Masuk', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         actions: [
           IconButton(
             icon: const Icon(Icons.done_all, color: Colors.orange),
@@ -188,7 +189,7 @@ class _InboxScreenState extends State<InboxScreen> {
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.surfaceColor,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Colors.grey.shade100),
                               boxShadow: isRead ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
@@ -215,7 +216,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Expanded(child: Text(notif['title'] ?? '', style: TextStyle(fontSize: 14, fontWeight: isRead ? FontWeight.w600 : FontWeight.bold, color: AppConstants.textPrimary))),
+                                          Expanded(child: Text(notif['title'] ?? '', style: TextStyle(fontSize: 14, fontWeight: isRead ? FontWeight.w600 : FontWeight.bold, color: context.textPrimary))),
                                           Text(
                                             notif['created_at'] != null ? notif['created_at'].toString().substring(0, 10) : '',
                                             style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold),
@@ -225,7 +226,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         notif['body'] ?? '',
-                                        style: TextStyle(fontSize: 13, color: isRead ? Colors.grey : AppConstants.textSecondary, height: 1.4),
+                                        style: TextStyle(fontSize: 13, color: isRead ? Colors.grey : context.textSecondary, height: 1.4),
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                       ),

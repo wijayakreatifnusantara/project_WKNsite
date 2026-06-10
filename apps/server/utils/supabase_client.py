@@ -939,6 +939,21 @@ class WKNSupabaseClient:
             print(f"Error updating auth user email: {str(e)}")
             return False
 
+    async def update_auth_user_password(self, email: str, new_password: str) -> bool:
+        """Update user password in Auth."""
+        if not self.client: return False
+        try:
+            users_res = self.client.auth.admin.list_users()
+            for u in users_res:
+                if u.email == email:
+                    self.client.auth.admin.update_user_by_id(u.id, {"password": new_password})
+                    return True
+            print(f"Auth user {email} not found for password update.")
+            return False
+        except Exception as e:
+            print(f"Error updating auth user password: {str(e)}")
+            return False
+
     async def delete_or_suspend_auth_user(self, email: str) -> bool:
         """Delete user from auth.users when they resign"""
         if not self.client: return False

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 import '../data/timesheet_service.dart';
@@ -84,12 +85,12 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Logbook Harian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Logbook Harian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -127,7 +128,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
             // Form
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
+              decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -168,7 +169,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
       bottomSheet: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
         ),
         child: SizedBox(
@@ -182,8 +183,8 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
               elevation: 0,
             ),
             child: _isLoading 
-              ? const CircularProgressIndicator(color: Colors.white)
-              : const Text('Simpan Timesheet', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              ? CircularProgressIndicator(color: context.surfaceColor)
+              : Text('Simpan Timesheet', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ),
       ),
@@ -192,8 +193,8 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(text, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+      padding: EdgeInsets.only(bottom: 8),
+      child: Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
     );
   }
 
@@ -203,8 +204,8 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
       hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
       filled: true,
       fillColor: const Color(0xFFF8F9FB),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.borderColor)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.borderColor)),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppConstants.primaryColor)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );

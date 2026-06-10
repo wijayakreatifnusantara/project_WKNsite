@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -47,10 +48,10 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppConstants.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: AppConstants.textPrimary,
+              onPrimary: context.surfaceColor,
+              onSurface: context.textPrimary,
             ),
           ),
           child: child!,
@@ -77,18 +78,18 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
-        title: const Text('Pusat Laporan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        title: Text('Pusat Laporan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
       ),
       body: Column(
         children: [
           // Global Filter Section
           Container(
-            color: Colors.white,
+            color: context.surfaceColor,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               children: [
@@ -100,7 +101,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: context.borderColor),
                     ),
                     child: Row(
                       children: [
@@ -110,9 +111,9 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Filter Tanggal (Global)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-                              const SizedBox(height: 2),
-                              Text(_formattedDateRange, style: const TextStyle(fontWeight: FontWeight.bold, color: AppConstants.textPrimary, fontSize: 13)),
+                              Text('Filter Tanggal (Global)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                              SizedBox(height: 2),
+                              Text(_formattedDateRange, style: TextStyle(fontWeight: FontWeight.bold, color: context.textPrimary, fontSize: 13)),
                             ],
                           ),
                         ),
@@ -127,8 +128,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                   decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
                   child: TabBar(
                     controller: _tabController,
-                    indicator: BoxDecoration(color: AppConstants.textPrimary, borderRadius: BorderRadius.circular(8)),
-                    labelColor: Colors.white,
+                    indicator: BoxDecoration(color: context.textPrimary, borderRadius: BorderRadius.circular(8)),
+                    labelColor: context.surfaceColor,
                     unselectedLabelColor: Colors.grey.shade600,
                     labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     indicatorSize: TabBarIndicatorSize.tab,
@@ -213,7 +214,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
 
               // Log Table
               Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
+                decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: context.borderColor)),
                 child: ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -231,7 +232,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                         decoration: BoxDecoration(color: isLate ? Colors.orange.shade50 : Colors.green.shade50, borderRadius: BorderRadius.circular(8)),
                         child: Center(child: Text(DateFormat('dd').format(date), style: TextStyle(fontWeight: FontWeight.bold, color: isLate ? Colors.orange : Colors.green))),
                       ),
-                      title: Text(DateFormat('EEEE, MMM yyyy').format(date), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppConstants.textPrimary)),
+                      title: Text(DateFormat('EEEE, MMM yyyy').format(date), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: context.textPrimary)),
                       subtitle: Text('In: ${log['in']}  •  Out: ${log['out']}', style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -251,8 +252,8 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
 
   Widget _buildShimmerLoading() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.white,
+      baseColor: context.borderColor,
+      highlightColor: context.surfaceColor,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -260,23 +261,23 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           children: [
             Row(
               children: [
-                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)))),
+                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)))),
                 const SizedBox(width: 12),
-                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)))),
+                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)))),
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)))),
+                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)))),
                 const SizedBox(width: 12),
-                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)))),
+                Expanded(child: Container(height: 80, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)))),
               ],
             ),
             const SizedBox(height: 32),
-            Container(width: 120, height: 16, color: Colors.white),
+            Container(width: 120, height: 16, color: context.surfaceColor),
             const SizedBox(height: 16),
-            Container(height: 300, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+            Container(height: 300, decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16))),
           ],
         ),
       ),
@@ -287,7 +288,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 8, offset: const Offset(0, 2))]),
+        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: context.borderColor), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 8, offset: const Offset(0, 2))]),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -295,7 +296,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 16)),
-                Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppConstants.textPrimary)),
+                Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: context.textPrimary)),
               ],
             ),
             const SizedBox(height: 12),

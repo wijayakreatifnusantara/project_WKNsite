@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/utils/constants.dart';
 import '../data/payslip_service.dart';
 
 class SalaryCorrectionScreen extends StatefulWidget {
@@ -52,12 +52,12 @@ class _SalaryCorrectionScreenState extends State<SalaryCorrectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Koreksi Gaji', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppConstants.textPrimary)),
+        backgroundColor: context.surfaceColor,
+        title: Text('Koreksi Gaji', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppConstants.textPrimary),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -91,14 +91,14 @@ class _SalaryCorrectionScreenState extends State<SalaryCorrectionScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Periode Gaji', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                  Text('Periode Gaji', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
@@ -107,10 +107,10 @@ class _SalaryCorrectionScreenState extends State<SalaryCorrectionScreen> {
                       color: Colors.grey[50],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(_period, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                    child: Text(_period, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
                   ),
-                  const SizedBox(height: 20),
-                  const Text('Rincian Kesalahan / Koreksi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppConstants.textPrimary)),
+                  SizedBox(height: 20),
+                  Text('Rincian Kesalahan / Koreksi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _messageCtrl,
@@ -140,10 +140,10 @@ class _SalaryCorrectionScreenState extends State<SalaryCorrectionScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   elevation: 5,
                 ),
-                icon: _isSubmitting ? const SizedBox() : const Icon(Icons.send, color: Colors.white, size: 20),
+                icon: _isSubmitting ? SizedBox() : Icon(Icons.send, color: context.surfaceColor, size: 20),
                 label: _isSubmitting 
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('KIRIM PENGAJUAN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  ? CircularProgressIndicator(color: context.surfaceColor)
+                  : Text('KIRIM PENGAJUAN', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
             ),
           ],

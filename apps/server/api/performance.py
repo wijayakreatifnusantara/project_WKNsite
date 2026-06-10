@@ -16,6 +16,48 @@ async def list_metrics():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/performance/metrics")
+async def create_metric(payload: Dict[str, Any]):
+    """Create a new KPI metric"""
+    try:
+        data = {
+            "name": payload.get("name"),
+            "description": payload.get("description", ""),
+            "max_score": payload.get("max_score", 5),
+            "weight": payload.get("weight", 0),
+            "is_active": True,
+        }
+        res = supabase_client.client.table("kpi_metrics").insert(data).execute()
+        return {"status": "success", "data": res.data[0]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/performance/metrics/{metric_id}")
+async def update_metric(metric_id: int, payload: Dict[str, Any]):
+    """Update an existing KPI metric"""
+    try:
+        data = {
+            "name": payload.get("name"),
+            "description": payload.get("description", ""),
+            "max_score": payload.get("max_score", 5),
+            "weight": payload.get("weight", 0),
+        }
+        res = supabase_client.client.table("kpi_metrics").update(data).eq("id", metric_id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Metric not found")
+        return {"status": "success", "data": res.data[0]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/performance/metrics/{metric_id}")
+async def delete_metric(metric_id: int):
+    """Soft delete a KPI metric"""
+    try:
+        res = supabase_client.client.table("kpi_metrics").update({"is_active": False}).eq("id", metric_id).execute()
+        return {"status": "success", "message": "Metric deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/performance/reviews")
 async def list_reviews(employee_id: str = None, period: str = None):
     """List performance reviews with filtering"""
