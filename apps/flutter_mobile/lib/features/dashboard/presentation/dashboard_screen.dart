@@ -63,6 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _currentDate = '';
   String _weatherTemp = '--';
   String _weatherCondition = 'Memuat Cuaca...';
+  String _humidity = '--';
   int? _weatherCode;
   double? _compassHeading;
   StreamSubscription<CompassEvent>? _compassSubscription;
@@ -129,16 +130,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
       if (perm == LocationPermission.whileInUse || perm == LocationPermission.always) {
         final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
-        final url = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=${pos.latitude}&longitude=${pos.longitude}&current_weather=true');
+        final url = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=${pos.latitude}&longitude=${pos.longitude}&current=temperature_2m,relative_humidity_2m,weather_code');
         final res = await http.get(url);
         if (res.statusCode == 200) {
           final data = jsonDecode(res.body);
-          final current = data['current_weather'];
+          final current = data['current'];
           if (mounted) {
             setState(() {
-              _weatherTemp = "${current['temperature']}°C";
-              _weatherCondition = _getWeatherDesc(current['weathercode']);
-              _weatherCode = current['weathercode'];
+              _weatherTemp = "${current['temperature_2m']}°C";
+              _humidity = "${current['relative_humidity_2m']}%";
+              _weatherCondition = _getWeatherDesc(current['weather_code']);
+              _weatherCode = current['weather_code'];
             });
           }
         }
@@ -459,7 +461,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         slivers: [
           // Dynamic Header with Scroll Transition
           SliverAppBar(
-            expandedHeight: 210.0,
+            expandedHeight: 185.0,
             floating: false,
             pinned: true,
             backgroundColor: context.surfaceColor,
@@ -593,7 +595,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       Text(_weatherCondition, style: TextStyle(color: context.textSecondary, fontSize: 10)),
                                     ],
                                   ),
-                                  SizedBox(height: 8),
+                                  SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.water_drop_outlined, color: Colors.blue, size: 10),
+                                      SizedBox(width: 4),
+                                      Text('Kelembapan: $_humidity', style: TextStyle(color: context.textSecondary, fontSize: 10)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6),
                                   Row(
                                     children: [
                                       Text('Arah: ${_compassHeading?.toStringAsFixed(0) ?? '--'}°', style: TextStyle(color: context.textSecondary, fontSize: 10)),
