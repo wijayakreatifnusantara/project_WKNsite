@@ -85,11 +85,11 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
             <div className="col-span-4 space-y-12">
               <SectionHeader title="Identity & Access" icon={<IconUserCircle size={18} />} />
               <div className="space-y-8 pl-2">
-                <SimpleInfo label="Corporate Email" value={employee["EMAIL"]} icon={<IconMail />} />
-                <SimpleInfo label="Primary Contact" value={employee["PHONE NUMBER"]} icon={<IconPhone />} />
-                <SimpleInfo label="Residential" value={employee["Address"] || 'N/A'} icon={<IconMapPin />} />
-                <SimpleInfo label="Active Device" value={`${employee.last_device_brand || 'Unknown'} ${employee.last_device_model || ''}`} icon={<IconShieldCheck />} />
-                <SimpleInfo label="Joining Date" value={employee["Join Date"] || 'Jan 12, 2024'} icon={<IconCalendar />} />
+                <SimpleInfo label="Corporate Email" value={employee["EMAIL"] || employee.email} icon={<IconMail />} />
+                <SimpleInfo label="Primary Contact" value={employee["PHONE NUMBER"] || employee.phone} icon={<IconPhone />} />
+                <SimpleInfo label="Residential" value={employee["Address"] || employee.address} icon={<IconMapPin />} />
+                <SimpleInfo label="Active Device" value={`${employee.last_device_brand || ''} ${employee.last_device_model || ''}`.trim() || 'Unknown'} icon={<IconShieldCheck />} />
+                <SimpleInfo label="Joining Date" value={employee["Join Date"] || employee.join_date} icon={<IconCalendar />} />
               </div>
             </div>
 
@@ -97,9 +97,9 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
             <div className="col-span-4 space-y-12">
               <SectionHeader title="Strategic Logistics" icon={<IconBriefcase size={18} />} />
               <div className="space-y-8 pl-2">
-                <SimpleInfo label="Internal Role" value={employee["Job Position *"]} icon={<IconTrendingUp />} />
-                <SimpleInfo label="Service Level" value={employee["Job Level *"]} icon={<IconAward />} />
-                <SimpleInfo label="Work Pattern" value="Regular (08:00 - 17:00)" icon={<IconClock />} />
+                <SimpleInfo label="Internal Role" value={employee["Job Position *"] || employee.job_position} icon={<IconTrendingUp />} />
+                <SimpleInfo label="Service Level" value={employee["Job Level *"] || employee.job_level} icon={<IconAward />} />
+                <SimpleInfo label="Work Pattern" value={employee.shifts?.name || employee.work_pattern || 'N/A'} icon={<IconClock />} />
                 <div className="space-y-2">
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contract Status</p>
                   <p className="text-sm font-black text-[#E31E24] uppercase tracking-tighter">{employee["Status *"]}</p>
@@ -111,9 +111,15 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
             <div className="col-span-4 space-y-12">
               <SectionHeader title="Digital Repository" icon={<IconFileText size={18} />} />
               <div className="space-y-3">
-                <DocumentItem name="Employment_Contract_2024.pdf" />
-                <DocumentItem name="NPWP_Certification.pdf" />
-                <DocumentItem name="Performance_Review_Q1.pdf" />
+                {employee.documents && employee.documents.length > 0 ? (
+                  employee.documents.map((doc, idx) => (
+                    <DocumentItem key={idx} name={doc.name || 'Document.pdf'} />
+                  ))
+                ) : (
+                  <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center h-24">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">Belum ada dokumen</p>
+                  </div>
+                )}
                 <button className="w-full h-12 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 uppercase tracking-widest hover:border-[#E31E24] hover:text-[#E31E24] transition-all">
                   + Add Document
                 </button>
@@ -147,28 +153,7 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
 
           </div>
 
-          {/* 📈 GROWTH & PERFORMANCE (HORIZONTAL STRIP) */}
-          <div className="grid grid-cols-12 gap-12 pt-12 border-t border-slate-200/50">
-            <div className="col-span-8">
-              <SectionHeader title="Growth Matrix" icon={<IconTrendingUp size={18} />} />
-              <div className="grid grid-cols-3 gap-8 mt-8">
-                <SimpleMetric label="Technical" value={85} color="bg-blue-500" />
-                <SimpleMetric label="Leadership" value={92} color="bg-[#E31E24]" />
-                <SimpleMetric label="Culture" value={78} color="bg-green-500" />
-              </div>
-            </div>
-            <div className="col-span-4">
-              <SectionHeader title="Operational History" icon={<IconChecklist size={18} />} />
-              <div className="space-y-4 mt-8">
-                <p className="text-[10px] font-bold text-slate-500 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-500"></span> Last Sync: Today, 09:42 AM
-                </p>
-                <p className="text-[10px] font-bold text-slate-500 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-blue-500"></span> Profile Verified: 100%
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* 📈 GROWTH & PERFORMANCE (HORIZONTAL STRIP) - Removed Dummy Data */}
         </div>
       </div>
     </div>

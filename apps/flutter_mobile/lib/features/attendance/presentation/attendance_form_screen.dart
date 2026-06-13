@@ -141,9 +141,51 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
                 ]
               ),
               child: _photoPath != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.file(File(_photoPath!), fit: BoxFit.cover),
+                  ? GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => Dialog(
+                            insetPadding: EdgeInsets.zero,
+                            backgroundColor: Colors.black,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: MediaQuery.of(context).size.height,
+                                  child: InteractiveViewer(
+                                    child: Image.file(File(_photoPath!), fit: BoxFit.contain),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 40,
+                                  right: 16,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.file(File(_photoPath!), fit: BoxFit.cover),
+                            Container(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              child: const Center(
+                                child: Icon(Icons.zoom_out_map, color: Colors.white, size: 32),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
