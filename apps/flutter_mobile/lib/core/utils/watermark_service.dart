@@ -41,7 +41,7 @@ class WatermarkService {
     // 1. Load Merek Baru (Logo Watermark)
     ui.Image? logoImage;
     try {
-      final ByteData data = await rootBundle.load('assets/wkn_logo_square.png');
+      final ByteData data = await rootBundle.load('assets/wkn_logo.png');
       final ui.Codec logoCodec = await ui.instantiateImageCodec(data.buffer.asUint8List());
       final ui.FrameInfo logoFrame = await logoCodec.getNextFrame();
       logoImage = logoFrame.image;

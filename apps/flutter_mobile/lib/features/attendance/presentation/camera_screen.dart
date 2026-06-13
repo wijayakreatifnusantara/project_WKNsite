@@ -239,7 +239,7 @@ class _CameraScreenState extends State<CameraScreen> {
       // ----------------------------------------------------
       final watermarkedFile = await WatermarkService.addWatermark(
         imageFile: File(image.path),
-        employeeName: user['full_name'] ?? user['email'] ?? 'Unknown',
+        employeeName: user['name'] ?? user['email'] ?? 'Unknown',
         employeeId: user['id_karyawan'] ??
             (user['id'] != null && user['id'].toString().length > 8
                 ? user['id'].toString().substring(0, 8)
