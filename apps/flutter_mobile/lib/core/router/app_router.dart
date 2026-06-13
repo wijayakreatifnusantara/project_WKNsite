@@ -19,6 +19,8 @@ import '../../features/profile/presentation/signature_screen.dart';
 import '../../features/directory/presentation/directory_screen.dart';
 import '../../features/timesheet/presentation/timesheet_screen.dart';
 import '../../features/helpdesk/presentation/helpdesk_screen.dart';
+import '../../features/helpdesk/presentation/ticket_history_screen.dart';
+import '../../features/helpdesk/presentation/ticket_detail_screen.dart';
 import '../../features/documents/presentation/documents_screen.dart';
 import '../../features/assistant/presentation/assistant_screen.dart';
 import '../../features/company/presentation/announcements_screen.dart';
@@ -67,6 +69,14 @@ GoRouter createAppRouter(AuthProvider authProvider) {
     GoRoute(path: '/directory', builder: (context, state) => const DirectoryScreen()),
     GoRoute(path: '/timesheet', builder: (context, state) => const TimesheetScreen()),
     GoRoute(path: '/helpdesk', builder: (context, state) => const HelpdeskScreen()),
+    GoRoute(path: '/helpdesk-history', builder: (context, state) => const TicketHistoryScreen()),
+    GoRoute(
+      path: '/helpdesk-detail',
+      builder: (context, state) {
+        final ticket = state.extra as Map<String, dynamic>? ?? {};
+        return TicketDetailScreen(ticket: ticket);
+      },
+    ),
     GoRoute(path: '/documents', builder: (context, state) => const DocumentsScreen()),
     GoRoute(path: '/assistant', builder: (context, state) => const AssistantScreen()),
     GoRoute(path: '/announcements', builder: (context, state) => const AnnouncementsScreen()),

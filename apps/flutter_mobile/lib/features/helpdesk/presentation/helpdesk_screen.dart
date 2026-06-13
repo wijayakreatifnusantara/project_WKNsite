@@ -75,40 +75,50 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
         backgroundColor: context.surfaceColor,
         automaticallyImplyLeading: canPop,
         title: Text('Pusat Bantuan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () => context.push('/helpdesk-history'),
+            tooltip: 'Riwayat Tiket',
+          )
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20).copyWith(bottom: 100),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: Offset(0, 4))]),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Buat Tiket Baru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
-              const SizedBox(height: 4),
-              const Text('Sampaikan kendala IT, masalah perangkat, atau pertanyaan HRD Anda di sini.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              const SizedBox(height: 24),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: Offset(0, 4))]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Buat Tiket Baru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
+                        const SizedBox(height: 4),
+                        const Text('Sampaikan kendala IT, masalah perangkat, atau pertanyaan HRD Anda di sini.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 24),
 
-              // Kategori
-              const Text('KATEGORI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _categories.map((cat) {
-                  final isActive = _category == cat['id'];
-                  return ChoiceChip(
-                    label: Text(cat['label']!),
-                    selected: isActive,
-                    onSelected: (val) => setState(() => _category = cat['id']!),
-                    selectedColor: AppConstants.primaryColor,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    labelStyle: TextStyle(color: isActive ? context.surfaceColor : context.textPrimary, fontWeight: FontWeight.bold, fontSize: 12),
-                    showCheckmark: false,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: isActive ? AppConstants.primaryColor : context.borderColor)),
-                  );
-                }).toList(),
-              ),
+                        // Kategori Dropdown
+                        const Text('KATEGORI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          value: _category,
+                          decoration: _inputDecoration('Pilih kategori'),
+                          dropdownColor: context.surfaceColor,
+                          items: _categories.map((cat) {
+                            return DropdownMenuItem<String>(
+                              value: cat['id'],
+                              child: Text(cat['label']!, style: TextStyle(fontSize: 14, color: context.textPrimary)),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) setState(() => _category = val);
+                          },
+                        ),
               const SizedBox(height: 24),
 
               // Subject
@@ -120,36 +130,44 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Detail
-              const Text('DETAIL KENDALA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _descCtrl,
-                maxLines: 5,
-                decoration: _inputDecoration('Jelaskan secara rinci...'),
-              ),
-              const SizedBox(height: 30),
+                        // Detail
+                        const Text('DETAIL KENDALA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: _descCtrl,
+                            maxLines: null,
+                            expands: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            decoration: _inputDecoration('Jelaskan secara rinci...'),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
 
-              // Submit
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton.icon(
-                  onPressed: _handleSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppConstants.primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    elevation: 4,
-                    shadowColor: AppConstants.primaryColor.withValues(alpha: 0.5),
+                        // Submit
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: _handleSubmit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppConstants.primaryColor,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              elevation: 4,
+                              shadowColor: AppConstants.primaryColor.withValues(alpha: 0.5),
+                            ),
+                            icon: Icon(Icons.headset_mic_outlined, color: context.surfaceColor),
+                            label: Text('KIRIM TIKET', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  icon: Icon(Icons.headset_mic_outlined, color: context.surfaceColor),
-                  label: Text('KIRIM TIKET', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
+          );
+        },
     );
   }
 
@@ -158,7 +176,7 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
       filled: true,
-      fillColor: const Color(0xFFF8F9FB),
+      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppConstants.primaryColor)),
