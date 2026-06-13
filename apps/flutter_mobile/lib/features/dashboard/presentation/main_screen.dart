@@ -43,27 +43,6 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       extendBody: true,
       body: _screens[_currentIndex],
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: AppConstants.secondaryColor.withValues(alpha: 0.3),
-              blurRadius: 15,
-              spreadRadius: 2,
-              offset: const Offset(0, 5),
-            )
-          ]
-        ),
-        child: FloatingActionButton(
-          onPressed: () => context.push('/assistant'),
-          backgroundColor: AppConstants.secondaryColor,
-          shape: CircleBorder(),
-          elevation: 0,
-          child: Icon(Icons.auto_awesome, color: context.surfaceColor, size: 28),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
         decoration: BoxDecoration(
@@ -78,45 +57,32 @@ class _MainScreenState extends State<MainScreen> {
           ]
         ),
         child: BottomAppBar(
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 8,
           color: Colors.transparent,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: SizedBox(
             height: 60,
             child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildNavItem(0, Icons.home_outlined, Icons.home, 'Beranda'),
-                  _buildNavItem(1, Icons.mail_outline, Icons.mail, 'Inbox'),
-                ],
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildNavItem(3, Icons.help_outline, Icons.help, 'Bantuan'),
-                  _buildNavItem(4, Icons.person_outline, Icons.person, 'Profil'),
-                ],
-              ),
-            ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildNavItem(0, Icons.home_outlined, Icons.home, 'Beranda'),
+                _buildNavItem(1, Icons.mail_outline, Icons.mail, 'Inbox'),
+                _buildNavItem(3, Icons.help_outline, Icons.help, 'Bantuan'),
+                _buildNavItem(4, Icons.person_outline, Icons.person, 'Profil'),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
 
   Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label) {
     final isSelected = _currentIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width / 5,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _currentIndex = index),
+        behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,

@@ -18,6 +18,7 @@ import 'features/attendance/data/offline_attendance_service.dart';
 import 'features/attendance/data/attendance_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
+import 'core/widgets/floating_assistant.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -139,6 +140,14 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       routerConfig: _router,
+      builder: (context, child) {
+        return Stack(
+          children: [
+            if (child != null) child,
+            FloatingAssistant(router: _router),
+          ],
+        );
+      },
     );
   }
 }
