@@ -160,7 +160,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                     child: Signature(
                       controller: _signatureController,
                       height: 220,
-                      backgroundColor: Colors.blue.shade50,
+                      backgroundColor: Colors.blue.withValues(alpha: 0.1),
                     ),
                   ),
                 ),

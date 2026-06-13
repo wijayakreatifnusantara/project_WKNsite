@@ -179,7 +179,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           Container(
                             width: 52, height: 52,
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(color: context.borderColor)
                             ),

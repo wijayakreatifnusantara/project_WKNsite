@@ -99,7 +99,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: context.borderColor),
                     ),
@@ -125,7 +125,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                 const SizedBox(height: 16),
                 Container(
                   height: 42,
-                  decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(10)),
                   child: TabBar(
                     controller: _tabController,
                     indicator: BoxDecoration(color: context.textPrimary, borderRadius: BorderRadius.circular(8)),
@@ -219,7 +219,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: logs.length,
-                  separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade100),
+                  separatorBuilder: (context, index) => Divider(height: 1, color: Theme.of(context).colorScheme.surfaceContainerHighest),
                   itemBuilder: (context, index) {
                     final log = logs[index];
                     final date = DateTime.parse(log['date']);
@@ -229,14 +229,14 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       leading: Container(
                         width: 40, height: 40,
-                        decoration: BoxDecoration(color: isLate ? Colors.orange.shade50 : Colors.green.shade50, borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: isLate ? Colors.orange.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                         child: Center(child: Text(DateFormat('dd').format(date), style: TextStyle(fontWeight: FontWeight.bold, color: isLate ? Colors.orange : Colors.green))),
                       ),
                       title: Text(DateFormat('EEEE, MMM yyyy').format(date), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: context.textPrimary)),
                       subtitle: Text('In: ${log['in']}  •  Out: ${log['out']}', style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: isLate ? Colors.orange.shade50 : Colors.green.shade50, borderRadius: BorderRadius.circular(4)),
+                        decoration: BoxDecoration(color: isLate ? Colors.orange.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                         child: Text(log['status'], style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isLate ? Colors.orange : Colors.green)),
                       ),
                     );

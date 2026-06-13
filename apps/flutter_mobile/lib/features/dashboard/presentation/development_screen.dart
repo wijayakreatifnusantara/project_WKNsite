@@ -26,7 +26,7 @@ class DevelopmentScreen extends StatelessWidget {
               Container(
                 width: 120, height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
+                  color: Colors.orange.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [BoxShadow(color: Colors.orange.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10))],
                 ),

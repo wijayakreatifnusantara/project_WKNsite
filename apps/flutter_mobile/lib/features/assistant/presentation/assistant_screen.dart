@@ -191,7 +191,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
                 Expanded(
                   child: Container(
                     height: 48,
-                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(24)),
+                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(24)),
                     child: TextField(
                       controller: _msgCtrl,
                       decoration: const InputDecoration(

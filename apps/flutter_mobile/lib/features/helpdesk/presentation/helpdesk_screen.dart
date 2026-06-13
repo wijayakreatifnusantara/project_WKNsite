@@ -102,7 +102,7 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
                     selected: isActive,
                     onSelected: (val) => setState(() => _category = cat['id']!),
                     selectedColor: AppConstants.primaryColor,
-                    backgroundColor: Colors.grey.shade50,
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                     labelStyle: TextStyle(color: isActive ? context.surfaceColor : context.textPrimary, fontWeight: FontWeight.bold, fontSize: 12),
                     showCheckmark: false,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: isActive ? AppConstants.primaryColor : context.borderColor)),

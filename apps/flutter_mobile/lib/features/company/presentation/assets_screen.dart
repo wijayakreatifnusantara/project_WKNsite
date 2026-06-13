@@ -25,7 +25,7 @@ class AssetsScreen extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.blue.shade100)),
+              decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.blue.shade100)),
               child: Row(
                 children: [
                   const Icon(Icons.info_outline, color: Colors.blue),
@@ -93,7 +93,7 @@ class AssetsScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(12)),
             child: Icon(icon, color: Colors.grey.shade700, size: 28),
           ),
           const SizedBox(width: 16),
@@ -111,7 +111,7 @@ class AssetsScreen extends StatelessWidget {
                     Text('Diterima: $dateAssigned', style: const TextStyle(fontSize: 10, color: Colors.grey)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                       child: Text(status, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.green)),
                     )
                   ],

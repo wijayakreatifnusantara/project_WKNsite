@@ -155,7 +155,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                       const Text('Status Karyawan', style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w600)),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.green.shade200)),
+                        decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.green.shade200)),
                         child: Text(_employeeData?['status'] ?? 'TIDAK DIKETAHUI', style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
                       )
                     ],
@@ -296,7 +296,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                     _bankOwnerCtrl.text = _employeeData?['bank_account_holder'] ?? '';
                   });
                 },
-                style: TextButton.styleFrom(backgroundColor: Colors.grey.shade100, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 16)),
+                style: TextButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 16)),
                 child: const Text('Batal', style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
               ),
             ),

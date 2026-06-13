@@ -465,7 +465,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _proofPhotoPath != null ? Colors.green.withValues(alpha: 0.1) : Colors.grey.shade50,
+                  color: _proofPhotoPath != null ? Colors.green.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: _proofPhotoPath != null ? Colors.green.shade300 : Colors.grey.shade300),
                 ),

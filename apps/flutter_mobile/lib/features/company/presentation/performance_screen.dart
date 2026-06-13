@@ -109,7 +109,7 @@ class PerformanceScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Container(
             height: 6,
-            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(3)),
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(3)),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: progress,

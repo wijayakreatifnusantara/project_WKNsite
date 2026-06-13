@@ -133,7 +133,7 @@ class AcademyScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: isCompleted ? Colors.green.shade50 : Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: isCompleted ? Colors.green.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
             child: Icon(icon, color: isCompleted ? Colors.green : Colors.blue),
           ),
           const SizedBox(width: 16),

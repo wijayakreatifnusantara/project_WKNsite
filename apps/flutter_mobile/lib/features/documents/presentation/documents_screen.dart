@@ -205,7 +205,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : Colors.black87, fontSize: 11)),
                   selected: isSelected,
                   selectedColor: AppConstants.primaryColor,
-                  backgroundColor: Colors.grey.shade100,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   onSelected: (v) => setState(() => _docCategory = c),
                   showCheckmark: false,
                 );
@@ -232,7 +232,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400, style: BorderStyle.solid), // changed from dashed for simplicity
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey.shade50
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest
                 ),
                 child: Row(
                   children: [
@@ -312,7 +312,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(4)),
+                                        decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                                         child: Text(doc['category'] ?? '', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.blue)),
                                       ),
                                       const SizedBox(width: 8),

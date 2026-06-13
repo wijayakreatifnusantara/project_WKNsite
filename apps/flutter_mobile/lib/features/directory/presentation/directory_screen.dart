@@ -195,7 +195,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             name: emp['name'] ?? 'User',
             radius: 27,
             fontSize: 20,
-            backgroundColor: Colors.grey.shade100,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           const SizedBox(width: 15),
           

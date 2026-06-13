@@ -169,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: context.textPrimary, size: 24),
         ),
         const SizedBox(width: 16),
@@ -184,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                       child: const Text('Aktif', style: TextStyle(fontSize: 9, color: Colors.green, fontWeight: FontWeight.bold)),
                     )
                   ]
@@ -409,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ElevatedButton.icon(
                 onPressed: _handleLogout,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade50,
+                  backgroundColor: Colors.red.withValues(alpha: 0.1),
                   foregroundColor: Colors.red,
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -441,7 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       leading: Container(
         padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade100)),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8), border: Border.all(color: Theme.of(context).colorScheme.surfaceContainerHighest)),
         child: Icon(icon, color: AppConstants.primaryColor, size: 20),
       ),
       title: Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.textPrimary)),
@@ -461,7 +461,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       leading: Container(
         padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade100)),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8), border: Border.all(color: Theme.of(context).colorScheme.surfaceContainerHighest)),
         child: Icon(icon, color: AppConstants.primaryColor, size: 20),
       ),
       title: Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.textPrimary)),

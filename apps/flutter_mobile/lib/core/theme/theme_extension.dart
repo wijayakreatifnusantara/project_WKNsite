@@ -7,5 +7,6 @@ extension ThemeContext on BuildContext {
   Color get textPrimary => Theme.of(this).textTheme.bodyLarge?.color ?? AppConstants.textPrimary;
   Color get textSecondary => Theme.of(this).bottomNavigationBarTheme.unselectedItemColor ?? AppConstants.textSecondary;
   Color get borderColor => Theme.of(this).dividerColor;
+  Color get surfaceContainerHighest => Theme.of(this).colorScheme.surfaceContainerHighest;
   bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
 }

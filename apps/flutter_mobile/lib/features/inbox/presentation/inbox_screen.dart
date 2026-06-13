@@ -131,10 +131,10 @@ class _InboxScreenState extends State<InboxScreen> {
 
   Color _getIconBgColor(String type) {
     switch (type) {
-      case 'alert': return Colors.red.shade50;
-      case 'payroll': return Colors.green.shade50;
-      case 'hr': return Colors.blue.shade50;
-      case 'system': return Colors.orange.shade50;
+      case 'alert': return Colors.red.withValues(alpha: 0.1);
+      case 'payroll': return Colors.green.withValues(alpha: 0.1);
+      case 'hr': return Colors.blue.withValues(alpha: 0.1);
+      case 'system': return Colors.orange.withValues(alpha: 0.1);
       default: return Colors.deepPurple.shade50;
     }
   }
@@ -191,7 +191,7 @@ class _InboxScreenState extends State<InboxScreen> {
                             decoration: BoxDecoration(
                               color: context.surfaceColor,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade100),
+                              border: Border.all(color: Theme.of(context).colorScheme.surfaceContainerHighest),
                               boxShadow: isRead ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
                             ),
                             child: Row(

@@ -88,7 +88,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: item['type'] == 'Cuti' ? Colors.orange.shade50 : (item['type'] == 'Lembur' ? Colors.blue.shade50 : Colors.purple.shade50),
+                              color: item['type'] == 'Cuti' ? Colors.orange.withValues(alpha: 0.1) : (item['type'] == 'Lembur' ? Colors.blue.withValues(alpha: 0.1) : Colors.purple.shade50),
                               borderRadius: BorderRadius.circular(6)
                             ),
                             child: Text(item['type'], style: TextStyle(
@@ -102,7 +102,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          CircleAvatar(radius: 20, backgroundColor: Colors.grey.shade100, child: Text(item['avatar'], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
+                          CircleAvatar(radius: 20, backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest, child: Text(item['avatar'], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(

@@ -102,7 +102,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           children: [
             Container(
               width: 70, height: 70,
-              decoration: BoxDecoration(color: Colors.orange.shade50, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: Icon(Icons.vpn_key_outlined, size: 36, color: Colors.orange),
             ),
             SizedBox(height: 20),

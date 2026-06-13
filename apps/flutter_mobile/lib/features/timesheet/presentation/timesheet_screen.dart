@@ -101,7 +101,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
             // Info Box
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16)),
               child: Row(
                 children: [
                   Container(

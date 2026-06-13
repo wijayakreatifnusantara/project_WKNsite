@@ -103,7 +103,7 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
           children: [
             Container(
               width: 80, height: 80,
-              decoration: BoxDecoration(color: Colors.green.shade50, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: Icon(Icons.shield_outlined, size: 40, color: Colors.green),
             ),
             SizedBox(height: 20),
