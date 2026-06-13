@@ -192,16 +192,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (user == null || user['id'] == null) return;
       
       final today = DateTime.now().toIso8601String().split('T')[0];
-      final res = await Supabase.instance.client
+      final resList = await Supabase.instance.client
           .from('attendance')
-          .select('status, clock_in, clock_out')
+          .select('status, clock_in, clock_out, date')
           .eq('employee_id', user['id'])
-          .eq('date', today)
-          .maybeSingle();
+          .order('date', ascending: false)
+          .limit(1);
           
       if (mounted) {
         setState(() {
-          if (res == null) {
+          if (resList.isEmpty) {
+            _todayStatus = 'Belum Absen';
+            _hasClockedIn = false;
+            _clockInTime = null;
+            _clockOutTime = null;
+            _workDuration = null;
+            return;
+          }
+
+          final res = resList.first;
+          final isToday = res['date'] == today;
+          final isPendingNightShift = !isToday && res['clock_out'] == null;
+
+          if (!isToday && !isPendingNightShift) {
+            // Catatan terakhir adalah hari sebelumnya dan sudah selesai
             _todayStatus = 'Belum Absen';
             _hasClockedIn = false;
             _clockInTime = null;
@@ -215,17 +229,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
             _hasClockedIn = true;
             
-            final inTime = _parseTime(res['clock_in']?.toString());
-            final outTime = _parseTime(res['clock_out']?.toString());
+            final inTime = _parseTime(res['clock_in']?.toString(), isPendingNightShift);
+            final outTime = _parseTime(res['clock_out']?.toString(), false);
             
             if (inTime != null) {
               _clockInTime = "${inTime.hour.toString().padLeft(2, '0')}:${inTime.minute.toString().padLeft(2, '0')}";
               if (outTime != null) {
                 _clockOutTime = "${outTime.hour.toString().padLeft(2, '0')}:${outTime.minute.toString().padLeft(2, '0')}";
-                final diff = outTime.difference(inTime);
+                Duration diff = outTime.difference(inTime);
+                if (diff.isNegative) diff += const Duration(hours: 24);
                 _workDuration = "${diff.inHours}j ${diff.inMinutes % 60}m";
               } else {
-                final diff = DateTime.now().difference(inTime);
+                Duration diff = DateTime.now().difference(inTime);
+                if (diff.isNegative) diff += const Duration(hours: 24);
                 _workDuration = "${diff.inHours}j ${diff.inMinutes % 60}m";
               }
             }
@@ -241,15 +257,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  DateTime? _parseTime(String? timeStr) {
+  DateTime? _parseTime(String? timeStr, bool isYesterday) {
     if (timeStr == null) return null;
     try {
       if (timeStr.contains('T')) {
         return DateTime.parse(timeStr).toLocal();
       } else {
-        final now = DateTime.now();
+        DateTime base = DateTime.now();
+        if (isYesterday) {
+          base = base.subtract(const Duration(days: 1));
+        }
         final parts = timeStr.split(':');
-        return DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
+        return DateTime(base.year, base.month, base.day, int.parse(parts[0]), int.parse(parts[1]));
       }
     } catch(e) { return null; }
   }
