@@ -19,6 +19,7 @@ import '../../attendance/data/offline_attendance_service.dart';
 import 'package:text_scroll/text_scroll.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,7 +31,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   // Master list of all available actions
   final List<Map<String, dynamic>> _allActions = [
-    {'id': 'leave', 'icon': Icons.calendar_month, 'label': 'Cuti', 'route': '/leave'},
+    {'id': 'leave', 'icon': Icons.calendar_month, 'label': 'Izin', 'route': '/leave'},
     {'id': 'overtime', 'icon': Icons.timer, 'label': 'Lembur', 'route': '/overtime'},
     {'id': 'payslip', 'icon': Icons.receipt_long, 'label': 'Slip Gaji', 'route': '/payslip'},
     {'id': 'reimburse', 'icon': Icons.attach_money, 'label': 'Reimburse', 'route': '/reimburse'},
@@ -67,6 +68,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _clockInTime;
   String? _clockOutTime;
   String? _workDuration;
+  String? _clockInNotes;
+  String _locationName = 'Memuat Lokasi...';
+  String _locationDetail = 'Mencari sinyal GPS...';
   int? _weatherCode;
   double? _compassHeading;
   StreamSubscription<CompassEvent>? _compassSubscription;
@@ -125,31 +129,101 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) setState(() => _compassHeading = event.heading);
     });
 
-    // Weather
+    // Weather & Location
     try {
       LocationPermission perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
       }
       if (perm == LocationPermission.whileInUse || perm == LocationPermission.always) {
-        final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+        final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        
+        // 1. Weather
         final url = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=${pos.latitude}&longitude=${pos.longitude}&current=temperature_2m,relative_humidity_2m,weather_code');
-        final res = await http.get(url);
-        if (res.statusCode == 200) {
-          final data = jsonDecode(res.body);
-          final current = data['current'];
-          if (mounted) {
-            setState(() {
-              _weatherTemp = "${current['temperature_2m']}°C";
-              _humidity = "${current['relative_humidity_2m']}%";
-              _weatherCondition = _getWeatherDesc(current['weather_code']);
-              _weatherCode = current['weather_code'];
-            });
+        http.get(url).then((res) {
+          if (res.statusCode == 200) {
+            final data = jsonDecode(res.body);
+            final current = data['current'];
+            if (mounted) {
+              setState(() {
+                _weatherTemp = "${current['temperature_2m']}°C";
+                _humidity = "${current['relative_humidity_2m']}%";
+                _weatherCondition = _getWeatherDesc(current['weather_code']);
+                _weatherCode = current['weather_code'];
+              });
+            }
           }
+        });
+
+        // 2. Geofence & Location Name
+        try {
+          final settingsRes = await AttendanceService().getAttendanceSettings();
+          bool insideZone = false;
+          String zoneName = '';
+          
+          if (settingsRes['status'] == 'success') {
+            final data = settingsRes['data'];
+            final userData = context.read<AuthProvider>().userData;
+            final allowFreeGlobal = data['allow_free_attendance'] == true;
+            final isFieldTeam = userData?['is_field_team'] == true;
+            
+            if (allowFreeGlobal || isFieldTeam) {
+              insideZone = true;
+              zoneName = allowFreeGlobal ? 'Bebas Absen Global' : 'Lokasi Lapangan Bebas';
+            } else {
+               final workingLocName = userData?['working_location'];
+               final locations = (data['working_locations'] as List<dynamic>?) ?? [];
+               Map<String, dynamic>? matchedLoc;
+               for (var loc in locations) {
+                 if (loc['name'] == workingLocName) { matchedLoc = loc; break; }
+               }
+               
+               if (matchedLoc == null) {
+                  matchedLoc = data['hq_location'] ?? {'name': 'WKN HQ', 'lat': -6.2088, 'lon': 106.8456, 'radius': 100};
+               }
+               
+               double dist = Geolocator.distanceBetween(
+                 pos.latitude, pos.longitude,
+                 (matchedLoc!['lat'] ?? 0).toDouble(), (matchedLoc['lon'] ?? 0).toDouble()
+               );
+               
+               if (dist <= (matchedLoc['radius'] ?? 100).toDouble()) {
+                 insideZone = true;
+                 zoneName = matchedLoc['name'];
+               }
+            }
+          }
+
+          if (insideZone && zoneName.isNotEmpty) {
+             if (mounted) setState(() {
+                _locationName = zoneName;
+                _locationDetail = 'Sesuai dengan titik koordinat terdaftar';
+             });
+          } else {
+             // Fallback to Reverse Geocoding
+             List<geocoding.Placemark> placemarks = await geocoding.placemarkFromCoordinates(pos.latitude, pos.longitude);
+             if (placemarks.isNotEmpty) {
+               final place = placemarks.first;
+               if (mounted) setState(() {
+                  _locationName = place.name ?? place.street ?? 'Lokasi Tidak Dikenal';
+                  _locationDetail = '${place.subLocality ?? place.locality ?? ''}, ${place.subAdministrativeArea ?? place.administrativeArea ?? ''}';
+               });
+             }
+          }
+        } catch(e) {
+             if (mounted) setState(() {
+                _locationName = 'Lokasi GPS';
+                _locationDetail = '${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}';
+             });
         }
       }
     } catch (e) {
-      if (mounted) setState(() { _weatherTemp = '--'; _weatherCondition = 'Gagal memuat'; });
+      if (mounted) setState(() { 
+        _weatherTemp = '--'; 
+        _weatherCondition = 'Gagal memuat'; 
+        _locationName = 'Gagal memuat lokasi';
+        _locationDetail = 'Pastikan GPS menyala';
+      });
     }
   }
 
@@ -194,7 +268,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final today = DateTime.now().toIso8601String().split('T')[0];
       final resList = await Supabase.instance.client
           .from('attendance')
-          .select('status, clock_in, clock_out, date')
+          .select('status, clock_in, clock_out, date, notes')
           .eq('employee_id', user['id'])
           .order('date', ascending: false)
           .limit(1);
@@ -207,6 +281,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _clockInTime = null;
             _clockOutTime = null;
             _workDuration = null;
+            _clockInNotes = null;
             return;
           }
 
@@ -221,6 +296,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _clockInTime = null;
             _clockOutTime = null;
             _workDuration = null;
+            _clockInNotes = null;
           } else {
             if (res['clock_out'] != null) {
               _todayStatus = 'Selesai (Pulang)';
@@ -228,6 +304,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _todayStatus = res['status'] ?? 'Sudah Absen';
             }
             _hasClockedIn = true;
+            _clockInNotes = res['notes'];
             
             final inTime = _parseTime(res['clock_in']?.toString(), isPendingNightShift);
             final outTime = _parseTime(res['clock_out']?.toString(), false);
@@ -801,8 +878,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('WKN Office Tower', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: context.textPrimary)),
-                      Text('Sesuai dengan titik kordinat', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Text(_locationName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: context.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Text(_locationDetail, style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      ),
                     ],
                   ),
                 ],
@@ -814,27 +897,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          if (_hasClockedIn) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: AppConstants.slate50,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppConstants.slate200),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildTimeSummary(context, 'Masuk', _clockInTime ?? '--:--', Icons.login),
-                  Container(height: 30, width: 1, color: AppConstants.slate300),
-                  _buildTimeSummary(context, 'Pulang', _clockOutTime ?? '--:--', Icons.logout),
-                  Container(height: 30, width: 1, color: AppConstants.slate300),
-                  _buildTimeSummary(context, 'Durasi', _workDuration ?? '--', Icons.timer),
-                ],
-              ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppConstants.slate50,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppConstants.slate200),
             ),
-          ],
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildTimeSummary(context, 'Masuk', _clockInTime ?? '--:--', Icons.login),
+                    Container(height: 30, width: 1, color: AppConstants.slate300),
+                    _buildTimeSummary(context, 'Pulang', _clockOutTime ?? '--:--', Icons.logout),
+                    Container(height: 30, width: 1, color: AppConstants.slate300),
+                    _buildTimeSummary(context, 'Durasi', _workDuration ?? '--', Icons.timer),
+                  ],
+                ),
+                if (_clockInNotes != null && _clockInNotes!.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.notes, size: 12, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text('Catatan: $_clockInNotes', style: const TextStyle(fontSize: 10, color: Colors.grey, fontStyle: FontStyle.italic)),
+                      ),
+                    ],
+                  )
+                ]
+              ],
+            ),
+          ),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,

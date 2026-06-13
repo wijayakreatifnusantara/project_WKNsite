@@ -67,6 +67,7 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_local_notifications: ^22.0.0
   google_generative_ai: ^0.4.7
+  geocoding: ^4.0.0
 
 
 dev_dependencies:
