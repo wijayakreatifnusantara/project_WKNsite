@@ -88,13 +88,14 @@ class WatermarkService {
       }
     }
 
-    // --- ATAS KIRI: Tanggal, Jam, ID, Nama ---
-    final String dateStr = DateFormat('EEEE, dd MMM yyyy', 'id_ID').format(DateTime.now());
+    // --- ATAS KIRI: Hari, Tanggal, Jam, ID, Nama ---
+    final String dateStr = DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(DateTime.now());
     final String timeStr = DateFormat('HH:mm:ss').format(DateTime.now());
     drawTextBlock(
       [
         "$dateStr | $timeStr WIB",
-        "[$employeeId] $employeeName".toUpperCase(),
+        employeeId.toUpperCase(),
+        employeeName.toUpperCase(),
       ],
       padding,
       padding,
@@ -104,9 +105,7 @@ class WatermarkService {
 
     // --- ATAS KANAN: Check In / Check Out atau Custom Label ---
     final String statusText = customLabel ?? (isCheckOut ? "CHECK OUT" : "CHECK IN");
-    final Color statusColor = customLabel != null 
-        ? const Color(0xFF2563EB) // Primary Blue for Leave/Permission
-        : (isCheckOut ? const Color(0xFFFF3B30) : const Color(0xFF34C759));
+    final Color statusColor = Colors.white;
 
     final tpStatus = TextPainter(
       text: TextSpan(
@@ -140,49 +139,23 @@ class WatermarkService {
       smallTextStyle.copyWith(fontWeight: FontWeight.w600),
     );
 
-    // --- BAWAH KANAN: Logo + "WKN Mobile Verified" ---
-    // Layout teks terlebih dahulu untuk menghitung lebar & posisi
-    final tpVerify = TextPainter(
-      text: TextSpan(
-        text: "WKN Mobile Verified",
-        style: textStyle.copyWith(
-          fontSize: smallFontSize * 0.9,
-          letterSpacing: 1.2,
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: ui.TextDirection.ltr,
-    );
-    tpVerify.layout();
-
-    // Hitung posisi: Teks rata kanan dengan padding
-    final double textRightEdge = imgWidth - padding;
-    final double textX = textRightEdge - tpVerify.width;
-    final double textY = imgHeight - tpVerify.height - padding;
-
-    // Gambar teks
-    tpVerify.paint(canvas, Offset(textX, textY));
-
-    // Gambar Logo TEPAT di tengah teks — tanpa filter monochrome (full color)
+    // --- BAWAH KANAN: Logo WKN (Hanya Logo, Warna Putih) ---
     if (logoImage != null) {
-      // Tengah horizontal teks = textX + (tpVerify.width / 2)
-      final double textCenterX = textX + (tpVerify.width / 2);
-      final double logoCenterX = textCenterX - (logoSize / 2);
-      final double logoY = textY - logoSize - (padding * 0.4);
+      final double logoX = imgWidth - logoSize - padding;
+      final double logoY = imgHeight - logoSize - padding;
 
       canvas.drawImageRect(
         logoImage,
         Rect.fromLTWH(0, 0, logoImage.width.toDouble(), logoImage.height.toDouble()),
-        Rect.fromLTWH(logoCenterX, logoY, logoSize, logoSize),
+        Rect.fromLTWH(logoX, logoY, logoSize, logoSize),
         Paint()
           ..filterQuality = ui.FilterQuality.high
           ..colorFilter = const ColorFilter.matrix(<double>[
-            0.2126, 0.7152, 0.0722, 0, 0,
-            0.2126, 0.7152, 0.0722, 0, 0,
-            0.2126, 0.7152, 0.0722, 0, 0,
-            0,      0,      0,      1, 0,
-          ]), // Filter monokrom
+            0, 0, 0, 0, 255, // R -> 255 (White)
+            0, 0, 0, 0, 255, // G -> 255 (White)
+            0, 0, 0, 0, 255, // B -> 255 (White)
+            0, 0, 0, 1, 0,   // Alpha (Keep original alpha)
+          ]),
       );
     }
 
