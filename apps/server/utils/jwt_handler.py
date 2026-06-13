@@ -52,6 +52,7 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> dic
         raise credentials_exception
 
     try:
+        # 1. Coba decode sebagai token admin internal
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         role: str = payload.get("role")
@@ -70,6 +71,28 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> dic
             "is_field_team": is_field_team
         }
     except JWTError:
+        # 2. Jika gagal, coba periksa apakah ini adalah token dari Supabase (Mobile App)
+        try:
+            unverified_claims = jwt.get_unverified_claims(token)
+            if unverified_claims.get("aud") == "authenticated" or "supabase" in str(unverified_claims.get("iss", "")):
+                from utils.supabase_client import supabase_client
+                user_res = supabase_client.client.auth.get_user(token)
+                if user_res and user_res.user:
+                    email = user_res.user.email
+                    # Ambil data employee dari database
+                    emp_res = supabase_client.client.table("employees").select("*").eq("email", email).execute()
+                    if emp_res.data:
+                        employee = emp_res.data[0]
+                        return {
+                            "username": email,
+                            "role": "employee",
+                            "permissions": [],
+                            "employee_id": employee["id"],
+                            "is_field_team": employee.get("is_field_team", False)
+                        }
+        except Exception as e:
+            pass
+            
         raise credentials_exception
 
 def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
