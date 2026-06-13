@@ -168,6 +168,7 @@ class _HelpdeskScreenState extends State<HelpdeskScreen> {
             ),
           );
         },
+      ),
     );
   }
 

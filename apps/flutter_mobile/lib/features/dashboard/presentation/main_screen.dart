@@ -106,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected ? AppConstants.primaryColor : Theme.of(context).colorScheme.surfaceContainerHighest0,
+                color: isSelected ? AppConstants.primaryColor : Colors.grey.shade500,
               ),
             )
           ],
