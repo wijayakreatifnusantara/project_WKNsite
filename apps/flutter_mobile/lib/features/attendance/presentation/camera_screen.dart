@@ -15,6 +15,7 @@ import '../data/attendance_service.dart';
 import '../data/offline_attendance_service.dart';
 import '../utils/liveness_checker.dart';
 import '../../../core/utils/watermark_service.dart';
+import '../../../core/utils/notification_service.dart';
 
 class CameraScreen extends StatefulWidget {
   final String clockType;
@@ -237,7 +238,10 @@ class _CameraScreenState extends State<CameraScreen> {
       final watermarkedFile = await WatermarkService.addWatermark(
         imageFile: File(image.path),
         employeeName: user['full_name'] ?? user['email'] ?? 'Unknown',
-        employeeId: user['id_karyawan'] ?? user['id']?.toString().substring(0, 8) ?? 'ID',
+        employeeId: user['id_karyawan'] ??
+            (user['id'] != null && user['id'].toString().length > 8
+                ? user['id'].toString().substring(0, 8)
+                : (user['id']?.toString() ?? 'ID')),
         latitude: _currentPosition!.latitude,
         longitude: _currentPosition!.longitude,
         address: 'Titik Absen: ${_targetLocation?['name'] ?? 'Unknown'} (${_isInsideZone ? 'Dalam Zona' : 'Luar Zona'})', 
@@ -247,7 +251,7 @@ class _CameraScreenState extends State<CameraScreen> {
       // ----------------------------------------------------
 
       if (mounted) {
-        _showImagePreviewDialog(watermarkedFile);
+        context.pop(finalPhotoPath);
       }
     } catch (e) {
       if (mounted) {
@@ -264,161 +268,7 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  void _showImagePreviewDialog(File imageFile) {
-    final TextEditingController notesController = TextEditingController();
-    
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: context.surfaceColor.withValues(alpha: 0.7), 
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), 
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: context.surfaceColor.withValues(alpha: 0.2), width: 1),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 30, offset: const Offset(0, 10)),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.file(
-                      imageFile,
-                      fit: BoxFit.contain,
-                      height: MediaQuery.of(context).size.height * 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: context.surfaceColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: TextField(
-                    controller: notesController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      hintText: 'Tambahkan catatan (opsional)...',
-                      border: InputBorder.none,
-                      icon: Icon(Icons.edit_note, color: Colors.grey),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text("ULANGI"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: context.surfaceColor,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _submitAttendance(imageFile, notesController.text.trim());
-                      },
-                      icon: const Icon(Icons.check_rounded),
-                      label: const Text("LANJUTKAN"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
-                        foregroundColor: context.surfaceColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Future<void> _submitAttendance(File finalImage, [String customNotes = '']) async {
-    setState(() {
-      _isProcessing = true;
-    });
-    try {
-      final user = context.read<AuthProvider>().userData;
-      final isWebOrWindows = kIsWeb || (!Platform.isAndroid && !Platform.isIOS);
-      
-      bool isOffline = false;
-      if (!isWebOrWindows) {
-        final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-        isOffline = connectivityResult.contains(ConnectivityResult.none);
-      }
-
-      if (isOffline) {
-        await _offlineService.savePendingAttendance(
-          employeeId: user?['id'] ?? 'unknown',
-          latitude: _currentPosition!.latitude,
-          longitude: _currentPosition!.longitude,
-          clockType: widget.clockType, 
-          notes: customNotes.isNotEmpty ? customNotes : 'Offline Mobile check-in',
-          photoPath: finalImage.path,
-        );
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('📶 Sinyal Terputus. Absen disimpan secara OFFLINE.'), backgroundColor: Colors.orange),
-        );
-        context.go('/main');
-      } else {
-        final result = await _service.submitAttendance(
-          employeeId: user?['id'] ?? 'unknown',
-          latitude: _currentPosition!.latitude,
-          longitude: _currentPosition!.longitude,
-          clockType: widget.clockType, 
-          notes: customNotes.isNotEmpty ? customNotes : 'Mobile check-in',
-          photoPath: finalImage.path,
-        );
-
-        if (!mounted) return;
-        if (result['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('✅ Absen berhasil disimpan'), backgroundColor: Colors.green),
-          );
-          context.go('/main');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result['message']), backgroundColor: Colors.red),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengirim absen: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isProcessing = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

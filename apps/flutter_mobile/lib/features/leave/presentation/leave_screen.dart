@@ -75,7 +75,10 @@ class _LeaveScreenState extends State<LeaveScreen> {
         final watermarkedFile = await WatermarkService.addWatermark(
           imageFile: File(photo.path),
           employeeName: user?['name'] ?? user?['email'] ?? 'Karyawan',
-          employeeId: user?['employee_code'] ?? user?['id']?.toString().substring(0, 8) ?? 'ID',
+          employeeId: user?['employee_code'] ??
+              (user?['id'] != null && user!['id'].toString().length > 8
+                  ? user['id'].toString().substring(0, 8)
+                  : (user?['id']?.toString() ?? 'ID')),
           latitude: _currentPosition?.latitude ?? 0.0,
           longitude: _currentPosition?.longitude ?? 0.0,
           address: 'Lampiran Izin / Cuti',

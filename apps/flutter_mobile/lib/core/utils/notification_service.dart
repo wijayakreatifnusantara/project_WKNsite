@@ -118,6 +118,32 @@ class NotificationService {
       payload: payload,
     );
   }
+
+  // Fungsi untuk memicu notifikasi Gamifikasi (Points / Streak)
+  Future<void> showGamificationNotification(String title, String body, String payload) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'wkn_gamification_channel',
+      'Pencapaian & Gamifikasi',
+      channelDescription: 'Kanal untuk notifikasi poin, leaderboard, dan attendance streak',
+      importance: Importance.max,
+      priority: Priority.high,
+      color: Color(0xFFFFC107), // Amber / Gold Color for Gamification
+      icon: '@mipmap/launcher_icon',
+      largeIcon: DrawableResourceAndroidBitmap('@mipmap/launcher_icon'),
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      id: 888, // ID unik gamifikasi
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
+    );
+  }
 }
 
 @pragma('vm:entry-point')

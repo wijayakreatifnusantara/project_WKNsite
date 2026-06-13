@@ -69,10 +69,22 @@ class AttendanceService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'status': 'success', 'data': jsonDecode(response.body)};
+        final body = jsonDecode(response.body);
+        if (body['status'] == 'success') {
+          return {'status': 'success', 'data': body['data'] ?? body};
+        } else {
+          // Backend returned 200 but status is 'out_of_range' or 'already_checked_in' etc.
+          String errorMsg = 'Gagal absensi';
+          if (body['data'] != null && body['data']['message'] != null) {
+            errorMsg = body['data']['message'];
+          } else if (body['message'] != null) {
+            errorMsg = body['message'];
+          }
+          return {'status': body['status'] ?? 'error', 'message': errorMsg};
+        }
       } else {
         final body = jsonDecode(response.body);
-        return {'status': body['status'] ?? 'error', 'message': body['message'] ?? 'Gagal absensi'};
+        return {'status': body['status'] ?? 'error', 'message': body['message'] ?? body['detail'] ?? 'Gagal absensi'};
       }
     } catch (e) {
       return {'status': 'error', 'message': 'Gagal terhubung ke server: $e'};

@@ -47,6 +47,9 @@ void callbackDispatcher() {
           clockType: record['clockType'],
           notes: record['notes'] + ' (Auto-Synced Background)',
           photoPath: record['photoPath'],
+        ).timeout(
+          const Duration(seconds: 15),
+          onTimeout: () => throw Exception('Connection Timeout during background sync'),
         );
         
         if (result['status'] == 'success') {

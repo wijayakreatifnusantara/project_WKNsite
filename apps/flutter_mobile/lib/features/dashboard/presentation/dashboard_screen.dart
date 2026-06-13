@@ -758,7 +758,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: ElevatedButton(
               onPressed: () {
                 HapticFeedback.heavyImpact();
-                context.push('/camera?type=${_hasClockedIn ? 'OUT' : 'IN'}');
+                context.push('/attendance-form?type=${_hasClockedIn ? 'OUT' : 'IN'}');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.textPrimary,

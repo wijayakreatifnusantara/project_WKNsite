@@ -11,6 +11,7 @@ import '../../features/overtime/presentation/overtime_screen.dart';
 import '../../features/payslip/presentation/payslip_screen.dart';
 import '../../features/reimburse/presentation/reimburse_screen.dart';
 import '../../features/attendance/presentation/camera_screen.dart';
+import '../../features/attendance/presentation/attendance_form_screen.dart';
 import '../../features/profile/presentation/personal_data_auth_screen.dart';
 import '../../features/profile/presentation/personal_data_screen.dart';
 import '../../features/profile/presentation/change_password_screen.dart';
@@ -40,6 +41,12 @@ GoRouter createAppRouter(AuthProvider authProvider) {
     GoRoute(
       path: '/camera', 
       builder: (context, state) => CameraScreen(
+        clockType: state.uri.queryParameters['type'] ?? 'IN',
+      )
+    ),
+    GoRoute(
+      path: '/attendance-form', 
+      builder: (context, state) => AttendanceFormScreen(
         clockType: state.uri.queryParameters['type'] ?? 'IN',
       )
     ),

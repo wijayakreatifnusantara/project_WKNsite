@@ -300,7 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           border: Border.all(color: AppConstants.primaryColor.withValues(alpha: 0.3))
                         ),
                         child: Center(
-                          child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'A', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: AppConstants.primaryColor)),
+                          child: Text((user?['name']?.isNotEmpty == true) ? user!['name'].substring(0, 1).toUpperCase() : 'A', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: AppConstants.primaryColor)),
                         ),
                       ),
                       const SizedBox(width: 20),

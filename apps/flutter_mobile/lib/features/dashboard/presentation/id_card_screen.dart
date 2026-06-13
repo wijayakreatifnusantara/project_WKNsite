@@ -141,7 +141,7 @@ class _IdCardScreenState extends State<IdCardScreen> with SingleTickerProviderSt
                   border: Border.all(color: context.surfaceColor, width: 3),
                 ),
                 child: Center(
-                  child: Text(user?['name']?.substring(0, 1).toUpperCase() ?? 'W', style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: context.surfaceColor)),
+                  child: Text((user?['name']?.isNotEmpty == true) ? user!['name'].substring(0, 1).toUpperCase() : 'W', style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: context.surfaceColor)),
                 ),
               ),
               SizedBox(height: 16),

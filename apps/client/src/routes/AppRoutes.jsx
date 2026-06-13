@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Login from '../features/Login/pages/Login';
 import Employees from '../features/Employees/pages/Employees';
 import EmployeeForm from '../features/Employees/pages/EmployeeForm';
@@ -37,6 +37,7 @@ import LocationManagerPage from '../features/Attendance/pages/LocationManagerPag
 import OvertimeManagementPage from '../features/Attendance/pages/OvertimeManagementPage';
 import LiveTracking from '../features/Tracking/LiveTracking';
 import CareerPortal from '../features/Careers/pages/CareerPortal';
+import ReportBuilder from '../features/Reports/pages/ReportBuilder';
 import AuthenticatedApp from '../layouts/AuthenticatedApp';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
@@ -64,11 +65,18 @@ const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/overview" replace />} />
         <Route path="/dashboard" element={<Navigate to="/overview" replace />} />
         <Route path="/overview" element={<Overview />} />
-        <Route path="/master/employees" element={<Employees />} />
-        <Route path="/master/divisions" element={<DivisionManager />} />
-        <Route path="/master/shifts" element={<ShiftManager />} />
-        <Route path="/master/employees/create" element={<EmployeeForm />} />
-        <Route path="/master/employees/edit/:id" element={<EmployeeForm />} />
+        
+        {/* Strictly Protected Routes (Owner, Admin, HR) */}
+        <Route element={<ProtectedRoute roles={['owner', 'admin', 'hr']}><Outlet /></ProtectedRoute>}>
+          <Route path="/master/employees" element={<Employees />} />
+          <Route path="/master/divisions" element={<DivisionManager />} />
+          <Route path="/master/shifts" element={<ShiftManager />} />
+          <Route path="/master/employees/create" element={<EmployeeForm />} />
+          <Route path="/master/employees/edit/:id" element={<EmployeeForm />} />
+          <Route path="/payroll" element={<Payroll />} />
+          <Route path="/admin" element={<AdminHub />} />
+        </Route>
+
         <Route path="/employees/onboarding" element={<OnboardingPage />} />
         <Route path="/attendance" element={<AttendanceHub />} />
         <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
@@ -80,7 +88,6 @@ const AppRoutes = () => {
         <Route path="/attendance/recap" element={<AttendanceRecap />} />
         <Route path="/attendance/overtime" element={<OvertimeManagementPage />} />
         <Route path="/leave" element={<LeaveManagementHub />} />
-        <Route path="/payroll" element={<Payroll />} />
         <Route path="/finance/reimburse" element={<Expenses />} />
         <Route path="/performance" element={<PerformanceHub />} />
         <Route path="/documents" element={<DocumentHub />} />
@@ -98,7 +105,7 @@ const AppRoutes = () => {
         <Route path="/company/wiki" element={<Wiki />} />
         <Route path="/company/succession" element={<Succession />} />
         <Route path="/company/offboarding" element={<Offboarding />} />
-        <Route path="/admin" element={<AdminHub />} />
+        <Route path="/reports/builder" element={<ReportBuilder />} />
         
         {/* Fallback for other routes */}
         <Route path="*" element={

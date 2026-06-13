@@ -123,22 +123,24 @@ class AuthProvider extends ChangeNotifier {
         if (response.session != null) {
           await _secureStorage.write(key: 'authToken', value: response.session!.accessToken);
           
-          // Sinkronisasi FCM Token ke Backend
-          try {
-            String? fcmToken = await FirebaseMessaging.instance.getToken();
-            if (fcmToken != null) {
-               await http.put(
-                 Uri.parse('${AppConstants.apiUrl}/employees/fcm-token'),
-                 headers: {
-                   'Content-Type': 'application/json',
-                   'Authorization': 'Bearer ${response.session!.accessToken}',
-                 },
-                 body: jsonEncode({'token': fcmToken}),
-               );
+          // Sinkronisasi FCM Token ke Backend (Run asynchronously to prevent blocking login)
+          () async {
+            try {
+              String? fcmToken = await FirebaseMessaging.instance.getToken();
+              if (fcmToken != null) {
+                 await http.put(
+                   Uri.parse('${AppConstants.apiUrl}/employees/fcm-token'),
+                   headers: {
+                     'Content-Type': 'application/json',
+                     'Authorization': 'Bearer ${response!.session!.accessToken}',
+                   },
+                   body: jsonEncode({'token': fcmToken}),
+                 );
+              }
+            } catch(e) {
+               debugPrint('Gagal sync FCM Token: $e');
             }
-          } catch(e) {
-             debugPrint('Gagal sync FCM Token: $e');
-          }
+          }();
         }
 
         _isLoading = false;

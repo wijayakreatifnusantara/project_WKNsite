@@ -11,7 +11,9 @@ import {
 } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { apiClient } from '@/lib/apiClient';
+import { supabase } from '@/lib/supabaseClient';
+import * as XLSX from 'xlsx';
+import { IconDownload } from "@tabler/icons-react";
 
 
 const AuditTrail = () => {
@@ -27,29 +29,75 @@ const AuditTrail = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      // For presentation purposes, we load premium dummy data
-      setTimeout(() => {
-        const dummyData = [
-          { id: 101, created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(), action: 'UPDATE', module: 'Payroll', entity_id: 'Approved Salary Q3 2026', profiles: { full_name: 'Adi Anto' } },
-          { id: 102, created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), action: 'DELETE', module: 'Employees', entity_id: 'User ID: 8942 (Budi Santoso)', profiles: { full_name: 'Admin HR' } },
-          { id: 103, created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(), action: 'CREATE', module: 'Assets', entity_id: 'MacBook Pro M3 Max (Asset #401)', profiles: { full_name: 'IT Support' } },
-          { id: 104, created_at: new Date(Date.now() - 1000 * 60 * 240).toISOString(), action: 'UPDATE', module: 'System', entity_id: 'Changed Global SMTP Settings', profiles: { full_name: 'System Admin' } },
-          { id: 105, created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(), action: 'CREATE', module: 'Performance', entity_id: 'KPI Template Q4 Engineering', profiles: { full_name: 'Adi Anto' } },
-          { id: 106, created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), action: 'UPDATE', module: 'Employees', entity_id: 'Promoted Rina to Sr. Manager', profiles: { full_name: 'Adi Anto' } },
-        ];
-        
-        let logData = dummyData;
-        if (selectedModule !== 'All') {
-          logData = logData.filter(log => log.module === selectedModule);
-        }
-        setLogs(logData);
-        setLoading(false);
-      }, 600); // Simulate network latency
       
+      let query = supabase
+        .from('audit_logs')
+        .select(`
+          id,
+          created_at,
+          action,
+          table_name,
+          record_id,
+          user_id
+        `)
+        .order('created_at', { ascending: false });
+        
+      if (selectedModule !== 'All') {
+        query = query.eq('table_name', selectedModule.toLowerCase());
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      
+      const mappedLogs = data.map(log => ({
+        id: log.id,
+        created_at: log.created_at,
+        action: log.action,
+        module: log.table_name,
+        entity_id: log.record_id,
+        profiles: { full_name: log.user_id ? `User: ${log.user_id.substring(0,8)}` : 'System' }
+      }));
+      
+      setLogs(mappedLogs);
+      setLoading(false);
     } catch (err) {
       console.error("Error fetching audit logs:", err);
       setLoading(false);
     }
+  };
+
+  const exportToExcel = async () => {
+    if (logs.length === 0) return;
+    
+    try {
+      // Record the download action into audit_logs
+      await supabase.from('audit_logs').insert([{
+        table_name: 'system_export',
+        record_id: `Audit_Logs_${new Date().toISOString().split('T')[0]}.xlsx`,
+        action: 'DOWNLOAD',
+        old_data: null,
+        new_data: { format: 'Excel', total_records: logs.length },
+        user_id: null // Can be populated if frontend has the user's UUID
+      }]);
+    } catch (err) {
+      console.error("Gagal mencatat log download:", err);
+    }
+
+    const exportData = logs.map(log => ({
+      'Timestamp': new Date(log.created_at).toLocaleString(),
+      'Operator': log.profiles?.full_name || 'System',
+      'Action': log.action,
+      'Module': log.module,
+      'Entity ID': log.entity_id
+    }));
+    
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "AuditLogs");
+    XLSX.writeFile(workbook, `Audit_Logs_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    // Refresh logs to show the newly added download action
+    fetchLogs();
   };
 
   const getActionColor = (action) => {
@@ -57,6 +105,7 @@ const AuditTrail = () => {
       case 'CREATE': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
       case 'UPDATE': return 'bg-amber-50 text-amber-600 border-amber-100';
       case 'DELETE': return 'bg-rose-50 text-rose-600 border-rose-100';
+      case 'DOWNLOAD': return 'bg-blue-50 text-blue-600 border-blue-100';
       default: return 'bg-slate-50 text-slate-600 border-slate-100';
     }
   };
@@ -74,6 +123,13 @@ const AuditTrail = () => {
           </div>
           <div className="flex gap-4">
             <Button 
+              onClick={exportToExcel}
+              className="h-10 px-6 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all flex gap-2 items-center shadow-sm"
+            >
+              <IconDownload size={16} />
+              Export Excel
+            </Button>
+            <Button 
               onClick={fetchLogs}
               className="h-10 px-6 rounded-lg bg-white border border-slate-200 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex gap-2 items-center shadow-sm"
             >
@@ -85,7 +141,7 @@ const AuditTrail = () => {
 
         {/* Filter Bar */}
         <div className="flex gap-2 p-2 rounded-xl bg-white border border-slate-200 shadow-sm overflow-x-auto no-scrollbar">
-          {['All', 'Employees', 'Assets', 'Payroll', 'Performance', 'System'].map(mod => (
+          {['All', 'shifts', 'national_holidays', 'employees'].map(mod => (
             <button
               key={mod}
               onClick={() => setSelectedModule(mod)}

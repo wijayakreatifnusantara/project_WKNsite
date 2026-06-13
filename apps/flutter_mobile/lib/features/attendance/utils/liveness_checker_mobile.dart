@@ -27,6 +27,8 @@ class LivenessChecker {
     }
   }
 
+  bool _hasSeenEyesOpen = false;
+
   Future<bool> checkLiveness(CameraImage image, CameraDescription camera) async {
     if (!_isInitialized || _isProcessing) return false;
     
@@ -43,17 +45,30 @@ class LivenessChecker {
       final faces = await _faceDetector.processImage(inputImage);
       
       for (Face face in faces) {
-        // Liveness logic: Require either a smile or an eye blink (one eye closed, one open, or both closed momentarily)
         final double? smileProb = face.smilingProbability;
         final double? leftEyeProb = face.leftEyeOpenProbability;
         final double? rightEyeProb = face.rightEyeOpenProbability;
 
-        bool isSmiling = smileProb != null && smileProb > 0.4;
-        bool isBlinking = (leftEyeProb != null && leftEyeProb < 0.4) || 
-                          (rightEyeProb != null && rightEyeProb < 0.4);
+        // 1. Deteksi Senyum (Threshold cukup tinggi agar tidak false positive, tapi bisa membaca senyuman jelas)
+        bool isSmiling = smileProb != null && smileProb > 0.65;
+        if (isSmiling) {
+          debugPrint("Liveness: Senyum Terdeteksi ($smileProb)");
+          return true;
+        }
 
-        if (isSmiling || isBlinking) {
-          return true; // Liveness confirmed!
+        // 2. Deteksi Kedipan Mata (Stateful: Mata Terbuka -> Tertutup)
+        if (leftEyeProb != null && rightEyeProb != null) {
+          bool areEyesOpen = leftEyeProb > 0.8 && rightEyeProb > 0.8;
+          bool areEyesClosed = leftEyeProb < 0.2 && rightEyeProb < 0.2;
+
+          if (areEyesOpen) {
+            _hasSeenEyesOpen = true; // Rekam bahwa pengguna telah membuka matanya lebar-lebar
+          }
+
+          if (_hasSeenEyesOpen && areEyesClosed) {
+            debugPrint("Liveness: Kedipan Mata Terdeteksi");
+            return true;
+          }
         }
       }
       return false;

@@ -30,6 +30,7 @@ import {
   IconLock,
   IconUserPlus,
   IconHierarchy2,
+  IconFileExport,
   IconReceipt,
   IconBox,
   IconHeartbeat,
@@ -47,7 +48,8 @@ import {
   IconCalendarEvent,
   IconCalendarTime,
   IconEditCircle,
-  IconClockPlay
+  IconClockPlay,
+  IconPlus
 } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Clock, Users, CreditCard, Settings, Calendar, Bell } from "lucide-react";
@@ -245,10 +247,10 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       )}
 
       {/* Clean White Sidebar */}
-      <aside className={`bg-white flex flex-col shrink-0 border-r border-slate-200/80 transition-all duration-300 fixed lg:relative inset-y-0 left-0 z-50 shadow-2xl lg:shadow-none lg:translate-x-0 lg:flex ${
+      <aside className={`bg-white flex flex-col shrink-0 border-r border-slate-200/60 transition-all duration-300 fixed lg:relative inset-y-0 left-0 z-50 shadow-sm lg:shadow-none lg:translate-x-0 lg:flex ${
         isSidebarCollapsed 
           ? '-translate-x-full lg:w-20' 
-          : 'translate-x-0 w-72'
+          : 'translate-x-0 w-[260px]'
       }`}>
         <div className={`h-20 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-8 gap-4'}`}>
           <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
@@ -353,6 +355,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           {/* Hub Perusahaan */}
           <NavGroup label="Hub Perusahaan" isCollapsed={isSidebarCollapsed}>
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
+              <NavItem icon={<IconFileExport size={15} />} label="Report Builder" to="/reports/builder" />
+            )}
+            {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconHierarchy2 size={15} />} label="Struktur Org" to="/company/org-chart" />
             )}
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
@@ -406,8 +411,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-6 sm:px-10 shrink-0 z-10">
+      <main className="flex-1 flex flex-col overflow-hidden relative bg-[#FAFAFB]">
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/50 flex items-center justify-between px-6 sm:px-8 shrink-0 z-10 sticky top-0">
           <div className="flex flex-col justify-center min-w-0">
             <div className="flex items-center gap-3">
               {/* Toggle Sidebar Button */}
@@ -473,21 +478,29 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 p-1 rounded-xl relative" id="notification-container">
               <button 
+                className="hidden lg:flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-all text-xs font-semibold shadow-sm active:scale-95"
+                title="Tindakan Cepat"
+              >
+                <IconPlus size={16} />
+                <span>Quick Add</span>
+              </button>
+              
+              <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
-                className="h-10 w-10 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
+                className="h-9 w-9 flex items-center justify-center rounded-lg text-[#E31E24] hover:bg-red-50 transition-all relative group"
                 title="AI Diagnostics"
               >
-                <IconBrain size={20} />
+                <IconBrain size={18} />
               </button>
               <button 
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                className={`h-10 w-10 flex items-center justify-center rounded-lg transition-all relative ${
+                className={`h-9 w-9 flex items-center justify-center rounded-lg transition-all relative ${
                   isNotificationOpen ? 'bg-slate-200 text-slate-800' : 'text-slate-400 hover:bg-slate-100'
                 }`}
                 title="Notifications"
               >
-                <IconBell size={20} />
-                <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                <IconBell size={18} />
+                <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-white animate-pulse"></span>
               </button>
 
               {/* Notification Dropdown */}
@@ -650,10 +663,10 @@ const NavItem = ({ icon, label, to, isCollapsed, end = true }) => (
         {isActive && (
           <span className={`absolute bg-[#E31E24] rounded-r transition-all ${isCollapsed ? 'left-0 top-2 bottom-2 w-[3px]' : 'left-0 top-1.5 bottom-1.5 w-[3px]'}`} />
         )}
-        <span className={`transition-transform group-hover:scale-105 duration-200 ${isActive ? 'text-[#E31E24]' : 'text-slate-400 group-hover:text-[#E31E24]'}`}>
+        <span className={`transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-3 ${isActive ? 'text-[#E31E24]' : 'text-slate-400 group-hover:text-[#E31E24]'}`}>
           {icon}
         </span>
-        {!isCollapsed && <span className="animate-fade-in">{label}</span>}
+        {!isCollapsed && <span className="animate-fade-in transition-transform duration-300 ease-out group-hover:translate-x-1">{label}</span>}
       </>
     )}
   </NavLink>
