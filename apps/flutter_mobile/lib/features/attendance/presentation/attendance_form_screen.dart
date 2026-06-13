@@ -176,7 +176,7 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.file(File(_photoPath!), fit: BoxFit.cover),
+                            Image.file(File(_photoPath!), fit: BoxFit.contain),
                             Container(
                               color: Colors.black.withValues(alpha: 0.2),
                               child: const Center(
