@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/theme_extension.dart';
 import '../utils/constants.dart';
+import 'dart:async';
 
 class FloatingAssistant extends StatefulWidget {
   final GoRouter router;
@@ -14,19 +15,39 @@ class FloatingAssistant extends StatefulWidget {
 class _FloatingAssistantState extends State<FloatingAssistant> {
   Offset position = Offset.zero;
   bool isInitialized = false;
+  Timer? _inactivityTimer;
+  bool _isIdle = false;
 
   void _routeListener() {
     setState(() {});
+  }
+
+  void _resetTimer() {
+    _inactivityTimer?.cancel();
+    if (_isIdle) {
+      setState(() {
+        _isIdle = false;
+      });
+    }
+    _inactivityTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _isIdle = true;
+        });
+      }
+    });
   }
 
   @override
   void initState() {
     super.initState();
     widget.router.routerDelegate.addListener(_routeListener);
+    _resetTimer();
   }
 
   @override
   void dispose() {
+    _inactivityTimer?.cancel();
     widget.router.routerDelegate.removeListener(_routeListener);
     super.dispose();
   }
@@ -49,7 +70,9 @@ class _FloatingAssistantState extends State<FloatingAssistant> {
       left: position.dx,
       top: position.dy,
       child: GestureDetector(
+        onPanDown: (_) => _resetTimer(),
         onPanUpdate: (details) {
+          _resetTimer();
           setState(() {
             position = Offset(
               position.dx + details.delta.dx,
@@ -58,6 +81,7 @@ class _FloatingAssistantState extends State<FloatingAssistant> {
           });
         },
         onPanEnd: (details) {
+          _resetTimer();
           final size = MediaQuery.of(context).size;
           double dx = position.dx;
           if (dx < size.width / 2) {
@@ -74,27 +98,33 @@ class _FloatingAssistantState extends State<FloatingAssistant> {
             position = Offset(dx, dy);
           });
         },
+        onTapDown: (_) => _resetTimer(),
         onTap: () {
           widget.router.push('/assistant');
         },
         child: Material(
           color: Colors.transparent,
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppConstants.secondaryColor,
-              boxShadow: [
-                BoxShadow(
-                  color: AppConstants.secondaryColor.withValues(alpha: 0.3),
-                  blurRadius: 15,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 5),
-                )
-              ],
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            opacity: _isIdle ? 0.4 : 1.0,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _isIdle ? Colors.red : AppConstants.secondaryColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: (_isIdle ? Colors.red : AppConstants.secondaryColor).withValues(alpha: 0.3),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 5),
+                  )
+                ],
+              ),
+              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
             ),
-            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
           ),
         ),
       ),
