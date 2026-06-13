@@ -47,7 +47,8 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     _livenessChecker.initialize();
-    _initCameraAndLocation();
+    _initCamera();
+    _initLocationAndSettings();
   }
 
   void _calculateDistance() {
@@ -69,7 +70,50 @@ class _CameraScreenState extends State<CameraScreen> {
     _isInsideZone = _distanceToLocation <= _allowedRadius;
   }
 
-  Future<void> _initCameraAndLocation() async {
+  Future<void> _initCamera() async {
+    try {
+      cameras = await availableCameras();
+      final frontCamera = cameras.firstWhere(
+        (cam) => cam.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
+      );
+
+      _controller = CameraController(
+        frontCamera,
+        ResolutionPreset.medium, // Lowered from high for faster init and preview
+        enableAudio: false,
+        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
+      );
+
+      await _controller!.initialize();
+
+      if (_livenessChecker.isReady) {
+        _controller!.startImageStream((image) async {
+          if (!_isLivenessPassed && mounted) {
+            bool passed = await _livenessChecker.checkLiveness(image, frontCamera);
+            if (passed && mounted) {
+              setState(() {
+                _isLivenessPassed = true;
+              });
+              await _controller!.stopImageStream();
+            }
+          }
+        });
+      }
+
+      if (mounted) {
+        setState(() {
+          _isReady = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error Camera: $e')));
+      }
+    }
+  }
+
+  Future<void> _initLocationAndSettings() async {
     try {
       // 1. Get Location
       LocationPermission permission = await Geolocator.checkPermission();
@@ -81,16 +125,12 @@ class _CameraScreenState extends State<CameraScreen> {
       }
       
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.medium, // Changed to medium for much faster lock
       );
       
       // Anti Fake GPS (Mock Location Detection)
       if (_currentPosition!.isMocked) {
-        if (mounted) {
-          setState(() {
-            _isFakeGps = true;
-          });
-        }
+        if (mounted) setState(() => _isFakeGps = true);
       }
 
       // Sinkronisasi Geo-Fence dari Web Admin
@@ -128,7 +168,7 @@ class _CameraScreenState extends State<CameraScreen> {
               _targetLocation = {
                 'name': matchedLoc['name'],
                 'lat': (matchedLoc['lat'] ?? 0).toDouble(),
-                'lng': (matchedLoc['lon'] ?? 0).toDouble(), // Supabase API uses 'lon'
+                'lng': (matchedLoc['lon'] ?? 0).toDouble(),
                 'isFlexible': false
               };
               _allowedRadius = (matchedLoc['radius'] ?? 100).toDouble();
@@ -147,55 +187,17 @@ class _CameraScreenState extends State<CameraScreen> {
           _targetLocation = {'name': 'Gagal memuat konfigurasi. Pastikan internet menyala.', 'lat': 0.0, 'lng': 0.0, 'isFlexible': true};
         }
         
+        _calculateDistance();
         setState(() {}); // Trigger rebuild to show updated UI
       }
-
-      _calculateDistance();
-
-      // 2. Initialize Camera (Front camera usually preferred for attendance)
-      cameras = await availableCameras();
-      final frontCamera = cameras.firstWhere(
-        (cam) => cam.lensDirection == CameraLensDirection.front,
-        orElse: () => cameras.first,
-      );
-
-      _controller = CameraController(
-        frontCamera,
-        ResolutionPreset.high,
-        enableAudio: false,
-        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
-      );
-
-      await _controller!.initialize();
-      
-      // 3. Start Image Stream for Liveness Detection
-      if (_livenessChecker.isReady) {
-        _controller!.startImageStream((image) async {
-          if (!_isLivenessPassed && mounted) {
-            bool passed = await _livenessChecker.checkLiveness(image, frontCamera);
-            if (passed && mounted) {
-              setState(() {
-                _isLivenessPassed = true;
-              });
-              // Stop stream to save battery once passed
-              await _controller!.stopImageStream();
-            }
-          }
-        });
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _isReady = true;
-      });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error Lokasi: $e')));
       }
     }
   }
+      
+
 
   @override
   void dispose() {
