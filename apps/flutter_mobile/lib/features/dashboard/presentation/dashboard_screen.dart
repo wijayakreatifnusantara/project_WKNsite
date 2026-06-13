@@ -457,11 +457,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: context.backgroundColor,
       body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         slivers: [
           // Dynamic Header with Scroll Transition
           SliverAppBar(
-            expandedHeight: 185.0,
+            expandedHeight: 175.0,
             floating: false,
             pinned: true,
             backgroundColor: context.surfaceColor,
@@ -712,7 +712,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     _buildCleanQuickActions(context),
                     
-                    const SizedBox(height: 100), // Fab spacing
+                    const SizedBox(height: 16), // Fab spacing removed, minimal padding
                   ],
                 ),
               ),
@@ -815,9 +815,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       itemCount: displayActions.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
-        childAspectRatio: 0.95,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
       ),
       itemBuilder: (context, index) {
         final action = displayActions[index];
