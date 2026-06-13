@@ -418,7 +418,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: const Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 100), // Increased from 50 to prevent bottom nav bar overlap
           ],
         ),
       ),
