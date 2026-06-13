@@ -64,6 +64,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _weatherTemp = '--';
   String _weatherCondition = 'Memuat Cuaca...';
   String _humidity = '--';
+  String? _clockInTime;
+  String? _clockOutTime;
+  String? _workDuration;
   int? _weatherCode;
   double? _compassHeading;
   StreamSubscription<CompassEvent>? _compassSubscription;
@@ -201,6 +204,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           if (res == null) {
             _todayStatus = 'Belum Absen';
             _hasClockedIn = false;
+            _clockInTime = null;
+            _clockOutTime = null;
+            _workDuration = null;
           } else {
             if (res['clock_out'] != null) {
               _todayStatus = 'Selesai (Pulang)';
@@ -208,6 +214,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _todayStatus = res['status'] ?? 'Sudah Absen';
             }
             _hasClockedIn = true;
+            
+            final inTime = _parseTime(res['clock_in']?.toString());
+            final outTime = _parseTime(res['clock_out']?.toString());
+            
+            if (inTime != null) {
+              _clockInTime = "${inTime.hour.toString().padLeft(2, '0')}:${inTime.minute.toString().padLeft(2, '0')}";
+              if (outTime != null) {
+                _clockOutTime = "${outTime.hour.toString().padLeft(2, '0')}:${outTime.minute.toString().padLeft(2, '0')}";
+                final diff = outTime.difference(inTime);
+                _workDuration = "${diff.inHours}j ${diff.inMinutes % 60}m";
+              } else {
+                final diff = DateTime.now().difference(inTime);
+                _workDuration = "${diff.inHours}j ${diff.inMinutes % 60}m";
+              }
+            }
           }
         });
       }
@@ -218,6 +239,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     }
+  }
+
+  DateTime? _parseTime(String? timeStr) {
+    if (timeStr == null) return null;
+    try {
+      if (timeStr.contains('T')) {
+        return DateTime.parse(timeStr).toLocal();
+      } else {
+        final now = DateTime.now();
+        final parts = timeStr.split(':');
+        return DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
+      }
+    } catch(e) { return null; }
   }
 
   Future<void> _checkOfflineData() async {
@@ -761,6 +795,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
+          if (_hasClockedIn) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: AppConstants.slate50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppConstants.slate200),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildTimeSummary(context, 'Masuk', _clockInTime ?? '--:--', Icons.login),
+                  Container(height: 30, width: 1, color: AppConstants.slate300),
+                  _buildTimeSummary(context, 'Pulang', _clockOutTime ?? '--:--', Icons.logout),
+                  Container(height: 30, width: 1, color: AppConstants.slate300),
+                  _buildTimeSummary(context, 'Durasi', _workDuration ?? '--', Icons.timer),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
@@ -788,6 +843,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTimeSummary(BuildContext context, String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 12, color: Colors.grey),
+            const SizedBox(width: 4),
+            Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: context.textPrimary)),
+      ],
     );
   }
 
