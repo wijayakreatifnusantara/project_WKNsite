@@ -9,6 +9,7 @@ import '../../auth/data/auth_provider.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../../../core/theme/theme_provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -245,6 +246,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _showQrCodeModal(Map<String, dynamic>? user) {
+    if (user == null || user['id'] == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(24),
+          child: Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: context.surfaceColor,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10))
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'KARTU IDENTITAS KARYAWAN',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1.5),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: QrImageView(
+                    data: user['id'].toString(),
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  user['name'] ?? 'User Name',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: context.textPrimary),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  user['job_position'] ?? 'Staff',
+                  style: TextStyle(fontSize: 14, color: context.textSecondary, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Gunakan QR Code ini untuk scan peminjaman aset atau absensi manual.',
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text('TUTUP', style: TextStyle(color: context.textPrimary, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().userData;
@@ -283,10 +362,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Text('WKN', style: TextStyle(color: context.surfaceColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                           ),
                           const SizedBox(width: 10),
-                          const Text('ENTERPRISE IDENTITY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1.5)),
+                          const Text('MOBILE IDENTITY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1.5)),
                         ],
                       ),
-                      const Icon(Icons.qr_code, size: 20, color: Colors.grey)
+                      InkWell(
+                        onTap: () => _showQrCodeModal(user),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppConstants.primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8)
+                          ),
+                          child: const Icon(Icons.qr_code, size: 24, color: AppConstants.primaryColor)
+                        ),
+                      )
                     ],
                   ),
                   const SizedBox(height: 24),
