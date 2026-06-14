@@ -256,13 +256,13 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
         />
       )}
 
-      {/* Clean Glassmorphism Sidebar */}
-      <aside className={`bg-[#f0f2f5]/80 backdrop-blur-xl flex flex-col shrink-0 border-r border-white/60 shadow-neu transition-all duration-300 fixed lg:relative inset-y-0 left-0 z-50 lg:translate-x-0 lg:flex ${
+      {/* Clean Modern Flat Sidebar */}
+      <aside className={`bg-white flex flex-col shrink-0 border-r border-slate-200 transition-all duration-300 fixed lg:relative inset-y-0 left-0 z-50 lg:translate-x-0 lg:flex ${
         isSidebarCollapsed 
           ? '-translate-x-full lg:w-20' 
           : 'translate-x-0 w-[260px]'
       }`}>
-        <div className={`h-20 flex items-center border-b border-white shrink-0 bg-transparent transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-8 gap-4'}`}>
+        <div className={`h-16 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-6 gap-3'}`}>
           <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
           {!isSidebarCollapsed && (
             <div className="flex flex-col animate-fade-in">
@@ -415,34 +415,34 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           )}
         </nav>
 
-        <div className={`mt-auto border-t border-white bg-transparent transition-all duration-300 ${isSidebarCollapsed ? 'p-2' : 'p-4'}`}>
+        <div className={`mt-auto border-t border-slate-100 bg-white transition-all duration-300 p-4`}>
           <button 
             onClick={onLogout}
             title={isSidebarCollapsed ? "Sign Out Session" : undefined}
-            className={`flex items-center justify-center bg-[#f0f2f5] text-slate-600 font-semibold tracking-wide hover:text-[#E31E24] hover:shadow-neu-inset shadow-neu transition-all duration-300 group ${
+            className={`flex items-center justify-center bg-slate-50 text-slate-600 font-semibold hover:bg-red-50 hover:text-[#E31E24] transition-colors group ${
               isSidebarCollapsed 
-                ? 'w-10 h-10 rounded-xl mx-auto' 
-                : 'w-full h-12 gap-3 px-6 rounded-xl text-sm'
+                ? 'w-10 h-10 rounded-lg mx-auto' 
+                : 'w-full h-11 gap-3 px-4 rounded-lg text-sm'
             }`}
           >
-            <IconPower size={16} className="text-slate-400 group-hover:text-[#E31E24] transition-colors" />
+            <IconPower size={18} className="text-slate-400 group-hover:text-[#E31E24] transition-colors" />
             {!isSidebarCollapsed && <span>Sign Out Session</span>}
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden relative bg-transparent">
-        <header className="h-16 bg-[#f0f2f5]/80 backdrop-blur-xl border-b border-white shadow-neu flex items-center justify-between px-6 sm:px-8 shrink-0 z-10 sticky top-0">
+      <main className="flex-1 flex flex-col overflow-hidden relative bg-slate-50">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10 sticky top-0 shadow-sm">
           <div className="flex flex-col justify-center min-w-0">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* Toggle Sidebar Button */}
               <button 
                 onClick={toggleSidebar}
-                className="h-10 w-10 flex items-center justify-center rounded-xl bg-[#f0f2f5] text-slate-500 shadow-neu hover:shadow-neu-inset hover:text-[#E31E24] transition-all select-none active:scale-95 shrink-0"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-[#E31E24] transition-colors select-none shrink-0"
                 title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               >
-                <IconMenu2 size={16} />
+                <IconMenu2 size={18} />
               </button>
 
               {/* On mobile, show current page title. On desktop, show breadcrumbs */}
@@ -486,12 +486,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             {/* Visual Trigger for Command Palette */}
             <button 
               onClick={() => setIsCommandPaletteOpen(true)}
-              className="hidden lg:flex items-center w-full max-w-sm bg-[#f0f2f5] shadow-neu-inset hover:shadow-neu transition-all rounded-xl px-4 py-2.5 text-slate-400 group"
+              className="hidden lg:flex items-center w-full max-w-sm bg-slate-100 hover:bg-slate-200 transition-colors rounded-lg px-4 py-2 text-slate-500 group"
             >
               <IconSearch size={16} className="text-slate-400 group-hover:text-slate-500 mr-2" />
-              <span className="text-xs font-medium mr-auto text-slate-400 group-hover:text-slate-500">Cari menu, halaman, dsb...</span>
-              <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 font-mono text-[10px] font-bold text-slate-500 bg-[#f0f2f5] shadow-neu rounded">
-                <span className="text-[10px]">Ctrl</span>K
+              <span className="text-sm font-medium mr-auto text-slate-500">Cari menu, halaman, dsb...</span>
+              <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 font-mono text-xs font-semibold text-slate-500 bg-white border border-slate-200 rounded-md">
+                <span>Ctrl</span>K
               </kbd>
             </button>
           </div>
@@ -499,7 +499,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 bg-transparent p-1 relative" id="notification-container">
               <button 
-                className="hidden lg:flex items-center gap-2 px-4 py-2.5 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-xl transition-all duration-300 text-xs font-black shadow-neu active:shadow-neu-inset active:scale-95 uppercase tracking-widest"
+                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-lg transition-colors text-sm font-semibold shadow-sm"
                 title="Tindakan Cepat"
               >
                 <IconPlus size={16} />
@@ -508,26 +508,26 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               
               <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
-                className="h-10 w-10 flex items-center justify-center rounded-xl bg-[#f0f2f5] shadow-neu hover:shadow-neu-inset text-[#E31E24] transition-all relative group"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-slate-100 text-[#E31E24] transition-colors relative group"
                 title="AI Diagnostics"
               >
                 <IconBrain size={18} />
               </button>
               <button 
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all relative ${
-                  isNotificationOpen ? 'bg-[#f0f2f5] shadow-neu-inset text-[#E31E24]' : 'bg-[#f0f2f5] shadow-neu hover:shadow-neu-inset text-slate-500'
+                className={`h-10 w-10 flex items-center justify-center rounded-lg transition-colors relative ${
+                  isNotificationOpen ? 'bg-slate-200 text-[#E31E24]' : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
                 }`}
                 title="Notifications"
               >
                 <IconBell size={18} />
-                <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-[#f0f2f5] animate-pulse"></span>
+                <span className="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
               </button>
 
               {/* Notification Dropdown */}
               {isNotificationOpen && (
-                <div className="absolute top-14 right-0 w-80 bg-[#f0f2f5] rounded-3xl shadow-neu border-none overflow-hidden animate-fade-in-down z-50">
-                  <div className="px-4 py-3 border-b border-white/20 flex items-center justify-between bg-slate-50/50">
+                <div className="absolute top-14 right-0 w-80 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden animate-fade-in-down z-50">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Notifikasi</h3>
                     <button className="text-[10px] font-bold text-slate-400 hover:text-[#E31E24]">Tandai Dibaca</button>
                   </div>
@@ -570,21 +570,21 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <div className="relative" id="profile-container">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-3 p-1.5 rounded-2xl transition-all duration-300 bg-[#f0f2f5] shadow-neu hover:shadow-neu-inset"
+                className="flex items-center gap-3 p-1.5 rounded-full transition-colors hover:bg-slate-100 border border-transparent hover:border-slate-200"
               >
                 <div className="hidden md:flex flex-col items-end pl-2">
-                  <span className="text-xs font-bold text-slate-700 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
-                  <span className="text-[10px] font-black text-[#E31E24] uppercase tracking-widest">{user?.role || 'Owner'}</span>
+                  <span className="text-sm font-semibold text-slate-800 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
+                  <span className="text-xs font-medium text-[#E31E24] capitalize">{user?.role || 'Owner'}</span>
                 </div>
-                <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu-inset flex items-center justify-center text-sm font-black text-slate-700">
+                <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-700">
                   {(user?.fullName || user?.full_name)?.split(' ').map(n => n[0]).join('') || 'A'}
                 </div>
               </button>
 
               {/* Profile Dropdown */}
               {isProfileOpen && (
-                <div className="absolute top-16 right-0 w-64 bg-[#f0f2f5] rounded-3xl shadow-neu border-none overflow-hidden animate-fade-in-down z-50">
-                  <div className="p-4 border-b border-white/20 bg-slate-50/50">
+                <div className="absolute top-16 right-0 w-64 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden animate-fade-in-down z-50">
+                  <div className="p-4 border-b border-slate-100 bg-slate-50">
                     <p className="text-sm font-bold text-slate-800">{user?.fullName || user?.full_name || 'Administrator'}</p>
                     <p className="text-xs text-slate-500 mt-0.5">{user?.email || 'admin@wijayakn.com'}</p>
                   </div>
