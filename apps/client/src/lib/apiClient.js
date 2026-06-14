@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API URL from env, fallback to localhost in dev
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 // Create a configured axios instance
 export const apiClient = axios.create({
@@ -14,6 +14,19 @@ export const apiClient = axios.create({
 // Request Interceptor: Automatically attach JWT Token
 apiClient.interceptors.request.use(
   (config) => {
+    // Prevent axios from treating URLs starting with '/' as domain-relative
+    // which discards the '/api' part of the baseURL.
+    if (config.url) {
+        if (config.url.startsWith('/')) {
+            config.url = config.url.substring(1);
+        }
+        // If the URL already included 'api/', strip it to avoid duplication
+        // since our baseURL already ends with /api
+        if (config.url.startsWith('api/')) {
+            config.url = config.url.substring(4);
+        }
+    }
+    
     const token = localStorage.getItem('wkn_auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
