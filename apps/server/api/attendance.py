@@ -81,17 +81,26 @@ async def get_live_attendance(current_user: dict = Depends(require_admin)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/attendance/recap")
-async def get_attendance_recap(start_date: str, end_date: str, current_user: dict = Depends(require_admin)):
+async def get_attendance_recap(
+    start_date: str, 
+    end_date: str, 
+    mobile: bool = False,
+    current_user: dict = Depends(require_admin)
+):
     """Fetch attendance recap for a specific date range"""
     try:
         emp_res = supabase_client.client.table("employees").select("id, name, division_name, job_position").eq("is_resigned", False).execute()
-        att_res = supabase_client.client.table("attendance").select("*").gte("date", start_date).lte("date", end_date).execute()
-        ot_res = supabase_client.client.table("overtime_requests").select("*").gte("date", start_date).lte("date", end_date).eq("status", "Approved").execute()
+        
+        # Optimize fields for mobile
+        att_select = "date, status, clock_in, clock_out" if mobile else "*"
+        att_res = supabase_client.client.table("attendance").select(att_select).gte("date", start_date).lte("date", end_date).execute()
+        
+        ot_res = supabase_client.client.table("overtime_requests").select("date, status, hours" if mobile else "*").gte("date", start_date).lte("date", end_date).eq("status", "Approved").execute()
         
         return {
             "status": "success",
             "data": {
-                "employees": emp_res.data,
+                "employees": emp_res.data if not mobile else [], # Mobile usually requests individual recap, not all employees
                 "attendance": att_res.data,
                 "overtime": ot_res.data
             }
@@ -354,6 +363,19 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
     if not result.get("success"):
         raise HTTPException(status_code=500, detail=result.get("error", "Gagal menyimpan data absensi"))
 
+    # Gamification Push Notification (On Time Check-in)
+    if late_mins == 0:
+        fcm_token = employee.get("fcm_token")
+        if fcm_token:
+            from utils.fcm_service import send_fcm_notification
+            send_fcm_notification(
+                token=fcm_token,
+                title="🔥 +10 Poin Kehadiran!",
+                body="Hebat! Anda berhasil absen tepat waktu hari ini. Pertahankan streak Anda!",
+                data={"type": "gamification"},
+                channel_id="wkn_gamification_channel"
+            )
+
     return {
         "status": "success",
         "data": {
@@ -368,6 +390,33 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
             )
         }
     }
+
+import os
+import json
+
+ATTENDANCE_SETTINGS_FILE = os.path.join(os.path.dirname(__file__), "..", "attendance_settings.json")
+
+def load_attendance_settings():
+    if not os.path.exists(ATTENDANCE_SETTINGS_FILE):
+        return {"geofence_radius_meters": 30, "liveness_strictness": "high"}
+    try:
+        with open(ATTENDANCE_SETTINGS_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {"geofence_radius_meters": 30, "liveness_strictness": "high"}
+
+def save_attendance_settings(data):
+    with open(ATTENDANCE_SETTINGS_FILE, "w") as f:
+        json.dump(data, f)
+
+@router.get("/attendance/settings")
+async def get_attendance_settings():
+    return {"status": "success", "data": load_attendance_settings()}
+
+@router.post("/attendance/settings")
+async def update_attendance_settings(payload: dict):
+    save_attendance_settings(payload)
+    return {"status": "success", "message": "Settings updated", "data": payload}
 
 @router.post("/attendance/upload-photo")
 async def upload_attendance_photo(payload: dict, current_user: dict = Depends(get_current_user)):

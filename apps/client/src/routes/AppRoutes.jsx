@@ -13,10 +13,12 @@ import AdminHub from '../features/Admin/pages/AdminHub';
 import Overview from '../features/Overview/pages/Overview';
 import DivisionManager from '../features/Master/pages/DivisionManager';
 import ShiftManager from '../features/Master/pages/ShiftManager';
+import MasterDataHub from '../features/Master/pages/MasterDataHub';
 import LeaveManagementHub from '../features/Leave/pages/LeaveManagementHub';
 import Payroll from '../features/Payroll/pages/Payroll';
 import Expenses from '../features/Finance/pages/Expenses';
 import PerformanceHub from '../features/Performance/pages/PerformanceHub';
+import GamificationAdmin from '../features/Performance/pages/GamificationAdmin';
 import AssetInventory from '../features/Assets/pages/AssetInventory';
 import Consumables from '../features/Assets/pages/Consumables';
 import QuotationBuilder from '../features/CRM/pages/QuotationBuilder';
@@ -41,6 +43,7 @@ import ReportBuilder from '../features/Reports/pages/ReportBuilder';
 import AuthenticatedApp from '../layouts/AuthenticatedApp';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
+import WABroadcast from '../features/Company/pages/WABroadcast';
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -69,8 +72,9 @@ const AppRoutes = () => {
         {/* Strictly Protected Routes (Owner, Admin, HR) */}
         <Route element={<ProtectedRoute roles={['owner', 'admin', 'hr']}><Outlet /></ProtectedRoute>}>
           <Route path="/master/employees" element={<Employees />} />
-          <Route path="/master/divisions" element={<DivisionManager />} />
-          <Route path="/master/shifts" element={<ShiftManager />} />
+          <Route path="/master/dictionary" element={<MasterDataHub />} />
+          <Route path="/master/divisions" element={<Navigate to="/master/dictionary" replace />} />
+          <Route path="/master/shifts" element={<Navigate to="/master/dictionary" replace />} />
           <Route path="/master/employees/create" element={<EmployeeForm />} />
           <Route path="/master/employees/edit/:id" element={<EmployeeForm />} />
           <Route path="/payroll" element={<Payroll />} />
@@ -89,7 +93,9 @@ const AppRoutes = () => {
         <Route path="/attendance/overtime" element={<OvertimeManagementPage />} />
         <Route path="/leave" element={<LeaveManagementHub />} />
         <Route path="/finance/reimburse" element={<Expenses />} />
+        {/* Performance & Rewards */}
         <Route path="/performance" element={<PerformanceHub />} />
+        <Route path="/gamification" element={<GamificationAdmin />} />
         <Route path="/documents" element={<DocumentHub />} />
         <Route path="/assets" element={<AssetInventory />} />
         <Route path="/assets/consumables" element={<Consumables />} />
@@ -101,6 +107,7 @@ const AppRoutes = () => {
         <Route path="/company/wellness" element={<Wellness />} />
         <Route path="/company/surveys" element={<Surveys />} />
         <Route path="/company/announcements" element={<Announcements />} />
+        <Route path="/company/broadcast" element={<WABroadcast />} />
         <Route path="/company/grievance" element={<Grievance />} />
         <Route path="/company/wiki" element={<Wiki />} />
         <Route path="/company/succession" element={<Succession />} />

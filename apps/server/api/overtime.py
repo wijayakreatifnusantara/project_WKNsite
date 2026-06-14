@@ -173,6 +173,14 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
         except Exception:
             duration = payload.get("duration_hours", 0.0)
 
+        from api.approval_matrix import load_matrix
+        matrix = load_matrix()
+        ovt_matrix = matrix.get("overtime", {})
+        
+        initial_status = "Pending"
+        if ovt_matrix.get("enabled") and ovt_matrix.get("tiers"):
+            initial_status = ovt_matrix["tiers"][0].get("label", "Pending L1")
+
         record = {
             "employee_id": employee_id,
             "date": date,
@@ -180,7 +188,7 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
             "end_time": end_time,
             "duration_hours": round(duration, 2),
             "reason": reason,
-            "status": "Pending",
+            "status": initial_status,
             "compensation_type": compensation_type,
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat()
@@ -224,10 +232,10 @@ async def create_overtime_request(payload: Dict[str, Any], current_user: dict = 
 async def approve_overtime_request(request_id: str, payload: Dict[str, Any], current_user: dict = Depends(require_admin)):
     """Approve or reject an overtime request (Admin only)"""
     try:
-        status = payload.get("status") # Approved or Rejected
+        input_status = payload.get("status") # Approved or Rejected
         admin_id = current_user.get("employee_id") or payload.get("admin_id")
 
-        if status not in ["Approved", "Rejected"]:
+        if input_status not in ["Approved", "Rejected"]:
             raise HTTPException(status_code=400, detail="Status persetujuan tidak valid.")
 
         # 1a. Fetch existing request for Cross-Validation
@@ -236,8 +244,43 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
             raise HTTPException(status_code=404, detail="Pengajuan lembur tidak ditemukan.")
         request_data = req_res.data[0]
 
+        final_status = input_status
+
+        if input_status == "Approved":
+            from api.approval_matrix import load_matrix
+            matrix = load_matrix()
+            ovt_matrix = matrix.get("overtime", {})
+            
+            if ovt_matrix.get("enabled") and ovt_matrix.get("tiers"):
+                tiers = ovt_matrix["tiers"]
+                current_status = request_data.get("status")
+                
+                # Find current tier index
+                current_tier_idx = -1
+                for i, tier in enumerate(tiers):
+                    if tier.get("label") == current_status:
+                        current_tier_idx = i
+                        break
+                
+                # If we found the current tier, escalate to next
+                if current_tier_idx != -1 and current_tier_idx + 1 < len(tiers):
+                    next_tier = tiers[current_tier_idx + 1]
+                    # Check condition if any (e.g., 'hours > 3')
+                    condition = next_tier.get("condition")
+                    requires_next = True
+                    if condition and "hours > " in condition:
+                        try:
+                            threshold = float(condition.split(">")[1].strip())
+                            if float(request_data.get("duration_hours", 0)) <= threshold:
+                                requires_next = False
+                        except:
+                            pass
+                    
+                    if requires_next:
+                        final_status = next_tier.get("label", f"Pending L{current_tier_idx+2}")
+
         # Validasi Silang Absensi (Cross-Validation)
-        if status == "Approved":
+        if final_status == "Approved":
             employee_id = request_data.get("employee_id")
             ot_date = request_data.get("date")
             ot_start = request_data.get("start_time")
@@ -269,7 +312,7 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
                 pass
 
         res = supabase_client.client.table("overtime_requests").update({
-            "status": status,
+            "status": final_status,
             "approved_by": admin_id,
             "updated_at": datetime.now().isoformat()
         }).eq("id", request_id).execute()
@@ -277,7 +320,7 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
         request_data = res.data[0]
         
         # 2. Sinkronisasi Otomatis ke Payroll (Tunjangan Lembur)
-        if status == "Approved":
+        if final_status == "Approved":
             try:
                 employee_id_sync = request_data.get("employee_id")
                 duration = float(request_data.get("duration_hours", 0))
@@ -385,9 +428,9 @@ async def approve_overtime_request(request_id: str, payload: Dict[str, Any], cur
             from utils.fcm_service import send_fcm_notification
             fcm_token = employee_data.get("fcm_token")
             if fcm_token:
-                title = f"Status Lembur: {status}"
-                body = f"Pengajuan lembur Anda telah {'disetujui' if status == 'Approved' else 'ditolak'}."
-                send_fcm_notification(fcm_token, title, body, {"type": "overtime", "request_id": str(request_id), "status": status})
+                title = f"Status Lembur: {final_status}"
+                body = f"Pengajuan lembur Anda telah {'disetujui' if final_status == 'Approved' else ('ditolak' if final_status == 'Rejected' else 'diproses ke tahap selanjutnya')}."
+                send_fcm_notification(fcm_token, title, body, {"type": "overtime", "request_id": str(request_id), "status": final_status})
         except Exception as fcm_err:
             print(f"[FCM] Error sending notification for overtime: {fcm_err}")
 

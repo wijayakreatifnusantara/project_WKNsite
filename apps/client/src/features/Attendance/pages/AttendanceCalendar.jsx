@@ -37,7 +37,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, icon: Icon, dis
     <div ref={dropdownRef} className={`relative flex-1 max-w-[240px] min-w-[120px] ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
       <div 
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm transition-all cursor-pointer ${disabled ? 'bg-slate-50 border-slate-200' : `${activeColorClass} ${activeBorderClass} ${isOpen ? activeRingClass : ''}`}`}
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-neu transition-all cursor-pointer ${disabled ? 'bg-slate-50 border-white/50' : `${activeColorClass} ${activeBorderClass} ${isOpen ? activeRingClass : ''}`}`}
       >
         <Icon size={16} className={`shrink-0 ${disabled ? 'text-slate-400' : (value ? (activeColorClass.includes('white') ? 'text-[#E31E24]' : 'text-slate-600') : 'text-slate-500')}`} />
         <span className={`font-bold text-[10px] lg:text-[11px] uppercase truncate flex-1 ${disabled ? 'text-slate-500' : (value ? 'text-slate-800' : 'text-slate-600')}`}>
@@ -56,13 +56,13 @@ const CustomDropdown = ({ value, onChange, options, placeholder, icon: Icon, dis
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-transparent border border-white/50 rounded-xl shadow-neu z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="max-h-[240px] overflow-y-auto custom-scrollbar p-1 flex flex-col gap-0.5">
             {options.map((opt) => (
               <div
                 key={opt.value}
                 onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                className={`px-3 py-2.5 rounded-lg text-[10px] lg:text-[11px] font-bold uppercase cursor-pointer transition-colors ${value === opt.value ? 'bg-[#E31E24]/10 text-[#E31E24]' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                className={`px-3 py-2.5 rounded-lg text-[10px] lg:text-[11px] font-bold uppercase cursor-pointer transition-colors ${value === opt.value ? 'bg-[#E31E24]/10 text-[#E31E24]' : 'text-slate-600 hover:shadow-neu-inset hover:text-slate-900'}`}
               >
                 {opt.label}
               </div>
@@ -119,7 +119,7 @@ const AttendanceCalendar = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await apiClient.get('/api/employees?size=500');
+      const response = await apiClient.get('/employees?size=500');
       const rawData = response.data?.data || (Array.isArray(response.data) ? response.data : []);
       
       const empData = rawData.map(e => ({
@@ -213,7 +213,7 @@ const AttendanceCalendar = () => {
       case 'SICK': return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'LEAVE': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
       case 'ABSENT': return 'bg-rose-100 text-rose-700 border-rose-200';
-      default: return 'bg-slate-100 text-slate-700 border-slate-200';
+      default: return 'bg-slate-100 text-slate-700 border-white/50';
     }
   };
 
@@ -236,11 +236,11 @@ const AttendanceCalendar = () => {
       <div className="w-full mx-auto flex flex-col h-full gap-3">
         
         {/* PREMIUM HEADER */}
-        <div className="flex items-center justify-between bg-white p-3 px-6 rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] backdrop-blur-md">
+        <div className="flex items-center justify-between bg-[#f0f2f5] p-3 px-6 rounded-3xl border-none shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-5">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
+              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>
@@ -265,8 +265,8 @@ const AttendanceCalendar = () => {
                icon={IconBuildingSkyscraper}
                disabled={false}
                activeColorClass="bg-slate-50"
-               activeBorderClass="border-slate-200"
-               activeRingClass="border-slate-300 ring-2 ring-slate-100"
+               activeBorderClass="border-white/50"
+               activeRingClass="border-white/20 ring-2 ring-slate-100"
              />
 
              {/* Department Selector */}
@@ -279,8 +279,8 @@ const AttendanceCalendar = () => {
                icon={IconHierarchy2}
                disabled={!selectedOrg}
                activeColorClass="bg-slate-50"
-               activeBorderClass="border-slate-200"
-               activeRingClass="border-slate-300 ring-2 ring-slate-100"
+               activeBorderClass="border-white/50"
+               activeRingClass="border-white/20 ring-2 ring-slate-100"
              />
 
              {/* Employee Selector */}
@@ -292,7 +292,7 @@ const AttendanceCalendar = () => {
                placeholder="SELECT PERSONNEL"
                icon={IconUser}
                disabled={!selectedDept}
-               activeColorClass="bg-white"
+               activeColorClass="bg-transparent"
                activeBorderClass="border-[#E31E24]/30"
                activeRingClass="border-[#E31E24] ring-2 ring-[#E31E24]/10"
              />
@@ -300,21 +300,21 @@ const AttendanceCalendar = () => {
         </div>
 
         {/* CALENDAR VIEW */}
-        <div className="flex-1 bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col min-h-0">
+        <div className="flex-1 bg-transparent rounded-3xl border border-white/50 shadow-neu overflow-hidden flex flex-col min-h-0">
           {/* Calendar Header */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-center justify-between p-4 border-b border-white/50 bg-slate-50/50">
             <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
               {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
               {loading && <IconClock className="animate-spin text-slate-300" size={18} />}
             </h3>
             <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-10 w-10 rounded-xl border-slate-200 text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5">
+              <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-10 w-10 rounded-xl border-white/50 text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5">
                 <IconChevronLeft size={20} />
               </Button>
-              <Button variant="outline" onClick={() => setCurrentDate(new Date())} className="h-10 px-6 rounded-xl border-slate-200 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5">
+              <Button variant="outline" onClick={() => setCurrentDate(new Date())} className="h-10 px-6 rounded-xl border-white/50 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5">
                 Today
               </Button>
-              <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-10 w-10 rounded-xl border-slate-200 text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5">
+              <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-10 w-10 rounded-xl border-white/50 text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5">
                 <IconChevronRight size={20} />
               </Button>
             </div>
@@ -325,7 +325,7 @@ const AttendanceCalendar = () => {
             <div className="min-h-full grid grid-cols-7 grid-rows-[auto_repeat(6,minmax(85px,1fr))] bg-slate-100 gap-[1px]">
             {/* Days Header */}
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-              <div key={day} className="bg-white p-2 text-center">
+              <div key={day} className="bg-transparent p-2 text-center">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{day}</span>
               </div>
             ))}
@@ -348,10 +348,10 @@ const AttendanceCalendar = () => {
                 <div 
                   key={day} 
                   onClick={() => handleDayClick(day)}
-                  className="bg-white p-1.5 min-h-0 h-full cursor-pointer hover:bg-slate-50 transition-colors group relative flex flex-col"
+                  className="bg-transparent p-1.5 min-h-0 h-full cursor-pointer hover:shadow-neu-inset transition-colors group relative flex flex-col"
                 >
                   <div className="flex justify-between items-start mb-1 shrink-0">
-                    <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-md' : (isWeekend ? 'text-[#E31E24]' : 'text-slate-600')}`}>
+                    <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-neu' : (isWeekend ? 'text-[#E31E24]' : 'text-slate-600')}`}>
                       {day}
                     </span>
                     {!record && selectedEmployee && (
@@ -360,7 +360,7 @@ const AttendanceCalendar = () => {
                   </div>
 
                   {record && (
-                    <div className={`mt-auto p-1.5 rounded-lg border flex flex-col shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
+                    <div className={`mt-auto p-1.5 rounded-lg border flex flex-col shadow-neu transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
                       <div className="flex justify-between items-center px-0.5 mb-1">
                         <span className="text-[8.5px] font-black uppercase tracking-wider">{record.status}</span>
                         <IconCheck size={10} className="opacity-70" />

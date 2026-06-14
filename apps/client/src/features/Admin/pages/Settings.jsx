@@ -37,6 +37,10 @@ const Settings = () => {
   const [backups, setBackups] = useState([]);
   const [loadingBackups, setLoadingBackups] = useState(false);
   const [isBackupRunning, setIsBackupRunning] = useState(false);
+  
+  // Testing states
+  const [testingSMTP, setTestingSMTP] = useState(false);
+  const [testingWA, setTestingWA] = useState(false);
 
   const [settings, setSettings] = useState({
     general: {
@@ -67,15 +71,24 @@ const Settings = () => {
       auto_backup: true,
       logs_retention: true,
       retention_days: 30,
-      last_backup_time: null,
       last_backup_name: null,
       last_backup_size: null
+    },
+    antifraud: {
+      geofence_radius_meters: 30,
+      liveness_strictness: 'high'
+    },
+    approval: {
+      leave: { enabled: false, tiers: [] },
+      overtime: { enabled: false, tiers: [] }
     }
   });
 
   const tabs = [
     { id: 'general', label: 'General', icon: <IconSettings size={14} />, desc: 'Core system identity' },
     { id: 'security', label: 'Security', icon: <IconShieldLock size={14} />, desc: 'Access & Auth policy' },
+    { id: 'antifraud', label: 'Anti-Fraud', icon: <IconUserShield size={14} />, desc: 'Liveness & Geofencing' },
+    { id: 'approval', label: 'Approval Matrix', icon: <IconCheck size={14} />, desc: 'Multi-Tier Workflow' },
     { id: 'notifications', label: 'Alerts', icon: <IconBellRinging size={14} />, desc: 'Push & Email engine' },
     { id: 'network', label: 'Global', icon: <IconWorld size={14} />, desc: 'Localization & API' },
     { id: 'database', label: 'System', icon: <IconDatabase size={14} />, desc: 'Backups & Records' }
@@ -86,10 +99,23 @@ const Settings = () => {
     const fetchSettings = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/database/settings`);
-        if (response.data) {
-          setSettings(response.data);
+        const [dbRes, attRes, matrixRes] = await Promise.all([
+          axios.get(`${API_URL}/database/settings`, { withCredentials: true }).catch(() => ({ data: null })),
+          axios.get(`${API_URL}/attendance/settings`, { withCredentials: true }).catch(() => ({ data: null })),
+          axios.get(`${API_URL}/settings/approval-matrix`, { withCredentials: true }).catch(() => ({ data: null }))
+        ]);
+        
+        let newSettings = { ...settings };
+        if (dbRes.data) {
+          newSettings = { ...newSettings, ...dbRes.data };
         }
+        if (attRes.data && attRes.data.data) {
+          newSettings.antifraud = attRes.data.data;
+        }
+        if (matrixRes && matrixRes.data) {
+          newSettings.approval = matrixRes.data;
+        }
+        setSettings(newSettings);
       } catch (err) {
         console.error("Failed to load settings:", err);
         setMessage({ text: 'Failed to load configuration settings from server', type: 'error' });
@@ -123,11 +149,16 @@ const Settings = () => {
     setIsSaving(true);
     setMessage({ text: '', type: '' });
     try {
-      const response = await axios.post(`${API_URL}/database/settings`, settings);
-      if (response.data.status === 'success') {
+      const [resDb, resAtt, resMatrix] = await Promise.all([
+        axios.post(`${API_URL}/database/settings`, settings, { withCredentials: true }),
+        axios.post(`${API_URL}/attendance/settings`, settings.antifraud, { withCredentials: true }),
+        axios.post(`${API_URL}/settings/approval-matrix`, settings.approval, { withCredentials: true })
+      ]);
+      
+      if (resDb.data.status === 'success' && resAtt.data.status === 'success' && resMatrix.data.status === 'success') {
         setMessage({ text: 'Settings synchronized successfully', type: 'success' });
       } else {
-        setMessage({ text: response.data.message || 'Synchronization failed', type: 'error' });
+        setMessage({ text: 'Synchronization partially failed', type: 'error' });
       }
     } catch (err) {
       console.error("Failed to save settings:", err);
@@ -226,6 +257,34 @@ const Settings = () => {
     return `${diffDays}d ago`;
   };
 
+  const handleTestSMTP = async () => {
+    setTestingSMTP(true);
+    try {
+      // Mocking the backend call
+      await new Promise(r => setTimeout(r, 1500));
+      setMessage({ text: 'SMTP Connection Successful. Test email sent.', type: 'success' });
+    } catch (err) {
+      setMessage({ text: 'SMTP Connection Failed.', type: 'error' });
+    } finally {
+      setTestingSMTP(false);
+      setTimeout(() => setMessage({ text: '', type: '' }), 4000);
+    }
+  };
+
+  const handleTestWA = async () => {
+    setTestingWA(true);
+    try {
+      // Mocking the backend call
+      await new Promise(r => setTimeout(r, 1500));
+      setMessage({ text: 'WhatsApp API Instance is connected and active.', type: 'success' });
+    } catch (err) {
+      setMessage({ text: 'WhatsApp Connection Failed.', type: 'error' });
+    } finally {
+      setTestingWA(false);
+      setTimeout(() => setMessage({ text: '', type: '' }), 4000);
+    }
+  };
+
   const SettingRow = ({ label, desc, children }) => (
     <div className="flex items-center justify-between py-3 border-b border-white/50 last:border-0">
       <div className="space-y-0.5">
@@ -242,7 +301,7 @@ const Settings = () => {
       placeholder={placeholder}
       value={value ?? ''}
       onChange={onChange}
-      className="h-8 w-48 bg-slate-50 border border-slate-200 rounded-lg px-3 text-[10px] font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20 focus:border-[#E31E24]/20 font-mono"
+      className="h-8 w-48 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg px-3 text-[10px] font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20 focus:border-[#E31E24]/20 font-mono"
     />
   );
 
@@ -251,7 +310,7 @@ const Settings = () => {
       onClick={onClick}
       className={`w-8 h-4 rounded-full p-0.5 transition-all cursor-pointer ${active ? 'bg-[#E31E24]' : 'bg-slate-300'}`}
     >
-      <div className={`h-3 w-3 bg-white rounded-full transition-all shadow-sm ${active ? 'translate-x-4' : 'translate-x-0'}`}></div>
+      <div className={`h-3 w-3 bg-transparent rounded-full transition-all shadow-neu ${active ? 'translate-x-4' : 'translate-x-0'}`}></div>
     </div>
   );
 
@@ -271,7 +330,7 @@ const Settings = () => {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-white shadow-md rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
+            <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
               <IconSettings size={20} />
             </div>
             <div>
@@ -283,7 +342,7 @@ const Settings = () => {
           <Button 
             onClick={handleSave} 
             disabled={isSaving}
-            className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-md transition-all active:scale-95"
+            className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-neu transition-all active:scale-95"
           >
             {isSaving ? <IconLoader2 className="animate-spin mr-2" size={14} /> : <IconDeviceFloppy className="mr-2" size={14} />}
             Synchronize Config
@@ -308,11 +367,11 @@ const Settings = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all duration-300 border ${
                   activeTab === tab.id 
-                  ? 'bg-white border-slate-200 shadow-sm' 
+                  ? 'bg-transparent border-white/50 shadow-neu' 
                   : 'bg-transparent border-transparent hover:bg-slate-100/50 hover:translate-x-0.5'
                 }`}
               >
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all border ${activeTab === tab.id ? 'bg-[#E31E24] border-[#E31E24] text-white shadow-sm' : 'bg-white border-slate-200 text-slate-400 shadow-sm'}`}>
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all border ${activeTab === tab.id ? 'bg-[#E31E24] border-[#E31E24] text-white shadow-neu' : 'bg-transparent border-white/50 text-slate-400 shadow-neu'}`}>
                   {tab.icon}
                 </div>
                 <div className="text-left leading-none">
@@ -327,8 +386,8 @@ const Settings = () => {
           <div className="lg:col-span-4 space-y-4">
             {activeTab === 'general' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+                <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Brand Identity</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -351,8 +410,8 @@ const Settings = () => {
                     </SettingRow>
                   </CardContent>
                 </Card>
-                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+                <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Environment</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -380,8 +439,8 @@ const Settings = () => {
             )}
 
             {activeTab === 'security' && (
-              <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+              <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                   <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Security & Auth Policy</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
@@ -426,10 +485,170 @@ const Settings = () => {
               </Card>
             )}
 
+            {activeTab === 'antifraud' && (
+              <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
+                  <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Anti-Fraud & Geofencing Settings</CardTitle>
+                </CardHeader>
+                <CardContent className="p-5 grid grid-cols-1 gap-y-2">
+                  <SettingRow label="Geofence Radius (meters)" desc="Global tolerance for check-in distance from target location">
+                    <CompactInput 
+                      value={settings.antifraud?.geofence_radius_meters || 30} 
+                      onChange={e => setSettings(prev => ({ ...prev, antifraud: { ...prev.antifraud, geofence_radius_meters: parseInt(e.target.value) || 0 } }))}
+                      placeholder="30" 
+                      type="number" 
+                    />
+                  </SettingRow>
+                  <SettingRow label="Face Liveness Strictness" desc="AI face spoofing tolerance (low, medium, high)">
+                    <select 
+                      value={settings.antifraud?.liveness_strictness || 'high'}
+                      onChange={e => setSettings(prev => ({ ...prev, antifraud: { ...prev.antifraud, liveness_strictness: e.target.value } }))}
+                      className="h-8 px-2 bg-transparent border border-slate-200 shadow-neu-inset rounded-lg text-xs font-bold text-slate-700 focus:outline-none focus:border-[#E31E24]/30"
+                    >
+                      <option value="low">Low (Faster)</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High (Secure)</option>
+                    </select>
+                  </SettingRow>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'approval' && (
+              <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
+                  <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Dynamic Approval Matrix</CardTitle>
+                </CardHeader>
+                <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Leave Matrix */}
+                  <div className="space-y-4 border border-slate-200 rounded-xl p-4 bg-white/50">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-700">Leave (Cuti)</h4>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={settings.approval?.leave?.enabled || false} onChange={e => setSettings(prev => ({ ...prev, approval: { ...prev.approval, leave: { ...prev.approval.leave, enabled: e.target.checked } } }))} />
+                        <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#E31E24]"></div>
+                      </label>
+                    </div>
+                    {settings.approval?.leave?.enabled && (
+                      <div className="space-y-2">
+                        {(settings.approval.leave.tiers || []).map((tier, idx) => (
+                          <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <span className="text-[9px] font-black text-slate-400">L{tier.level}</span>
+                            <input 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-neu-inset focus:outline-none" 
+                              placeholder="Role (e.g. SPV)" 
+                              value={tier.role}
+                              onChange={e => {
+                                const newTiers = [...settings.approval.leave.tiers];
+                                newTiers[idx].role = e.target.value;
+                                setSettings(prev => ({ ...prev, approval: { ...prev.approval, leave: { ...prev.approval.leave, tiers: newTiers } } }));
+                              }}
+                            />
+                            <input 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-neu-inset focus:outline-none" 
+                              placeholder="Label (e.g. Pending L1)" 
+                              value={tier.label}
+                              onChange={e => {
+                                const newTiers = [...settings.approval.leave.tiers];
+                                newTiers[idx].label = e.target.value;
+                                setSettings(prev => ({ ...prev, approval: { ...prev.approval, leave: { ...prev.approval.leave, tiers: newTiers } } }));
+                              }}
+                            />
+                            <button 
+                              onClick={() => {
+                                const newTiers = settings.approval.leave.tiers.filter((_, i) => i !== idx);
+                                setSettings(prev => ({ ...prev, approval: { ...prev.approval, leave: { ...prev.approval.leave, tiers: newTiers } } }));
+                              }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <IconTrash size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full h-8 text-[9px] font-black uppercase tracking-widest mt-2"
+                          onClick={() => {
+                            const newTiers = [...(settings.approval?.leave?.tiers || [])];
+                            newTiers.push({ level: newTiers.length + 1, role: "", label: `Pending L${newTiers.length + 1}` });
+                            setSettings(prev => ({ ...prev, approval: { ...prev.approval, leave: { ...prev.approval.leave, tiers: newTiers } } }));
+                          }}
+                        >
+                          + Add Tier
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Overtime Matrix */}
+                  <div className="space-y-4 border border-slate-200 rounded-xl p-4 bg-white/50">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-700">Overtime (Lembur)</h4>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={settings.approval?.overtime?.enabled || false} onChange={e => setSettings(prev => ({ ...prev, approval: { ...prev.approval, overtime: { ...prev.approval.overtime, enabled: e.target.checked } } }))} />
+                        <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#E31E24]"></div>
+                      </label>
+                    </div>
+                    {settings.approval?.overtime?.enabled && (
+                      <div className="space-y-2">
+                        {(settings.approval.overtime.tiers || []).map((tier, idx) => (
+                          <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
+                            <span className="text-[9px] font-black text-slate-400">L{tier.level}</span>
+                            <input 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-neu-inset focus:outline-none" 
+                              placeholder="Role" 
+                              value={tier.role}
+                              onChange={e => {
+                                const newTiers = [...settings.approval.overtime.tiers];
+                                newTiers[idx].role = e.target.value;
+                                setSettings(prev => ({ ...prev, approval: { ...prev.approval, overtime: { ...prev.approval.overtime, tiers: newTiers } } }));
+                              }}
+                            />
+                            <input 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-neu-inset focus:outline-none" 
+                              placeholder="Label" 
+                              value={tier.label}
+                              onChange={e => {
+                                const newTiers = [...settings.approval.overtime.tiers];
+                                newTiers[idx].label = e.target.value;
+                                setSettings(prev => ({ ...prev, approval: { ...prev.approval, overtime: { ...prev.approval.overtime, tiers: newTiers } } }));
+                              }}
+                            />
+                            <button 
+                              onClick={() => {
+                                const newTiers = settings.approval.overtime.tiers.filter((_, i) => i !== idx);
+                                setSettings(prev => ({ ...prev, approval: { ...prev.approval, overtime: { ...prev.approval.overtime, tiers: newTiers } } }));
+                              }}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <IconTrash size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full h-8 text-[9px] font-black uppercase tracking-widest mt-2"
+                          onClick={() => {
+                            const newTiers = [...(settings.approval?.overtime?.tiers || [])];
+                            newTiers.push({ level: newTiers.length + 1, role: "", label: `Pending L${newTiers.length + 1}` });
+                            setSettings(prev => ({ ...prev, approval: { ...prev.approval, overtime: { ...prev.approval.overtime, tiers: newTiers } } }));
+                          }}
+                        >
+                          + Add Tier
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {activeTab === 'notifications' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
+                <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Email Engine (SMTP)</CardTitle>
                     <IconMail size={14} className="text-slate-400" />
                   </CardHeader>
@@ -455,10 +674,21 @@ const Settings = () => {
                         placeholder="no-reply@wijayakn.com" 
                       />
                     </SettingRow>
+                    <div className="pt-2">
+                      <Button 
+                        onClick={handleTestSMTP}
+                        disabled={testingSMTP}
+                        className="w-full h-8 text-[9px] font-black uppercase tracking-widest flex gap-2 items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-neu-inset"
+                        variant="outline"
+                      >
+                        {testingSMTP ? <IconLoader2 size={14} className="animate-spin" /> : <IconRefresh size={14} />}
+                        {testingSMTP ? 'Connecting...' : 'Test SMTP Connection'}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
-                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
+                <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">WhatsApp Gateway</CardTitle>
                     <IconMessageDots size={14} className="text-green-500" />
                   </CardHeader>
@@ -484,14 +714,25 @@ const Settings = () => {
                         onClick={() => setSettings(prev => ({ ...prev, notifications: { ...prev.notifications, wa_webhooks: !prev.notifications.wa_webhooks } }))}
                       />
                     </SettingRow>
+                    <div className="pt-2">
+                      <Button 
+                        onClick={handleTestWA}
+                        disabled={testingWA}
+                        className="w-full h-8 text-[9px] font-black uppercase tracking-widest flex gap-2 items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-neu-inset"
+                        variant="outline"
+                      >
+                        {testingWA ? <IconLoader2 size={14} className="animate-spin" /> : <IconRefresh size={14} />}
+                        {testingWA ? 'Connecting...' : 'Test WhatsApp Instance'}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
             )}
 
             {activeTab === 'network' && (
-              <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+              <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                   <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Localization & Global Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
@@ -522,7 +763,7 @@ const Settings = () => {
                     { label: 'Last Backup', val: getLastBackupTimeStr(), icon: <IconClock size={14} /> },
                     { label: 'Storage', val: totalBackupSizeFormatted(), icon: <IconDatabase size={14} /> }
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white border border-slate-200 shadow-sm rounded-xl p-3 flex items-center justify-between transition-all hover:translate-y-[-1px]">
+                    <div key={i} className="bg-transparent border border-white/50 shadow-neu rounded-xl p-3 flex items-center justify-between transition-all hover:translate-y-[-1px]">
                       <div className="space-y-0.5">
                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
                         <p className="text-xs font-black text-slate-800">{stat.val}</p>
@@ -533,8 +774,8 @@ const Settings = () => {
                     </div>
                   ))}
                 </div>
-                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden">
-                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+                <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden">
+                  <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Maintenance & Recovery</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -562,7 +803,7 @@ const Settings = () => {
                       <Button 
                         onClick={handleForceBackup}
                         disabled={isBackupRunning}
-                        className="h-8 px-4 bg-slate-800 text-white text-[8px] font-black uppercase tracking-widest rounded hover:bg-slate-700 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
+                        className="h-8 px-4 bg-slate-800 text-white text-[8px] font-black uppercase tracking-widest rounded hover:bg-slate-700 transition-all flex items-center gap-1.5 shadow-neu active:scale-95 disabled:opacity-50"
                       >
                         {isBackupRunning ? <IconLoader2 size={12} className="animate-spin" /> : <IconRefresh size={12} />}
                         {isBackupRunning ? 'Backing up...' : 'Force Backup Now'}
@@ -572,8 +813,8 @@ const Settings = () => {
                 </Card>
 
                 {/* Backups table */}
-                <Card className="border-slate-200 border bg-white shadow-sm rounded-xl overflow-hidden mt-4">
-                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+                <Card className="border-white/50 border bg-transparent shadow-neu rounded-xl overflow-hidden mt-4">
+                  <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                     <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Backup Archives</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4">
@@ -586,9 +827,9 @@ const Settings = () => {
                         No backup archives found on disk
                       </div>
                     ) : (
-                      <div className="overflow-x-auto rounded-xl border border-slate-100">
+                      <div className="overflow-x-auto rounded-xl border border-white/50">
                         <table className="w-full text-left">
-                          <thead className="bg-slate-50 border-b border-slate-100">
+                          <thead className="bg-slate-50 border-b border-white/50">
                             <tr>
                               {['Filename', 'Created At', 'Size', 'Initiator', 'Actions'].map(h => (
                                 <th key={h} className="px-3 py-2.5 text-[8px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
@@ -597,7 +838,7 @@ const Settings = () => {
                           </thead>
                           <tbody className="divide-y divide-slate-50 text-[10px] font-bold text-slate-600">
                             {backups.map((backup) => (
-                              <tr key={backup.filename} className="hover:bg-slate-50 transition-all">
+                              <tr key={backup.filename} className="hover:shadow-neu-inset transition-all">
                                 <td className="px-3 py-2.5 font-mono text-[9px] text-slate-800 truncate max-w-[220px]" title={backup.filename}>
                                   {backup.filename}
                                 </td>

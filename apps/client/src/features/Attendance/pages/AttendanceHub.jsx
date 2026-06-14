@@ -43,7 +43,7 @@ const AttendanceHub = () => {
   const fetchPendingTasks = async () => {
     try {
       const { apiClient } = await import('@/lib/apiClient');
-      const res = await apiClient.get('/api/attendance/pending-tasks');
+      const res = await apiClient.get('/attendance/pending-tasks');
       if (res.status === 'success') {
         setPendingTasks(res.data);
       }
@@ -70,11 +70,11 @@ const AttendanceHub = () => {
   const totalPending = pendingTasks.overtime + pendingTasks.corrections;
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-[#f8fafc] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="w-full mx-auto space-y-6">
         
         {/* 🚀 ULTRA-COMPACT HEADER & NAV BAR */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white p-5 px-8 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-transparent p-5 px-8 rounded-2xl border border-white/50 shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-4">
              <div className="h-10 w-10 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
                 <IconClock size={18} />
@@ -94,7 +94,7 @@ const AttendanceHub = () => {
              {totalPending > 0 && (
                <div 
                  onClick={() => navigate('/attendance/correction')}
-                 className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors shadow-sm animate-pulse"
+                 className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors shadow-neu animate-pulse"
                  title="Terdapat pengajuan menunggu persetujuan"
                >
                  <IconAlertTriangle size={14} className="text-amber-500" />
@@ -105,7 +105,7 @@ const AttendanceHub = () => {
              )}
 
              {/* Period Selector */}
-             <div className="h-10 px-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 transition-all focus-within:border-[#E31E24]/20">
+             <div className="h-10 px-4 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-center gap-2 transition-all focus-within:border-[#E31E24]/20">
                 <IconCalendarEvent size={12} className="text-[#E31E24]" />
                 <input 
                   type="month" 
@@ -180,14 +180,14 @@ const AttendanceHub = () => {
                       const success = await exportDailyAttendance();
                       if (success) toast.success("Daily report downloaded.");
                     }}
-                    className="h-10 px-6 rounded-lg bg-[#f0f2f5] border-2 border-white text-slate-700 font-semibold text-xs tracking-wide hover:bg-slate-50 shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex gap-2 items-center transition-all"
+                    className="h-10 px-6 rounded-lg bg-[#f0f2f5] border-2 border-white text-slate-700 font-semibold text-xs tracking-wide hover:shadow-neu-inset shadow-neu flex gap-2 items-center transition-all"
                   >
                     <IconDownload size={14} className="text-slate-500" />
                     Export
                   </Button>
                   <Button 
                     onClick={() => setIsBulkModalOpen(true)}
-                    className="h-10 px-6 rounded-lg bg-white border border-slate-200 text-slate-700 font-semibold text-xs tracking-wide hover:bg-slate-50 shadow-sm flex gap-2 items-center"
+                    className="h-10 px-6 rounded-lg bg-transparent border border-white/50 text-slate-700 font-semibold text-xs tracking-wide hover:shadow-neu-inset shadow-neu flex gap-2 items-center"
                   >
                     <IconCloudUpload size={14} className="text-[#E31E24]" />
                     Bulk
@@ -195,7 +195,7 @@ const AttendanceHub = () => {
                   
                   <Button 
                     onClick={() => setIsManualModalOpen(true)}
-                    className="h-10 px-6 rounded-lg bg-[#E31E24] text-white font-semibold text-xs tracking-wide shadow-md hover:bg-[#C1181E] flex gap-2 items-center"
+                    className="h-10 px-6 rounded-lg bg-[#E31E24] text-white font-semibold text-xs tracking-wide shadow-neu hover:bg-[#C1181E] flex gap-2 items-center"
                   >
                     <IconPlus size={14} />
                     Entry
@@ -242,7 +242,7 @@ const AttendanceHub = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-9 space-y-6">
-             <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+             <div className="bg-transparent rounded-2xl border border-white/50 p-4 shadow-neu">
                 <div className="flex items-center justify-between mb-4">
                    <h3 className="text-sm font-bold text-slate-800 tracking-wide flex items-center gap-2">
                      <IconChartBar size={14} className="text-[#E31E24]" />
@@ -252,7 +252,7 @@ const AttendanceHub = () => {
                 <TrendsChart data={trends} loading={loading} height={250} />
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+                <div className="bg-transparent rounded-2xl border border-white/50 p-4 shadow-neu">
                    <h3 className="text-sm font-bold text-slate-800 tracking-wide mb-4 flex items-center gap-2">
                      <IconUsers size={14} className="text-amber-500" />
                      Delay Analysis by Department

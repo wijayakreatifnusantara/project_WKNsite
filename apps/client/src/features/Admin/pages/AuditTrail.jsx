@@ -21,6 +21,8 @@ const AuditTrail = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModule, setSelectedModule] = useState('All');
+  const [availableModules, setAvailableModules] = useState(['All', 'shifts', 'national_holidays', 'employees']);
+  const [selectedLogForDiff, setSelectedLogForDiff] = useState(null);
 
   useEffect(() => {
     fetchLogs();
@@ -38,7 +40,9 @@ const AuditTrail = () => {
           action,
           table_name,
           record_id,
-          user_id
+          user_id,
+          old_data,
+          new_data
         `)
         .order('created_at', { ascending: false });
         
@@ -49,12 +53,18 @@ const AuditTrail = () => {
       const { data, error } = await query;
       if (error) throw error;
       
+      // Extract unique modules dynamically
+      const uniqueModules = ['All', ...new Set(data.map(d => d.table_name))];
+      if (selectedModule === 'All') setAvailableModules(uniqueModules);
+
       const mappedLogs = data.map(log => ({
         id: log.id,
         created_at: log.created_at,
         action: log.action,
         module: log.table_name,
         entity_id: log.record_id,
+        old_data: log.old_data,
+        new_data: log.new_data,
         profiles: { full_name: log.user_id ? `User: ${log.user_id.substring(0,8)}` : 'System' }
       }));
       
@@ -106,12 +116,12 @@ const AuditTrail = () => {
       case 'UPDATE': return 'bg-amber-50 text-amber-600 border-amber-100';
       case 'DELETE': return 'bg-rose-50 text-rose-600 border-rose-100';
       case 'DOWNLOAD': return 'bg-blue-50 text-blue-600 border-blue-100';
-      default: return 'bg-slate-50 text-slate-600 border-slate-100';
+      default: return 'bg-slate-50 text-slate-600 border-white/50';
     }
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f8fafc] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -124,14 +134,14 @@ const AuditTrail = () => {
           <div className="flex gap-4">
             <Button 
               onClick={exportToExcel}
-              className="h-10 px-6 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all flex gap-2 items-center shadow-sm"
+              className="h-10 px-6 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all flex gap-2 items-center shadow-neu"
             >
               <IconDownload size={16} />
               Export Excel
             </Button>
             <Button 
               onClick={fetchLogs}
-              className="h-10 px-6 rounded-lg bg-white border border-slate-200 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex gap-2 items-center shadow-sm"
+              className="h-10 px-6 rounded-lg bg-transparent border border-white/50 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:shadow-neu-inset transition-all flex gap-2 items-center shadow-neu"
             >
               <IconClock size={16} />
               Refresh Logs
@@ -140,15 +150,15 @@ const AuditTrail = () => {
         </header>
 
         {/* Filter Bar */}
-        <div className="flex gap-2 p-2 rounded-xl bg-white border border-slate-200 shadow-sm overflow-x-auto no-scrollbar">
-          {['All', 'shifts', 'national_holidays', 'employees'].map(mod => (
+        <div className="flex gap-2 p-2 rounded-xl bg-transparent border border-white/50 shadow-neu overflow-x-auto no-scrollbar">
+          {availableModules.map(mod => (
             <button
               key={mod}
               onClick={() => setSelectedModule(mod)}
               className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap
                 ${selectedModule === mod 
-                  ? 'bg-[#E31E24] text-white shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                  ? 'bg-[#E31E24] text-white shadow-neu' 
+                  : 'text-slate-500 hover:text-slate-700 hover:shadow-neu-inset'}`}
             >
               {mod}
             </button>
@@ -156,10 +166,10 @@ const AuditTrail = () => {
         </div>
 
         {/* Logs Table */}
-        <Card className="border border-slate-200 shadow-sm bg-white rounded-2xl overflow-hidden">
+        <Card className="border border-white/50 shadow-neu bg-transparent rounded-2xl overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
+              <tr className="border-b border-white/50 bg-slate-50">
                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Timestamp</th>
                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Operator</th>
                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Action</th>
@@ -176,7 +186,7 @@ const AuditTrail = () => {
                 </tr>
               ) : logs.length > 0 ? (
                 logs.map((log) => (
-                  <tr key={log.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group">
+                  <tr key={log.id} className="border-b border-white/50 hover:shadow-neu-inset/50 transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
                         <span className="text-[11px] font-black text-slate-700">{new Date(log.created_at).toLocaleTimeString()}</span>
@@ -185,7 +195,7 @@ const AuditTrail = () => {
                     </td>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-[#E31E24]">
+                        <div className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center text-[#E31E24]">
                           <IconUserShield size={16} />
                         </div>
                         <span className="text-[10px] font-black text-slate-700 uppercase">{log.profiles?.full_name || 'System'}</span>
@@ -202,7 +212,9 @@ const AuditTrail = () => {
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
                         <span className="text-[10px] font-bold text-slate-500 max-w-[200px] truncate">{log.entity_id}</span>
-                        <button className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#E31E24] transition-all opacity-0 group-hover:opacity-100 shadow-sm">
+                        <button 
+                          onClick={() => setSelectedLogForDiff(log)}
+                          className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center text-slate-500 hover:text-[#E31E24] transition-all opacity-0 group-hover:opacity-100 shadow-neu">
                           <IconBraces size={16} />
                         </button>
                       </div>
@@ -220,6 +232,40 @@ const AuditTrail = () => {
           </table>
         </Card>
       </div>
+      
+      {/* Diff Viewer Modal */}
+      {selectedLogForDiff && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <Card className="w-full max-w-4xl border border-white/50 bg-transparent shadow-neu rounded-3xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="p-6 border-b border-white/50 bg-slate-50/80 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                  <IconBraces className="text-[#E31E24]" />
+                  Data Payload Details
+                </h3>
+                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+                  {selectedLogForDiff.action} on {selectedLogForDiff.module} ({selectedLogForDiff.entity_id})
+                </p>
+              </div>
+              <Button variant="ghost" onClick={() => setSelectedLogForDiff(null)} className="h-10 w-10 p-0 rounded-full text-slate-500 hover:text-red-500 shadow-neu-inset flex items-center justify-center font-bold">X</Button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/50">
+              <div>
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-rose-500"></div> Previous Data</h4>
+                <pre className="p-4 bg-slate-800 text-rose-300 text-[10px] font-mono rounded-xl overflow-x-auto shadow-neu-inset whitespace-pre-wrap min-h-[150px]">
+                  {selectedLogForDiff.old_data ? JSON.stringify(selectedLogForDiff.old_data, null, 2) : 'null'}
+                </pre>
+              </div>
+              <div>
+                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> New Data</h4>
+                <pre className="p-4 bg-slate-800 text-emerald-300 text-[10px] font-mono rounded-xl overflow-x-auto shadow-neu-inset whitespace-pre-wrap min-h-[150px]">
+                  {selectedLogForDiff.new_data ? JSON.stringify(selectedLogForDiff.new_data, null, 2) : 'null'}
+                </pre>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

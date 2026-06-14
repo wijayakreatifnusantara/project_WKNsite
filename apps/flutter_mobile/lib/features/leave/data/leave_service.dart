@@ -33,8 +33,13 @@ class LeaveService {
       final prefs = await SharedPreferences.getInstance();
       final cached = prefs.getString('cached_leaves');
       if (cached != null) {
-        List<dynamic> data = jsonDecode(cached);
-        return data.map((json) => LeaveRequest.fromJson(json)).toList();
+        try {
+          final Map<String, dynamic> body = jsonDecode(cached);
+          final List<dynamic> data = body['data'] ?? [];
+          return data.map((json) => LeaveRequest.fromJson(json)).toList();
+        } catch (decodeError) {
+          return [];
+        }
       }
       return [];
     }

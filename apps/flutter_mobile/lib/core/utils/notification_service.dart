@@ -1,6 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
+import '../router/app_router.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -48,7 +50,12 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-         debugPrint('onDidReceiveNotificationResponse: ${response.actionId}');
+         debugPrint('onDidReceiveNotificationResponse: action=${response.actionId}, payload=${response.payload}');
+         if (response.actionId == 'view_leaderboard' || response.payload == 'gamification') {
+           if (rootNavigatorKey.currentContext != null) {
+             rootNavigatorKey.currentContext!.push('/leaderboard');
+           }
+         }
       },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
@@ -68,6 +75,29 @@ class NotificationService {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         if (message.notification != null) {
           debugPrint('Got foreground message: ${message.notification?.title}');
+          
+          final type = message.data['type'] as String?;
+          bool isGamification = type == 'gamification';
+
+          flutterLocalNotificationsPlugin.show(
+            id: message.notification.hashCode,
+            title: message.notification!.title,
+            body: message.notification!.body,
+            notificationDetails: NotificationDetails(
+              android: AndroidNotificationDetails(
+                isGamification ? 'wkn_gamification_channel' : 'wkn_fcm_channel',
+                isGamification ? 'Pencapaian & Gamifikasi' : 'Pemberitahuan WKN',
+                channelDescription: isGamification 
+                  ? 'Kanal untuk notifikasi poin dan leaderboard' 
+                  : 'Kanal untuk notifikasi real-time',
+                importance: Importance.max,
+                priority: Priority.high,
+                color: isGamification ? const Color(0xFFFFC107) : const Color(0xFFE31E24),
+                icon: '@mipmap/launcher_icon',
+              ),
+            ),
+            payload: type ?? 'general',
+          );
         }
       });
       
@@ -130,6 +160,14 @@ class NotificationService {
       color: Color(0xFFFFC107), // Amber / Gold Color for Gamification
       icon: '@mipmap/launcher_icon',
       largeIcon: DrawableResourceAndroidBitmap('@mipmap/launcher_icon'),
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          'view_leaderboard',
+          'Lihat Peringkat',
+          cancelNotification: true,
+          showsUserInterface: true,
+        ),
+      ],
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
@@ -142,6 +180,30 @@ class NotificationService {
       body: body,
       notificationDetails: platformChannelSpecifics,
       payload: payload,
+    );
+  }
+
+  // Fungsi untuk memicu notifikasi Offline Sync
+  Future<void> showOfflineSyncNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'wkn_sync_channel',
+      'Sinkronisasi Latar Belakang',
+      channelDescription: 'Kanal untuk notifikasi berhasilnya sinkronisasi offline',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+      color: Colors.green,
+      icon: '@mipmap/launcher_icon',
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      id: 777, // ID unik sync
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
     );
   }
 }

@@ -73,7 +73,7 @@ const Payroll = () => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5] animate-fade-in">
       {/* Page Header */}
-      <header className="h-20 bg-[#f0f2f5] border-b border-white/50 flex items-center justify-between px-10 shrink-0 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.05)] z-10">
+      <header className="h-20 bg-[#f0f2f5] border-b border-white/50 flex items-center justify-between px-10 shrink-0 shadow-neu z-10">
         <div className="flex flex-col leading-none">
           <h2 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight">Treasury Operations</h2>
           <p className="text-[9px] text-slate-400 font-black mt-1.5 uppercase tracking-[0.3em] opacity-70">
@@ -85,14 +85,14 @@ const Payroll = () => {
             <Button 
               onClick={handleFinalize}
               variant="outline" 
-              className="h-12 px-6 rounded-2xl bg-green-50 shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-green-600 font-black text-[10px] uppercase tracking-widest flex gap-2 transition-all"
+              className="h-12 px-6 rounded-2xl bg-green-50 shadow-neu border-white border-2 text-green-600 font-black text-[10px] uppercase tracking-widest flex gap-2 transition-all"
             >
               <IconCircleCheck size={18} /> Finalize Run
             </Button>
           )}
           <Button 
             onClick={() => setIsModalOpen(true)}
-            className="h-12 px-6 rounded-2xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] flex gap-2 transition-all"
+            className="h-12 px-6 rounded-2xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest shadow-neu flex gap-2 transition-all"
           >
             <IconPlus size={18} /> Run Logic
           </Button>
@@ -134,7 +134,7 @@ const Payroll = () => {
           </div>
 
           {/* Table Area (Neumorphic Component) */}
-          <Card className="border-white border-4 shadow-[15px_15px_30px_#d1d9e6,-15px_-15px_30px_#ffffff] bg-[#f0f2f5] rounded-[2.5rem] overflow-hidden">
+          <Card className="border-white border-4 shadow-neu bg-[#f0f2f5] rounded-[2.5rem] overflow-hidden">
             <CardHeader className="p-8 border-b border-white/50 flex flex-row items-center justify-between">
               <div className="flex items-center gap-6">
                 <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-[0.2em]">Disbursement List</CardTitle>
@@ -143,15 +143,15 @@ const Payroll = () => {
                   <input 
                     type="text" 
                     placeholder="Search personnel or ID..." 
-                    className="w-full h-full pl-12 pr-6 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-none rounded-2xl text-[11px] font-bold text-slate-700 focus:outline-none transition-all"
+                    className="w-full h-full pl-12 pr-6 bg-[#f0f2f5] shadow-neu border-none rounded-2xl text-[11px] font-bold text-slate-700 focus:outline-none transition-all"
                   />
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl transition-all hover:text-[#E31E24] active:shadow-none">
+                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-[#f0f2f5] shadow-neu rounded-2xl transition-all hover:text-[#E31E24] active:shadow-none">
                   <IconFilter size={18} />
                 </button>
-                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-2xl transition-all hover:text-[#E31E24] active:shadow-none">
+                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-[#f0f2f5] shadow-neu rounded-2xl transition-all hover:text-[#E31E24] active:shadow-none">
                   <IconTableExport size={18} />
                 </button>
               </div>
@@ -198,8 +198,8 @@ const Payroll = () => {
               <div className="p-6 border-t border-white/50 flex items-center justify-between">
                 <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Active Pool: {displayData.length} records</p>
                 <div className="flex gap-3">
-                  <Button variant="outline" size="sm" className="h-10 px-5 text-[9px] font-black uppercase tracking-widest rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] border-white border-2 disabled:opacity-30" disabled>Prev</Button>
-                  <Button variant="outline" size="sm" className="h-10 px-5 text-[9px] font-black uppercase tracking-widest rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] border-white border-2">Next</Button>
+                  <Button variant="outline" size="sm" className="h-10 px-5 text-[9px] font-black uppercase tracking-widest rounded-xl bg-[#f0f2f5] shadow-neu border-white border-2 disabled:opacity-30" disabled>Prev</Button>
+                  <Button variant="outline" size="sm" className="h-10 px-5 text-[9px] font-black uppercase tracking-widest rounded-xl bg-[#f0f2f5] shadow-neu border-white border-2">Next</Button>
                 </div>
               </div>
             </CardContent>
@@ -220,18 +220,18 @@ const Payroll = () => {
 
 const KPICard = ({ title, value, subtitle, icon, trend, positive, color = "blue" }) => {
   const colors = {
-    blue: "text-blue-500 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]",
-    amber: "text-amber-500 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]",
-    indigo: "text-[#E31E24] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]",
+    blue: "text-blue-500 shadow-neu",
+    amber: "text-amber-500 shadow-neu",
+    indigo: "text-[#E31E24] shadow-neu",
   };
 
   return (
-    <Card className="border-white border-2 shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] p-8 hover:scale-[1.02] transition-all cursor-pointer group">
+    <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-[2rem] p-8 hover:scale-[1.02] transition-all cursor-pointer group">
       <div className="flex justify-between items-start mb-6">
         <div className={`h-14 w-14 rounded-2xl flex items-center justify-center bg-[#f0f2f5] ${colors[color]} group-hover:scale-110 transition-transform duration-300`}>
           {icon}
         </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] text-[10px] font-black ${positive ? 'text-green-500' : 'text-rose-500'}`}>
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f0f2f5] shadow-neu text-[10px] font-black ${positive ? 'text-green-500' : 'text-rose-500'}`}>
           {trend}
           {positive ? <IconArrowUpRight size={14} /> : <IconArrowDownRight size={14} />}
         </div>
@@ -298,7 +298,7 @@ const PayrollRow = ({ data, formatIDR }) => {
     <tr className="group hover:bg-white/40 transition-all cursor-pointer">
       <td className="px-8 py-4 border-b border-white/20">
         <div className="flex items-center gap-4">
-          <div className="h-10 w-10 bg-[#f0f2f5] rounded-xl shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] border-2 border-white flex items-center justify-center text-slate-400 font-black text-[11px] uppercase group-hover:text-[#E31E24] transition-colors">
+          <div className="h-10 w-10 bg-[#f0f2f5] rounded-xl shadow-neu border-2 border-white flex items-center justify-center text-slate-400 font-black text-[11px] uppercase group-hover:text-[#E31E24] transition-colors">
             {name.charAt(0)}
           </div>
           <div className="flex flex-col leading-none">
@@ -308,7 +308,7 @@ const PayrollRow = ({ data, formatIDR }) => {
         </div>
       </td>
       <td className="px-8 py-4 border-b border-white/20 text-center">
-        <span className={`px-3 py-1 rounded-lg bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] text-[9px] font-black uppercase tracking-widest text-slate-500`}>
+        <span className={`px-3 py-1 rounded-lg bg-[#f0f2f5] shadow-neu text-[9px] font-black uppercase tracking-widest text-slate-500`}>
           Cat {category}
         </span>
       </td>

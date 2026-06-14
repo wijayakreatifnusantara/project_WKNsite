@@ -26,12 +26,12 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div 
-        className="w-full max-w-4xl h-[80vh] bg-[#f0f2f5] shadow-2xl rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-4xl h-[80vh] bg-[#f0f2f5] shadow-neu rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 🏆 COMPACT IDENTITY TOP BAR */}
-        <header className="relative h-16 bg-white border-b border-slate-200/80 flex items-center px-8 gap-4 shrink-0">
-          <div className="h-10 w-10 rounded-lg bg-white border border-slate-200/80 flex items-center justify-center text-[#E31E24] overflow-hidden shrink-0">
+        <header className="relative h-16 bg-transparent border-b border-white/50/80 flex items-center px-8 gap-4 shrink-0">
+          <div className="h-10 w-10 rounded-lg bg-transparent border border-white/50/80 flex items-center justify-center text-[#E31E24] overflow-hidden shrink-0">
             {employee["Photo"] ? (
               <img src={employee["Photo"]} alt={employee["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
             ) : (
@@ -63,13 +63,13 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                   onEdit(employee);
                   onClose();
                 }}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-semibold text-[10px] uppercase tracking-wider hover:bg-[#C1181E] transition-all active:scale-95 shadow-sm"
+                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-semibold text-[10px] uppercase tracking-wider hover:bg-[#C1181E] transition-all active:scale-95 shadow-neu"
               >
                 Edit Dossier
               </Button>
               <button 
                 onClick={onClose}
-                className="h-8 w-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#E31E24] transition-all"
+                className="h-8 w-8 flex items-center justify-center bg-transparent border border-white/50 rounded-lg text-slate-400 hover:text-[#E31E24] transition-all"
               >
                 <IconX size={16} />
               </button>
@@ -116,17 +116,17 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                     <DocumentItem key={idx} name={doc.name || 'Document.pdf'} />
                   ))
                 ) : (
-                  <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center h-24">
+                  <div className="bg-white/50 border-2 border-dashed border-white/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center h-24">
                     <p className="text-[9px] font-bold text-slate-400 uppercase">Belum ada dokumen</p>
                   </div>
                 )}
-                <button className="w-full h-12 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-black text-slate-400 uppercase tracking-widest hover:border-[#E31E24] hover:text-[#E31E24] transition-all">
+                <button className="w-full h-12 mt-2 border-2 border-dashed border-white/50 rounded-2xl text-[9px] font-black text-slate-400 uppercase tracking-widest hover:border-[#E31E24] hover:text-[#E31E24] transition-all">
                   + Add Document
                 </button>
               </div>
 
               {/* Tanda Tangan Elektronik Section */}
-              <div className="pt-6 border-t border-slate-200/50 space-y-4">
+              <div className="pt-6 border-t border-white/50/50 space-y-4">
                 <div className="flex justify-between items-center px-1">
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Electronic Signature</p>
                   <button 
@@ -140,11 +140,11 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                   </button>
                 </div>
                 {employee.signature_url ? (
-                  <div className="bg-white p-3 border border-slate-200 rounded-2xl flex items-center justify-center h-28 relative group">
+                  <div className="bg-transparent p-3 border border-white/50 rounded-2xl flex items-center justify-center h-28 relative group">
                     <img src={employee.signature_url} alt="Signature" className="h-20 object-contain animate-fade-in" />
                   </div>
                 ) : (
-                  <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 h-28">
+                  <div className="bg-white/50 border-2 border-dashed border-white/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 h-28">
                     <p className="text-[9px] font-bold text-slate-400 uppercase">Belum ada tanda tangan</p>
                   </div>
                 )}
@@ -162,7 +162,7 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
 
 const SectionHeader = ({ title, icon }) => (
   <div className="flex items-center gap-3">
-    <div className="h-8 w-8 bg-white shadow-sm border border-slate-100 rounded-lg flex items-center justify-center text-[#E31E24]">
+    <div className="h-8 w-8 bg-transparent shadow-neu border border-white/50 rounded-lg flex items-center justify-center text-[#E31E24]">
       {icon}
     </div>
     <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em]">{title}</h3>
@@ -171,7 +171,7 @@ const SectionHeader = ({ title, icon }) => (
 
 const SimpleInfo = ({ label, value, icon }) => (
   <div className="flex items-center gap-4 group">
-    <div className="h-10 w-10 bg-white shadow-sm border border-white rounded-xl flex items-center justify-center text-slate-300 group-hover:text-[#E31E24] transition-all">
+    <div className="h-10 w-10 bg-transparent shadow-neu border border-white rounded-xl flex items-center justify-center text-slate-300 group-hover:text-[#E31E24] transition-all">
       {React.cloneElement(icon, { size: 18 })}
     </div>
     <div>
@@ -182,7 +182,7 @@ const SimpleInfo = ({ label, value, icon }) => (
 );
 
 const DocumentItem = ({ name }) => (
-  <div className="flex items-center justify-between p-4 bg-white shadow-sm border border-white rounded-2xl hover:shadow-md transition-all cursor-pointer group">
+  <div className="flex items-center justify-between p-4 bg-transparent shadow-neu border border-white rounded-2xl hover:shadow-neu transition-all cursor-pointer group">
     <div className="flex items-center gap-3">
       <IconFileText size={18} className="text-slate-300 group-hover:text-[#E31E24]" />
       <span className="text-[10px] font-black text-slate-600 truncate max-w-[180px]">{name}</span>

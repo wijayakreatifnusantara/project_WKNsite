@@ -39,10 +39,10 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="w-full max-w-lg bg-[#f0f2f5] border-white border-[4px] shadow-[20px_20px_60px_#00000044] rounded-[2.5rem] p-8 relative overflow-hidden">
+      <div className="w-full max-w-lg bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] text-slate-400 hover:text-[#E31E24] transition-all z-20"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all z-20"
         >
           <IconX size={20} />
         </button>
@@ -55,7 +55,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Point your camera at an Asset QR Code</p>
         </div>
 
-        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-[inset_6px_6px_12px_#00000044] border-4 border-white aspect-square">
+        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-neu border-4 border-white aspect-square">
           <div id="qr-reader" className="w-full h-full"></div>
           
           {/* Scanning Overlay UI */}

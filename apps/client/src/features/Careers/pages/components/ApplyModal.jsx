@@ -44,7 +44,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
   if (success) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl p-10 text-center animate-in zoom-in-95 duration-200">
+        <div className="w-full max-w-md bg-transparent rounded-[2rem] shadow-neu p-10 text-center animate-in zoom-in-95 duration-200">
           <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <IconSend size={32} className="text-emerald-500" />
           </div>
@@ -58,7 +58,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-lg bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="w-full max-w-lg bg-transparent rounded-[2rem] shadow-neu overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-8 bg-slate-900 relative">
@@ -83,7 +83,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g. John Doe"
-              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-slate-200"
+              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
               required
             />
           </div>
@@ -99,7 +99,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="john@example.com"
-                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-slate-200"
+                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
                 required
               />
             </div>
@@ -113,7 +113,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+62 812..."
-                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-slate-200"
+                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
                 required
               />
             </div>
@@ -129,7 +129,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
               value={formData.resume_url}
               onChange={handleChange}
               placeholder="Link to Google Drive, LinkedIn, etc."
-              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-slate-200"
+              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
               required
             />
             <p className="text-[9px] text-slate-400 mt-1">Make sure the link is publicly accessible.</p>
@@ -139,7 +139,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
             <Button 
               type="submit"
               disabled={loading}
-              className="w-full h-14 rounded-xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[11px] uppercase tracking-widest shadow-[0_8px_20px_rgba(227,30,36,0.3)] transition-all flex items-center justify-center gap-2"
+              className="w-full h-14 rounded-xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[11px] uppercase tracking-widest shadow-neu transition-all flex items-center justify-center gap-2"
             >
               {loading ? 'Submitting...' : (
                 <>Submit Application <IconSend size={16} /></>

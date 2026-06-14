@@ -4,8 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../../core/utils/constants.dart';
+
 class ProfileService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api'; // Ganti sesuai ENV saat deploy
+  static String baseUrl = AppConstants.apiUrl; // Ganti sesuai ENV saat deploy
   final _supabase = Supabase.instance.client;
   final _secureStorage = const FlutterSecureStorage();
 

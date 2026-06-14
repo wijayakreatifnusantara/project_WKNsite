@@ -121,7 +121,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
       formData.append('file', file);
       formData.append('bucket', 'employees');
       
-      const response = await apiClient.post('/api/employees/upload', formData, {
+      const response = await apiClient.post('/employees/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
@@ -151,13 +151,13 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div 
-        className="w-full max-w-5xl h-[85vh] bg-[#f0f2f5] shadow-[20px_20px_60px_#1e293b,-20px_-20px_60px_#ffffff] rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-5xl h-[85vh] bg-[#f0f2f5] shadow-neu rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <header className="h-20 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
               <IconSignature size={24} />
             </div>
             <div>
@@ -167,7 +167,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
           </div>
           <button 
             onClick={onClose}
-            className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl text-slate-400 hover:text-red-500 transition-all"
+            className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-neu rounded-xl text-slate-400 hover:text-red-500 transition-all"
           >
             <IconX size={20} />
           </button>
@@ -177,7 +177,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
         <div className="flex-1 overflow-hidden flex">
           {/* Left: Document Preview */}
           <div className="flex-1 bg-slate-200/30 p-12 overflow-y-auto custom-scrollbar flex flex-col items-center">
-            <div className="w-full max-w-2xl bg-white shadow-2xl rounded-sm p-16 min-h-[1000px] relative">
+            <div className="w-full max-w-2xl bg-transparent shadow-neu rounded-sm p-16 min-h-[1000px] relative">
               <div className="flex justify-between items-center mb-10 pb-6 border-b">
                 <img src="/assets/wkn_logo.png" alt="WKN" className="h-8 w-auto opacity-50" />
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Confidential</span>
@@ -190,7 +190,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
                 <p>The employee agrees to comply with all corporate policies, including but not limited to confidentiality, intellectual property rights, and code of conduct.</p>
                 <p>The position of <strong>{employee["Job Position *"]}</strong> carries responsibilities as detailed in the attached job description. Salary and benefits are subject to the terms discussed during the recruitment process.</p>
                 <div className="py-10">
-                  <div className="h-40 w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center">
+                  <div className="h-40 w-full bg-slate-50 border-2 border-dashed border-white/50 rounded-xl flex items-center justify-center">
                     <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Document Body Content Placeholder</p>
                   </div>
                 </div>
@@ -234,7 +234,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
 
             {/* Canvas Container */}
             <div className="flex flex-col gap-4">
-              <div className="bg-[#f0f2f5] shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] rounded-[2rem] border-4 border-white overflow-hidden relative">
+              <div className="bg-[#f0f2f5] shadow-neu rounded-[2rem] border-4 border-white overflow-hidden relative">
                 <canvas 
                   ref={canvasRef}
                   width={300}
@@ -282,7 +282,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
 
               <Button 
                 onClick={handleFinalize}
-                className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex gap-3 ${isSigned && !loading ? 'bg-[#E31E24] text-white shadow-[8px_8px_20px_rgba(227,30,36,0.3)] hover:bg-[#C1181E]' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
+                className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex gap-3 ${isSigned && !loading ? 'bg-[#E31E24] text-white shadow-neu hover:bg-[#C1181E]' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
                 disabled={!isSigned || loading}
               >
                 {loading ? <IconLoader2 size={20} className="animate-spin" /> : <IconCircleCheck size={20} />}

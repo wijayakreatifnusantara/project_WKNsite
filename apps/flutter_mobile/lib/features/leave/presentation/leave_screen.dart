@@ -24,6 +24,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
   bool _isLoading = false;
   bool _isSubmitLoading = false;
   bool _showForm = false;
+  final _formKey = GlobalKey<FormState>();
   List<LeaveRequest> _requests = [];
 
   // Form Fields
@@ -260,16 +261,9 @@ class _LeaveScreenState extends State<LeaveScreen> {
       return;
     }
 
-    if (_startDateCtrl.text.isEmpty || _endDateCtrl.text.isEmpty || _reasonCtrl.text.isEmpty) {
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Form Belum Lengkap')),
-      );
-      return;
-    }
-
-    if (_leaveType == 'Emergency' && (_startTimeCtrl.text.isEmpty || _endTimeCtrl.text.isEmpty)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Silakan isi jam mulai dan selesai izin.')),
+        const SnackBar(content: Text('Form Belum Lengkap. Harap perbaiki isian yang berwarna merah.'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -400,9 +394,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
             BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Text('Formulir Izin & Cuti Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
             Text('JENIS ABSEN / CUTI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
@@ -465,9 +461,9 @@ class _LeaveScreenState extends State<LeaveScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _proofPhotoPath != null ? Colors.green.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: _proofPhotoPath != null ? Colors.green.withValues(alpha: 0.1) : (context.isDarkMode ? context.backgroundColor : Theme.of(context).colorScheme.surfaceContainerHighest),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _proofPhotoPath != null ? Colors.green.shade300 : Colors.grey.shade300),
+                  border: Border.all(color: _proofPhotoPath != null ? Colors.green.shade300 : context.borderColor),
                 ),
                 child: Row(
                   children: [
@@ -509,6 +505,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -518,7 +515,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
       label: Text(label, style: TextStyle(color: isSelected ? context.surfaceColor : context.textPrimary, fontSize: 12)),
       selected: isSelected,
       selectedColor: AppConstants.primaryColor,
-      backgroundColor: Colors.grey[100],
+      backgroundColor: context.isDarkMode ? context.surfaceColor : Colors.grey[100],
       onSelected: (selected) {
         if (selected) setState(() => _leaveType = key);
       },
@@ -531,19 +528,27 @@ class _LeaveScreenState extends State<LeaveScreen> {
       children: [
         Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
           controller: controller,
           maxLines: maxLines,
           readOnly: readOnly,
           onTap: onTap,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) return 'Wajib diisi';
+            if (label == 'ALASAN / DETAIL PENGAJUAN' && value.trim().length < 5) return 'Terlalu singkat';
+            return null;
+          },
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
+            focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 2)),
           ),
         ),
       ],

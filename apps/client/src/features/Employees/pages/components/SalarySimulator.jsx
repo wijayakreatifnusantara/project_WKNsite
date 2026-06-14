@@ -48,13 +48,13 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
   return (
     <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div 
-        className="w-full max-w-5xl h-[85vh] bg-[#f0f2f5] shadow-[20px_20px_60px_#1e293b,-20px_-20px_60px_#ffffff] rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-5xl h-[85vh] bg-[#f0f2f5] shadow-neu rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <header className="h-20 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
               <IconCalculator size={24} />
             </div>
             <div>
@@ -64,7 +64,7 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
           </div>
           <button 
             onClick={onClose}
-            className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8_#ffffff] rounded-xl text-slate-400 hover:text-red-500 transition-all"
+            className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-neu rounded-xl text-slate-400 hover:text-red-500 transition-all"
           >
             <IconX size={20} />
           </button>
@@ -78,7 +78,7 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
               <select 
                 value={selectedEmpId}
                 onChange={(e) => setSelectedEmpId(e.target.value)}
-                className="w-full h-12 px-5 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-2xl text-xs font-black text-slate-700 focus:outline-none cursor-pointer"
+                className="w-full h-12 px-5 bg-[#f0f2f5] shadow-neu border-none rounded-2xl text-xs font-black text-slate-700 focus:outline-none cursor-pointer"
               >
                 {employees.map(emp => (
                   <option key={emp["EMPLOYEE ID"]} value={emp["EMPLOYEE ID"]}>{emp["EMPLOYEE NAME"]}</option>
@@ -116,7 +116,7 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
               </p>
             </div>
 
-            <Button className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.2em] shadow-[8px_8px_20px_rgba(227,30,36,0.2)] hover:bg-[#C1181E] transition-all flex gap-3">
+            <Button className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.2em] shadow-neu hover:bg-[#C1181E] transition-all flex gap-3">
               <IconChartBar size={18} />
               Commit to Forecast
             </Button>
@@ -126,17 +126,17 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
           <div className="flex-1 p-12 overflow-y-auto custom-scrollbar space-y-10">
             {/* Stats Overview */}
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-[#f0f2f5] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] rounded-[2.5rem] p-8 border-4 border-white text-center">
+              <div className="bg-[#f0f2f5] shadow-neu rounded-[2.5rem] p-8 border-4 border-white text-center">
                 <IconWallet size={20} className="text-slate-300 mx-auto mb-4" />
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Current Base</p>
                 <h3 className="text-xl font-black text-slate-700">Rp {calculations.current.toLocaleString()}</h3>
               </div>
-              <div className="bg-[#f0f2f5] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] rounded-[2.5rem] p-8 border-4 border-white text-center">
+              <div className="bg-[#f0f2f5] shadow-neu rounded-[2.5rem] p-8 border-4 border-white text-center">
                 <IconTrendingUp size={20} className="text-green-500 mx-auto mb-4" />
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Proposed Base</p>
                 <h3 className="text-xl font-black text-green-600">Rp {calculations.proposed.toLocaleString()}</h3>
               </div>
-              <div className="bg-[#f0f2f5] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] rounded-[2.5rem] p-8 border-4 border-white text-center">
+              <div className="bg-[#f0f2f5] shadow-neu rounded-[2.5rem] p-8 border-4 border-white text-center">
                 <IconCoins size={20} className="text-blue-500 mx-auto mb-4" />
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Take Home Pay</p>
                 <h3 className="text-xl font-black text-blue-600">Rp {Math.round(calculations.takeHome).toLocaleString()}</h3>
@@ -144,7 +144,7 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
             </div>
 
             {/* Projection Chart Mockup */}
-            <div className="bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-[3rem] p-10 border-2 border-white relative overflow-hidden">
+            <div className="bg-[#f0f2f5] shadow-neu rounded-[3rem] p-10 border-2 border-white relative overflow-hidden">
               <div className="flex justify-between items-center mb-10">
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3">
                   <IconTrendingUp size={20} className="text-[#E31E24]" />

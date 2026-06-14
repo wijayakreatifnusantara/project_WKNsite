@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 
 const Grievance = () => {
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="text-center space-y-4">
-          <div className="inline-flex h-16 w-16 bg-[#f0f2f5] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] rounded-[1.5rem] border-4 border-white items-center justify-center text-[#E31E24] mb-4">
+          <div className="inline-flex h-16 w-16 bg-[#f0f2f5] shadow-neu rounded-[1.5rem] border-4 border-white items-center justify-center text-[#E31E24] mb-4">
             <IconShieldLock size={32} />
           </div>
           <h2 className="text-3xl font-black text-slate-800 font-outfit tracking-tight uppercase">
@@ -24,11 +24,11 @@ const Grievance = () => {
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">Your safety and comfort are our priority. All reports are encrypted and handled with strict confidentiality by the Internal Audit Team.</p>
         </header>
 
-        <Card className="border-white border-[4px] shadow-[15px_15px_30px_#d1d9e6,-15px_-15px_30px_#ffffff] bg-[#f0f2f5] rounded-[3rem] p-10 space-y-8">
+        <Card className="border-white border-[4px] shadow-neu bg-[#f0f2f5] rounded-[3rem] p-10 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Type of Report</label>
-              <select className="w-full h-14 px-6 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-none rounded-2xl text-xs font-black text-slate-700 focus:outline-none uppercase tracking-widest">
+              <select className="w-full h-14 px-6 bg-[#f0f2f5] shadow-neu border-none rounded-2xl text-xs font-black text-slate-700 focus:outline-none uppercase tracking-widest">
                 <option>Harassment / Bullying</option>
                 <option>Integrity / Fraud</option>
                 <option>Operational Grievance</option>
@@ -38,11 +38,11 @@ const Grievance = () => {
             <div className="space-y-2">
                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Method</label>
                <div className="flex gap-4">
-                  <button className="flex-1 h-14 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-2xl flex items-center justify-center gap-3 text-[#E31E24] border-2 border-transparent hover:border-red-100 transition-all">
+                  <button className="flex-1 h-14 bg-[#f0f2f5] shadow-neu rounded-2xl flex items-center justify-center gap-3 text-[#E31E24] border-2 border-transparent hover:border-red-100 transition-all">
                      <IconLock size={18} />
                      <span className="text-[9px] font-black uppercase tracking-widest">Anonymous</span>
                   </button>
-                  <button className="flex-1 h-14 bg-white/50 rounded-2xl flex items-center justify-center gap-3 text-slate-400 hover:bg-white transition-all">
+                  <button className="flex-1 h-14 bg-white/50 rounded-2xl flex items-center justify-center gap-3 text-slate-400 hover:bg-transparent transition-all">
                      <IconCircleCheck size={18} />
                      <span className="text-[9px] font-black uppercase tracking-widest">Identify Me</span>
                   </button>
@@ -55,7 +55,7 @@ const Grievance = () => {
              <textarea 
                rows={6}
                placeholder="PROVIDE CLEAR DETAILS, DATES, AND LOCATIONS..."
-               className="w-full p-6 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-none rounded-[2rem] text-xs font-bold text-slate-700 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest resize-none"
+               className="w-full p-6 bg-[#f0f2f5] shadow-neu border-none rounded-[2rem] text-xs font-bold text-slate-700 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest resize-none"
              />
           </div>
 
@@ -64,7 +64,7 @@ const Grievance = () => {
              <p className="text-[9px] font-bold text-rose-600 leading-relaxed uppercase">False reporting or defamation may lead to disciplinary action. Please ensure all information provided is accurate and made in good faith.</p>
           </div>
 
-          <Button className="w-full h-16 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.3em] shadow-[10px_10px_20px_rgba(227,30,36,0.2)] hover:bg-[#C1181E] transition-all flex items-center justify-center gap-4 active:scale-95">
+          <Button className="w-full h-16 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.3em] shadow-neu hover:bg-[#C1181E] transition-all flex items-center justify-center gap-4 active:scale-95">
              Submit Encrypted Report
              <IconArrowRight size={20} />
           </Button>

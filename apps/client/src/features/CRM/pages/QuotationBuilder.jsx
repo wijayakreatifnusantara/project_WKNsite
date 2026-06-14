@@ -19,9 +19,7 @@ import { useQuotations } from './hooks/useQuotations';
 const QuotationBuilder = () => {
   const { clients, loading, fetchClients, saveQuotation } = useQuotations();
   
-  const [items, setItems] = useState([
-    { id: 1, description: 'Creative Design Service', qty: 1, rate: 5000000 },
-  ]);
+  const [items, setItems] = useState([]);
   
   const [selectedClient, setSelectedClient] = useState('');
   const [taxRate, setTaxRate] = useState(0); // Default 0% (Non-PKP)
@@ -82,14 +80,14 @@ const QuotationBuilder = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-[#f0f2f5] custom-scrollbar animate-fade-in print:bg-white print:p-0">
+    <div className="flex-1 overflow-y-auto p-4 bg-transparent custom-scrollbar animate-fade-in print:bg-transparent print:p-0">
       <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-4 print:block print:max-w-none">
         
         {/* Editor Side (Hidden during print) */}
         <div className="flex-1 space-y-4 print:hidden">
           <header className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-white shadow-md rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
+              <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
                 <IconSignature size={20} />
               </div>
               <div>
@@ -100,7 +98,7 @@ const QuotationBuilder = () => {
             <Button 
               onClick={() => setShowSettings(!showSettings)}
               variant="outline" 
-              className="h-8 rounded-lg bg-white shadow-sm border-slate-200 text-slate-500 font-black text-[9px] uppercase tracking-widest flex gap-2"
+              className="h-8 rounded-lg bg-transparent shadow-neu border-white/50 text-slate-500 font-black text-[9px] uppercase tracking-widest flex gap-2"
             >
               <IconSettings size={14} /> Letterhead
             </Button>
@@ -108,29 +106,29 @@ const QuotationBuilder = () => {
 
           {/* Settings Panel */}
           {showSettings && (
-            <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-5 animate-in slide-in-from-top-4 duration-300">
+            <Card className="border-white border-2 shadow-neu bg-transparent rounded-xl p-5 animate-in slide-in-from-top-4 duration-300">
               <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <IconPhoto size={14} className="text-[#E31E24]"/> Edit Letterhead
               </h3>
               <div className="space-y-3">
                 <div>
                   <label className="text-[9px] font-bold text-slate-400 uppercase">Logo URL (Kosongkan untuk pakai teks)</label>
-                  <input type="text" value={letterhead.logoUrl} onChange={e => setLetterhead({...letterhead, logoUrl: e.target.value})} className="w-full h-8 bg-slate-50 border border-slate-200 rounded-md px-2 text-xs" />
+                  <input type="text" value={letterhead.logoUrl} onChange={e => setLetterhead({...letterhead, logoUrl: e.target.value})} className="w-full h-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md px-2 text-xs" />
                 </div>
                 <div>
                   <label className="text-[9px] font-bold text-slate-400 uppercase">Company Name</label>
-                  <input type="text" value={letterhead.companyName} onChange={e => setLetterhead({...letterhead, companyName: e.target.value})} className="w-full h-8 bg-slate-50 border border-slate-200 rounded-md px-2 text-xs" />
+                  <input type="text" value={letterhead.companyName} onChange={e => setLetterhead({...letterhead, companyName: e.target.value})} className="w-full h-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md px-2 text-xs" />
                 </div>
                 <div>
                   <label className="text-[9px] font-bold text-slate-400 uppercase">Address / Contact Info</label>
-                  <textarea value={letterhead.address} onChange={e => setLetterhead({...letterhead, address: e.target.value})} className="w-full h-16 bg-slate-50 border border-slate-200 rounded-md p-2 text-xs" />
+                  <textarea value={letterhead.address} onChange={e => setLetterhead({...letterhead, address: e.target.value})} className="w-full h-16 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md p-2 text-xs" />
                 </div>
               </div>
             </Card>
           )}
 
           {/* Client Selection Card */}
-          <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl p-5">
+          <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-xl p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1">Select Client</label>
@@ -138,7 +136,7 @@ const QuotationBuilder = () => {
                   <select 
                     value={selectedClient} 
                     onChange={e => setSelectedClient(e.target.value)}
-                    className="w-full h-10 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-slate-700 font-bold cursor-pointer transition-all text-[11px] appearance-none focus:outline-none"
+                    className="w-full h-10 bg-[#f0f2f5] shadow-neu rounded-xl px-4 text-slate-700 font-bold cursor-pointer transition-all text-[11px] appearance-none focus:outline-none"
                   >
                     <option value="">-- Choose Client --</option>
                     {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -153,7 +151,7 @@ const QuotationBuilder = () => {
                   <select 
                     value={taxRate} 
                     onChange={e => setTaxRate(Number(e.target.value))}
-                    className="w-full h-10 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-[#E31E24] font-black cursor-pointer transition-all text-[11px] appearance-none focus:outline-none"
+                    className="w-full h-10 bg-[#f0f2f5] shadow-neu rounded-xl px-4 text-[#E31E24] font-black cursor-pointer transition-all text-[11px] appearance-none focus:outline-none"
                   >
                     <option value={0}>0% (Non-PKP Default)</option>
                     <option value={11}>11% (Standar Lama)</option>
@@ -166,11 +164,11 @@ const QuotationBuilder = () => {
           </Card>
 
           {/* Line Items Card */}
-          <Card className="border-white border-2 shadow-sm bg-[#f0f2f5] rounded-xl p-5 flex flex-col max-h-[400px]">
+          <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-xl p-5 flex flex-col max-h-[400px]">
             <div className="space-y-4 flex flex-col h-full">
               <div className="flex justify-between items-center px-1 shrink-0">
                 <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Service Line Items</h3>
-                <Button onClick={addItem} className="h-8 px-4 rounded-lg bg-green-500 text-white font-black text-[8px] uppercase tracking-widest shadow-md hover:bg-green-600 transition-all flex gap-1.5">
+                <Button onClick={addItem} className="h-8 px-4 rounded-lg bg-green-500 text-white font-black text-[8px] uppercase tracking-widest shadow-neu hover:bg-green-600 transition-all flex gap-1.5">
                   <IconPlus size={12} /> Add Item
                 </Button>
               </div>
@@ -183,7 +181,7 @@ const QuotationBuilder = () => {
                       <input 
                         value={item.description}
                         onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                        className="w-full h-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
+                        className="w-full h-10 bg-[#f0f2f5] shadow-neu border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
                       />
                     </div>
                     <div className="w-16 space-y-1">
@@ -191,7 +189,7 @@ const QuotationBuilder = () => {
                       <input 
                         type="number" value={item.qty}
                         onChange={(e) => updateItem(item.id, 'qty', parseFloat(e.target.value) || 0)}
-                        className="w-full h-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg px-2 text-[11px] font-bold text-slate-700 text-center focus:outline-none"
+                        className="w-full h-10 bg-[#f0f2f5] shadow-neu border-none rounded-lg px-2 text-[11px] font-bold text-slate-700 text-center focus:outline-none"
                       />
                     </div>
                     <div className="w-32 space-y-1">
@@ -199,7 +197,7 @@ const QuotationBuilder = () => {
                       <input 
                         type="number" value={item.rate}
                         onChange={(e) => updateItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
-                        className="w-full h-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
+                        className="w-full h-10 bg-[#f0f2f5] shadow-neu border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
                       />
                     </div>
                     <button onClick={() => removeItem(item.id)} className="h-10 w-10 flex items-center justify-center text-red-300 hover:text-red-500 transition-colors">
@@ -217,11 +215,11 @@ const QuotationBuilder = () => {
           <header className="flex justify-between items-center h-10 px-1 print:hidden">
             <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Document Preview</h3>
             <div className="flex gap-2">
-              <button onClick={handlePrint} className="h-8 w-8 flex items-center justify-center bg-white shadow-sm rounded-lg text-slate-400 hover:text-slate-800 transition-all"><IconPrinter size={14} /></button>
+              <button onClick={handlePrint} className="h-8 w-8 flex items-center justify-center bg-transparent shadow-neu rounded-lg text-slate-400 hover:text-slate-800 transition-all"><IconPrinter size={14} /></button>
             </div>
           </header>
 
-          <div className="bg-white shadow-xl rounded-xl p-8 min-h-[600px] flex flex-col border-[4px] border-[#f8f9fa] relative overflow-hidden ring-1 ring-slate-200 print:shadow-none print:border-none print:ring-0 print:p-0 print:min-h-0">
+          <div className="bg-transparent shadow-neu rounded-xl p-8 min-h-[600px] flex flex-col border-[4px] border-[#f8f9fa] relative overflow-hidden ring-1 ring-slate-200 print:shadow-none print:border-none print:ring-0 print:p-0 print:min-h-0">
             {/* Watermark Decoration - Hidden in print usually, but kept for style */}
             <div className="absolute -right-20 -top-20 h-40 w-40 bg-red-50 rounded-full blur-3xl opacity-50 print:hidden"></div>
             
@@ -243,7 +241,7 @@ const QuotationBuilder = () => {
               </div>
 
               {/* Addresses */}
-              <div className="mb-8 border-t border-slate-100 pt-6">
+              <div className="mb-8 border-t border-white/50 pt-6">
                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Prepared For</p>
                 <p className="text-sm font-black text-slate-800">{activeClient.name}</p>
                 {activeClient.address && <p className="text-[10px] text-slate-500 mt-1">{activeClient.address}</p>}
@@ -254,14 +252,14 @@ const QuotationBuilder = () => {
               <div className="flex-1 mb-8">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b-2 border-slate-200">
+                    <tr className="border-b-2 border-white/50">
                       <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">Description</th>
                       <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center w-16">Qty</th>
                       <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Price</th>
                       <th className="py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-white/50">
                     {items.map(item => (
                       <tr key={item.id}>
                         <td className="py-3 pr-2">
@@ -279,7 +277,7 @@ const QuotationBuilder = () => {
               </div>
 
               {/* Totals */}
-              <div className="w-2/3 ml-auto space-y-2 border-t-2 border-slate-200 pt-4">
+              <div className="w-2/3 ml-auto space-y-2 border-t-2 border-white/50 pt-4">
                 <div className="flex justify-between items-center px-2">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subtotal</span>
                   <span className="text-xs font-bold text-slate-700">{formatCurrency(totals.subtotal)}</span>
@@ -301,7 +299,7 @@ const QuotationBuilder = () => {
                 <Button 
                   onClick={handleSave} 
                   disabled={isSaving}
-                  className="w-full h-12 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex gap-2 shadow-lg"
+                  className="w-full h-12 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex gap-2 shadow-neu"
                 >
                   {isSaving ? <IconLoader2 className="animate-spin" size={16} /> : <><IconSend size={16} /> Save to Database</>}
                 </Button>

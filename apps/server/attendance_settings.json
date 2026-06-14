@@ -1,0 +1,4 @@
+{
+  "geofence_radius_meters": 30,
+  "liveness_strictness": "high"
+}

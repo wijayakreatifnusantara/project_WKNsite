@@ -12,6 +12,7 @@ import {
   IconFileText
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { apiClient } from '@/lib/apiClient';
 import { useAuth } from '@/context/AuthContext';
@@ -28,7 +29,7 @@ const OvertimeManagementPage = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/api/attendance/overtime');
+      const response = await apiClient.get('/attendance/overtime');
       if (response.status !== 'success') throw new Error('Failed to fetch');
       setRequests(response.data || []);
     } catch (err) {
@@ -81,15 +82,15 @@ const OvertimeManagementPage = () => {
     .reduce((sum, r) => sum + parseFloat(r.duration_hours || 0), 0);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-[#f8fafc] custom-scrollbar animate-fade-in text-[10px]">
+    <div className="flex-1 overflow-y-auto p-4 bg-transparent custom-scrollbar animate-fade-in text-[10px]">
       <div className="w-full mx-auto space-y-4">
         
         {/* 🚀 HEADER & FILTER BAR */}
-        <div className="flex items-center justify-between bg-white p-2 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between bg-transparent p-2 px-5 rounded-2xl border border-white/50 shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-4">
              <button 
                onClick={() => navigate('/attendance')}
-               className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95"
+               className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95"
              >
                <IconArrowLeft size={16} />
              </button>
@@ -108,12 +109,12 @@ const OvertimeManagementPage = () => {
           </div>
 
           <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-white/50">
                   {['Pending', 'Approved', 'Rejected', 'All'].map((s) => (
                     <button 
                       key={s}
                       onClick={() => setFilterStatus(s)}
-                      className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-400 hover:text-slate-600'}`}
+                      className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                       {s}
                     </button>
@@ -123,17 +124,17 @@ const OvertimeManagementPage = () => {
         </div>
 
         {/* 📊 KPI SUMMARY STRIP */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-           <StatCard 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatCard 
              title="Pending Reviews" 
-             value={requests.filter(r => r.status === 'Pending').length} 
-             icon={<IconClock size={16} />} 
+             value={requests.filter(r => r.status?.startsWith('Pending')).length} 
+             icon={<IconClock className="text-amber-500" size={16} />} 
              color="amber"
-           />
-           <StatCard 
-             title="Approved Requests" 
+          />
+          <StatCard 
+             title="Approved (This Month)" 
              value={requests.filter(r => r.status === 'Approved').length} 
-             icon={<IconUserCheck size={16} />} 
+             icon={<IconCheck className="text-emerald-500" size={16} />} 
              color="emerald"
            />
            <StatCard 
@@ -152,11 +153,11 @@ const OvertimeManagementPage = () => {
         </div>
 
         {/* 📜 TABLE VIEW OF OVERTIME REQUESTS */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-[#f0f2f5] rounded-3xl border-none shadow-neu overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
+                <tr className="bg-slate-50/50 border-b border-white/50">
                   <th className="px-5 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Karyawan</th>
                   <th className="px-5 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Tanggal Lembur</th>
                   <th className="px-5 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Jam & Durasi</th>
@@ -173,16 +174,16 @@ const OvertimeManagementPage = () => {
                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Syncing overtime requests...</p>
                     </td>
                   </tr>
-                ) : requests.filter(r => filterStatus === 'All' || r.status === filterStatus).length === 0 ? (
+                ) : requests.filter(r => filterStatus === 'All' || (filterStatus === 'Pending' ? r.status?.startsWith('Pending') : r.status === filterStatus)).length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-12 text-center text-slate-300 uppercase font-black text-[9px] tracking-widest">Tidak ada pengajuan lembur di kategori ini</td>
+                    <td colSpan="6" className="py-12 text-center text-slate-300 uppercase font-black text-[9px] tracking-widest">Tidak ada data lembur di kategori ini</td>
                   </tr>
                 ) : (
-                  requests.filter(r => filterStatus === 'All' || r.status === filterStatus).map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50 transition-all group">
-                      <td className="px-5 py-2">
+                  requests.filter(r => filterStatus === 'All' || (filterStatus === 'Pending' ? r.status?.startsWith('Pending') : r.status === filterStatus)).map((row) => (
+                    <tr key={row.id} className="hover:shadow-neu-inset/50 transition-all group">
+                      <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
+                          <div className="h-8 w-8 rounded-lg bg-slate-100 border border-white/50 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
                             {row.employees?.name?.charAt(0) || 'E'}
                           </div>
                           <div>
@@ -204,7 +205,7 @@ const OvertimeManagementPage = () => {
                            <span className="text-[8px] font-bold text-[#E31E24] uppercase mt-0.5">{row.duration_hours} Jam Kerja</span>
                            
                            {row.attendance && row.attendance.clock_out ? (
-                              <div className="flex items-center gap-1 mt-1.5 bg-slate-50 border border-slate-100 rounded-md px-1.5 py-0.5 w-fit" title={`Clock In: ${formatTime(row.attendance.clock_in)} | Clock Out: ${formatTime(row.attendance.clock_out)}`}>
+                              <div className="flex items-center gap-1 mt-1.5 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md px-1.5 py-0.5 w-fit" title={`Clock In: ${formatTime(row.attendance.clock_in)} | Clock Out: ${formatTime(row.attendance.clock_out)}`}>
                                 <IconClock size={10} className="text-slate-400" />
                                 <span className="text-[7px] font-bold text-slate-500 uppercase">
                                   Absen: {formatTime(row.attendance.clock_in)} - {formatTime(row.attendance.clock_out)}
@@ -228,7 +229,7 @@ const OvertimeManagementPage = () => {
                            {row.reason}
                          </p>
                          {row.compensation_type && (
-                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[7px] font-black uppercase tracking-widest bg-slate-50 border-slate-200 text-slate-500">
+                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[7px] font-black uppercase tracking-widest bg-slate-50 border-white/50 text-slate-500">
                                {row.compensation_type == 'Paid' ? '💰 Dibayar (Uang)' : '🏝️ Ditukar Cuti (Time-off)'}
                                {row.multiplier && row.multiplier > 1.5 && (
                                  <span className="text-rose-500 ml-1">• {row.multiplier}x (Libur)</span>
@@ -237,50 +238,54 @@ const OvertimeManagementPage = () => {
                          )}
                       </td>
                       <td className="px-5 py-2 text-center">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest border shadow-sm ${getStatusStyle(row.status)}`}>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest border shadow-neu ${getStatusStyle(row.status)}`}>
                           {row.status}
                         </span>
                       </td>
-                      <td className="px-5 py-2 text-right">
+                      <td className="px-5 py-3 text-right">
                         <div className="flex justify-end items-center gap-3">
                           {row.pdf_url && (
                             <a 
                               href={row.pdf_url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-white transition-all active:scale-95 shrink-0"
+                              className="h-7 w-7 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-transparent transition-all active:scale-95 shrink-0"
                               title="Unduh PDF TTD Resmi"
                             >
                               <IconFileText size={14} className="text-[#E31E24]" />
                             </a>
                           )}
-                          {row.status === 'Pending' ? (
-                            isAdmin ? (
-                              <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
-                                <button 
-                                  onClick={() => handleApprove(row, 'Approved')}
-                                  className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
-                                >
-                                  <IconCheck size={12} />
-                                  Setujui
-                                </button>
-                                <button 
-                                  onClick={() => handleApprove(row, 'Rejected')}
-                                  className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
-                                >
-                                  <IconX size={12} />
-                                  Tolak
-                                </button>
-                              </div>
-                            ) : (
-                              <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest">
-                                Menunggu Review
-                              </span>
-                            )
+                          {row.status?.startsWith('Pending') ? (
+                            <div className="flex gap-2 justify-end">
+                              <Button 
+                                size="sm" 
+                                onClick={() => handleAction(row.id, 'Approved')}
+                                className="h-8 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 shadow-none px-3 border border-green-200"
+                              >
+                                <IconCheck size={14} className="mr-1" /> Approve
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                onClick={() => handleAction(row.id, 'Rejected')}
+                                className="h-8 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 px-3"
+                              >
+                                <IconX size={14} className="mr-1" /> Reject
+                              </Button>
+                            </div>
                           ) : (
-                            <span className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">
-                              {row.status !== 'Pending' ? `Diproses oleh ${row.approved_by || 'HR Admin'}` : 'Menunggu Persetujuan'}
-                            </span>
+                            <div className="flex justify-end gap-2 items-center">
+                              <Badge variant="outline" className={
+                                row.status === 'Approved' ? 'bg-green-50 text-green-600 border-green-200' :
+                                row.status === 'Rejected' ? 'bg-red-50 text-red-600 border-red-200' :
+                                'bg-amber-50 text-amber-600 border-amber-200'
+                              }>
+                                {row.status}
+                              </Badge>
+                              <span className="text-[9px] text-slate-400 max-w-[120px] truncate">
+                              {!row.status?.startsWith('Pending') ? `Diproses oleh ${row.approved_by || 'HR Admin'}` : 'Menunggu Persetujuan'}
+                              </span>
+                            </div>
                           )}
                         </div>
                       </td>
@@ -305,7 +310,7 @@ const StatCard = ({ title, value, unit = "", icon, color }) => {
   };
 
   return (
-    <Card className="bg-white border border-slate-200 shadow-sm p-3 flex items-center gap-3 transition-all hover:translate-y-[-2px] cursor-pointer">
+    <Card className="bg-transparent border border-white/50 shadow-neu p-3 flex items-center gap-3 transition-all hover:translate-y-[-2px] cursor-pointer">
       <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center border ${colorMap[color]}`}>
         {icon}
       </div>

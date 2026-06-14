@@ -82,7 +82,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 animate-fade-in relative">
       {/* Chart Header */}
-      <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-10 relative">
+      <header className="h-16 bg-transparent border-b border-white/50 flex items-center justify-between px-8 shrink-0 z-10 relative">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
             <IconHierarchy2 size={18} />
@@ -105,20 +105,20 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
               placeholder="Cari Karyawan..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-44 h-9 pl-9 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase tracking-wider"
+              className="w-44 h-9 pl-9 pr-3 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-[10px] font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:bg-transparent focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase tracking-wider"
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-lg shadow-sm">
-            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:bg-slate-50 transition-all text-slate-400 hover:text-[#E31E24]">
+          <div className="flex items-center gap-1 bg-transparent border border-white/50 p-1 rounded-lg shadow-neu">
+            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-neu-inset transition-all text-slate-400 hover:text-[#E31E24]">
               <IconZoomOut size={14} />
             </button>
             <span className="text-[9px] font-bold text-slate-500 min-w-[36px] text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:bg-slate-50 transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-neu-inset transition-all text-slate-400 hover:text-[#E31E24]">
               <IconZoomIn size={14} />
             </button>
             <div className="w-[1px] h-3 bg-slate-200 mx-1"></div>
-            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded hover:bg-slate-50 transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-neu-inset transition-all text-slate-400 hover:text-[#E31E24]">
               <IconMaximize size={14} />
             </button>
           </div>
@@ -139,7 +139,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
           style={{ transform: `scale(${zoom})` }}
         >
           {/* Root Node: Company */}
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-5 w-[260px] text-center mb-16 relative">
+          <div className="bg-transparent border border-white/50 shadow-neu rounded-xl p-5 w-[260px] text-center mb-16 relative">
             <div className="h-10 w-10 bg-[#E31E24]/10 rounded-lg flex items-center justify-center mx-auto mb-3 text-[#E31E24]">
               <IconBuildingSkyscraper size={22} />
             </div>
@@ -154,7 +154,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
             {Object.entries(deptTree).map(([dept, staff]) => (
               <div key={dept} className="flex flex-col items-center">
                 {/* Dept Node */}
-                <div className="bg-white border border-slate-200/80 shadow-sm rounded-xl p-4 w-[210px] relative">
+                <div className="bg-transparent border border-white/50/80 shadow-neu rounded-xl p-4 w-[210px] relative">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 bg-blue-50/50 border border-blue-100/50 rounded-lg flex items-center justify-center text-blue-600">
                       <IconUsers size={16} />
@@ -172,9 +172,9 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
                   {staff.filter(e => !searchTerm || e["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 15).map((emp) => (
                     <div 
                       key={emp["EMPLOYEE ID"]} 
-                      className={`group bg-white border border-slate-200/60 shadow-sm rounded-lg p-2.5 w-[190px] flex items-center gap-2.5 hover:border-[#E31E24]/20 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-1 ring-[#E31E24] bg-red-50/10' : ''}`}
+                      className={`group bg-transparent border border-white/50/60 shadow-neu rounded-lg p-2.5 w-[190px] flex items-center gap-2.5 hover:border-[#E31E24]/20 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-1 ring-[#E31E24] bg-red-50/10' : ''}`}
                     >
-                      <div className="h-7 w-7 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center text-[9px] font-bold text-slate-600 shrink-0">
+                      <div className="h-7 w-7 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md flex items-center justify-center text-[9px] font-bold text-slate-600 shrink-0">
                         {emp["EMPLOYEE NAME"].split(' ').map(n => n[0]).join('')}
                       </div>
                       <div className="flex-1 overflow-hidden text-left leading-none">
@@ -197,7 +197,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
 
       {/* Floating Legend */}
       <div className="absolute bottom-6 left-6 z-15">
-        <div className="bg-white/90 backdrop-blur border border-slate-200/80 shadow-md rounded-xl p-3 flex flex-col gap-1.5">
+        <div className="bg-white/90 backdrop-blur border border-white/50/80 shadow-neu rounded-xl p-3 flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
             <span className="text-[8px] font-bold text-slate-550 uppercase tracking-wider">Kluster Divisi / Unit</span>

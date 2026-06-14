@@ -25,7 +25,7 @@ const AttendanceCorrection = () => {
   const fetchCorrections = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get('/api/attendance/corrections');
+      const res = await apiClient.get('/attendance/corrections');
       setCorrections(res.data?.data || []);
     } catch (err) {
       console.error('Error fetching corrections:', err);
@@ -59,15 +59,15 @@ const AttendanceCorrection = () => {
   );
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-6 bg-transparent custom-scrollbar animate-fade-in">
       <div className="w-full mx-auto space-y-4">
         
         {/* HEADER */}
-        <div className="flex items-center justify-between bg-white p-3 px-6 rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] backdrop-blur-md">
+        <div className="flex items-center justify-between bg-[#f0f2f5] p-3 px-6 rounded-3xl border-none shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-5">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
+              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>
@@ -83,9 +83,9 @@ const AttendanceCorrection = () => {
         </div>
 
         {/* CONTROL CENTER */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white/60 p-2.5 rounded-2xl border border-white shadow-sm backdrop-blur-sm">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white/60 p-2.5 rounded-2xl border border-white shadow-neu backdrop-blur-sm">
             {/* Search Input */}
-            <div className="md:col-span-8 flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm transition-all focus-within:border-amber-500/30 focus-within:shadow-md group">
+            <div className="md:col-span-8 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-white/50 shadow-neu transition-all focus-within:border-amber-500/30 focus-within:shadow-neu group">
                 <IconSearch size={14} className="text-slate-300 group-focus-within:text-amber-500 transition-colors" />
                 <div className="flex flex-col flex-1">
                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Cari Pengajuan</span>
@@ -100,7 +100,7 @@ const AttendanceCorrection = () => {
             </div>
 
             {/* Legend / Information */}
-            <div className="md:col-span-4 flex items-center justify-between px-5 py-2 rounded-xl bg-slate-50 border border-slate-100 shadow-inner">
+            <div className="md:col-span-4 flex items-center justify-between px-5 py-2 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none shadow-inner">
                 <div className="flex flex-col">
                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Total Menunggu</span>
                   <p className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
@@ -112,11 +112,11 @@ const AttendanceCorrection = () => {
         </div>
 
         {/* LIST VIEW */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden">
+        <div className="bg-transparent rounded-3xl border border-white/50 shadow-neu overflow-hidden">
           <div className="overflow-x-auto relative">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-100 backdrop-blur-md">
+                <tr className="bg-slate-50/80 border-b border-white/50 backdrop-blur-md">
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Tanggal & Pegawai</th>
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Jam Asli</th>
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Jam Usulan</th>
@@ -141,7 +141,7 @@ const AttendanceCorrection = () => {
                   </tr>
                 ) : (
                   filteredData.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50 transition-all group border-b border-transparent hover:border-slate-100">
+                    <tr key={row.id} className="hover:shadow-neu-inset/50 transition-all group border-b border-transparent hover:border-white/50">
                       <td className="px-6 py-3">
                         <div className="flex flex-col">
                            <span className="text-[11px] font-black text-slate-700 tracking-tight">{row.date}</span>

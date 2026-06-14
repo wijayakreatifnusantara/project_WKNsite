@@ -320,9 +320,9 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
       filled: true,
-      fillColor: const Color(0xFFF8F9FB),
+      fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppConstants.primaryColor)),

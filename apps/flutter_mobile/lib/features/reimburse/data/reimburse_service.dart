@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../../core/utils/constants.dart';
 
 class ReimburseService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  static String baseUrl = AppConstants.apiUrl;
 
   Future<Map<String, dynamic>> submitReimburse(Map<String, dynamic> payload) async {
     try {

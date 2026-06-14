@@ -11,7 +11,7 @@ export const useCareerPortal = () => {
       setLoading(true);
       setError(null);
       
-      const response = await apiClient.get('/api/recruitment/public/jobs');
+      const response = await apiClient.get('/recruitment/public/jobs');
 
       if (response.status !== 'success') throw new Error('Failed to fetch jobs');
       setJobs(response.data || []);
@@ -26,7 +26,7 @@ export const useCareerPortal = () => {
 
   const submitApplication = async (applicationData) => {
     try {
-      const response = await apiClient.post('/api/recruitment/public/apply', {
+      const response = await apiClient.post('/recruitment/public/apply', {
         job_id: applicationData.job_id,
         name: applicationData.name,
         email: applicationData.email,

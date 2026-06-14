@@ -30,7 +30,7 @@ const NewJobModal = ({ isOpen, onClose, onSuccess, createJob }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-md bg-[#f0f2f5] rounded-[2rem] shadow-2xl border-[6px] border-white overflow-hidden animate-in zoom-in-95 duration-200"
+        className="w-full max-w-md bg-[#f0f2f5] rounded-[2rem] shadow-neu border-[6px] border-white overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6 border-b border-white/50 flex justify-between items-center bg-white/40">
@@ -49,7 +49,7 @@ const NewJobModal = ({ isOpen, onClose, onSuccess, createJob }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Senior Backend Engineer"
-              className="w-full h-12 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-xs font-bold text-slate-800 focus:outline-none border-none"
+              className="w-full h-12 bg-[#f0f2f5] shadow-neu rounded-xl px-4 text-xs font-bold text-slate-800 focus:outline-none border-none"
               required
             />
           </div>
@@ -60,7 +60,7 @@ const NewJobModal = ({ isOpen, onClose, onSuccess, createJob }) => {
               <select 
                 value={dept}
                 onChange={(e) => setDept(e.target.value)}
-                className="w-full h-12 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-xs font-bold text-slate-800 focus:outline-none border-none cursor-pointer"
+                className="w-full h-12 bg-[#f0f2f5] shadow-neu rounded-xl px-4 text-xs font-bold text-slate-800 focus:outline-none border-none cursor-pointer"
               >
                 <option value="Engineering">Engineering</option>
                 <option value="Operations">Operations</option>
@@ -76,7 +76,7 @@ const NewJobModal = ({ isOpen, onClose, onSuccess, createJob }) => {
               <select 
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full h-12 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl px-4 text-xs font-bold text-slate-800 focus:outline-none border-none cursor-pointer"
+                className="w-full h-12 bg-[#f0f2f5] shadow-neu rounded-xl px-4 text-xs font-bold text-slate-800 focus:outline-none border-none cursor-pointer"
               >
                 <option value="Active">Active (Public)</option>
                 <option value="Internal Only">Internal Only</option>
@@ -97,7 +97,7 @@ const NewJobModal = ({ isOpen, onClose, onSuccess, createJob }) => {
             <Button 
               type="submit"
               disabled={loading}
-              className="flex-1 h-12 rounded-xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest shadow-lg"
+              className="flex-1 h-12 rounded-xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest shadow-neu"
             >
               {loading ? 'Posting...' : 'Publish Job'}
             </Button>

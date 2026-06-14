@@ -40,7 +40,7 @@ const ResetPasswordModal = ({ isOpen, onClose, employee, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in font-outfit">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-slide-up relative">
+      <div className="bg-transparent rounded-2xl shadow-neu w-full max-w-sm overflow-hidden animate-slide-up relative">
         
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-5 flex items-center justify-between">
@@ -60,7 +60,7 @@ const ResetPasswordModal = ({ isOpen, onClose, employee, onSuccess }) => {
 
         {/* Modal Body */}
         <form onSubmit={handleSubmit} className="p-6">
-          <div className="mb-6 flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <div className="mb-6 flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-white/50">
             <div className="h-10 w-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-sm shrink-0">
               {employee['Photo'] || employee.photo ? (
                 <img src={employee['Photo'] || employee.photo} alt={employee['EMPLOYEE NAME']} className="w-full h-full object-cover rounded-full" />
@@ -82,7 +82,7 @@ const ResetPasswordModal = ({ isOpen, onClose, employee, onSuccess }) => {
                 placeholder="Masukkan password baru"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+                className="w-full h-10 px-3 bg-transparent border border-white/50 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
                 required
                 minLength={6}
               />
@@ -108,7 +108,7 @@ const ResetPasswordModal = ({ isOpen, onClose, employee, onSuccess }) => {
             <button 
               type="submit"
               disabled={isLoading || !newPassword}
-              className="px-6 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider flex items-center gap-2"
+              className="px-6 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-neu disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider flex items-center gap-2"
             >
               {isLoading ? <IconLoader2 size={16} className="animate-spin" /> : <IconKey size={16} />}
               Reset Password

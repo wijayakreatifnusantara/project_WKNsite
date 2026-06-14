@@ -203,7 +203,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
       filled: true,
-      fillColor: const Color(0xFFF8F9FB),
+      fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.borderColor)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.borderColor)),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppConstants.primaryColor)),

@@ -62,7 +62,7 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
       <label htmlFor={id} className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</label>
       <input
         id={id} type={type} value={value} onChange={onChange} placeholder={placeholder}
-        className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+        className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
       />
     </div>
   );
@@ -85,7 +85,7 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
 
       <div className="flex items-center gap-3">
         <button id="save-hq-btn" onClick={handleSave} disabled={saving}
-          className="h-9 px-5 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest flex items-center gap-2 shadow-md hover:bg-[#C1181E] transition-all disabled:opacity-50">
+          className="h-9 px-5 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest flex items-center gap-2 shadow-neu hover:bg-[#C1181E] transition-all disabled:opacity-50">
           {saving ? <IconLoader2 size={14} className="animate-spin" /> : <IconDeviceFloppy size={14} />}
           {saving ? 'Menyimpan...' : 'Simpan Kantor Utama'}
         </button>
@@ -146,7 +146,7 @@ const FreeAttendanceToggle = () => {
         <h4 className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Kebijakan Absensi Global</h4>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-[#f8fafc] border border-slate-100 rounded-2xl gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-[#f8fafc] border border-white/50 rounded-2xl gap-4">
         <div className="space-y-0.5">
           <p className="text-xs font-black text-slate-700 uppercase tracking-tight">Bebas Absen Di Mana Saja (Kebijakan Global)</p>
           <p className="text-[9px] font-bold text-slate-400">
@@ -164,7 +164,7 @@ const FreeAttendanceToggle = () => {
               disabled={saving}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E31E24]"></div>
+            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-transparent after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E31E24]"></div>
           </label>
           {msg && (
             <span className={`text-[8px] font-black uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
@@ -184,7 +184,7 @@ const LocationMapPreview = ({ lat, lon, radius, height = '140px' }) => {
   if (!lat || !lon || isNaN(vLat) || isNaN(vLon)) {
     return (
       <div
-        className="flex flex-col items-center justify-center bg-slate-50 border border-dashed border-slate-200 rounded-lg text-slate-400 gap-1"
+        className="flex flex-col items-center justify-center bg-slate-50 border border-dashed border-white/50 rounded-lg text-slate-400 gap-1"
         style={{ height }}
       >
         <IconMapPin size={20} className="text-slate-200" />
@@ -222,17 +222,17 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
     onSave({ name: form.name.trim(), lat: parseFloat(form.lat), lon: parseFloat(form.lon), radius: parseInt(form.radius) || 100 });
   };
 
-  const inputCls = 'w-full h-8 px-2.5 rounded-lg bg-[#f0f2f5] border border-slate-200 text-slate-800 font-semibold text-[11px] focus:outline-none focus:ring-1 focus:ring-[#E31E24]/40';
+  const inputCls = 'w-full h-8 px-2.5 rounded-lg bg-[#f0f2f5] border border-white/50 text-slate-800 font-semibold text-[11px] focus:outline-none focus:ring-1 focus:ring-[#E31E24]/40';
   const labelCls = 'block text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in" style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}>
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[min(560px,92vh)] flex flex-col overflow-hidden"
+        className="bg-transparent rounded-2xl shadow-neu w-full max-w-md max-h-[min(560px,92vh)] flex flex-col overflow-hidden"
       >
         {/* Header — compact */}
-        <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-100 shrink-0">
+        <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-white/50 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <div className="h-7 w-7 bg-[#E31E24]/10 rounded-lg flex items-center justify-center shrink-0">
               <IconMapPin size={15} className="text-[#E31E24]" />
@@ -246,7 +246,7 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
               )}
             </div>
           </div>
-          <button type="button" onClick={onClose} className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 shrink-0">
+          <button type="button" onClick={onClose} className="h-7 w-7 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center text-slate-400 hover:text-slate-700 shrink-0">
             <IconX size={14} />
           </button>
         </div>
@@ -282,9 +282,9 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
         </div>
 
         {/* Footer — always visible */}
-        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-slate-100 bg-slate-50/80 shrink-0">
+        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-white/50 bg-slate-50/80 shrink-0">
           <button type="button" onClick={onClose}
-            className="h-8 px-4 rounded-lg bg-white border border-slate-200 text-slate-600 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50">
+            className="h-8 px-4 rounded-lg bg-transparent border border-white/50 text-slate-600 font-black text-[8px] uppercase tracking-widest hover:shadow-neu-inset">
             Batal
           </button>
           <button type="submit" disabled={saving}
@@ -301,15 +301,15 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
 // ─── Location View Modal ───────────────────────────────────────────────────────
 const LocationViewModal = ({ location, onClose, onEdit }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in" style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}>
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[min(480px,88vh)] flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-100 shrink-0">
+    <div className="bg-transparent rounded-2xl shadow-neu w-full max-w-md max-h-[min(480px,88vh)] flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-white/50 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <div className="h-7 w-7 bg-[#E31E24]/10 rounded-lg flex items-center justify-center shrink-0">
             <IconMapPin size={15} className="text-[#E31E24]" />
           </div>
           <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">{location.name}</h3>
         </div>
-        <button onClick={onClose} className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 shrink-0">
+        <button onClick={onClose} className="h-7 w-7 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center text-slate-400 hover:text-slate-700 shrink-0">
           <IconX size={14} />
         </button>
       </div>
@@ -320,7 +320,7 @@ const LocationViewModal = ({ location, onClose, onEdit }) => (
             { label: 'Lon', value: location.lon },
             { label: 'Radius', value: `${location.radius}m` },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-100">
+            <div key={label} className="bg-slate-50 rounded-lg px-2 py-1.5 border border-white/50">
               <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
               <p className="text-[10px] font-black text-slate-800 font-mono truncate">{value}</p>
             </div>
@@ -328,9 +328,9 @@ const LocationViewModal = ({ location, onClose, onEdit }) => (
         </div>
         <LocationMapPreview lat={location.lat} lon={location.lon} radius={location.radius} height="150px" />
       </div>
-      <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-100 bg-slate-50/80 shrink-0">
+      <div className="flex justify-end gap-2 px-4 py-3 border-t border-white/50 bg-slate-50/80 shrink-0">
         <button onClick={onClose}
-          className="h-8 px-4 rounded-lg bg-white border border-slate-200 text-slate-600 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50">
+          className="h-8 px-4 rounded-lg bg-transparent border border-white/50 text-slate-600 font-black text-[8px] uppercase tracking-widest hover:shadow-neu-inset">
           Tutup
         </button>
         <button onClick={() => { onClose(); onEdit(); }}
@@ -360,7 +360,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
         <button
           id="add-loc-btn"
           onClick={() => setModal({ mode: 'add' })}
-          className="h-9 px-4 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest flex items-center gap-2 shadow-md hover:bg-[#C1181E] transition-all active:scale-95"
+          className="h-9 px-4 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest flex items-center gap-2 shadow-neu hover:bg-[#C1181E] transition-all active:scale-95"
         >
           <IconPlus size={14} /> Tambah Lokasi
         </button>
@@ -376,7 +376,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
 
       {/* Location Cards Grid */}
       {locations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-14 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 gap-3">
+        <div className="flex flex-col items-center justify-center py-14 border-2 border-dashed border-white/50 rounded-2xl text-slate-400 gap-3">
           <IconMapPin size={36} className="text-slate-200" />
           <p className="text-[9px] font-black uppercase tracking-widest">Belum ada lokasi kerja custom terdaftar</p>
           <button
@@ -387,9 +387,9 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-100">
+        <div className="overflow-x-auto rounded-2xl border border-white/50">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-slate-50 border-b border-white/50">
               <tr>
                 {['Location Name', 'Coordinates', 'Radius', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
@@ -398,7 +398,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
             </thead>
             <tbody className="divide-y divide-slate-50">
               {locations.map((loc, idx) => (
-                <tr key={idx} className="hover:bg-slate-50 transition-all group">
+                <tr key={idx} className="hover:shadow-neu-inset transition-all group">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 bg-[#E31E24]/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-[#E31E24]/20 transition-all">
@@ -414,7 +414,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 font-black text-[9px] uppercase tracking-widest">{loc.radius}m</span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 border border-white/50 text-slate-600 font-black text-[9px] uppercase tracking-widest">{loc.radius}m</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -569,14 +569,14 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama, ID, posisi..."
-            className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+            className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-100">
+      <div className="overflow-x-auto rounded-2xl border border-white/50">
         <table className="w-full text-left">
-          <thead className="bg-slate-50 border-b border-slate-100">
+          <thead className="bg-slate-50 border-b border-white/50">
             <tr>
               {['Karyawan', 'Posisi', 'Lokasi Absen Ditentukan', 'Bebas Absen (Anywhere)', 'Status'].map(h => (
                 <th key={h} className="px-3 py-2.5 text-[8px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
@@ -593,7 +593,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
               const status = rowStatus[empId];
 
               return (
-                <tr key={empId} className="hover:bg-slate-50 transition-all">
+                <tr key={empId} className="hover:shadow-neu-inset transition-all">
                   {/* Name & ID */}
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
@@ -616,7 +616,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
                       value={currentLocName}
                       disabled={status === 'loading'}
                       onChange={(e) => updateEmployeeSettings(empId, isBebasAbsen, e.target.value)}
-                      className="h-8 px-2.5 rounded-lg bg-[#f0f2f5] border border-slate-200 text-slate-700 font-black text-[9px] uppercase tracking-wider focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20"
+                      className="h-8 px-2.5 rounded-lg bg-[#f0f2f5] border border-white/50 text-slate-700 font-black text-[9px] uppercase tracking-wider focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20"
                     >
                       {locOptions.map(opt => (
                         <option key={opt.value} value={opt.value}>
@@ -638,7 +638,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
                           onChange={(e) => updateEmployeeSettings(empId, e.target.checked, currentLocName)}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-transparent after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
                       </label>
                       <span className={`ml-2 text-[8px] font-black uppercase tracking-wider ${isBebasAbsen ? 'text-emerald-600' : 'text-slate-400'}`}>
                         {isBebasAbsen ? 'Bebas Absen' : 'Geofenced'}
@@ -767,11 +767,11 @@ const LocationManager = ({ onBack }) => {
   return (
     <div className="space-y-6 animate-fade-in text-[11px]">
       {/* Top Banner Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 px-6 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-transparent p-4 px-6 rounded-2xl border border-white/50 shadow-neu backdrop-blur-md">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
+            className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
           >
             <IconArrowLeft size={16} />
           </button>
@@ -792,7 +792,7 @@ const LocationManager = ({ onBack }) => {
             onClick={() => setActiveTab('database')}
             className={`h-8 px-4 rounded-lg font-black text-[9px] uppercase tracking-wider transition-all flex items-center gap-1.5 ${
               activeTab === 'database'
-                ? 'bg-white text-slate-800 shadow-sm'
+                ? 'bg-transparent text-slate-800 shadow-neu'
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -803,7 +803,7 @@ const LocationManager = ({ onBack }) => {
             onClick={() => setActiveTab('employees')}
             className={`h-8 px-4 rounded-lg font-black text-[9px] uppercase tracking-wider transition-all flex items-center gap-1.5 ${
               activeTab === 'employees'
-                ? 'bg-white text-slate-800 shadow-sm'
+                ? 'bg-transparent text-slate-800 shadow-neu'
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -817,12 +817,12 @@ const LocationManager = ({ onBack }) => {
       {activeTab === 'database' ? (
         <div className="space-y-6">
           {/* Global free attendance policy toggle */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div className="bg-transparent rounded-2xl border border-white/50 p-5 shadow-neu">
             <FreeAttendanceToggle />
           </div>
 
           {/* Custom Working Locations list manager */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div className="bg-transparent rounded-2xl border border-white/50 p-5 shadow-neu">
             <WorkingLocationsManager
               locations={locations}
               loading={loading}
@@ -835,7 +835,7 @@ const LocationManager = ({ onBack }) => {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-transparent rounded-2xl border border-white/50 p-5 shadow-neu">
           {/* Employee assignments list */}
           <EmployeeLocationSettings workingLocations={locations} hqLocation={hqLocation} />
         </div>

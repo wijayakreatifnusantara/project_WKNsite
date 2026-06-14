@@ -13,14 +13,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const Consumables = () => {
-  const inventory = [
-    { id: 1, name: 'A4 Paper (80gsm)', stock: 45, unit: 'Reams', threshold: 10, status: 'Healthy' },
-    { id: 2, name: 'Tiner Ink - Black', stock: 4, unit: 'Units', threshold: 5, status: 'Low Stock' },
-    { id: 3, name: 'Standard Ballpoints', stock: 120, unit: 'Pcs', threshold: 20, status: 'Healthy' },
-  ];
+  const [inventory, setInventory] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/assets/consumables', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+        });
+        const data = await res.json();
+        setInventory(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchInventory();
+  }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -30,11 +41,11 @@ const Consumables = () => {
             <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Supply Chain & Inventory Management</p>
           </div>
           <div className="flex gap-4">
-            <Button className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-[5px_5px_10px_#d1d9e6,-5px_-5px_10px_#ffffff] text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] hover:shadow-none transition-all flex gap-3 items-center border-2 border-white">
+            <Button className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] hover:shadow-none transition-all flex gap-3 items-center border-2 border-white">
               <IconQrcode size={16} />
               Scan QR Checkout
             </Button>
-            <Button className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center">
+            <Button className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center">
               <IconPlus size={16} />
               Restock Item
             </Button>
@@ -43,7 +54,7 @@ const Consumables = () => {
         </header>
 
         {/* Inventory Table */}
-        <Card className="border-white border-[3px] shadow-[12px_12px_24px_#d1d9e6,-12px_-10px_20px_#ffffff] bg-[#f0f2f5] rounded-[2.5rem] overflow-hidden">
+        <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2.5rem] overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/50">
@@ -59,7 +70,7 @@ const Consumables = () => {
                 <tr key={item.id} className="border-b border-white/30 hover:bg-white/30 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
+                      <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
                         <IconPackage size={20} />
                       </div>
                       <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{item.name}</span>

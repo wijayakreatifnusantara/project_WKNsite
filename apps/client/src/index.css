@@ -4,13 +4,13 @@
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 216 20% 95%; /* #f0f2f5 */
     --foreground: 222.2 84% 4.9%;
  
-    --card: 0 0% 100%;
-    --foreground: 222.2 84% 2%; /* Even darker for maximum clarity */
+    --card: 216 20% 95%;
+    --card-foreground: 222.2 84% 2%; /* Even darker for maximum clarity */
  
-    --popover: 0 0% 100%;
+    --popover: 216 20% 95%;
     --popover-foreground: 222.2 84% 4.9%;
  
     --primary: 221.2 83.2% 53.3%;
@@ -36,13 +36,13 @@
   }
  
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 47% 11%;
     --foreground: 210 40% 98%;
  
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 47% 11%;
     --card-foreground: 210 40% 98%;
  
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 47% 11%;
     --popover-foreground: 210 40% 98%;
  
     --primary: 217.2 91.2% 59.8%;
@@ -102,6 +102,22 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .shadow-neu {
+    box-shadow: 12px 12px 24px #d1d9e6, -12px -12px 24px #ffffff;
+  }
+
+  .shadow-neu-inset {
+    box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
+  }
+
+  .dark .shadow-neu {
+    box-shadow: 10px 10px 20px #0a0f1d, -10px -10px 20px #1a2541;
+  }
+
+  .dark .shadow-neu-inset {
+    box-shadow: inset 4px 4px 8px #0a0f1d, inset -4px -4px 8px #1a2541;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -313,5 +329,68 @@
   background-color: #f8fafc !important;
   box-shadow: none !important;
   border: 1px solid #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   🌙 WKNsite Dark Mode Global Overrides
+   ========================================================================== */
+.dark .bg-\[\#f0f2f5\] {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-\[\#f0f2f5\]\/80 {
+  background-color: rgba(15, 23, 42, 0.8) !important; 
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+.dark .border-white,
+.dark .border-white\/20,
+.dark .border-white\/60,
+.dark .border-slate-200,
+.dark .border-slate-100 {
+  border-color: #1e293b !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-white {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #334155 !important;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: #334155 !important;
+}
+
+.dark .bg-emerald-50,
+.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.dark .border-emerald-100 {
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.dark .text-emerald-700,
+.dark .text-emerald-600 {
+  color: #34d399 !important;
+}
+
+.dark .shadow-neu,
+.dark .shadow-neu-inset {
+  box-shadow: none !important;
+  border: 1px solid #1e293b !important;
 }
 

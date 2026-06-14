@@ -8,6 +8,8 @@ import '../../../core/utils/constants.dart';
 import '../../../core/utils/tracking_service.dart';
 import 'dashboard_screen.dart';
 
+import 'dart:ui'; // Add this for BackdropFilter
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -46,30 +48,39 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
         decoration: BoxDecoration(
-          color: context.surfaceColor,
+          color: context.isDarkMode 
+              ? context.surfaceColor.withValues(alpha: 0.8) 
+              : Colors.white.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(32),
+          border: Border.all(color: context.borderColor.withValues(alpha: 0.5), width: 1),
           boxShadow: [
             BoxShadow(
-              color: AppConstants.secondaryColor.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 24,
               offset: const Offset(0, 8),
             )
           ]
         ),
-        child: BottomAppBar(
-          color: Colors.transparent,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SizedBox(
-            height: 60,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNavItem(0, Icons.home_outlined, Icons.home, 'Beranda'),
-                _buildNavItem(1, Icons.mail_outline, Icons.mail, 'Inbox'),
-                _buildNavItem(3, Icons.help_outline, Icons.help, 'Bantuan'),
-                _buildNavItem(4, Icons.person_outline, Icons.person, 'Profil'),
-              ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: BottomAppBar(
+              color: Colors.transparent,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SizedBox(
+                height: 60,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildNavItem(0, Icons.home_outlined, Icons.home, 'Beranda'),
+                    _buildNavItem(1, Icons.mail_outline, Icons.mail, 'Inbox'),
+                    _buildNavItem(3, Icons.help_outline, Icons.help, 'Bantuan'),
+                    _buildNavItem(4, Icons.person_outline, Icons.person, 'Profil'),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

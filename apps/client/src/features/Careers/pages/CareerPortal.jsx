@@ -57,7 +57,7 @@ const CareerPortal = () => {
         </div>
 
         {/* Job Listings */}
-        <div className="w-full bg-white rounded-t-[3rem] p-6 lg:p-12 md:px-24 xl:px-48 flex-1 border-t-8 border-[#E31E24] mt-10">
+        <div className="w-full bg-transparent rounded-t-[3rem] p-6 lg:p-12 md:px-24 xl:px-48 flex-1 border-t-8 border-[#E31E24] mt-10">
            <div className="max-w-4xl mx-auto">
              <div className="flex justify-between items-end mb-10">
                <div>
@@ -75,7 +75,7 @@ const CareerPortal = () => {
                  <p className="text-[10px] font-black uppercase tracking-widest">Loading Opportunities...</p>
                </div>
              ) : jobs.length === 0 ? (
-               <div className="text-center py-20 border-2 border-dashed border-slate-200 rounded-[2rem]">
+               <div className="text-center py-20 border-2 border-dashed border-white/50 rounded-[2rem]">
                  <IconBriefcase size={48} className="mx-auto text-slate-300 mb-4" />
                  <p className="text-slate-500 font-bold">No active job postings at the moment.</p>
                  <p className="text-slate-400 text-sm mt-1">Please check back later.</p>
@@ -85,7 +85,7 @@ const CareerPortal = () => {
                  {jobs.map(job => (
                    <div 
                      key={job.id} 
-                     className="group bg-slate-50 hover:bg-white border-2 border-slate-100 hover:border-[#E31E24]/30 rounded-[1.5rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between transition-all hover:shadow-[0_10px_40px_rgba(227,30,36,0.1)]"
+                     className="group bg-slate-50 hover:bg-transparent border-2 border-white/50 hover:border-[#E31E24]/30 rounded-[1.5rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between transition-all hover:shadow-neu"
                    >
                      <div className="mb-6 md:mb-0">
                        <div className="flex items-center gap-3 mb-3">

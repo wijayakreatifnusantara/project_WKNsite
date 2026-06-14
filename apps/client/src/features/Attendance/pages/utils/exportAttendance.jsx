@@ -7,7 +7,7 @@ export const exportDailyAttendance = async () => {
     const today = dayjs().format('YYYY-MM-DD');
     
     // Fetch today's raw logs via API
-    const response = await apiClient.get('/api/attendance/export/today');
+    const response = await apiClient.get('/attendance/export/today');
 
     if (response.status !== 'success') throw new Error('Failed to fetch attendance data');
     const data = response.data;

@@ -1,0 +1,15 @@
+{
+    "leave": {
+        "enabled": true,
+        "tiers": [
+            { "level": 1, "role": "Supervisor", "label": "Pending L1" },
+            { "level": 2, "role": "HR Manager", "label": "Pending L2" }
+        ]
+    },
+    "overtime": {
+        "enabled": true,
+        "tiers": [
+            { "level": 1, "role": "Supervisor", "label": "Pending L1" }
+        ]
+    }
+}

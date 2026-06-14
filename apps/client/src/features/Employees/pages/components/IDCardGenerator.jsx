@@ -22,13 +22,13 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300 print:hidden">
       <div 
-        className="w-full max-w-4xl h-[90vh] bg-[#f0f2f5] shadow-[20px_20px_60px_#1e293b,-20px_-20px_60px_#ffffff] rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-4xl h-[90vh] bg-[#f0f2f5] shadow-neu rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <header className="h-20 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
               <IconId size={24} />
             </div>
             <div>
@@ -39,14 +39,14 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
           <div className="flex items-center gap-3">
             <Button 
               onClick={handlePrint}
-              className="h-11 px-5 rounded-xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3"
+              className="h-11 px-5 rounded-xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3"
             >
               <IconPrinter size={16} />
               Print Card
             </Button>
             <button 
               onClick={onClose}
-              className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl text-slate-400 hover:text-red-500 transition-all"
+              className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-neu rounded-xl text-slate-400 hover:text-red-500 transition-all"
             >
               <IconX size={20} />
             </button>
@@ -54,11 +54,11 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
         </header>
 
         {/* Studio Content */}
-        <div className="flex-1 overflow-y-auto p-12 flex items-center justify-center bg-[#f0f2f5] custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-12 flex items-center justify-center bg-transparent custom-scrollbar">
           <div className="flex gap-20 scale-110">
             
             {/* FRONT CARD */}
-            <div className="relative w-[320px] h-[500px] bg-[#f0f2f5] shadow-[15px_15px_30px_#bebebe,-15px_-15px_30px_#ffffff] rounded-[2.5rem] border-[6px] border-white overflow-hidden flex flex-col p-8 items-center text-center">
+            <div className="relative w-[320px] h-[500px] bg-[#f0f2f5] shadow-neu rounded-[2.5rem] border-[6px] border-white overflow-hidden flex flex-col p-8 items-center text-center">
               {/* Header Logo */}
               <div className="flex flex-col items-center mb-10">
                 <img src="/assets/wkn_logo.png" alt="WKN" className="h-10 w-auto object-contain mb-2" />
@@ -66,11 +66,11 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
               </div>
 
               {/* Avatar Slot */}
-              <div className="h-32 w-32 bg-[#f0f2f5] shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] rounded-[2rem] border-4 border-white flex items-center justify-center mb-8 relative group">
+              <div className="h-32 w-32 bg-[#f0f2f5] shadow-neu rounded-[2rem] border-4 border-white flex items-center justify-center mb-8 relative group">
                 <div className="text-4xl font-black text-slate-300 uppercase select-none group-hover:scale-110 transition-transform">
                   {employee["EMPLOYEE NAME"]?.split(' ').map(n => n[0]).join('')}
                 </div>
-                <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-[#E31E24] rounded-xl flex items-center justify-center text-white shadow-lg border-4 border-white">
+                <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-[#E31E24] rounded-xl flex items-center justify-center text-white shadow-neu border-4 border-white">
                   <IconShieldCheck size={20} />
                 </div>
               </div>
@@ -83,7 +83,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
 
               {/* ID Barcode / QR Placeholder */}
               <div className="mt-auto flex flex-col items-center">
-                <div className="p-3 bg-white shadow-[inset_2px_2px_4px_#d1d9e6] rounded-xl mb-3">
+                <div className="p-3 bg-transparent shadow-neu rounded-xl mb-3">
                   <IconQrcode size={64} className="text-slate-800" />
                 </div>
                 <div className="flex flex-col">
@@ -97,7 +97,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
             </div>
 
             {/* BACK CARD */}
-            <div className="relative w-[320px] h-[500px] bg-[#f0f2f5] shadow-[15px_15px_30px_#bebebe,-15px_-15px_30px_#ffffff] rounded-[2.5rem] border-[6px] border-white overflow-hidden flex flex-col p-10 items-center justify-between">
+            <div className="relative w-[320px] h-[500px] bg-[#f0f2f5] shadow-neu rounded-[2.5rem] border-[6px] border-white overflow-hidden flex flex-col p-10 items-center justify-between">
               <div className="w-full">
                 <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 border-b-2 border-white pb-4">Terms & Conditions</h3>
                 <div className="space-y-4 text-left">
@@ -129,7 +129,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
               </div>
 
               <div className="mt-6 flex flex-col items-center">
-                <div className="h-10 w-full bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-lg flex items-center justify-center px-4">
+                <div className="h-10 w-full bg-[#f0f2f5] shadow-neu rounded-lg flex items-center justify-center px-4">
                   <span className="text-[9px] font-black text-slate-400 tracking-[0.5em] uppercase">Security Verified</span>
                 </div>
               </div>
@@ -142,7 +142,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
 
       <div className="hidden print-area flex-row gap-10">
         {/* Simplified Front for Print */}
-        <div className="print-card w-[54mm] h-[86mm] border rounded-lg overflow-hidden flex flex-col items-center text-center p-4 bg-white">
+        <div className="print-card w-[54mm] h-[86mm] border rounded-lg overflow-hidden flex flex-col items-center text-center p-4 bg-transparent">
            <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto mb-2" />
            <div className="h-20 w-20 border-2 rounded-xl mb-4 flex items-center justify-center font-bold text-xl">
              {employee["EMPLOYEE NAME"]?.split(' ').map(n => n[0]).join('')}
@@ -153,7 +153,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
            <p className="text-[10px] font-mono mt-2">{employee["EMPLOYEE ID"]}</p>
         </div>
         {/* Simplified Back for Print */}
-        <div className="print-card w-[54mm] h-[86mm] border rounded-lg overflow-hidden flex flex-col items-center text-center p-4 bg-white justify-between">
+        <div className="print-card w-[54mm] h-[86mm] border rounded-lg overflow-hidden flex flex-col items-center text-center p-4 bg-transparent justify-between">
            <div className="text-[6px] text-left">
              <p className="font-bold mb-2 uppercase">Official Identity Card</p>
              <p>This card is the property of PT. WKN. If found, please return to office.</p>

@@ -81,7 +81,7 @@ const DocumentHub = () => {
             </div>
             <Button 
               onClick={() => setIsUploadOpen(true)}
-              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center"
+              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center"
             >
               <IconPlus size={16} />
               New Upload
@@ -96,14 +96,14 @@ const DocumentHub = () => {
               placeholder="Search by filename or employee..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-14 pl-12 pr-6 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-none rounded-2xl text-xs font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
+              className="w-full h-14 pl-12 pr-6 bg-[#f0f2f5] shadow-neu border-none rounded-2xl text-xs font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
             />
           </div>
         </header>
 
         {/* 🚨 Document Expiry Alerts Banner */}
         <div className="px-8 pb-4">
-          <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+          <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex items-center justify-between shadow-neu">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 bg-rose-100 rounded-xl flex items-center justify-center text-rose-500">
                 <IconLock size={20} />
@@ -113,7 +113,7 @@ const DocumentHub = () => {
                 <p className="text-[9px] font-bold text-rose-600 mt-1">2 employee contracts and 1 ID card are expiring within 30 days.</p>
               </div>
             </div>
-            <Button className="h-8 px-4 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest shadow-md transition-all">
+            <Button className="h-8 px-4 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest shadow-neu transition-all">
               Review Now
             </Button>
           </div>
@@ -170,7 +170,7 @@ const CategoryItem = ({ label, icon, active, onClick }) => (
     onClick={onClick}
     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 group
       ${active 
-        ? 'bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] text-[#E31E24]' 
+        ? 'bg-[#f0f2f5] shadow-neu text-[#E31E24]' 
         : 'text-slate-400 hover:text-slate-700 hover:bg-white/50'}`}
   >
     <span className="transition-transform group-hover:scale-110">{icon}</span>
@@ -195,29 +195,29 @@ const FileCard = ({ doc, onDelete, onSign }) => {
   };
 
   return (
-    <Card className="border-white border-[3px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-5 group hover:scale-[1.02] transition-all cursor-pointer relative overflow-hidden">
+    <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-5 group hover:scale-[1.02] transition-all cursor-pointer relative overflow-hidden">
       {doc.is_private && (
-        <div className="absolute top-3 left-3 h-6 w-6 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 shadow-sm border border-rose-100 z-10 animate-pulse">
+        <div className="absolute top-3 left-3 h-6 w-6 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 shadow-neu border border-rose-100 z-10 animate-pulse">
           <IconLock size={12} />
         </div>
       )}
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-start mb-4">
-          <div className="h-14 w-14 bg-[#f0f2f5] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center">
+          <div className="h-14 w-14 bg-[#f0f2f5] rounded-xl shadow-neu flex items-center justify-center">
             {getIcon(doc.file_type)}
           </div>
           <div className="flex gap-1">
             <button 
               onClick={(e) => { e.stopPropagation(); onSign(); }}
-              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
+              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
               title="Sign Document"
             >
               <IconSignature size={14} />
             </button>
-            <button className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
+            <button className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
               <IconDownload size={14} />
             </button>
-            <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all">
+            <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all">
               <IconTrash size={14} />
             </button>
           </div>

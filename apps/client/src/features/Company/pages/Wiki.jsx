@@ -20,7 +20,7 @@ const Wiki = () => {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -29,7 +29,7 @@ const Wiki = () => {
             </h2>
             <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Corporate SOPs & Knowledge Base</p>
           </div>
-          <div className="h-12 w-64 px-4 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-white border-2 rounded-2xl flex items-center gap-3">
+          <div className="h-12 w-64 px-4 bg-[#f0f2f5] shadow-neu border-white border-2 rounded-2xl flex items-center gap-3">
             <IconSearch size={16} className="text-slate-400" />
             <input 
               placeholder="SEARCH SOP..." 
@@ -50,12 +50,12 @@ const Wiki = () => {
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Recently Updated Articles</h3>
           <div className="grid grid-cols-1 gap-4">
             {articles.map(art => (
-              <Card key={art.id} className="border-white border-[3px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6 flex items-center justify-between group hover:scale-[1.005] transition-all cursor-pointer relative overflow-hidden">
+              <Card key={art.id} className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6 flex items-center justify-between group hover:scale-[1.005] transition-all cursor-pointer relative overflow-hidden">
                 {art.id === 1 && (
-                  <div className="absolute top-0 left-0 h-1 w-full bg-[#E31E24] shadow-[0_2px_10px_rgba(227,30,36,0.2)]"></div>
+                  <div className="absolute top-0 left-0 h-1 w-full bg-[#E31E24] shadow-neu"></div>
                 )}
                 <div className="flex items-center gap-6">
-                  <div className="h-12 w-12 bg-[#f0f2f5] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center text-[#E31E24]">
+                  <div className="h-12 w-12 bg-[#f0f2f5] rounded-xl shadow-neu flex items-center justify-center text-[#E31E24]">
                     <IconFileText size={24} />
                   </div>
                   <div>
@@ -74,7 +74,7 @@ const Wiki = () => {
                     <span className="text-[9px] font-black uppercase">{art.lastUpdate}</span>
                   </div>
                   {art.id === 1 ? (
-                    <Button className="h-10 px-6 rounded-xl bg-[#E31E24] text-white text-[8px] font-black uppercase tracking-widest shadow-[4px_4px_10px_rgba(227,30,36,0.2)] hover:bg-[#C1181E] transition-all">
+                    <Button className="h-10 px-6 rounded-xl bg-[#E31E24] text-white text-[8px] font-black uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all">
                        Confirm Read
                     </Button>
                   ) : (
@@ -96,8 +96,8 @@ const Wiki = () => {
 };
 
 const WikiLink = ({ label, count, icon, color }) => (
-  <Card className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6 group cursor-pointer hover:shadow-none transition-all">
-    <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center mb-4
+  <Card className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6 group cursor-pointer hover:shadow-none transition-all">
+    <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center mb-4
       ${color === 'indigo' ? 'text-indigo-500' : color === 'emerald' ? 'text-emerald-500' : 'text-rose-500'}`}>
       {icon}
     </div>

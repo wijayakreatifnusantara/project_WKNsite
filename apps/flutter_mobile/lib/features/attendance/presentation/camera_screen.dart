@@ -25,7 +25,7 @@ class CameraScreen extends StatefulWidget {
   State<CameraScreen> createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver {
   CameraController? _controller;
   List<CameraDescription> cameras = [];
   bool _isReady = false;
@@ -46,6 +46,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _livenessChecker.initialize();
     _initCamera();
     _initLocationAndSettings();
@@ -201,8 +202,31 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final CameraController? cameraController = _controller;
+
+    // App state changed before we got the chance to initialize.
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return;
+    }
+
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      // Bebaskan resource kamera saat aplikasi di background
+      cameraController.dispose();
+      _controller = null;
+      setState(() {
+        _isReady = false;
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      // Inisialisasi ulang kamera saat aplikasi aktif kembali
+      _initCamera();
+    }
   }
 
   Future<void> _takePictureAndPreview() async {

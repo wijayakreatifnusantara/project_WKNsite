@@ -194,11 +194,12 @@ class _AssistantScreenState extends State<AssistantScreen> {
                     decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(24)),
                     child: TextField(
                       controller: _msgCtrl,
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: context.textPrimary),
+                      decoration: InputDecoration(
                         hintText: 'Tanya soal sisa cuti, lembur...',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                        hintStyle: TextStyle(color: context.textSecondary, fontSize: 14),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       ),
                       onSubmitted: (_) => _handleSend(),
                     ),

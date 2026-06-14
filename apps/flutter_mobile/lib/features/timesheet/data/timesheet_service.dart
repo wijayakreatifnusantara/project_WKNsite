@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../../core/utils/constants.dart';
 
 class TimesheetService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  static String baseUrl = AppConstants.apiUrl;
   final _secureStorage = const FlutterSecureStorage();
 
   Future<void> submitTimesheet(String taskDescription, double hoursWorked) async {

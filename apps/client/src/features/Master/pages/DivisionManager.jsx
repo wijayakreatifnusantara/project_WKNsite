@@ -408,7 +408,7 @@ const DivisionManager = () => {
 
 
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
-      <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">
+      <div className="bg-transparent border-b border-white/50 z-30 shadow-neu shrink-0">
         <div className="max-w-[1400px] mx-auto p-4 space-y-3">
           
           {/* HEADER ROW */}
@@ -427,7 +427,7 @@ const DivisionManager = () => {
             <button
               onClick={handleRunMigration}
               disabled={isLoading || isSyncing}
-              className="h-10 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-[9px] uppercase tracking-widest rounded-xl transition-all border border-slate-200/65 flex items-center gap-1.5 active:scale-95"
+              className="h-10 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-[9px] uppercase tracking-widest rounded-xl transition-all border border-white/50/65 flex items-center gap-1.5 active:scale-95"
             >
               {isSyncing ? (
                 <IconLoader2 size={12} className="animate-spin text-slate-500" />
@@ -438,7 +438,7 @@ const DivisionManager = () => {
             </button>
             <button 
               onClick={() => handleOpenOrgModal()} 
-              className="h-10 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95"
+              className="h-10 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-neu transition-all active:scale-95"
             >
               <IconPlus size={14} />
               Tambah Divisi
@@ -473,7 +473,7 @@ const DivisionManager = () => {
               const orgDepts = departments[org.id] || [];
 
               return (
-                <div key={org.id} className="bg-white rounded-2xl border border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.03),0_1px_2px_0_rgba(0,0,0,0.02)] hover:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.06)] hover:border-slate-200/60 transition-all duration-300 overflow-hidden">
+                <div key={org.id} className="bg-transparent rounded-2xl border border-white/50 shadow-neu hover:shadow-neu hover:border-white/50/60 transition-all duration-300 overflow-hidden">
                   <div className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 bg-gradient-to-br from-[#E31E24]/5 to-[#E31E24]/10 border border-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24] shadow-2xs shrink-0">
@@ -487,7 +487,7 @@ const DivisionManager = () => {
                           <h2 className="text-xs font-black text-slate-800 uppercase tracking-tight leading-none">
                             {org.name}
                           </h2>
-                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider border ${org.is_active ? 'bg-emerald-50 text-emerald-600 border-emerald-100/60' : 'bg-slate-100 text-slate-500 border-slate-200/60'}`}>
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider border ${org.is_active ? 'bg-emerald-50 text-emerald-600 border-emerald-100/60' : 'bg-slate-100 text-slate-500 border-white/50/60'}`}>
                             {org.is_active ? 'Active' : 'Inactive'}
                           </span>
                         </div>
@@ -515,7 +515,7 @@ const DivisionManager = () => {
                       </button>
                       <button
                         onClick={() => handleOpenOrgModal(org)}
-                        className="h-8 w-8 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center transition-all active:scale-95"
+                        className="h-8 w-8 rounded-lg border border-white/50 text-slate-500 hover:text-slate-700 hover:shadow-neu-inset flex items-center justify-center transition-all active:scale-95"
                         title="Edit Divisi"
                       >
                         <IconEdit size={14} />
@@ -529,7 +529,7 @@ const DivisionManager = () => {
                       </button>
                       <button
                         onClick={() => handleExpandOrg(org.id)}
-                        className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+                        className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all shadow-neu active:scale-95"
                       >
                         <span>DEPT ({orgDepts.length})</span>
                         {isExpanded ? <IconChevronUp size={12} /> : <IconChevronDown size={12} />}
@@ -539,7 +539,7 @@ const DivisionManager = () => {
 
                   {/* DEPARTMENTS DRAWER */}
                   {isExpanded && (
-                    <div className="border-t border-slate-100 bg-slate-50/50 p-6 space-y-4 animate-in slide-in-from-top-4 duration-300">
+                    <div className="border-t border-white/50 bg-slate-50/50 p-6 space-y-4 animate-in slide-in-from-top-4 duration-300">
                       <div className="flex items-center justify-between">
                         <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                           Daftar Unit Kerja / Departemen ({org.code})
@@ -554,17 +554,17 @@ const DivisionManager = () => {
                       </div>
 
                       {orgDepts.length === 0 ? (
-                        <div className="py-6 text-center bg-white rounded-2xl border border-slate-200/50">
+                        <div className="py-6 text-center bg-transparent rounded-2xl border border-white/50/50">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Belum ada departemen ditambahkan</p>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           {orgDepts.map(dept => (
-                            <div key={dept.id} className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs hover:border-slate-300 transition-all flex flex-col gap-2">
+                            <div key={dept.id} className="bg-transparent rounded-xl border border-white/50 p-4 shadow-xs hover:border-white/20 transition-all flex flex-col gap-2">
                               <div className="flex items-center justify-between gap-3">
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="bg-slate-100 text-slate-600 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border border-slate-200/40">
+                                    <span className="bg-slate-100 text-slate-600 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border border-white/50/40">
                                       {dept.code}
                                     </span>
                                     <h5 className="text-[11px] font-black text-slate-800 uppercase tracking-tight">
@@ -588,7 +588,7 @@ const DivisionManager = () => {
                                   </button>
                                   <button
                                     onClick={() => handleOpenDeptModal(org.id, dept)}
-                                    className="h-6 w-6 rounded bg-slate-50 text-slate-500 hover:bg-slate-100 flex items-center justify-center transition-all border border-slate-200/60"
+                                    className="h-6 w-6 rounded bg-slate-50 text-slate-500 hover:bg-slate-100 flex items-center justify-center transition-all border border-white/50/60"
                                   >
                                     <IconEdit size={10} />
                                   </button>
@@ -603,7 +603,7 @@ const DivisionManager = () => {
 
                               {/* POSITIONS DRAWER */}
                               {expandedDept === dept.id && (
-                                <div className="pt-2 border-t border-slate-100 animate-in slide-in-from-top-2 duration-200">
+                                <div className="pt-2 border-t border-white/50 animate-in slide-in-from-top-2 duration-200">
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest flex items-center gap-1">
                                       <IconBriefcase size={9} /> Posisi / Jabatan
@@ -630,7 +630,7 @@ const DivisionManager = () => {
                                           <div className="flex gap-1">
                                             <button
                                               onClick={() => handleOpenPosModal(dept.id, pos)}
-                                              className="h-5 w-5 rounded bg-white text-slate-500 hover:bg-slate-100 flex items-center justify-center border border-slate-200/60"
+                                              className="h-5 w-5 rounded bg-transparent text-slate-500 hover:bg-slate-100 flex items-center justify-center border border-white/50/60"
                                             >
                                               <IconEdit size={8} />
                                             </button>
@@ -662,8 +662,8 @@ const DivisionManager = () => {
         {/* ─── ADD/EDIT ORG MODAL ───────────────────────────────────────────── */}
         {isOrgModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="bg-transparent rounded-3xl p-6 w-full max-w-md shadow-neu space-y-4">
+              <div className="flex items-center justify-between border-b border-white/50 pb-3">
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
                   <IconBuilding className="text-[#E31E24]" size={18} />
                   {selectedOrg ? 'Edit Divisi' : 'Tambah Divisi'}
@@ -682,7 +682,7 @@ const DivisionManager = () => {
                     placeholder="e.g. SEI"
                     value={orgForm.code}
                     onChange={e => setOrgForm({ ...orgForm, code: e.target.value.toUpperCase() })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                   />
                 </div>
 
@@ -694,7 +694,7 @@ const DivisionManager = () => {
                     placeholder="e.g. Schneider Electric Indonesia"
                     value={orgForm.name}
                     onChange={e => setOrgForm({ ...orgForm, name: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                   />
                 </div>
 
@@ -705,7 +705,7 @@ const DivisionManager = () => {
                     placeholder="e.g. Energy management and industrial automation division"
                     value={orgForm.description}
                     onChange={e => setOrgForm({ ...orgForm, description: e.target.value })}
-                    className="w-full p-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30 resize-none"
+                    className="w-full p-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30 resize-none"
                   />
                 </div>
 
@@ -717,7 +717,7 @@ const DivisionManager = () => {
                       placeholder="e.g. John Doe"
                       value={orgForm.pic_name}
                       onChange={e => setOrgForm({ ...orgForm, pic_name: e.target.value })}
-                      className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                      className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                     />
                   </div>
 
@@ -728,7 +728,7 @@ const DivisionManager = () => {
                       placeholder="e.g. 0812..."
                       value={orgForm.pic_phone}
                       onChange={e => setOrgForm({ ...orgForm, pic_phone: e.target.value })}
-                      className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                      className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                     />
                   </div>
                 </div>
@@ -740,11 +740,11 @@ const DivisionManager = () => {
                     placeholder="pic@company.com"
                     value={orgForm.pic_email}
                     onChange={e => setOrgForm({ ...orgForm, pic_email: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                   />
                 </div>
 
-                <div className="flex gap-2 justify-end border-t border-slate-100 pt-3">
+                <div className="flex gap-2 justify-end border-t border-white/50 pt-3">
                   <button
                     type="button"
                     onClick={() => setIsOrgModalOpen(false)}
@@ -755,7 +755,7 @@ const DivisionManager = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-9 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95"
+                    className="h-9 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-neu transition-all active:scale-95"
                   >
                     {isSubmitting ? <IconLoader2 className="animate-spin" size={14} /> : <IconDeviceFloppy size={14} />}
                     Simpan
@@ -769,8 +769,8 @@ const DivisionManager = () => {
         {/* ─── ADD/EDIT DEPT MODAL ───────────────────────────────────────────── */}
         {isDeptModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="bg-transparent rounded-3xl p-6 w-full max-w-md shadow-neu space-y-4">
+              <div className="flex items-center justify-between border-b border-white/50 pb-3">
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
                   <IconBuilding className="text-[#E31E24]" size={18} />
                   {selectedDept ? 'Edit Departemen' : 'Tambah Departemen'}
@@ -789,7 +789,7 @@ const DivisionManager = () => {
                     placeholder="e.g. ENG"
                     value={deptForm.code}
                     onChange={e => setDeptForm({ ...deptForm, code: e.target.value.toUpperCase() })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                   />
                 </div>
 
@@ -801,11 +801,11 @@ const DivisionManager = () => {
                     placeholder="e.g. Engineering & Support"
                     value={deptForm.name}
                     onChange={e => setDeptForm({ ...deptForm, name: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
                   />
                 </div>
 
-                <div className="flex gap-2 justify-end border-t border-slate-100 pt-3">
+                <div className="flex gap-2 justify-end border-t border-white/50 pt-3">
                   <button
                     type="button"
                     onClick={() => setIsDeptModalOpen(false)}
@@ -816,7 +816,7 @@ const DivisionManager = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-9 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95"
+                    className="h-9 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-neu transition-all active:scale-95"
                   >
                     {isSubmitting ? <IconLoader2 className="animate-spin" size={14} /> : <IconDeviceFloppy size={14} />}
                     Simpan
@@ -830,8 +830,8 @@ const DivisionManager = () => {
         {/* ─── ADD/EDIT POSITION MODAL ─────────────────────────────────────────── */}
         {isPosModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="bg-transparent rounded-3xl p-6 w-full max-w-md shadow-neu space-y-4">
+              <div className="flex items-center justify-between border-b border-white/50 pb-3">
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
                   <IconBriefcase className="text-indigo-600" size={18} />
                   {selectedPos ? 'Edit Posisi' : 'Tambah Posisi'}
@@ -850,7 +850,7 @@ const DivisionManager = () => {
                     placeholder="e.g. Senior Engineer"
                     value={posForm.name}
                     onChange={e => setPosForm({ ...posForm, name: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400/30"
                   />
                 </div>
 
@@ -861,7 +861,7 @@ const DivisionManager = () => {
                     placeholder="e.g. Level 3 / Grade C"
                     value={posForm.level}
                     onChange={e => setPosForm({ ...posForm, level: e.target.value })}
-                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400/30"
+                    className="w-full h-9 px-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400/30"
                   />
                 </div>
 
@@ -872,11 +872,11 @@ const DivisionManager = () => {
                     placeholder="e.g. Bertanggung jawab atas..."
                     value={posForm.description}
                     onChange={e => setPosForm({ ...posForm, description: e.target.value })}
-                    className="w-full p-3 rounded-xl bg-[#f0f2f5] border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400/30 resize-none"
+                    className="w-full p-3 rounded-xl bg-[#f0f2f5] border border-white/50 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400/30 resize-none"
                   />
                 </div>
 
-                <div className="flex gap-2 justify-end border-t border-slate-100 pt-3">
+                <div className="flex gap-2 justify-end border-t border-white/50 pt-3">
                   <button
                     type="button"
                     onClick={() => setIsPosModalOpen(false)}
@@ -887,7 +887,7 @@ const DivisionManager = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-9 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95"
+                    className="h-9 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[9px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-neu transition-all active:scale-95"
                   >
                     {isSubmitting ? <IconLoader2 className="animate-spin" size={14} /> : <IconDeviceFloppy size={14} />}
                     Simpan

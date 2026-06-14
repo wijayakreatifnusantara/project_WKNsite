@@ -50,7 +50,7 @@ const Timesheet = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -60,16 +60,16 @@ const Timesheet = () => {
             <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Billable Hours & Resource Allocation</p>
           </div>
           <div className="flex gap-4">
-            <div className="flex bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-2xl p-1">
+            <div className="flex bg-[#f0f2f5] shadow-neu rounded-2xl p-1">
               <button 
                 onClick={() => setFilter('pending')}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === 'pending' ? 'bg-[#E31E24] text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === 'pending' ? 'bg-[#E31E24] text-white shadow-neu' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 Need Approval
               </button>
               <button 
                 onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === 'all' ? 'bg-[#E31E24] text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === 'all' ? 'bg-[#E31E24] text-white shadow-neu' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 All Logs
               </button>
@@ -78,7 +78,7 @@ const Timesheet = () => {
         </header>
 
         {/* Weekly Progress Card (Visual Only) */}
-        <Card className="bg-[#f0f2f5] border-white border-[4px] shadow-[12px_12px_24px_#d1d9e6,-12px_-10px_20px_#ffffff] rounded-[2.5rem] p-8 flex flex-col gap-6">
+        <Card className="bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 flex flex-col gap-6">
            <div className="flex justify-between items-center px-4">
              <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Weekly Summary</h3>
              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{dayjs().startOf('week').format('MMM DD')} - {dayjs().endOf('week').format('MMM DD')}</span>
@@ -87,7 +87,7 @@ const Timesheet = () => {
            <div className="flex items-end justify-around h-48 gap-4 px-4">
              {weeklyData.map((h, i) => (
                <div key={i} className="flex-1 flex flex-col items-center gap-3">
-                 <div className="w-full bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl h-32 relative overflow-hidden flex items-end">
+                 <div className="w-full bg-[#f0f2f5] shadow-neu rounded-xl h-32 relative overflow-hidden flex items-end">
                    <div className="w-full bg-[#E31E24] transition-all duration-1000" style={{ height: `${h}%` }}></div>
                  </div>
                  <span className="text-[8px] font-black text-slate-400 uppercase">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}</span>
@@ -126,9 +126,9 @@ const Timesheet = () => {
 };
 
 const TimesheetLog = ({ log, onApprove, onReject }) => (
-  <Card className="border-white border-[3px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6 flex flex-col md:flex-row md:items-center justify-between group gap-4">
+  <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6 flex flex-col md:flex-row md:items-center justify-between group gap-4">
     <div className="flex items-center gap-6">
-      <div className="h-12 w-12 bg-[#f0f2f5] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center text-[#E31E24]">
+      <div className="h-12 w-12 bg-[#f0f2f5] rounded-xl shadow-neu flex items-center justify-center text-[#E31E24]">
         <IconHistory size={24} />
       </div>
       <div>
@@ -154,7 +154,7 @@ const TimesheetLog = ({ log, onApprove, onReject }) => (
           <Button 
             onClick={onReject}
             variant="ghost" 
-            className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] border-white border-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 p-0 flex items-center justify-center transition-all"
+            className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu border-white border-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 p-0 flex items-center justify-center transition-all"
             title="Reject"
           >
             <IconX size={16} />
@@ -162,7 +162,7 @@ const TimesheetLog = ({ log, onApprove, onReject }) => (
           <Button 
             onClick={onApprove}
             variant="ghost" 
-            className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] border-white border-2 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 p-0 flex items-center justify-center transition-all"
+            className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu border-white border-2 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 p-0 flex items-center justify-center transition-all"
             title="Approve"
           >
             <IconCheck size={16} />

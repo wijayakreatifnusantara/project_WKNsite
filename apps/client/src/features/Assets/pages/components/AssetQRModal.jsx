@@ -33,10 +33,10 @@ const AssetQRModal = ({ isOpen, onClose, asset }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-sm bg-[#f0f2f5] border-white border-[4px] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] rounded-[2.5rem] p-8 relative overflow-hidden">
+      <div className="w-full max-w-sm bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] text-slate-400 hover:text-[#E31E24] transition-all"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all"
         >
           <IconX size={20} />
         </button>
@@ -47,7 +47,7 @@ const AssetQRModal = ({ isOpen, onClose, asset }) => {
         </div>
 
         <div className="flex flex-col items-center gap-6">
-          <div className="p-6 bg-white rounded-[2rem] shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] border-4 border-white print:shadow-none print:border-0">
+          <div className="p-6 bg-transparent rounded-[2rem] shadow-neu border-4 border-white print:shadow-none print:border-0">
             <QRCodeSVG 
               id="asset-qr-code"
               value={asset.asset_tag || asset.id}
@@ -73,14 +73,14 @@ const AssetQRModal = ({ isOpen, onClose, asset }) => {
           <div className="grid grid-cols-2 gap-4 w-full pt-4 no-print">
             <Button 
               onClick={downloadQR}
-              className="h-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:shadow-none transition-all flex gap-2 items-center"
+              className="h-12 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:shadow-none transition-all flex gap-2 items-center"
             >
               <IconDownload size={16} />
               Download
             </Button>
             <Button 
               onClick={printLabel}
-              className="h-12 rounded-2xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-2 items-center"
+              className="h-12 rounded-2xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-2 items-center"
             >
               <IconPrinter size={16} />
               Print Label

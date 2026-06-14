@@ -145,3 +145,95 @@ async def get_pending_reviews(period: str = None):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+import json
+import os
+
+GAMIFICATION_FILE = os.path.join(os.path.dirname(__file__), "..", "gamification.json")
+
+def load_bonus_points():
+    if not os.path.exists(GAMIFICATION_FILE):
+        return {}
+    try:
+        with open(GAMIFICATION_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {}
+
+def save_bonus_points(data):
+    with open(GAMIFICATION_FILE, "w") as f:
+        json.dump(data, f)
+
+@router.get("/performance/leaderboard")
+async def get_leaderboard(limit: int = 10):
+    """Get gamification leaderboard based on on-time attendance and manual bonuses"""
+    try:
+        # Fetch attendance to calculate points dynamically
+        att_res = supabase_client.client.table("attendance").select("employee_id, late_minutes, date").execute()
+        
+        bonus_points = load_bonus_points()
+        points_map = {}
+        for row in att_res.data:
+            eid = row.get("employee_id")
+            if not eid: continue
+            if eid not in points_map:
+                points_map[eid] = 0
+            # +10 points for on-time check-in
+            if row.get("late_minutes", 0) == 0:
+                points_map[eid] += 10
+                
+        # Fetch active employees
+        emp_res = supabase_client.client.table("employees").select("id, name, employee_id, profile_photo_base64, division_id").eq("is_active", True).execute()
+        
+        # Optional: fetch division names for better UI
+        div_res = supabase_client.client.table("divisions").select("id, name").execute()
+        div_map = {d["id"]: d["name"] for d in div_res.data} if div_res.data else {}
+        
+        leaderboard = []
+        for emp in emp_res.data:
+            base_pts = points_map.get(emp["id"], 0)
+            if base_pts == 0 and emp.get("employee_id"):
+                base_pts = points_map.get(emp["employee_id"], 0)
+                
+            bonus_pts = bonus_points.get(emp["id"], 0)
+            if bonus_pts == 0 and emp.get("employee_id"):
+                bonus_pts = bonus_points.get(emp["employee_id"], 0)
+                
+            total_pts = base_pts + bonus_pts
+            div_name = div_map.get(emp.get("division_id"), "Staff")
+                
+            leaderboard.append({
+                "id": emp["id"],
+                "name": emp["name"],
+                "department": div_name,
+                "avatar_url": emp.get("profile_photo_base64"),
+                "points": total_pts,
+                "base_points": base_pts,
+                "bonus_points": bonus_pts,
+                "streak": base_pts // 10  # Simplified streak calculation for demo
+            })
+            
+        # Sort descending by points
+        leaderboard.sort(key=lambda x: x["points"], reverse=True)
+        
+        return {"status": "success", "data": leaderboard[:limit]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+from pydantic import BaseModel
+class BonusRequest(BaseModel):
+    employee_id: str
+    bonus: int
+
+@router.post("/performance/gamification/bonus")
+async def add_bonus_points(payload: BonusRequest):
+    """Add manual bonus points to an employee"""
+    try:
+        bonus_data = load_bonus_points()
+        current_bonus = bonus_data.get(payload.employee_id, 0)
+        bonus_data[payload.employee_id] = current_bonus + payload.bonus
+        save_bonus_points(bonus_data)
+        
+        return {"status": "success", "message": f"Added {payload.bonus} points to {payload.employee_id}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

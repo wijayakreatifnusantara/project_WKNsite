@@ -59,6 +59,14 @@ void callbackDispatcher() {
         }
       }
       debugPrint("Background sync completed: $successCount records synced.");
+      
+      if (successCount > 0) {
+        await NotificationService().showOfflineSyncNotification(
+          'Sinkronisasi Selesai',
+          '$successCount data absen offline berhasil diunggah ke server.',
+        );
+      }
+      
       return Future.value(true);
     } catch (err) {
       debugPrint("Background task error: $err");

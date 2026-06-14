@@ -18,7 +18,7 @@ const Academy = () => {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -28,7 +28,7 @@ const Academy = () => {
             <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Knowledge Hub & Professional Development</p>
           </div>
           <div className="flex gap-4">
-            <Button className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center">
+            <Button className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center">
               <IconBook size={16} />
               Course Catalog
             </Button>
@@ -47,8 +47,8 @@ const Academy = () => {
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Active Learning Paths</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {courses.map(course => (
-              <Card key={course.id} className="border-white border-[3px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] p-6 flex items-center gap-6 group hover:scale-[1.01] transition-all">
-                <div className="h-20 w-20 bg-[#f0f2f5] rounded-[1.5rem] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center text-[#E31E24]">
+              <Card key={course.id} className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2rem] p-6 flex items-center gap-6 group hover:scale-[1.01] transition-all">
+                <div className="h-20 w-20 bg-[#f0f2f5] rounded-[1.5rem] shadow-neu flex items-center justify-center text-[#E31E24]">
                   <IconSchool size={32} />
                 </div>
                 <div className="flex-1 space-y-2">
@@ -60,7 +60,7 @@ const Academy = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-[#f0f2f5] shadow-[inset_1px_1px_2px_#d1d9e6,inset_-1px_-1px_2px_#ffffff] rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-[#f0f2f5] shadow-neu rounded-full overflow-hidden">
                       <div className="h-full bg-[#E31E24] transition-all duration-1000" style={{ width: `${course.progress}%` }}></div>
                     </div>
                     <span className="text-[9px] font-black text-slate-400">{course.progress}%</span>
@@ -83,9 +83,9 @@ const Academy = () => {
 };
 
 const StatCard = ({ label, value, icon, color }) => (
-  <Card className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6">
+  <Card className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6">
     <div className="flex items-center gap-4">
-      <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center
+      <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
         ${color === 'emerald' ? 'text-emerald-500' : color === 'indigo' ? 'text-indigo-500' : 'text-amber-500'}`}>
         {icon}
       </div>

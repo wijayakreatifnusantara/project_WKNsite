@@ -508,7 +508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: const Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               ),
             ),
-            const SizedBox(height: 100), // Increased from 50 to prevent bottom nav bar overlap
+            const SizedBox(height: 140), // Increased to prevent bottom nav bar overlap
           ],
         ),
       ),
@@ -563,5 +563,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildDivider() => const Divider(height: 1, indent: 56, endIndent: 16, color: Color(0xFFF1F5F9));
+  Widget _buildDivider() => Divider(height: 1, indent: 56, endIndent: 16, color: context.borderColor);
 }

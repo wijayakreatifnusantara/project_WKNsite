@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final isLoading = context.watch<AuthProvider>().isLoading;
-    final bgColor = const Color(0xFFF0F2F5);
+    final bgColor = context.backgroundColor;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -114,14 +114,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(40),
                   border: Border.all(color: context.surfaceColor, width: 4),
                   boxShadow: [
-                    const BoxShadow(
-                      color: Color(0xFFD1D9E6),
-                      offset: Offset(12, 12),
+                    BoxShadow(
+                      color: context.isDarkMode ? Colors.black.withValues(alpha: 0.4) : const Color(0xFFD1D9E6),
+                      offset: const Offset(12, 12),
                       blurRadius: 24,
                     ),
                     BoxShadow(
-                      color: context.surfaceColor,
-                      offset: Offset(-12, -12),
+                      color: context.isDarkMode ? Colors.white.withValues(alpha: 0.02) : context.surfaceColor,
+                      offset: const Offset(-12, -12),
                       blurRadius: 24,
                     ),
                   ],
@@ -139,14 +139,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     ),
                     const SizedBox(height: 16),
                     RichText(
-                      text: const TextSpan(
+                      text: TextSpan(
                         children: [
                           TextSpan(
                             text: 'WKN',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              color: Color(0xFF1E293B),
+                              color: context.textPrimary,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -163,12 +163,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'CORPORATE MANAGEMENT SYSTEM',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
-                        color: Colors.black45,
+                        color: context.textSecondary,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -178,35 +178,36 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
                             'EMAIL ADDRESS',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: Colors.black45,
+                              color: context.textSecondary,
                               letterSpacing: 1.5,
                             ),
                           ),
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8EBF0),
+                            color: context.isDarkMode ? context.surfaceColor : const Color(0xFFE8EBF0),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: context.isDarkMode ? context.borderColor : Colors.transparent),
                           ),
                           child: TextField(
                             controller: _emailController,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF334155),
+                              color: context.textPrimary,
                             ),
                             keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'name@company.com',
-                              hintStyle: TextStyle(color: Colors.black26),
-                              prefixIcon: Icon(Icons.mail_outline, color: Colors.black26, size: 20),
+                              hintStyle: TextStyle(color: context.textSecondary.withValues(alpha: 0.5)),
+                              prefixIcon: Icon(Icons.mail_outline, color: context.textSecondary.withValues(alpha: 0.5), size: 20),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(vertical: 16),
                             ),
@@ -220,39 +221,40 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
                             'PASSWORD',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: Colors.black45,
+                              color: context.textSecondary,
                               letterSpacing: 1.5,
                             ),
                           ),
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8EBF0),
+                            color: context.isDarkMode ? context.surfaceColor : const Color(0xFFE8EBF0),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: context.isDarkMode ? context.borderColor : Colors.transparent),
                           ),
                           child: TextField(
                             controller: _passwordController,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF334155),
+                              color: context.textPrimary,
                             ),
                             obscureText: _obscurePassword,
                             decoration: InputDecoration(
                               hintText: '••••••••',
-                              hintStyle: const TextStyle(color: Colors.black26),
-                              prefixIcon: const Icon(Icons.lock_outline, color: Colors.black26, size: 20),
+                              hintStyle: TextStyle(color: context.textSecondary.withValues(alpha: 0.5)),
+                              prefixIcon: Icon(Icons.lock_outline, color: context.textSecondary.withValues(alpha: 0.5), size: 20),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  color: Colors.black26,
+                                  color: context.textSecondary.withValues(alpha: 0.5),
                                   size: 20,
                                 ),
                                 onPressed: () {
@@ -348,28 +350,28 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.shield_outlined, color: Colors.black26, size: 14),
+                        Icon(Icons.shield_outlined, color: context.textSecondary.withValues(alpha: 0.5), size: 14),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'SECURE SSL',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.black26, letterSpacing: 1.0),
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: context.textSecondary.withValues(alpha: 0.5), letterSpacing: 1.0),
                         ),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('•', style: TextStyle(color: Colors.black26)),
+                          child: Text('•', style: TextStyle(color: context.textSecondary.withValues(alpha: 0.5))),
                         ),
                         Icon(Icons.check_circle_outline, color: Colors.green.withValues(alpha: 0.5), size: 14),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'ENCRYPTED',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.black26, letterSpacing: 1.0),
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: context.textSecondary.withValues(alpha: 0.5), letterSpacing: 1.0),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       '© 2026 WIJAYA KREATIF NUSANTARA',
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.black26, letterSpacing: 1.0),
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: context.textSecondary.withValues(alpha: 0.5), letterSpacing: 1.0),
                     ),
                     const SizedBox(height: 4),
                     Container(
@@ -379,9 +381,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: context.surfaceColor),
                       ),
-                      child: const Text(
+                      child: Text(
                         'IMS VERSION 1.2.0 • OPTIMIZED FOR MOBILE',
-                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.black45, letterSpacing: 1.0),
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: context.textSecondary, letterSpacing: 1.0),
                       ),
                     ),
                   ],

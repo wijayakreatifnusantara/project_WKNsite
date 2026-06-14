@@ -27,14 +27,14 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-[#f0f2f5] w-full max-w-2xl rounded-[2.5rem] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] border-white border-[6px] overflow-hidden flex flex-col max-h-[80vh]">
+      <div className="bg-[#f0f2f5] w-full max-w-2xl rounded-[2.5rem] shadow-neu border-white border-[6px] overflow-hidden flex flex-col max-h-[80vh]">
         <div className="p-8 border-b border-white/50">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight">Assignment <span className="text-[#E31E24]">History</span></h2>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Lifecycle Audit Log: {asset.name}</p>
             </div>
-            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
+            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
               <IconX size={20} />
             </button>
           </div>
@@ -55,19 +55,19 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
                   )}
                   
                   {/* Icon Node */}
-                  <div className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] flex items-center justify-center shrink-0 z-10 border-white border-2">
+                  <div className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center justify-center shrink-0 z-10 border-white border-2">
                     <IconHistory size={20} className={log.return_date ? 'text-slate-400' : 'text-emerald-500 animate-pulse'} />
                   </div>
 
                   {/* Content Card */}
-                  <div className="flex-1 p-5 rounded-2xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] border-white border-2">
+                  <div className="flex-1 p-5 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-2">
                         <IconUser size={14} className="text-[#E31E24]" />
                         <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{log.employees?.name}</span>
                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest opacity-60">({log.employee_id})</span>
                       </div>
-                      <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm
+                      <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-neu
                         ${log.return_date ? 'bg-slate-100 text-slate-500' : 'bg-emerald-50 text-emerald-600'}`}>
                         {log.return_date ? 'Completed' : 'Active'}
                       </div>

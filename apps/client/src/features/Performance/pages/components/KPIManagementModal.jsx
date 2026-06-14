@@ -92,12 +92,12 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-[#f0f2f5] w-full max-w-4xl rounded-[2rem] shadow-2xl border-2 border-white overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#f0f2f5] w-full max-w-4xl rounded-[2rem] shadow-neu border-2 border-white overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="p-6 border-b-2 border-white flex justify-between items-center bg-[#f0f2f5]">
           <div>
             <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#E31E24]">
+              <div className="h-10 w-10 rounded-xl bg-transparent shadow-neu flex items-center justify-center text-[#E31E24]">
                 <IconTargetArrow size={24} />
               </div>
               Kelola Master KPI
@@ -108,7 +108,7 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
           </div>
           <button 
             onClick={onClose}
-            className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:bg-rose-50 transition-colors"
+            className="h-10 w-10 rounded-full bg-transparent shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:bg-rose-50 transition-colors"
           >
             <IconX size={20} />
           </button>
@@ -121,12 +121,12 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
             
             <div className="space-y-4">
               {metrics.length === 0 ? (
-                <div className="p-8 text-center bg-white/50 rounded-2xl border-2 border-dashed border-slate-300">
+                <div className="p-8 text-center bg-white/50 rounded-2xl border-2 border-dashed border-white/20">
                   <p className="text-slate-500 font-medium">Belum ada metrik KPI.</p>
                 </div>
               ) : (
                 metrics.map(metric => (
-                  <div key={metric.id} className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-[#E31E24]/30 transition-colors">
+                  <div key={metric.id} className="p-4 bg-transparent rounded-2xl shadow-neu border border-white/50 flex items-center justify-between group hover:border-[#E31E24]/30 transition-colors">
                     <div className="flex-1 pr-4">
                       <div className="flex items-center gap-2 mb-1">
                         <h5 className="font-bold text-slate-800">{metric.name}</h5>
@@ -175,7 +175,7 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
           </div>
 
           {/* Right Panel: Form */}
-          <div className="w-full md:w-80 bg-white p-6 overflow-y-auto custom-scrollbar">
+          <div className="w-full md:w-80 bg-transparent p-6 overflow-y-auto custom-scrollbar">
             <h4 className="text-[11px] font-black text-[#E31E24] uppercase tracking-[0.2em] mb-4">
               {isEditing ? 'Edit Metrik' : 'Tambah Metrik Baru'}
             </h4>
@@ -189,7 +189,7 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="Contoh: Komunikasi"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
+                  className="w-full h-10 px-3 rounded-xl border border-white/50 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
                 />
               </div>
 
@@ -203,7 +203,7 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
                   min="1"
                   max="100"
                   placeholder="Contoh: 20"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
+                  className="w-full h-10 px-3 rounded-xl border border-white/50 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
                 />
               </div>
 
@@ -215,7 +215,7 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
                   onChange={(e) => setMaxScore(e.target.value)}
                   required
                   min="1"
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
+                  className="w-full h-10 px-3 rounded-xl border border-white/50 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
                 />
               </div>
 
@@ -226,7 +226,7 @@ const KPIManagementModal = ({ isOpen, onClose, metrics, addMetric, updateMetric,
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Penjelasan kriteria penilaian..."
                   rows="3"
-                  className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all resize-none"
+                  className="w-full p-3 rounded-xl border border-white/50 bg-slate-50 text-sm focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all resize-none"
                 />
               </div>
 

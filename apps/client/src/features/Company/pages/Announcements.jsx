@@ -20,8 +20,8 @@ export default function Announcements() {
   const fetchFilters = async () => {
     try {
       const [deptRes, empRes] = await Promise.all([
-        apiClient.get('/api/organizations/departments'),
-        apiClient.get('/api/employees')
+        apiClient.get('/organizations/departments'),
+        apiClient.get('/employees')
       ]);
 
       if (deptRes.data && deptRes.data.data) setDepartments(deptRes.data.data);
@@ -57,7 +57,7 @@ export default function Announcements() {
         targetValue
       };
 
-      const res = await apiClient.post('/api/company/announcements', payload);
+      const res = await apiClient.post('/company/announcements', payload);
       toast.success(res.data.message || 'Pengumuman berhasil dikirim!');
       
       // Reset form
@@ -84,7 +84,7 @@ export default function Announcements() {
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-[#f0f2f5] rounded-2xl border-none shadow-neu overflow-hidden">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4 md:col-span-2">
@@ -95,7 +95,7 @@ export default function Announcements() {
                   required
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-wkn-500 focus:border-wkn-500 transition-all outline-none text-slate-800"
+                  className="w-full px-4 py-2 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg focus:ring-2 focus:ring-wkn-500 focus:border-wkn-500 transition-all outline-none text-slate-800"
                   placeholder="Contoh: Perubahan Jam Kerja Selama Ramadhan"
                 />
               </div>
@@ -107,7 +107,7 @@ export default function Announcements() {
                   rows="4"
                   value={body}
                   onChange={e => setBody(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-wkn-500 focus:border-wkn-500 transition-all outline-none text-slate-800 resize-none"
+                  className="w-full px-4 py-2 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg focus:ring-2 focus:ring-wkn-500 focus:border-wkn-500 transition-all outline-none text-slate-800 resize-none"
                   placeholder="Tuliskan isi pesan pengumuman dengan jelas..."
                 />
               </div>
@@ -119,7 +119,7 @@ export default function Announcements() {
                 <select
                   value={type}
                   onChange={e => setType(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
+                  className="w-full px-4 py-2 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
                 >
                   <option value="info">Informasi (Biru Ungu)</option>
                   <option value="system">Sistem (Oranye)</option>
@@ -139,7 +139,7 @@ export default function Announcements() {
                     setTargetType(e.target.value);
                     setTargetValue('');
                   }}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
+                  className="w-full px-4 py-2 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
                 >
                   <option value="ALL">Semua Karyawan (Seluruh Perusahaan)</option>
                   <option value="DEPARTMENT">Berdasarkan Departemen</option>
@@ -153,7 +153,7 @@ export default function Announcements() {
                   <select
                     value={targetValue}
                     onChange={e => setTargetValue(e.target.value)}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
+                    className="w-full px-4 py-2 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
                   >
                     <option value="">-- Pilih Departemen --</option>
                     {departments.map(dept => (
@@ -169,7 +169,7 @@ export default function Announcements() {
                   <select
                     value={targetValue}
                     onChange={e => setTargetValue(e.target.value)}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
+                    className="w-full px-4 py-2 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg focus:ring-2 focus:ring-wkn-500 outline-none"
                   >
                     <option value="">-- Pilih Jabatan --</option>
                     {positions.map((pos, idx) => (
@@ -181,11 +181,11 @@ export default function Announcements() {
             </div>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-100">
+          <div className="flex justify-end pt-4 border-t border-white/50">
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-wkn-500 text-white font-medium rounded-lg hover:bg-wkn-600 transition-colors shadow-sm disabled:opacity-50 flex items-center"
+              className="px-6 py-2.5 bg-wkn-500 text-white font-medium rounded-lg hover:bg-wkn-600 transition-colors shadow-neu disabled:opacity-50 flex items-center"
             >
               {loading ? (
                 <span>Sedang Mengirim...</span>

@@ -67,7 +67,7 @@ const PerformanceHub = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -81,11 +81,11 @@ const PerformanceHub = () => {
             <div className="relative">
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all relative"
+                className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all relative"
               >
                 <IconBell size={20} />
                 {pendingReviews.length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#E31E24] text-white text-[10px] font-black flex items-center justify-center shadow-lg">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#E31E24] text-white text-[10px] font-black flex items-center justify-center shadow-neu">
                     {pendingReviews.length}
                   </span>
                 )}
@@ -93,7 +93,7 @@ const PerformanceHub = () => {
               
               {/* Notification Dropdown */}
               {showNotifications && (
-                <div className="absolute right-0 top-16 w-80 bg-[#f0f2f5] rounded-2xl shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] border-white border-3 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-16 w-80 bg-[#f0f2f5] rounded-2xl shadow-neu border-white border-3 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="p-4 border-b border-white/50">
                     <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                       <IconAlertCircle size={14} className="text-[#E31E24]" />
@@ -108,7 +108,7 @@ const PerformanceHub = () => {
                     ) : (
                       pendingReviews.map((employee, idx) => (
                         <div key={idx} className="p-4 flex items-center gap-3 border-b border-white/30 last:border-0 hover:bg-white/30 transition-colors">
-                          <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center">
+                          <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center">
                             <IconUserCircle size={20} className="text-[#E31E24]" />
                           </div>
                           <div className="flex-1">
@@ -133,7 +133,7 @@ const PerformanceHub = () => {
             
             <Button 
               onClick={() => setIsReviewModalOpen(true)}
-              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center"
+              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center"
             >
               <IconPlus size={16} />
               New Appraisal
@@ -144,9 +144,9 @@ const PerformanceHub = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat, i) => (
-            <Card key={i} className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6">
+            <Card key={i} className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6">
               <div className="flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center
+                <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
                   ${stat.color === 'emerald' ? 'text-emerald-500' : stat.color === 'amber' ? 'text-amber-500' : 'text-indigo-500'}`}>
                   {stat.icon}
                 </div>
@@ -172,7 +172,7 @@ const PerformanceHub = () => {
                   placeholder="Search Employee..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-9 pl-9 pr-4 bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] border-none rounded-xl text-[10px] font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
+                  className="w-full h-9 pl-9 pr-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-[10px] font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
                 />
               </div>
             </div>
@@ -193,7 +193,7 @@ const PerformanceHub = () => {
           {/* Right Column: Visualization & Configuration */}
           <div className="space-y-8">
             {selectedReview ? (
-              <Card className="border-white border-[3px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] p-6 animate-in slide-in-from-right-4 duration-500">
+              <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2rem] p-6 animate-in slide-in-from-right-4 duration-500">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.25em] flex items-center gap-2 mb-1">
@@ -206,7 +206,7 @@ const PerformanceHub = () => {
                     {/* Export PDF Button (T019) */}
                     <button 
                       onClick={() => handleExportPDF(selectedReview)}
-                      className="h-10 px-4 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center gap-2 text-[8px] font-black text-[#E31E24] uppercase tracking-widest hover:text-[#C1181E] transition-all"
+                      className="h-10 px-4 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center gap-2 text-[8px] font-black text-[#E31E24] uppercase tracking-widest hover:text-[#C1181E] transition-all"
                     >
                       <IconDownload size={14} />
                       Export PDF
@@ -248,7 +248,7 @@ const PerformanceHub = () => {
                     <div className="space-y-4">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Contributing Factors</p>
                       {burnoutData.factors.map((f, i) => (
-                        <div key={i} className="p-4 rounded-2xl bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-white border-2">
+                        <div key={i} className="p-4 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2">
                           <div className="flex justify-between items-center mb-1">
                             <span className="text-[10px] font-black text-slate-700 uppercase">{f.factor}</span>
                             <span className={`text-[8px] font-black uppercase ${f.impact === 'High' || f.impact === 'Critical' ? 'text-rose-500' : 'text-amber-500'}`}>
@@ -261,7 +261,7 @@ const PerformanceHub = () => {
                     </div>
 
                     {burnoutData.level === 'High' && (
-                      <div className="p-5 rounded-[1.5rem] bg-rose-50 border-2 border-white shadow-[4px_4px_8px_rgba(227,30,36,0.1)]">
+                      <div className="p-5 rounded-[1.5rem] bg-rose-50 border-2 border-white shadow-neu">
                         <p className="text-[10px] font-black text-rose-600 uppercase tracking-tight mb-2">AI Recommendation</p>
                         <p className="text-[9px] text-rose-500 font-bold leading-relaxed">
                           Sistem mendeteksi risiko kejenuhan tinggi. Direkomendasikan untuk memberikan istirahat (Wellness Leave) selama 1-2 hari atau melakukan sesi konseling 1-on-1 segera.
@@ -289,7 +289,7 @@ const PerformanceHub = () => {
 
             ) : (
               <>
-                <Card className="border-white border-[3px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] p-6">
+                <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2rem] p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.25em] flex items-center gap-2">
                     <IconTargetArrow size={16} className="text-[#E31E24]" />
@@ -297,7 +297,7 @@ const PerformanceHub = () => {
                   </h3>
                   <button 
                     onClick={() => setIsKpiModalOpen(true)}
-                    className="h-8 px-3 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-[#E31E24] transition-all"
+                    className="h-8 px-3 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:text-[#E31E24] transition-all"
                   >
                     <IconSettings size={14} />
                     Kelola Master KPI
@@ -310,9 +310,9 @@ const PerformanceHub = () => {
                       <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{metric.name}</span>
                       <span className="text-[10px] font-black text-[#E31E24] uppercase tracking-widest">{(metric.weight * 100).toFixed(0)}%</span>
                     </div>
-                    <div className="h-2 w-full bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-[#f0f2f5] shadow-neu rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-[#E31E24] shadow-[0_0_8px_rgba(227,30,36,0.4)] rounded-full transition-all duration-1000" 
+                        className="h-full bg-[#E31E24] shadow-neu rounded-full transition-all duration-1000" 
                         style={{ width: `${metric.weight * 100}%` }}
                       ></div>
                     </div>
@@ -321,7 +321,7 @@ const PerformanceHub = () => {
               </div>
             </Card>
 
-            <Card className="border-white border-[3px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2rem] p-6">
+            <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2rem] p-6">
               <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-[0.25em] mb-6 flex items-center gap-2">
                 <IconTrophy size={16} className="text-amber-500" />
                 Performance Leaderboard
@@ -329,7 +329,7 @@ const PerformanceHub = () => {
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/40 border border-white/50">
-                    <div className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] flex items-center justify-center text-[10px] font-black text-slate-400">
+                    <div className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu flex items-center justify-center text-[10px] font-black text-slate-400">
                       #{i}
                     </div>
                     <div className="flex-1">
@@ -372,12 +372,12 @@ const ReviewCard = ({ review, onClick, isActive, onExport }) => {
   return (
     <Card 
       onClick={onClick}
-      className={`border-white border-[3px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-5 group hover:scale-[1.01] transition-all cursor-pointer
-        ${isActive ? 'ring-2 ring-[#E31E24] shadow-[inset_4px_4px_8px_#d1d9e6]' : ''}`}
+      className={`border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-5 group hover:scale-[1.01] transition-all cursor-pointer
+        ${isActive ? 'ring-2 ring-[#E31E24] shadow-neu' : ''}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center">
+          <div className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center justify-center">
             <IconUserCircle size={24} className="text-[#E31E24]" />
           </div>
           <div>
@@ -397,7 +397,7 @@ const ReviewCard = ({ review, onClick, isActive, onExport }) => {
           
           <div className="flex flex-col items-end">
             <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Score</span>
-            <div className={`px-3 py-1 rounded-full text-xs font-black shadow-sm ${badge.bgColor} ${badge.textColor}`}>
+            <div className={`px-3 py-1 rounded-full text-xs font-black shadow-neu ${badge.bgColor} ${badge.textColor}`}>
               {review.total_score} / 5.0
             </div>
           </div>
@@ -406,14 +406,14 @@ const ReviewCard = ({ review, onClick, isActive, onExport }) => {
           {onExport && (
             <button 
               onClick={(e) => { e.stopPropagation(); onExport(review); }}
-              className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
+              className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
               title="Export to PDF"
             >
               <IconDownload size={18} />
             </button>
           )}
           
-          <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[3px_3px_6px_#d1d9e6,-3px_-3px_6px_#ffffff] flex items-center justify-center text-slate-400 group-hover:text-[#E31E24] transition-all">
+          <div className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 group-hover:text-[#E31E24] transition-all">
             <IconChevronRight size={18} />
           </div>
         </div>
@@ -423,7 +423,7 @@ const ReviewCard = ({ review, onClick, isActive, onExport }) => {
 };
 
 const FeedbackBubble = ({ label, score, count }) => (
-  <div className="p-4 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 flex flex-col items-center gap-1">
+  <div className="p-4 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2 flex flex-col items-center gap-1">
     <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">{label}</span>
     <span className="text-sm font-black text-slate-800">{score}</span>
     <span className="text-[7px] font-bold text-[#E31E24] uppercase">{count} Responses</span>

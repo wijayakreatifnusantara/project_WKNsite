@@ -97,10 +97,10 @@ export default function CommandPalette({ isOpen, onClose }) {
       />
 
       {/* Palette Container */}
-      <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-200 overflow-hidden animate-fade-in-down">
+      <div className="relative w-full max-w-xl bg-transparent rounded-2xl shadow-neu border border-white/20 overflow-hidden animate-fade-in-down">
         
         {/* Search Input */}
-        <div className="flex items-center px-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center px-4 border-b border-white/20 bg-slate-50/50">
           <IconSearch className="text-slate-400 mr-3" size={22} />
           <input
             ref={inputRef}
@@ -112,7 +112,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           />
           <button 
             onClick={onClose}
-            className="text-[10px] font-bold text-slate-400 border border-slate-200 bg-white px-2 py-1 rounded-md ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="text-[10px] font-bold text-slate-400 border border-white/20 bg-transparent px-2 py-1 rounded-md ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           >
             ESC
           </button>
@@ -154,7 +154,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                           onMouseEnter={() => setSelectedIndex(globalIndex)}
                         >
                           <div className={`h-8 w-8 rounded-lg flex items-center justify-center mr-3 ${
-                            isSelected ? 'bg-[#E31E24] text-white shadow-md shadow-[#E31E24]/20' : 'bg-slate-100 text-slate-500'
+                            isSelected ? 'bg-[#E31E24] text-white shadow-neu shadow-neu/20' : 'bg-slate-100 text-slate-500'
                           }`}>
                             {item.icon}
                           </div>
@@ -177,15 +177,15 @@ export default function CommandPalette({ isOpen, onClose }) {
         </div>
         
         {/* Footer */}
-        <div className="bg-slate-50 px-4 py-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-medium text-slate-500">
+        <div className="bg-slate-50 px-4 py-3 border-t border-white/20 flex items-center justify-between text-[10px] font-medium text-slate-500">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
-              <span className="border border-slate-300 bg-white px-1.5 py-0.5 rounded shadow-sm text-slate-700">↑</span>
-              <span className="border border-slate-300 bg-white px-1.5 py-0.5 rounded shadow-sm text-slate-700">↓</span>
+              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">↑</span>
+              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">↓</span>
               Navigasi
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="border border-slate-300 bg-white px-1.5 py-0.5 rounded shadow-sm text-slate-700">Enter</span>
+              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">Enter</span>
               Pilih
             </span>
           </div>

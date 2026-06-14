@@ -249,7 +249,7 @@ const Employees = () => {
     <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
-      <div className="bg-white border-b border-slate-200 z-30 shadow-sm shrink-0">
+      <div className="bg-transparent border-b border-white/50 z-30 shadow-neu shrink-0">
         <div className="w-full mx-auto p-4 space-y-3 px-6">
           
           {/* HEADER ROW */}
@@ -266,11 +266,11 @@ const Employees = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-white text-slate-600 shadow-sm border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-blue-600 hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5">
+              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-transparent text-slate-600 shadow-neu border border-white/50 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-blue-600 hover:shadow-neu-inset transition-all flex items-center justify-center gap-1.5">
                 <IconTable size={14} className="text-blue-500" /> Impor Bulk
               </Button>
               {isAdmin() && (
-                <Button onClick={() => navigate('/master/employees/create')} className="h-9 px-4 bg-[#E31E24] text-white shadow-sm rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
+                <Button onClick={() => navigate('/master/employees/create')} className="h-9 px-4 bg-[#E31E24] text-white shadow-neu rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
                   <IconPlus size={14} /> Tambah Karyawan
                 </Button>
               )}
@@ -307,7 +307,7 @@ const Employees = () => {
                 placeholder="Cari karyawan berdasarkan nama atau ID..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-10 pl-11 pr-10 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-white focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400"
+                className="w-full h-10 pl-11 pr-10 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-transparent focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400"
               />
               {searchTerm && (
                 <button 
@@ -352,7 +352,7 @@ const Employees = () => {
             {isFilterActive && (
               <button 
                 onClick={resetFilters}
-                className="h-9 px-4 bg-white shadow-sm border border-slate-200 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
+                className="h-9 px-4 bg-transparent shadow-neu border border-white/50 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
                 title="Reset All Filters"
               >
                 <IconRefresh size={14} className="group-hover:rotate-180 transition-all duration-500" />
@@ -373,10 +373,10 @@ const Employees = () => {
                   </div>
                 ) : filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp, idx) => (
-                    <div key={idx} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col space-y-3">
+                    <div key={idx} className="bg-transparent border border-white/50 rounded-xl p-4 shadow-neu flex flex-col space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
+                          <div className="h-10 w-10 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                             {emp["Photo"] || emp.photo ? (
                               <img src={emp["Photo"] || emp.photo} alt={emp["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
                             ) : (
@@ -399,7 +399,7 @@ const Employees = () => {
                         </span>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[10px]">
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/50 text-[10px]">
                         <div>
                           <span className="text-slate-400 font-bold uppercase block">Departemen</span>
                           <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Department Name *"] || emp["Division Name *"]}</span>
@@ -410,22 +410,22 @@ const Employees = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-slate-100">
+                      <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-white/50">
                         <button 
                           onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} 
-                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md hover:bg-slate-100 transition-colors"
                         >
                           Lihat
                         </button>
                         <button 
                           onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} 
-                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md hover:bg-slate-100 transition-colors"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={() => {setESignTargetEmployee(emp); setIsESignOpen(true);}} 
-                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md hover:bg-slate-100 transition-colors"
                         >
                           TTD
                         </button>
@@ -474,11 +474,11 @@ const Employees = () => {
                 )}
 
                 {/* Mobile Pagination Control */}
-                <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-sm">
+                <div className="bg-transparent border border-white/50 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-neu">
                   <button 
                     disabled={currentPage === 1 || loading}
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    className="h-8 px-3 rounded border border-slate-200 bg-white text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
+                    className="h-8 px-3 rounded border border-white/50 bg-transparent text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
                   >
                     Prev
                   </button>
@@ -488,17 +488,17 @@ const Employees = () => {
                   <button 
                     disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
                     onClick={() => setCurrentPage(p => p + 1)}
-                    className="h-8 px-3 rounded border border-slate-200 bg-white text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
+                    className="h-8 px-3 rounded border border-white/50 bg-transparent text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
                   >
                     Next
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="bg-white flex flex-col flex-1 min-h-0 border-t-0">
+              <div className="bg-transparent flex flex-col flex-1 min-h-0 border-t-0">
                 {/* 📌 STATIONARY HEADER TABLE */}
                 <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-slate-50 border-b border-white/50">
                     <tr>
                       <th className="w-[4%] pl-6 py-3.5 bg-slate-50">
                         <div 
@@ -512,8 +512,8 @@ const Employees = () => {
                           }}
                           className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                             filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length
-                            ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
-                            : 'bg-white border-slate-300 hover:border-[#E31E24]'
+                            ? 'bg-[#E31E24] border-[#E31E24] shadow-neu' 
+                            : 'bg-transparent border-white/20 hover:border-[#E31E24]'
                           }`}
                         >
                           {filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length && <IconCheck size={10} className="text-white" stroke={4} />}
@@ -531,9 +531,9 @@ const Employees = () => {
                 </table>
 
                 {/* 📜 SCROLLABLE DATA BODY */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar bg-white min-h-0">
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-transparent min-h-0">
                   <table className="w-full text-left border-separate border-spacing-0 table-fixed">
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-white/50">
                       {loading ? (
                         Array.from({ length: 5 }).map((_, i) => (
                           <tr key={`skel-${i}`}>
@@ -556,7 +556,7 @@ const Employees = () => {
                         ))
                       ) : filteredEmployees.length > 0 ? (
                         filteredEmployees.map((emp, idx) => (
-                          <tr key={idx} className={`group hover:bg-slate-50/50 transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
+                          <tr key={idx} className={`group hover:shadow-neu-inset/50 transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
                             <td className="w-[4%] pl-6 py-2.5">
                               <div 
                                 onClick={(e) => {
@@ -565,8 +565,8 @@ const Employees = () => {
                                 }}
                                 className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                                   selectedIds.has(emp["EMPLOYEE ID"]) 
-                                  ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
-                                  : 'bg-white border-slate-300 hover:border-[#E31E24]'
+                                  ? 'bg-[#E31E24] border-[#E31E24] shadow-neu' 
+                                  : 'bg-transparent border-white/20 hover:border-[#E31E24]'
                                 }`}
                               >
                                 {selectedIds.has(emp["EMPLOYEE ID"]) && <IconCheck size={10} className="text-white" stroke={4} />}
@@ -577,7 +577,7 @@ const Employees = () => {
                             </td>
                             <td className="w-[24%] px-4 py-2.5">
                               <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
+                                <div className="h-8 w-8 rounded-lg bg-slate-100 border border-white/50/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                                   {emp["Photo"] || emp.photo ? (
                                     <img src={emp["Photo"] || emp.photo} alt={emp["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
                                   ) : (
@@ -646,7 +646,7 @@ const Employees = () => {
                 </div>
 
                 {/* 📌 STRUCTURAL FOOTER */}
-                <div className="h-11 bg-slate-50 border-t border-slate-200 px-6 flex items-center justify-between shrink-0">
+                <div className="h-11 bg-slate-50 border-t border-white/50 px-6 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -663,7 +663,7 @@ const Employees = () => {
                       <button 
                         disabled={currentPage === 1 || loading}
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-white text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-white/50 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-neu"
                       >
                         <IconChevronDown size={14} className="rotate-90" />
                       </button>
@@ -673,7 +673,7 @@ const Employees = () => {
                       <button 
                         disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
                         onClick={() => setCurrentPage(p => p + 1)}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-white text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-white/50 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-neu"
                       >
                         <IconChevronDown size={14} className="-rotate-90" />
                       </button>
@@ -700,7 +700,7 @@ const Employees = () => {
             </div>
           )
         ) : (
-            <div className="flex-1 bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden">
+            <div className="flex-1 bg-transparent shadow-neu border border-white/50 rounded-xl overflow-hidden">
               <OrgChart employees={filteredEmployees} />
             </div>
           )}
@@ -737,7 +737,7 @@ const ViewToggle = ({ active, onClick, label, icon }) => (
     onClick={onClick} 
     className={`px-4 py-1.5 rounded-lg flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-all ${
       active 
-        ? 'bg-slate-900 text-white shadow-sm' 
+        ? 'bg-slate-900 text-white shadow-neu' 
         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'
     }`}
   >
@@ -749,11 +749,11 @@ const MiniStat = ({ label, value, color, icon, onClick, isActive }) => (
   <div 
     onClick={onClick}
     className={`p-3 rounded-xl border flex items-center justify-between w-full transition-all ${
-      onClick ? 'cursor-pointer hover:border-slate-300 hover:shadow-md' : 'shadow-sm'
+      onClick ? 'cursor-pointer hover:border-white/20 hover:shadow-neu' : 'shadow-neu'
     } ${
       isActive 
-        ? 'bg-blue-50/50 border-blue-200 shadow-sm ring-1 ring-blue-100' 
-        : 'bg-white border-slate-200'
+        ? 'bg-blue-50/50 border-blue-200 shadow-neu ring-1 ring-blue-100' 
+        : 'bg-transparent border-white/50'
     }`}
   >
     <div className="space-y-1 min-w-0">
@@ -763,7 +763,7 @@ const MiniStat = ({ label, value, color, icon, onClick, isActive }) => (
     <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
       isActive 
         ? 'bg-blue-100 text-blue-600 border border-blue-200' 
-        : 'bg-slate-50 border border-slate-100 text-slate-400'
+        : 'bg-[#f0f2f5] shadow-neu-inset border-none text-slate-400'
     }`}>
       {icon}
     </div>
@@ -775,7 +775,7 @@ const TabButton = ({ active, onClick, label }) => (
     onClick={onClick} 
     className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
       active 
-        ? 'bg-white text-[#E31E24] shadow-sm border border-slate-200/40' 
+        ? 'bg-transparent text-[#E31E24] shadow-neu border border-white/50/40' 
         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/30'
     }`}
   >
@@ -790,7 +790,7 @@ const FilterSelect = ({ label, value, options, onChange }) => (
       <select 
         value={value} 
         onChange={(e) => onChange(e.target.value)} 
-        className="w-full appearance-none h-9 pl-3 pr-8 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all hover:bg-slate-50 cursor-pointer uppercase tracking-wide"
+        className="w-full appearance-none h-9 pl-3 pr-8 bg-transparent border border-white/50 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all hover:shadow-neu-inset cursor-pointer uppercase tracking-wide"
       >
         {options.map((opt, i) => (
           <option key={i} value={opt}>{opt}</option>
@@ -804,7 +804,7 @@ const FilterSelect = ({ label, value, options, onChange }) => (
 const TableHead = ({ label, center, right, width }) => (
   <th 
     style={{ width }} 
-    className={`px-4 py-3 bg-slate-50 border-b border-slate-200 text-[9px] font-bold text-slate-400 uppercase tracking-wider ${
+    className={`px-4 py-3 bg-slate-50 border-b border-white/50 text-[9px] font-bold text-slate-400 uppercase tracking-wider ${
       center ? 'text-center' : ''
     } ${right ? 'text-right' : ''}`}
   >
@@ -816,11 +816,11 @@ const ActionButton = ({ onClick, icon, hover, label }) => (
   <div className="group/tip relative flex items-center justify-center">
     <button 
       onClick={onClick} 
-      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-md border border-transparent hover:border-slate-200 transition-all`}
+      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-md border border-transparent hover:border-white/50 transition-all`}
     >
       {icon}
     </button>
-    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[8px] font-bold uppercase tracking-wider rounded shadow-md opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[8px] font-bold uppercase tracking-wider rounded shadow-neu opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
       {label}
     </div>
   </div>

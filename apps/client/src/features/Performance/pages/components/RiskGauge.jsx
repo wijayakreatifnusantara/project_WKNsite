@@ -18,7 +18,7 @@ const RiskGauge = ({ score, level, color }) => {
     <div className="flex flex-col items-center gap-4 py-4">
       <div className="relative h-40 w-40 flex items-center justify-center">
         {/* Neumorphic Outer Ring */}
-        <div className="absolute inset-0 rounded-full shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] border-4 border-white"></div>
+        <div className="absolute inset-0 rounded-full shadow-neu border-4 border-white"></div>
         
         {/* Progress Circle */}
         <svg className="h-full w-full -rotate-90 transform overflow-visible">
@@ -29,7 +29,7 @@ const RiskGauge = ({ score, level, color }) => {
             fill="transparent"
             stroke="#f0f2f5"
             strokeWidth="12"
-            className="shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff]"
+            className="shadow-neu"
           />
           <circle
             cx="50%"
@@ -55,7 +55,7 @@ const RiskGauge = ({ score, level, color }) => {
         </div>
       </div>
 
-      <div className={`px-4 py-1.5 rounded-xl border-2 border-white shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] flex items-center gap-2
+      <div className={`px-4 py-1.5 rounded-xl border-2 border-white shadow-neu flex items-center gap-2
         ${level === 'High' ? 'bg-rose-50 text-rose-600' : level === 'Medium' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
         {level === 'High' ? <IconAlertTriangle size={14} /> : <IconActivity size={14} />}
         <span className="text-[10px] font-black uppercase tracking-widest">{level} Risk Detected</span>

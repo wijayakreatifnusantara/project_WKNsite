@@ -65,7 +65,7 @@ const AttendanceReport = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await apiClient.get('/api/employees?size=500');
+      const response = await apiClient.get('/employees?size=500');
       const empData = response.data?.data || (Array.isArray(response.data) ? response.data : []);
       setEmployees(empData.map(e => ({ id: e['EMPLOYEE ID'], name: e['EMPLOYEE NAME'] })));
     } catch (err) {
@@ -112,7 +112,7 @@ const AttendanceReport = () => {
       case 'SICK': return 'text-blue-600 bg-blue-50 border-blue-100';
       case 'LEAVE': return 'text-indigo-600 bg-indigo-50 border-indigo-100';
       case 'ABSENT': return 'text-rose-600 bg-rose-50 border-rose-100';
-      default: return 'text-slate-500 bg-slate-50 border-slate-100';
+      default: return 'text-slate-500 bg-slate-50 border-white/50';
     }
   };
 
@@ -129,15 +129,15 @@ const AttendanceReport = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-6 bg-transparent custom-scrollbar animate-fade-in">
       <div className="w-full mx-auto space-y-4">
         
         {/* 🏆 PREMIUM HEADER */}
-        <div className="flex items-center justify-between bg-white p-3 px-6 rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] backdrop-blur-md">
+        <div className="flex items-center justify-between bg-[#f0f2f5] p-3 px-6 rounded-3xl border-none shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-5">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
+              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>
@@ -154,7 +154,7 @@ const AttendanceReport = () => {
           <div className="flex items-center gap-4">
              <Button 
                 onClick={handleExport}
-                className="h-10 px-6 rounded-xl bg-[#1e293b] text-white font-bold text-[10px] uppercase tracking-widest hover:bg-[#0f172a] shadow-lg flex gap-3 items-center transition-all hover:translate-y-[-1px] active:translate-y-0"
+                className="h-10 px-6 rounded-xl bg-[#1e293b] text-white font-bold text-[10px] uppercase tracking-widest hover:bg-[#0f172a] shadow-neu flex gap-3 items-center transition-all hover:translate-y-[-1px] active:translate-y-0"
               >
                 <IconDownload size={14} />
                 EXPORT CSV
@@ -163,9 +163,9 @@ const AttendanceReport = () => {
         </div>
         
         {/* 🔍 SLEEK CONTROL CENTER */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white/60 p-2.5 rounded-2xl border border-white shadow-sm backdrop-blur-sm">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white/60 p-2.5 rounded-2xl border border-white shadow-neu backdrop-blur-sm">
             {/* Month Selector */}
-            <div className="md:col-span-2 flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm transition-all focus-within:border-[#E31E24]/30 relative group">
+            <div className="md:col-span-2 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 relative group">
                <IconCalendarStats size={14} className="text-[#E31E24]" />
                <div className="flex flex-col flex-1">
                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Cycle</span>
@@ -182,7 +182,7 @@ const AttendanceReport = () => {
             </div>
 
             {/* Personnel Filter */}
-            <div className="md:col-span-3 flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm transition-all focus-within:border-[#E31E24]/30 relative group">
+            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 relative group">
                <IconUser size={14} className="text-slate-400 group-focus-within:text-[#E31E24] transition-colors" />
                <div className="flex flex-col flex-1">
                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Personnel</span>
@@ -203,7 +203,7 @@ const AttendanceReport = () => {
             </div>
 
             {/* Search Input */}
-            <div className="md:col-span-4 flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-md group">
+            <div className="md:col-span-4 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-neu group">
                 <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
                 <div className="flex flex-col flex-1">
                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Quick Search</span>
@@ -218,7 +218,7 @@ const AttendanceReport = () => {
             </div>
 
             {/* Period Indicator */}
-            <div className="md:col-span-3 flex items-center justify-between px-5 py-2 rounded-xl bg-slate-50 border border-slate-100 shadow-inner">
+            <div className="md:col-span-3 flex items-center justify-between px-5 py-2 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none shadow-inner">
                 <div className="flex flex-col">
                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Active Period</span>
                   <p className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
@@ -230,11 +230,11 @@ const AttendanceReport = () => {
         </div>
 
         {/* 📜 PROFESSIONAL LOG TABLE */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] overflow-hidden">
+        <div className="bg-transparent rounded-3xl border border-white/50 shadow-neu overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-100 backdrop-blur-md">
+                <tr className="bg-slate-50/80 border-b border-white/50 backdrop-blur-md">
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] w-32">Date</th>
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Personnel Information</th>
                   <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Department & Position</th>
@@ -262,10 +262,10 @@ const AttendanceReport = () => {
                   </tr>
                 ) : (
                   filteredData.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50 transition-all group border-b border-transparent hover:border-slate-100">
+                    <tr key={row.id} className="hover:shadow-neu-inset/50 transition-all group border-b border-transparent hover:border-white/50">
                       <td className="px-6 py-2 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                           <div className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-[#E31E24] transition-colors">
+                           <div className="h-7 w-7 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center text-slate-400 group-hover:text-[#E31E24] transition-colors">
                             <IconCalendar size={14} />
                            </div>
                            <span className="text-[11px] font-black text-slate-700 tracking-tight">{row.date}</span>
@@ -290,7 +290,7 @@ const AttendanceReport = () => {
                         <span className="text-[11px] font-black text-slate-600 tracking-tighter">{row.clock_out || '--:--'}</span>
                       </td>
                       <td className="px-6 py-2 text-center">
-                        <span className={`inline-flex items-center px-4 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-[0.1em] border shadow-sm ${getStatusStyle(row.status)}`}>
+                        <span className={`inline-flex items-center px-4 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-[0.1em] border shadow-neu ${getStatusStyle(row.status)}`}>
                           {row.status}
                         </span>
                       </td>

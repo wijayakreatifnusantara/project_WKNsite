@@ -22,7 +22,7 @@ const Recruitment = () => {
   }, [fetchJobs]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -33,7 +33,7 @@ const Recruitment = () => {
           </div>
           <Button 
             onClick={() => setIsModalOpen(true)}
-            className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center"
+            className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center"
           >
             <IconUserPlus size={16} />
             Post New Job
@@ -61,9 +61,9 @@ const Recruitment = () => {
                </div>
             ) : (
               jobs.map(job => (
-                <Card key={job.id} className="border-white border-[3px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6 flex items-center justify-between group hover:shadow-none transition-all">
+                <Card key={job.id} className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6 flex items-center justify-between group hover:shadow-none transition-all">
                   <div className="flex items-center gap-6">
-                    <div className="h-14 w-14 bg-[#f0f2f5] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-center text-[#E31E24]">
+                    <div className="h-14 w-14 bg-[#f0f2f5] rounded-xl shadow-neu flex items-center justify-center text-[#E31E24]">
                       <IconBriefcase size={24} />
                     </div>
                     <div>
@@ -80,7 +80,7 @@ const Recruitment = () => {
                       ${job.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
                       {job.status}
                     </div>
-                    <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-slate-400 hover:text-[#E31E24] p-0 flex items-center justify-center">
+                    <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2 text-slate-400 hover:text-[#E31E24] p-0 flex items-center justify-center">
                       <IconArrowRight size={20} />
                     </Button>
                   </div>
@@ -102,9 +102,9 @@ const Recruitment = () => {
 };
 
 const StatCard = ({ label, value, icon, color }) => (
-  <Card className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6">
+  <Card className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6">
     <div className="flex items-center gap-4">
-      <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center
+      <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
         ${color === 'emerald' ? 'text-emerald-500' : color === 'indigo' ? 'text-indigo-500' : 'text-amber-500'}`}>
         {icon}
       </div>

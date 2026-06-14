@@ -8,7 +8,7 @@ export const useQuotations = () => {
   const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
-      const { data: res } = await apiClient.get('/api/crm/clients');
+      const { data: res } = await apiClient.get('/crm/clients');
       const data = res.data;
       
       setClients(data || []);
@@ -30,7 +30,7 @@ export const useQuotations = () => {
         rate: item.rate
       }));
 
-      const { data: res } = await apiClient.post('/api/crm/quotations', {
+      const { data: res } = await apiClient.post('/crm/quotations', {
         quotation: {
           reference_number: quotationData.reference_number,
           client_id: quotationData.client_id,

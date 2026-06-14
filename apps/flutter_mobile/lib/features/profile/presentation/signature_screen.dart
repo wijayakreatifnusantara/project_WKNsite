@@ -17,7 +17,7 @@ class SignatureScreen extends StatefulWidget {
 
 class _SignatureScreenState extends State<SignatureScreen> {
   final _secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  final String baseUrl = AppConstants.apiUrl;
 
   final SignatureController _signatureController = SignatureController(
     penStrokeWidth: 3,

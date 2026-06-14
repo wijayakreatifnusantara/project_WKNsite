@@ -16,6 +16,7 @@ import {
   IconArrowLeft
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { apiClient } from '@/lib/apiClient';
 import { useAuth } from '@/context/AuthContext';
@@ -35,7 +36,7 @@ const LeaveManagementHub = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/api/leave/requests');
+      const response = await apiClient.get('/leave/requests');
       // Assume the backend returns them in order, or we sort them here
       setRequests(response.data.data.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) || []);
     } catch (err) {
@@ -47,7 +48,7 @@ const LeaveManagementHub = () => {
 
   const fetchBalances = async () => {
     try {
-      const response = await apiClient.get('/api/leave/balances');
+      const response = await apiClient.get('/leave/balances');
       setBalances(response.data.data || []);
     } catch (err) {
       console.error("Error fetching balances:", err);
@@ -97,15 +98,15 @@ const LeaveManagementHub = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-[#f8fafc] custom-scrollbar animate-fade-in text-[10px]">
+    <div className="flex-1 overflow-y-auto p-4 bg-transparent custom-scrollbar animate-fade-in text-[10px]">
       <div className="max-w-[1600px] mx-auto space-y-4">
         
         {/* 🚀 PREMIUM COMPACT HEADER */}
-        <div className="flex items-center justify-between bg-white p-2 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between bg-transparent p-2 px-5 rounded-2xl border border-white/50 shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-4">
              <button 
                onClick={() => navigate('/attendance')}
-               className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95"
+               className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95"
              >
                <IconArrowLeft size={16} />
              </button>
@@ -124,12 +125,12 @@ const LeaveManagementHub = () => {
           </div>
 
           <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-white/50">
                   {['Pending', 'Approved', 'Rejected', 'All'].map((s) => (
                     <button 
                       key={s}
                       onClick={() => setFilterStatus(s)}
-                      className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-white shadow-sm text-[#E31E24]' : 'text-slate-400 hover:text-slate-600'}`}
+                      className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                       {s}
                     </button>
@@ -138,7 +139,7 @@ const LeaveManagementHub = () => {
               <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
               <Button 
                 onClick={() => setIsModalOpen(true)}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest shadow-md hover:bg-[#C1181E] flex gap-2 items-center"
+                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest shadow-neu hover:bg-[#C1181E] flex gap-2 items-center"
               >
                 <IconPlus size={14} />
                 New Request
@@ -150,7 +151,7 @@ const LeaveManagementHub = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
            <StatCard 
              title="Pending Reviews" 
-             value={requests.filter(r => r.status === 'Pending').length} 
+             value={requests.filter(r => r.status?.startsWith('Pending')).length} 
              icon={<IconClock size={16} />} 
              color="amber"
            />
@@ -179,11 +180,11 @@ const LeaveManagementHub = () => {
         </div>
 
         {/* 📜 HIGH DENSITY REQUESTS TABLE */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-[#f0f2f5] rounded-3xl border-none shadow-neu overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
+                <tr className="bg-slate-50/50 border-b border-white/50">
                   <th className="px-5 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Employee</th>
                   <th className="px-5 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Type & Duration</th>
                   <th className="px-5 py-3 text-[8px] font-black text-slate-400 uppercase tracking-widest">Period</th>
@@ -199,16 +200,16 @@ const LeaveManagementHub = () => {
                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Syncing request database...</p>
                     </td>
                   </tr>
-                ) : requests.filter(r => filterStatus === 'All' || r.status === filterStatus).length === 0 ? (
+                ) : requests.filter(r => filterStatus === 'All' || (filterStatus === 'Pending' ? r.status?.startsWith('Pending') : r.status === filterStatus)).length === 0 ? (
                   <tr>
                     <td colSpan="5" className="py-12 text-center text-slate-300 uppercase font-black text-[9px] tracking-widest">No requests found in this category</td>
                   </tr>
                 ) : (
-                  requests.filter(r => filterStatus === 'All' || r.status === filterStatus).map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50 transition-all group">
+                  requests.filter(r => filterStatus === 'All' || (filterStatus === 'Pending' ? r.status?.startsWith('Pending') : r.status === filterStatus)).map((row) => (
+                    <tr key={row.id} className="hover:shadow-neu-inset/50 transition-all group">
                       <td className="px-5 py-2">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
+                          <div className="h-8 w-8 rounded-lg bg-slate-100 border border-white/50 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
                             {row.employees?.name?.charAt(0)}
                           </div>
                           <div>
@@ -238,7 +239,7 @@ const LeaveManagementHub = () => {
                          </div>
                       </td>
                       <td className="px-5 py-2 text-center">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest border shadow-sm ${getStatusStyle(row.status)}`}>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest border shadow-neu ${getStatusStyle(row.status)}`}>
                           {row.status}
                         </span>
                       </td>
@@ -249,24 +250,24 @@ const LeaveManagementHub = () => {
                               href={row.pdf_url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-white transition-all active:scale-95 shrink-0"
+                              className="h-7 w-7 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-transparent transition-all active:scale-95 shrink-0"
                               title="Unduh PDF TTD Resmi"
                             >
                               <IconFileText size={14} className="text-[#E31E24]" />
                             </a>
                           )}
-                          {row.status === 'Pending' && isAdmin() ? (
+                          {row.status?.startsWith('Pending') && isAdmin() ? (
                             <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                               <button 
                                 onClick={() => handleApprove(row, 'Approved')}
-                                className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                                className="h-7 px-3 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-neu"
                               >
                                 <IconCheck size={12} />
                                 Approve
                               </button>
                               <button 
                                 onClick={() => handleApprove(row, 'Rejected')}
-                                className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm"
+                                className="h-7 px-3 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-neu"
                               >
                                 <IconX size={12} />
                                 Reject
@@ -309,7 +310,7 @@ const StatCard = ({ title, value, unit = "", icon, color }) => {
   };
 
   return (
-    <Card className="bg-white border border-slate-200 shadow-sm p-3 flex items-center gap-3 transition-all hover:translate-y-[-2px] cursor-pointer">
+    <Card className="bg-transparent border border-white/50 shadow-neu p-3 flex items-center gap-3 transition-all hover:translate-y-[-2px] cursor-pointer">
       <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center border ${colorMap[color]}`}>
         {icon}
       </div>

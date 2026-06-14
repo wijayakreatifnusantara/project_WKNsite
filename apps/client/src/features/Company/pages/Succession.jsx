@@ -17,7 +17,7 @@ const Succession = () => {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -26,7 +26,7 @@ const Succession = () => {
             </h2>
             <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Leadership Pipeline & Talent Readiness</p>
           </div>
-          <Button className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center">
+          <Button className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center">
             <IconChartLine size={16} />
             Benchmarking Engine
           </Button>
@@ -44,9 +44,9 @@ const Succession = () => {
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Leadership Talent Pool</h3>
           <div className="grid grid-cols-1 gap-6">
             {candidates.map(cand => (
-              <Card key={cand.id} className="border-white border-[3px] shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-[2.5rem] p-8 flex items-center justify-between group">
+              <Card key={cand.id} className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2.5rem] p-8 flex items-center justify-between group">
                 <div className="flex items-center gap-8">
-                   <div className="h-20 w-20 rounded-[2rem] bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center text-slate-400 overflow-hidden border-2 border-white">
+                   <div className="h-20 w-20 rounded-[2rem] bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 overflow-hidden border-2 border-white">
                       <img src={`https://i.pravatar.cc/150?u=${cand.id}`} alt={cand.name} className="h-full w-full object-cover" />
                    </div>
                    <div>
@@ -61,7 +61,7 @@ const Succession = () => {
                 <div className="flex items-center gap-12">
                    <div className="text-center">
                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Readiness</p>
-                      <div className="h-16 w-16 rounded-full border-[6px] border-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] flex items-center justify-center">
+                      <div className="h-16 w-16 rounded-full border-[6px] border-[#f0f2f5] shadow-neu flex items-center justify-center">
                          <span className="text-sm font-black text-emerald-500">{cand.readiness}%</span>
                       </div>
                    </div>
@@ -71,7 +71,7 @@ const Succession = () => {
                          "{cand.gap}"
                       </div>
                    </div>
-                   <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white border-2 text-slate-400 hover:text-[#E31E24] p-0 flex items-center justify-center">
+                   <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2 text-slate-400 hover:text-[#E31E24] p-0 flex items-center justify-center">
                       <IconChevronRight size={20} />
                    </Button>
                 </div>
@@ -85,8 +85,8 @@ const Succession = () => {
 };
 
 const StatCard = ({ label, value, icon, color }) => (
-  <Card className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6 flex items-center gap-4">
-    <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center
+  <Card className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6 flex items-center gap-4">
+    <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
       ${color === 'emerald' ? 'text-emerald-500' : color === 'indigo' ? 'text-indigo-500' : 'text-amber-500'}`}>
       {icon}
     </div>

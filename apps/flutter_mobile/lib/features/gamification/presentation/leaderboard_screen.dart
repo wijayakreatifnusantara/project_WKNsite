@@ -31,7 +31,7 @@ class LeaderboardEntry {
       name: json['name'] ?? 'Unknown',
       department: json['department'] ?? 'General',
       points: json['points'] ?? 0,
-      avatarUrl: json['avatarUrl'] ?? 'https://ui-avatars.com/api/?name=A',
+      avatarUrl: json['avatar_url'] ?? json['avatarUrl'] ?? 'https://ui-avatars.com/api/?name=A',
     );
   }
 }

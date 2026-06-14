@@ -40,7 +40,7 @@ const Overview = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/api/employees?size=500');
+      const response = await apiClient.get('/employees?size=500');
       const employeeData = response.data?.data || (Array.isArray(response.data) ? response.data : []);
       setEmployees(employeeData);
       
@@ -66,7 +66,7 @@ const Overview = () => {
   }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-[#FAFAFB] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Morning Briefing / Greeting */}
@@ -88,7 +88,7 @@ const Overview = () => {
                   if (success) toast.success("Laporan berhasil diekspor.");
                   else toast.error("Gagal membuat laporan.");
                 }}
-                className="h-10 px-4 rounded-xl bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm transition-all flex gap-2 items-center"
+                className="h-10 px-4 rounded-xl bg-transparent border-white/50 text-slate-700 hover:shadow-neu-inset shadow-neu transition-all flex gap-2 items-center"
               >
                 <IconChartBar size={16} />
                 Export Data
@@ -96,7 +96,7 @@ const Overview = () => {
               <Button 
                 onClick={fetchData}
                 disabled={loading}
-                className="h-10 px-4 rounded-xl bg-[#E31E24] text-white hover:bg-[#C1181E] shadow-sm transition-all flex gap-2 items-center"
+                className="h-10 px-4 rounded-xl bg-[#E31E24] text-white hover:bg-[#C1181E] shadow-neu transition-all flex gap-2 items-center"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <IconRefresh size={16} />}
                 Refresh
@@ -156,12 +156,12 @@ const Overview = () => {
               </Button>
             </div>
             {loading ? (
-              <div className="h-96 w-full bg-white border border-slate-100 rounded-2xl shadow-sm p-6 space-y-4">
-                <Skeleton className="h-8 w-1/3" />
-                <Skeleton className="h-[280px] w-full rounded-xl" />
+              <div className="h-96 w-full bg-[#f0f2f5] shadow-neu rounded-3xl p-6 space-y-4">
+                <Skeleton className="h-8 w-1/3 opacity-50" />
+                <Skeleton className="h-[280px] w-full rounded-2xl opacity-50" />
               </div>
             ) : (
-              <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-2 overflow-hidden">
+              <div className="bg-[#f0f2f5] shadow-neu rounded-3xl p-2 overflow-hidden">
                 <AnalyticsGrid employees={employees} />
               </div>
             )}
@@ -174,7 +174,7 @@ const Overview = () => {
               <IconDotsVertical size={16} className="text-slate-400" />
             </div>
             
-            <Card className="bg-white border-slate-100 shadow-sm rounded-2xl overflow-hidden flex flex-col h-[400px]">
+            <Card className="bg-[#f0f2f5] border-none shadow-neu rounded-3xl overflow-hidden flex flex-col h-[400px]">
               <CardContent className="p-0 flex-1 overflow-y-auto custom-scrollbar">
                 <div className="p-5 relative">
                   {/* Vertical Line for Timeline */}
@@ -222,7 +222,7 @@ const Overview = () => {
 };
 
 const StatCard = ({ title, value, subtitle, icon, trend, positive, colorClass }) => (
-  <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-5 hover:shadow-md hover:border-slate-200 transition-all cursor-pointer group relative overflow-hidden">
+  <div className="bg-[#f0f2f5] shadow-neu rounded-3xl p-6 hover:-translate-y-1 hover:shadow-neu active:shadow-neu-inset transition-all duration-300 cursor-pointer group relative overflow-hidden">
     {/* Subtle Background Accent */}
     <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 transition-transform group-hover:scale-150 ${colorClass.split(' ')[1]}`}></div>
     
@@ -250,13 +250,13 @@ const ActivityItem = ({ title, time, icon, type, desc }) => {
     warning: "bg-amber-100 text-amber-600 border-amber-200",
     success: "bg-emerald-100 text-emerald-600 border-emerald-200",
     info: "bg-blue-100 text-blue-600 border-blue-200",
-    default: "bg-slate-100 text-slate-600 border-slate-200"
+    default: "bg-slate-100 text-slate-600 border-white/50"
   };
 
   return (
     <div className="flex gap-4 relative group cursor-pointer">
       <div className="flex flex-col items-center">
-        <div className={`h-10 w-10 rounded-full flex items-center justify-center border-2 z-10 transition-transform group-hover:scale-110 bg-white ${colorMap[type]}`}>
+        <div className={`h-10 w-10 rounded-2xl flex items-center justify-center z-10 transition-transform group-hover:scale-110 shadow-neu bg-[#f0f2f5] ${colorMap[type]}`}>
           {icon}
         </div>
       </div>

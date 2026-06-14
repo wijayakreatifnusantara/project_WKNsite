@@ -19,7 +19,7 @@ export const useRecruitment = () => {
       setError(null);
       
       // Fetch job postings and count applicants per job
-      const { data: res } = await apiClient.get('/api/recruitment/jobs');
+      const { data: res } = await apiClient.get('/recruitment/jobs');
       const jobData = res.data;
       
       // Transform data to include applicant counts
@@ -64,7 +64,7 @@ export const useRecruitment = () => {
 
   const createJob = async (jobData) => {
     try {
-      await apiClient.post('/api/recruitment/jobs', {
+      await apiClient.post('/recruitment/jobs', {
         title: jobData.title,
         department: jobData.dept,
         status: jobData.status || 'Active'

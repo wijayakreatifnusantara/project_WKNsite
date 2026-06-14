@@ -64,7 +64,7 @@ class _MenuScreenState extends State<MenuScreen> {
               decoration: BoxDecoration(
                 color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(14),
-                border: const Border(left: BorderSide(color: AppConstants.primaryColor, width: 4), top: BorderSide(color: Color(0xFFF1F5F9)), right: BorderSide(color: Color(0xFFF1F5F9)), bottom: BorderSide(color: Color(0xFFF1F5F9))),
+                border: Border(left: const BorderSide(color: AppConstants.primaryColor, width: 4), top: BorderSide(color: context.borderColor), right: BorderSide(color: context.borderColor), bottom: BorderSide(color: context.borderColor)),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]
               ),
               child: Row(

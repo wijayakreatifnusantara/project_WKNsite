@@ -85,7 +85,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
           const chunkSize = 50;
           for (let i = 0; i < mappedData.length; i += chunkSize) {
             const chunk = mappedData.slice(i, i + chunkSize);
-            const { data } = await apiClient.post('/api/employees/bulk-insert', chunk);
+            const { data } = await apiClient.post('/employees/bulk-insert', chunk);
             setProgress(prev => ({ ...prev, current: Math.min(i + chunkSize, data.length) }));
           }
 
@@ -151,10 +151,10 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-[460px] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
+        className="w-full max-w-[460px] bg-transparent border border-white/50 rounded-2xl shadow-neu overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 shrink-0">
+        <header className="h-16 bg-transparent border-b border-white/50 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
               <IconFileUpload size={18} />
@@ -166,7 +166,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
           </div>
           <button 
             onClick={onClose}
-            className="h-8 w-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#E31E24] hover:bg-slate-50 transition-all shadow-sm"
+            className="h-8 w-8 flex items-center justify-center bg-transparent border border-white/50 rounded-lg text-slate-400 hover:text-[#E31E24] hover:shadow-neu-inset transition-all shadow-neu"
           >
             <IconX size={16} />
           </button>
@@ -192,7 +192,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
                 </div>
               </div>
               <div className="w-full space-y-2">
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-white/50/50">
                   <div 
                     className="h-full bg-[#E31E24] transition-all duration-300" 
                     style={{ width: `${(progress.current / progress.total) * 100}%` }}
@@ -208,7 +208,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
               <div className="w-full">
                 <div 
                   onClick={() => document.getElementById('bulk-upload-input').click()}
-                  className="w-full aspect-video bg-slate-55/40 hover:bg-red-50/10 border-2 border-dashed border-slate-200 hover:border-[#E31E24]/30 rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group"
+                  className="w-full aspect-video bg-slate-55/40 hover:bg-red-50/10 border-2 border-dashed border-white/50 hover:border-[#E31E24]/30 rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group"
                 >
                   <IconFileSpreadsheet size={40} className="text-slate-300 group-hover:text-[#E31E24] transition-colors" strokeWidth={1.2} />
                   <div>
@@ -232,10 +232,10 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
                 )}
               </div>
 
-              <div className="w-full pt-6 border-t border-slate-100 flex flex-col gap-4">
+              <div className="w-full pt-6 border-t border-white/50 flex flex-col gap-4">
                 <button 
                   onClick={downloadTemplate}
-                  className="w-full h-10 flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-lg text-slate-650 hover:text-[#E31E24] hover:bg-slate-50 transition-all shadow-sm group"
+                  className="w-full h-10 flex items-center justify-center gap-2 bg-transparent border border-white/50 rounded-lg text-slate-650 hover:text-[#E31E24] hover:shadow-neu-inset transition-all shadow-neu group"
                 >
                   <IconDownload size={14} className="group-hover:bounce text-slate-400 group-hover:text-[#E31E24]" />
                   <span className="text-[9px] font-bold uppercase tracking-widest">Download Data Template</span>

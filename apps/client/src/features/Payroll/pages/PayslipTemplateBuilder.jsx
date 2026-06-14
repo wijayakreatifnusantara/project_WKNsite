@@ -25,7 +25,7 @@ export default function PayslipTemplateBuilder() {
 
   const fetchTemplate = async () => {
     try {
-      const { data: res } = await apiClient.get('/api/payroll/templates/active');
+      const { data: res } = await apiClient.get('/payroll/templates/active');
       const data = res.data;
       setTemplate({
         id: data.id,
@@ -72,7 +72,7 @@ export default function PayslipTemplateBuilder() {
       if (template.id) {
         await apiClient.put(`/api/payroll/templates/${template.id}`, payload);
       } else {
-        const { data: res } = await apiClient.post('/api/payroll/templates', payload);
+        const { data: res } = await apiClient.post('/payroll/templates', payload);
         const data = res.data;
         if (data) setTemplate(prev => ({ ...prev, id: data.id }));
       }
@@ -99,14 +99,14 @@ export default function PayslipTemplateBuilder() {
           <Button 
             variant="outline" 
             onClick={() => setPreviewMode(!previewMode)}
-            className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] border-white text-slate-600 font-black uppercase text-[10px]"
+            className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-neu border-white text-slate-600 font-black uppercase text-[10px]"
           >
             {previewMode ? <><IconBrush size={18} className="mr-2"/> Edit Mode</> : <><IconEye size={18} className="mr-2"/> Preview PDF</>}
           </Button>
           <Button 
             onClick={handleSave}
             disabled={saving}
-            className="h-12 px-6 rounded-2xl bg-[#F97316] hover:bg-[#EA580C] text-white font-black text-[10px] uppercase shadow-[5px_5px_15px_rgba(249,115,22,0.3)] disabled:opacity-50"
+            className="h-12 px-6 rounded-2xl bg-[#F97316] hover:bg-[#EA580C] text-white font-black text-[10px] uppercase shadow-neu disabled:opacity-50"
           >
             <IconDeviceFloppy size={18} className="mr-2" /> {saving ? 'Menyimpan...' : 'Simpan Template'}
           </Button>
@@ -118,13 +118,13 @@ export default function PayslipTemplateBuilder() {
         {/* Editor Sidebar */}
         {!previewMode && (
           <div className="w-[400px] shrink-0 space-y-6">
-            <Card className="border-white border-2 shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-3xl p-6">
+            <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
               <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6">Kop Surat (Header)</CardTitle>
               
               <div className="space-y-5">
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Logo Perusahaan</label>
-                  <div className="border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white/50 relative overflow-hidden">
+                  <div className="border-2 border-dashed border-white/20 rounded-xl p-4 flex flex-col items-center justify-center bg-white/50 relative overflow-hidden">
                     {template.headerLogo ? (
                       <img src={template.headerLogo} alt="Logo" className="max-h-20 object-contain" />
                     ) : (
@@ -143,7 +143,7 @@ export default function PayslipTemplateBuilder() {
                     type="text" 
                     value={template.companyName}
                     onChange={(e) => setTemplate(prev => ({ ...prev, companyName: e.target.value }))}
-                    className="w-full h-12 px-4 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-xl text-sm font-bold text-slate-700 outline-none"
+                    className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu rounded-xl text-sm font-bold text-slate-700 outline-none"
                   />
                 </div>
 
@@ -152,13 +152,13 @@ export default function PayslipTemplateBuilder() {
                   <textarea 
                     value={template.addressText}
                     onChange={(e) => setTemplate(prev => ({ ...prev, addressText: e.target.value }))}
-                    className="w-full h-24 p-4 bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-xl text-xs font-medium text-slate-700 outline-none resize-none"
+                    className="w-full h-24 p-4 bg-[#f0f2f5] shadow-neu rounded-xl text-xs font-medium text-slate-700 outline-none resize-none"
                   />
                 </div>
               </div>
             </Card>
 
-            <Card className="border-white border-2 shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] bg-[#f0f2f5] rounded-3xl p-6">
+            <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
               <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6">Warna & Tema</CardTitle>
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Warna Aksen Utama</label>
@@ -178,7 +178,7 @@ export default function PayslipTemplateBuilder() {
 
         {/* Live Preview Pane */}
         <div className="flex-1 flex justify-center">
-          <div className="w-[600px] bg-white shadow-[0_20px_40px_rgba(0,0,0,0.1)] rounded-sm p-12 overflow-y-auto" style={{ height: '800px', transform: previewMode ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }}>
+          <div className="w-[600px] bg-transparent shadow-neu rounded-sm p-12 overflow-y-auto" style={{ height: '800px', transform: previewMode ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }}>
             
             {/* Template Header / Kop Surat */}
             <div className="border-b-2 pb-6 mb-8 text-center" style={{ borderColor: template.primaryColor }}>

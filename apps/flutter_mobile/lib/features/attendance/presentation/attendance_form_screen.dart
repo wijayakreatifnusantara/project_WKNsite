@@ -85,13 +85,6 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
           
           final data = result['data'];
           bool isOnTime = data != null && data['late_minutes'] == 0;
-          if (isOnTime) {
-             NotificationService().showGamificationNotification(
-                '🔥 +10 Poin Kehadiran!',
-                'Hebat! Anda berhasil absen tepat waktu hari ini. Pertahankan streak Anda!',
-                'gamification'
-             );
-          }
           
           context.go('/main');
         } else {

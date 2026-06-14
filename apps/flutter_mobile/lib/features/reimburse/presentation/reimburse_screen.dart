@@ -20,6 +20,8 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
   final TextEditingController _amountCtrl = TextEditingController();
   final TextEditingController _descCtrl = TextEditingController();
   
+  final _formKey = GlobalKey<FormState>();
+  bool _hasAttemptedSubmit = false;
   XFile? _selectedImage;
   bool _isSubmitting = false;
 
@@ -80,8 +82,12 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
   }
 
   Future<void> _handleSubmit() async {
-    if (_amountCtrl.text.isEmpty || _descCtrl.text.isEmpty || _selectedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Form Tidak Lengkap. Harap isi nominal, keterangan, dan lampirkan bukti pembayaran.')));
+    setState(() {
+      _hasAttemptedSubmit = true;
+    });
+
+    if (!_formKey.currentState!.validate() || _selectedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Form Tidak Lengkap. Harap perbaiki isian yang salah dan lampirkan bukti pembayaran.'), backgroundColor: Colors.red));
       return;
     }
 
@@ -164,9 +170,11 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Text('Form Klaim Pengeluaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
               SizedBox(height: 4),
               Text('Silakan isi data pengeluaran operasional atau medis Anda di bawah ini beserta bukti struk/nota yang sah.', style: TextStyle(fontSize: 11, color: context.textSecondary, height: 1.5)),
@@ -174,32 +182,47 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
               
               Text('NOMINAL (RP)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
               const SizedBox(height: 6),
-              TextField(
+              TextFormField(
                 controller: _amountCtrl,
                 keyboardType: TextInputType.number,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Nominal tidak boleh kosong';
+                  return null;
+                },
                 decoration: InputDecoration(
                   hintText: 'Contoh: 150000',
                   hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
                   filled: true,
-                  fillColor: Colors.grey[50],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
+                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 2)),
                 ),
               ),
               SizedBox(height: 16),
               
               Text('KETERANGAN PENGELUARAN', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
               const SizedBox(height: 6),
-              TextField(
+              TextFormField(
                 controller: _descCtrl,
                 maxLines: 3,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Keterangan tidak boleh kosong';
+                  if (value.length < 5) return 'Keterangan terlalu singkat';
+                  return null;
+                },
                 decoration: InputDecoration(
                   hintText: 'Misal: Biaya bensin dinas ke site A...',
                   hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
                   filled: true,
-                  fillColor: Colors.grey[50],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
+                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
+                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 2)),
                 ),
               ),
               SizedBox(height: 16),
@@ -212,8 +235,8 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                    color: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
+                    border: Border.all(color: (_hasAttemptedSubmit && _selectedImage == null) ? Colors.red : context.borderColor, style: BorderStyle.solid),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: _selectedImage != null
@@ -262,10 +285,11 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
                     ? CircularProgressIndicator(color: context.surfaceColor)
                     : Text('KIRIM KLAIM', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 ),
-              )
+              ),
             ],
           ),
         ),
+      ),
       ),
     );
   }

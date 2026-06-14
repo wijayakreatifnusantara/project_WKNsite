@@ -51,10 +51,30 @@ async def create_employee(employee: EmployeeCreate, current_user: dict = Depends
         )
 
 @router.get("/employees")
-async def get_employees(q: Optional[str] = None, page: int = 1, size: int = 50, current_user: dict = Depends(require_admin)):
+async def get_employees(
+    q: Optional[str] = None, 
+    page: int = 1, 
+    size: int = 50, 
+    mobile: bool = False,
+    current_user: dict = Depends(get_current_user)
+):
     try:
         # Optimized: Pagination and Filtering handled at database level
         result = await supabase_client.get_employees(q=q, page=page, page_size=size)
+        
+        # Field Reduction for Mobile Bandwidth Optimization
+        if mobile and result and "data" in result:
+            optimized_data = []
+            for emp in result["data"]:
+                optimized_data.append({
+                    "employee_id": emp.get("employee_id"),
+                    "employee_name": emp.get("employee_name"),
+                    "department": emp.get("department"),
+                    "position": emp.get("position"),
+                    "barcode": emp.get("barcode")
+                })
+            result["data"] = optimized_data
+            
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching employees: {str(e)}")

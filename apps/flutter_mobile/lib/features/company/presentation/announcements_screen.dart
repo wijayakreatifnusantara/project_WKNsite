@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../core/utils/constants.dart';
 
 class AnnouncementsScreen extends StatefulWidget {
@@ -14,8 +15,7 @@ class AnnouncementsScreen extends StatefulWidget {
 }
 
 class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
-  final _secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  final _supabase = Supabase.instance.client;
 
   bool _isLoading = true;
   List<dynamic> _announcements = [];
@@ -29,46 +29,15 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   Future<void> _fetchAnnouncements() async {
     setState(() => _isLoading = true);
     try {
-      final token = await _secureStorage.read(key: 'authToken');
-      final response = await http.get(
-        Uri.parse('$baseUrl/announcements'),
-        headers: {if (token != null) 'Authorization': 'Bearer $token'},
-      );
-
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        if (mounted) setState(() => _announcements = body['data'] ?? []);
-      }
+      final data = await _supabase
+          .from('announcements')
+          .select('*')
+          .order('created_at', ascending: false);
+          
+      if (mounted) setState(() => _announcements = data);
     } catch (e) {
-      debugPrint('Error fetching announcements: $e');
-      // Mock data in case backend is not ready
-      if (mounted) {
-        setState(() {
-          _announcements = [
-            {
-              'id': '1',
-              'title': 'Townhall Kuartal 3 PT WKN',
-              'content': 'Seluruh karyawan diwajibkan hadir pada acara Townhall virtual yang akan diselenggarakan pada Jumat minggu ini. Tautan Zoom akan dikirim melalui email.',
-              'type': 'important',
-              'created_at': DateTime.now().subtract(const Duration(days: 1)).toIso8601String()
-            },
-            {
-              'id': '2',
-              'title': 'Cuti Bersama Hari Raya',
-              'content': 'Sesuai dengan keputusan pemerintah, cuti bersama Idul Fitri akan dilaksanakan pada tanggal 10-12 Mei. Mohon selesaikan seluruh tanggungan kerja sebelum tanggal tersebut.',
-              'type': 'info',
-              'created_at': DateTime.now().subtract(const Duration(days: 3)).toIso8601String()
-            },
-            {
-              'id': '3',
-              'title': 'Pemeliharaan Server ERP',
-              'content': 'Aplikasi ERP dan portal absen tidak dapat diakses pada Sabtu dini hari pukul 02:00 - 04:00 WIB untuk pemeliharaan.',
-              'type': 'warning',
-              'created_at': DateTime.now().subtract(const Duration(days: 7)).toIso8601String()
-            }
-          ];
-        });
-      }
+      debugPrint('Error fetching announcements from Supabase: $e');
+      if (mounted) setState(() => _announcements = []);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -102,7 +71,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
       ),
       body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
+        ? _buildSkeletonLoading()
         : _announcements.isEmpty 
           ? _buildEmptyState()
           : RefreshIndicator(
@@ -170,12 +139,68 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.feed_outlined, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('Belum ada pengumuman', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppConstants.primaryColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.campaign_outlined, size: 64, color: AppConstants.primaryColor.withValues(alpha: 0.8)),
+          ),
+          const SizedBox(height: 24),
+          Text('Belum Ada Pengumuman', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
+          const SizedBox(height: 8),
+          Text('Informasi terbaru dari perusahaan akan\nmuncul di sini', textAlign: TextAlign.center, style: TextStyle(color: context.textSecondary, fontSize: 13, height: 1.5)),
         ],
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoading() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: context.surfaceColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: context.borderColor),
+          ),
+          child: Shimmer.fromColors(
+            baseColor: context.isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+            highlightColor: context.isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(width: 36, height: 36, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(width: double.infinity, height: 14, color: Colors.white),
+                          const SizedBox(height: 6),
+                          Container(width: 80, height: 10, color: Colors.white),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(width: double.infinity, height: 10, color: Colors.white),
+                const SizedBox(height: 6),
+                Container(width: 200, height: 10, color: Colors.white),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

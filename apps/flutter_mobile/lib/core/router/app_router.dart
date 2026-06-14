@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/data/auth_provider.dart';
 import '../../features/auth/presentation/splash_screen.dart';
@@ -32,8 +33,11 @@ import '../../features/reports/presentation/report_screen.dart';
 import '../../features/gamification/presentation/leaderboard_screen.dart';
 import '../utils/auth_guard.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 GoRouter createAppRouter(AuthProvider authProvider) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     refreshListenable: authProvider,
     routes: [

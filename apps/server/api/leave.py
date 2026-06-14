@@ -93,10 +93,19 @@ async def create_leave_request(payload: Dict[str, Any], current_user: dict = Dep
             except Exception as e:
                 print(f"[Leave Proof] Error uploading proof: {e}")
         
+        from api.approval_matrix import load_matrix
+        matrix = load_matrix()
+        leave_matrix = matrix.get("leave", {})
+        
+        initial_status = "Pending"
+        if leave_matrix.get("enabled") and leave_matrix.get("tiers"):
+            # Set to the first tier's label
+            initial_status = leave_matrix["tiers"][0].get("label", "Pending L1")
+            
         record = {
             **payload,
             "days_count": days,
-            "status": "Pending",
+            "status": initial_status,
             "applied_at": datetime.now().isoformat()
         }
         
@@ -135,12 +144,53 @@ async def create_leave_request(payload: Dict[str, Any], current_user: dict = Dep
 async def approve_leave_request(request_id: str, payload: Dict[str, Any], current_user: dict = Depends(require_admin)):
     """Approve or reject a leave request (Admin only)"""
     try:
-        status = payload.get("status") # Approved or Rejected
+        input_status = payload.get("status") # Approved or Rejected
         admin_id = payload.get("admin_id")
         
+        # Fetch current record first for matrix evaluation
+        curr_res = supabase_client.client.table("leave_requests").select("*").eq("id", request_id).execute()
+        if not curr_res.data:
+            raise HTTPException(status_code=404, detail="Request not found")
+        request_data = curr_res.data[0]
+        
+        final_status = input_status
+        
+        if input_status == "Approved":
+            from api.approval_matrix import load_matrix
+            matrix = load_matrix()
+            leave_matrix = matrix.get("leave", {})
+            
+            if leave_matrix.get("enabled") and leave_matrix.get("tiers"):
+                tiers = leave_matrix["tiers"]
+                current_status = request_data.get("status")
+                
+                # Find current tier index
+                current_tier_idx = -1
+                for i, tier in enumerate(tiers):
+                    if tier.get("label") == current_status:
+                        current_tier_idx = i
+                        break
+                
+                # If we found the current tier, escalate to next
+                if current_tier_idx != -1 and current_tier_idx + 1 < len(tiers):
+                    next_tier = tiers[current_tier_idx + 1]
+                    # Check condition if any (e.g., 'days > 3')
+                    condition = next_tier.get("condition")
+                    requires_next = True
+                    if condition and "days > " in condition:
+                        try:
+                            threshold = int(condition.split(">")[1].strip())
+                            if request_data.get("days_count", 0) <= threshold:
+                                requires_next = False
+                        except:
+                            pass
+                    
+                    if requires_next:
+                        final_status = next_tier.get("label", f"Pending L{current_tier_idx+2}")
+
         # 1. Update request status
         res = supabase_client.client.table("leave_requests").update({
-            "status": status,
+            "status": final_status,
             "approved_by": admin_id
         }).eq("id", request_id).execute()
         
@@ -152,7 +202,7 @@ async def approve_leave_request(request_id: str, payload: Dict[str, Any], curren
         # 1b. Fetch approver signature and employee details to regenerate PDF
         try:
             manager_sig_url = None
-            if status == "Approved" and admin_id:
+            if final_status == "Approved" and admin_id:
                 mgr_res = supabase_client.client.table("employees").select("signature_url").eq("id", admin_id).execute()
                 if not mgr_res.data:
                     mgr_res = supabase_client.client.table("employees").select("signature_url").eq("employee_id", admin_id).execute()
@@ -181,7 +231,7 @@ async def approve_leave_request(request_id: str, payload: Dict[str, Any], curren
             print(f"[PDF Generator] Error during approval PDF regeneration: {pdf_err}")
         
         # 2. If approved, sync to attendance and deduct balance (T022)
-        if status == "Approved":
+        if final_status == "Approved":
             eid = request_data.get("employee_id")
             days = request_data.get("days_count", 0)
             start_date_str = request_data.get("start_date")
@@ -213,9 +263,9 @@ async def approve_leave_request(request_id: str, payload: Dict[str, Any], curren
             from utils.fcm_service import send_fcm_notification
             fcm_token = employee_data.get("fcm_token")
             if fcm_token:
-                title = f"Status Cuti: {status}"
-                body = f"Pengajuan cuti Anda telah {'disetujui' if status == 'Approved' else 'ditolak'}."
-                send_fcm_notification(fcm_token, title, body, {"type": "leave", "request_id": str(request_id), "status": status})
+                title = f"Status Cuti: {final_status}"
+                body = f"Pengajuan cuti Anda telah {'disetujui' if final_status == 'Approved' else ('ditolak' if final_status == 'Rejected' else 'diproses ke tahap selanjutnya')}."
+                send_fcm_notification(fcm_token, title, body, {"type": "leave", "request_id": str(request_id), "status": final_status})
         except Exception as fcm_err:
             print(f"[FCM] Error sending notification for leave: {fcm_err}")
 

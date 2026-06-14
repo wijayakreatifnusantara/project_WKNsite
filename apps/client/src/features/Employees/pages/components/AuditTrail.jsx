@@ -54,13 +54,13 @@ const AuditTrail = ({ isOpen, onClose, employee }) => {
   return (
     <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div 
-        className="w-full max-w-4xl h-[80vh] bg-[#f0f2f5] shadow-[20px_20px_60px_#1e293b,-20px_-20px_60px_#ffffff] rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
+        className="w-full max-w-4xl h-[80vh] bg-[#f0f2f5] shadow-neu rounded-[3rem] overflow-hidden flex flex-col border-[8px] border-white animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <header className="h-20 bg-[#f0f2f5] border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
               <IconHistory size={24} />
             </div>
             <div>
@@ -70,7 +70,7 @@ const AuditTrail = ({ isOpen, onClose, employee }) => {
           </div>
           <button 
             onClick={onClose}
-            className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] rounded-xl text-slate-400 hover:text-red-500 transition-all"
+            className="h-11 w-11 flex items-center justify-center bg-[#f0f2f5] shadow-neu rounded-xl text-slate-400 hover:text-red-500 transition-all"
           >
             <IconX size={20} />
           </button>
@@ -85,7 +85,7 @@ const AuditTrail = ({ isOpen, onClose, employee }) => {
               placeholder="Search history..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-[10px] font-black text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/10 transition-all uppercase tracking-widest"
+              className="w-full h-10 pl-10 pr-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-[10px] font-black text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/10 transition-all uppercase tracking-widest"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -109,13 +109,13 @@ const AuditTrail = ({ isOpen, onClose, employee }) => {
 
               {/* Indicator Node */}
               <div className="relative z-10 pt-1">
-                <div className={`h-8 w-8 rounded-xl bg-white shadow-[4px_4px_10px_rgba(0,0,0,0.05)] flex items-center justify-center ${log.color} border-2 border-white ring-4 ring-[#f0f2f5]`}>
+                <div className={`h-8 w-8 rounded-xl bg-transparent shadow-neu flex items-center justify-center ${log.color} border-2 border-white ring-4 ring-[#f0f2f5]`}>
                   {log.icon}
                 </div>
               </div>
 
               {/* Content Card */}
-              <div className="flex-1 bg-white/40 shadow-[4px_4px_12px_rgba(0,0,0,0.02)] border-2 border-white rounded-[2rem] p-6 hover:bg-white/70 transition-all duration-300">
+              <div className="flex-1 bg-white/40 shadow-neu border-2 border-white rounded-[2rem] p-6 hover:bg-white/70 transition-all duration-300">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">{log.action}</h3>
@@ -128,7 +128,7 @@ const AuditTrail = ({ isOpen, onClose, employee }) => {
 
                 <div className="space-y-3">
                   {log.changes.map((change, cIdx) => (
-                    <div key={cIdx} className="bg-[#f0f2f5] shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff] rounded-xl p-3 flex items-center justify-between">
+                    <div key={cIdx} className="bg-[#f0f2f5] shadow-neu rounded-xl p-3 flex items-center justify-between">
                       <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{change.field}</span>
                       <div className="flex items-center gap-3">
                         <span className="text-[9px] font-bold text-slate-400 line-through decoration-red-500/30">{change.from}</span>

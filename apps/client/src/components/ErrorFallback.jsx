@@ -14,10 +14,10 @@ const ErrorFallback = ({ error, resetError }) => {
 
   return (
     <div className="min-h-screen w-full bg-[#f8fafc] flex items-center justify-center p-6 font-sans">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200/80 shadow-[8px_8px_24px_rgba(148,163,184,0.1),-8px_-8px_24px_rgba(255,255,255,0.9)] p-8 space-y-6 text-center animate-fade-in">
+      <div className="max-w-md w-full bg-transparent rounded-3xl border border-white/20/80 shadow-neu p-8 space-y-6 text-center animate-fade-in">
         
         {/* Neumorphic Red Alert Icon Container */}
-        <div className="mx-auto h-16 w-16 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center text-[#E31E24] shadow-[inset_4px_4px_8px_rgba(227,30,36,0.05),4px_4px_12px_rgba(227,30,36,0.1)]">
+        <div className="mx-auto h-16 w-16 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center text-[#E31E24] shadow-neu">
           <IconAlertTriangle size={32} className="animate-pulse" />
         </div>
 
@@ -37,7 +37,7 @@ const ErrorFallback = ({ error, resetError }) => {
         </p>
 
         {/* Error Message Box */}
-        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left font-mono text-[9px] font-bold text-slate-600 break-all select-all flex items-start gap-2.5">
+        <div className="p-4 bg-slate-50 border border-white/20 rounded-2xl text-left font-mono text-[9px] font-bold text-slate-600 break-all select-all flex items-start gap-2.5">
           <IconTerminal size={14} className="text-[#E31E24] mt-0.5 shrink-0" />
           <span>{error?.message || "Unknown Application Exception"}</span>
         </div>
@@ -45,14 +45,14 @@ const ErrorFallback = ({ error, resetError }) => {
         {/* Control Button */}
         <Button
           onClick={handleReload}
-          className="w-full h-11 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-[4px_4px_12px_rgba(227,30,36,0.25)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          className="w-full h-11 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-neu transition-all active:scale-[0.98] flex items-center justify-center gap-2"
         >
           <IconRefresh size={14} />
           Reload Application
         </Button>
 
         {/* Collapsible Error Trace Details */}
-        <div className="pt-2 border-t border-slate-100">
+        <div className="pt-2 border-t border-white/20">
           <button
             onClick={() => setShowDetails(!showDetails)}
             className="flex items-center justify-center gap-1.5 mx-auto text-[8px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-all"

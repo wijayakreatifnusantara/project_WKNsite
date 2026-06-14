@@ -65,7 +65,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
         delete record.end_time;
       }
       
-      await apiClient.post('/api/leave/request', record);
+      await apiClient.post('/leave/request', record);
 
       toast.success("Leave request submitted successfully");
       onSuccess?.();
@@ -80,7 +80,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300 p-4">
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div className="bg-transparent w-full max-w-md rounded-2xl shadow-neu border border-white/50 overflow-hidden">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -89,7 +89,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
               </h2>
               <p className="text-[7px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Personnel Absence Authorization</p>
             </div>
-            <button onClick={onClose} className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
+            <button onClick={onClose} className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
               <IconX size={16} />
             </button>
           </div>
@@ -98,7 +98,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Leave Type</label>
-                <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                <div className="h-10 px-3 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
                   <IconClipboardCheck size={14} className="text-[#E31E24]" />
                   <select 
                     value={formData.leave_type}
@@ -114,7 +114,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Attachment</label>
-                <button type="button" className="h-10 w-full px-3 rounded-xl bg-white border border-slate-200 border-dashed flex items-center justify-center gap-2 text-slate-400 font-black text-[8px] uppercase tracking-widest hover:bg-slate-50 transition-all">
+                <button type="button" className="h-10 w-full px-3 rounded-xl bg-transparent border border-white/50 border-dashed flex items-center justify-center gap-2 text-slate-400 font-black text-[8px] uppercase tracking-widest hover:shadow-neu-inset transition-all">
                   <IconUpload size={14} />
                   Upload Doc
                 </button>
@@ -124,7 +124,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
-                <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                <div className="h-10 px-3 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
                   <IconCalendar size={14} className="text-[#E31E24]" />
                   <input 
                     type="date" 
@@ -137,7 +137,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
-                <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                <div className="h-10 px-3 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
                   <IconCalendar size={14} className="text-[#E31E24]" />
                   <input 
                     type="date" 
@@ -154,7 +154,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Time</label>
-                  <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                  <div className="h-10 px-3 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
                     <IconClock size={14} className="text-[#E31E24]" />
                     <input 
                       type="time" 
@@ -167,7 +167,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">End Time</label>
-                  <div className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
+                  <div className="h-10 px-3 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-center gap-2 focus-within:border-[#E31E24]/30 transition-all">
                     <IconClock size={14} className="text-[#E31E24]" />
                     <input 
                       type="time" 
@@ -183,7 +183,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
 
             <div className="space-y-1.5">
               <label className="text-[7px] font-black text-slate-400 uppercase tracking-widest ml-1">Reason / Justification</label>
-              <div className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-2 focus-within:border-[#E31E24]/30 transition-all">
+              <div className="px-3 py-2 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none flex items-start gap-2 focus-within:border-[#E31E24]/30 transition-all">
                 <IconFileDescription size={14} className="text-[#E31E24] mt-0.5" />
                 <textarea 
                   rows="2"
@@ -209,14 +209,14 @@ const LeaveRequestModal = ({ isOpen, onClose, onSuccess }) => {
                 type="button" 
                 onClick={onClose}
                 variant="ghost"
-                className="flex-1 h-10 rounded-xl text-slate-400 font-black text-[9px] uppercase tracking-widest hover:bg-slate-50 transition-all"
+                className="flex-1 h-10 rounded-xl text-slate-400 font-black text-[9px] uppercase tracking-widest hover:shadow-neu-inset transition-all"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit"
                 disabled={loading}
-                className="flex-1 h-10 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest shadow-lg hover:bg-[#C1181E] transition-all disabled:opacity-50"
+                className="flex-1 h-10 rounded-xl bg-[#E31E24] text-white font-black text-[9px] uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Submit Request'}
               </Button>

@@ -209,15 +209,15 @@ const AttendanceRecap = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-[#f8fafc] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-6 bg-transparent custom-scrollbar animate-fade-in">
       <div className="w-full mx-auto space-y-4">
         
         {/* 🚀 ULTRA-COMPACT HEADER */}
-        <div className="flex items-center justify-between bg-white p-3 px-5 rounded-2xl border border-slate-200 shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between bg-transparent p-3 px-5 rounded-2xl border border-white/50 shadow-neu backdrop-blur-md">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-white transition-all active:scale-95 shrink-0"
+              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>
@@ -228,7 +228,7 @@ const AttendanceRecap = () => {
           </div>
 
           <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-white/50">
                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Cycle:</span>
                <input 
                   type="month" 
@@ -245,14 +245,14 @@ const AttendanceRecap = () => {
              </div>
              <Button 
                 onClick={handleExportCSV}
-                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[8px] uppercase tracking-widest hover:bg-slate-900 shadow-md flex gap-2 items-center print:hidden"
+                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[8px] uppercase tracking-widest hover:bg-slate-900 shadow-neu flex gap-2 items-center print:hidden"
               >
                 <IconDownload size={12} />
                 CSV
               </Button>
               <Button 
                 onClick={() => setIsPreviewMode(true)}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest hover:bg-[#c8191f] shadow-md flex gap-2 items-center print:hidden"
+                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest hover:bg-[#c8191f] shadow-neu flex gap-2 items-center print:hidden"
               >
                 <IconClipboardList size={12} />
                 PDF
@@ -262,14 +262,14 @@ const AttendanceRecap = () => {
         
         {/* 👁️ PREVIEW MODE FLOATING BAR */}
         {isPreviewMode && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 border border-slate-700 print:hidden animate-fade-in-down">
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-6 py-3 rounded-full shadow-neu flex items-center gap-6 border border-slate-700 print:hidden animate-fade-in-down">
             <span className="text-xs font-bold flex items-center gap-2"><IconClipboardList size={16}/> Mode Pratinjau Cetak</span>
             <div className="h-4 w-[1px] bg-slate-600"></div>
             <div className="flex gap-2">
               <Button onClick={() => setIsPreviewMode(false)} variant="ghost" className="h-8 text-slate-300 hover:text-white hover:bg-slate-700 text-[10px] font-bold">
                 BATAL
               </Button>
-              <Button onClick={() => window.print()} className="h-8 bg-[#E31E24] hover:bg-[#c8191f] text-white text-[10px] font-bold shadow-lg">
+              <Button onClick={() => window.print()} className="h-8 bg-[#E31E24] hover:bg-[#c8191f] text-white text-[10px] font-bold shadow-neu">
                 <IconDownload size={14} className="mr-1" />
                 UNDUH PDF
               </Button>
@@ -286,8 +286,8 @@ const AttendanceRecap = () => {
 
         {/* 📊 COMPACT STATS BAR */}
         <div className={`flex flex-wrap items-center gap-3 print:hidden ${isPreviewMode ? 'hidden' : ''}`}>
-            <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-[#E31E24] shadow-sm">
+            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu">
+                <div className="h-8 w-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg flex items-center justify-center text-[#E31E24] shadow-neu">
                     <IconCalendarStats size={16} />
                 </div>
                 <div>
@@ -296,8 +296,8 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-amber-500 shadow-sm">
+            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu">
+                <div className="h-8 w-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg flex items-center justify-center text-amber-500 shadow-neu">
                     <IconSettings size={16} />
                 </div>
                 <div>
@@ -313,8 +313,8 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="h-8 w-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-emerald-500 shadow-sm">
+            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu">
+                <div className="h-8 w-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg flex items-center justify-center text-emerald-500 shadow-neu">
                     <IconBriefcase size={16} />
                 </div>
                 <div>
@@ -323,7 +323,7 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-[2] flex items-center gap-3 bg-white p-2 px-4 rounded-2xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-md group">
+            <div className="flex-[2] flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-neu group">
                 <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
                 <input 
                     type="text" 
@@ -336,11 +336,11 @@ const AttendanceRecap = () => {
         </div>
 
         {/* 📜 HIGH DENSITY TABLE */}
-        <div className="bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] rounded-3xl border border-slate-200 overflow-hidden">
+        <div className="bg-transparent shadow-neu rounded-3xl border border-white/50 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-100 backdrop-blur-md">
+                <tr className="bg-slate-50/80 border-b border-white/50 backdrop-blur-md">
                   <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Employee</th>
                   <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
                   <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Target</th>
@@ -370,7 +370,7 @@ const AttendanceRecap = () => {
                       <React.Fragment key={emp.id}>
                         <tr 
                           onClick={() => setExpandedRow(isExpanded ? null : emp.id)}
-                          className="hover:bg-slate-50/50 transition-all group border-b border-transparent hover:border-slate-100 cursor-pointer"
+                          className="hover:shadow-neu-inset/50 transition-all group border-b border-transparent hover:border-white/50 cursor-pointer"
                         >
                           <td className="px-6 py-2">
                             <div className="flex items-center gap-3">
@@ -413,13 +413,13 @@ const AttendanceRecap = () => {
                         </tr>
                         {isExpanded && (
                           <tr className="bg-slate-50/50">
-                            <td colSpan="9" className="px-6 py-4 border-b border-slate-100">
-                              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                            <td colSpan="9" className="px-6 py-4 border-b border-white/50">
+                              <div className="bg-transparent rounded-xl border border-white/50 p-4 shadow-neu">
                                 <h4 className="text-[9px] font-black text-slate-800 uppercase tracking-widest mb-3">Detail Pelanggaran Kehadiran</h4>
                                 {emp.logs && emp.logs.filter(l => l.status !== 'Present').length > 0 ? (
                                   <div className="grid grid-cols-3 gap-3">
                                     {emp.logs.filter(l => l.status !== 'Present').map((log, idx) => (
-                                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-slate-100 bg-slate-50">
+                                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-white/50 bg-slate-50">
                                         <div>
                                           <p className="text-[10px] font-black text-slate-700">{log.date}</p>
                                           <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{log.status}</p>

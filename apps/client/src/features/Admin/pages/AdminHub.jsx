@@ -3,19 +3,25 @@ import Settings from './Settings';
 import UserManager from './UserManager';
 import RBACManager from './RBACManager';
 import AuditTrail from './AuditTrail';
+import OverviewDashboard from './OverviewDashboard';
+import DataImportCenter from './DataImportCenter';
 import { 
   IconSettings, 
   IconUsers, 
   IconWorld, 
   IconShieldLock,
   IconShieldCheck,
-  IconBuilding
+  IconBuilding,
+  IconActivity,
+  IconDatabaseImport
 } from "@tabler/icons-react";
 
 const AdminHub = () => {
-  const [activeTab, setActiveTab] = useState('settings');
+  const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
+    { id: 'overview', label: 'Overview', icon: <IconActivity size={18} />, component: <OverviewDashboard /> },
+    { id: 'datahub', label: 'Data Hub', icon: <IconDatabaseImport size={18} />, component: <DataImportCenter /> },
     { id: 'settings', label: 'Konfigurasi Sistem', icon: <IconSettings size={18} />, component: <Settings /> },
     { id: 'users', label: 'Manajemen User', icon: <IconUsers size={18} />, component: <UserManager /> },
     { id: 'rbac', label: 'Hak Akses (RBAC)', icon: <IconWorld size={18} />, component: <RBACManager /> },
@@ -25,10 +31,10 @@ const AdminHub = () => {
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-[#f8fafc] font-inter animate-fade-in">
       {/* 🚀 PREMIUM FLAT SUB-HEADER & TAB BAR */}
-      <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-slate-200 z-10 shrink-0">
+      <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-white/50 z-10 shrink-0">
         <div className="max-w-[1400px] mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
+            <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white/50">
               <IconShieldCheck size={22} stroke={2.5} />
             </div>
             <div>
@@ -38,7 +44,7 @@ const AdminHub = () => {
           </div>
 
           {/* Premium Flat Tab Selector */}
-          <div className="flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/60">
+          <div className="flex p-1 bg-slate-100/80 rounded-xl border border-white/50/60">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -47,7 +53,7 @@ const AdminHub = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${
                     isActive 
-                      ? 'bg-white shadow-sm border border-slate-200/50 text-[#E31E24]' 
+                      ? 'bg-transparent shadow-neu border border-white/50/50 text-[#E31E24]' 
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >

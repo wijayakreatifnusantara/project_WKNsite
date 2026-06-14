@@ -13,7 +13,7 @@ const AttendanceKPI = ({ title, value, total, unit = "", icon, color, compact = 
 
   if (compact) {
     return (
-      <Card className="border-white border-2 shadow-sm bg-white rounded-2xl p-3 flex items-center gap-3 transition-all hover:translate-y-[-2px] cursor-pointer">
+      <Card className="border-white border-2 shadow-neu bg-transparent rounded-2xl p-3 flex items-center gap-3 transition-all hover:translate-y-[-2px] cursor-pointer">
         <div className={`h-10 w-10 shrink-0 rounded-xl flex items-center justify-center ${colorConfig[color]}`}>
           {React.cloneElement(icon, { size: 18 })}
         </div>
@@ -31,14 +31,14 @@ const AttendanceKPI = ({ title, value, total, unit = "", icon, color, compact = 
   }
 
   return (
-    <Card className="border-slate-200 border bg-white shadow-sm rounded-2xl p-5 transition-all hover:translate-y-[-2px] cursor-pointer group">
+    <Card className="border-white/50 border bg-transparent shadow-neu rounded-2xl p-5 transition-all hover:translate-y-[-2px] cursor-pointer group">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className={`h-12 w-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 ${colorConfig[color]}`}>
             {icon}
           </div>
           {total > 0 && unit !== "%" && (
-            <div className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-400">
+            <div className="px-3 py-1 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none text-[9px] font-black uppercase tracking-widest text-slate-400">
               {percentage}% OF TOTAL
             </div>
           )}

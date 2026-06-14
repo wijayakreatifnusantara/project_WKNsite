@@ -118,7 +118,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildPasswordField('PASSWORD SAAT INI', _currentPassCtrl, _showCurrent, (val) => setState(() => _showCurrent = val), Icons.lock_outline),
-                  const Divider(height: 30, color: Color(0xFFF1F5F9)),
+                  Divider(height: 30, color: context.borderColor),
                   _buildPasswordField('PASSWORD BARU', _newPassCtrl, _showNew, (val) => setState(() => _showNew = val), Icons.key_outlined, iconColor: Colors.orange),
                   const SizedBox(height: 20),
                   _buildPasswordField('KONFIRMASI PASSWORD BARU', _confirmPassCtrl, _showConfirm, (val) => setState(() => _showConfirm = val), Icons.check_circle_outline, iconColor: Colors.green),
@@ -164,7 +164,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               onPressed: () => onToggle(!showPass),
             ),
             filled: true,
-            fillColor: const Color(0xFFF8F9FB),
+            fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppConstants.primaryColor)),

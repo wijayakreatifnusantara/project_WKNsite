@@ -8,7 +8,7 @@ const AnomalyAlerts = () => {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-rose-200 p-4 shadow-sm flex flex-col h-full">
+    <div className="bg-transparent rounded-2xl border border-rose-200 p-4 shadow-neu flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
           <IconAlertTriangle size={14} className="text-rose-500" />
@@ -22,7 +22,7 @@ const AnomalyAlerts = () => {
       <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2">
         {alerts.map(alert => (
           <div key={alert.id} className="p-2.5 rounded-xl border border-rose-100 bg-rose-50/50 flex gap-3 group hover:bg-rose-50 transition-colors cursor-pointer">
-            <div className="h-8 w-8 rounded-lg bg-white border border-rose-100 flex items-center justify-center text-rose-500 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="h-8 w-8 rounded-lg bg-transparent border border-rose-100 flex items-center justify-center text-rose-500 shrink-0 shadow-neu group-hover:scale-105 transition-transform">
               {alert.type === 'location' ? <IconCurrentLocation size={16} /> : <IconDeviceMobile size={16} />}
             </div>
             <div className="min-w-0 flex-1">

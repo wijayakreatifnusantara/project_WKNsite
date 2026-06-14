@@ -112,7 +112,7 @@ const OnboardingPage = () => {
     <div className="flex-1 flex flex-col bg-slate-50 min-h-0 overflow-hidden animate-fade-in">
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
-      <div className="bg-white border-b border-slate-200 z-10 shadow-sm shrink-0">
+      <div className="bg-transparent border-b border-white/50 z-10 shadow-neu shrink-0">
         <div className="max-w-[1400px] mx-auto p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           
           {/* HEADER ROW */}
@@ -131,12 +131,12 @@ const OnboardingPage = () => {
           </div>
 
           {/* TOGGLE BUTTONS */}
-          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/50 self-start sm:self-center">
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-white/50/50 self-start sm:self-center">
             <button 
               onClick={() => setActiveMode('onboarding')}
               className={`px-5 py-2 rounded-lg flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-all ${
                 activeMode === 'onboarding' 
-                  ? 'bg-[#E31E24] text-white shadow-sm' 
+                  ? 'bg-[#E31E24] text-white shadow-neu' 
                   : 'text-slate-500 hover:text-slate-850'
               }`}
             >
@@ -147,7 +147,7 @@ const OnboardingPage = () => {
               onClick={() => setActiveMode('offboarding')}
               className={`px-5 py-2 rounded-lg flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-all ${
                 activeMode === 'offboarding' 
-                  ? 'bg-slate-800 text-white shadow-sm' 
+                  ? 'bg-slate-800 text-white shadow-neu' 
                   : 'text-slate-500 hover:text-slate-850'
               }`}
             >
@@ -163,8 +163,8 @@ const OnboardingPage = () => {
       <div className="flex-1 min-h-0 flex flex-col md:flex-row max-w-[1400px] w-full mx-auto">
         
         {/* Left: Process Queue List */}
-        <div className="w-full md:w-[380px] border-r border-slate-200 bg-white flex flex-col shrink-0">
-          <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+        <div className="w-full md:w-[380px] border-r border-white/50 bg-transparent flex flex-col shrink-0">
+          <div className="p-4 border-b border-white/50 bg-slate-50/50 flex justify-between items-center">
             <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
               Proses Aktif ({currentQueue.filter(e => !e.isCompleted).length})
             </h3>
@@ -178,10 +178,10 @@ const OnboardingPage = () => {
                 <div 
                   key={item.id} 
                   onClick={() => setSelectedId(item.id)}
-                  className={`group bg-white border rounded-xl cursor-pointer relative overflow-hidden transition-all p-4 ${
+                  className={`group bg-transparent border rounded-xl cursor-pointer relative overflow-hidden transition-all p-4 ${
                     isSelected 
-                      ? 'border-slate-300 shadow-sm ring-1 ring-slate-200' 
-                      : 'border-slate-200/80 hover:border-slate-300 hover:shadow-xs'
+                      ? 'border-white/20 shadow-neu ring-1 ring-slate-200' 
+                      : 'border-white/50/80 hover:border-white/20 hover:shadow-xs'
                   }`}
                 >
                   {/* Active Indicator Line */}
@@ -207,7 +207,7 @@ const OnboardingPage = () => {
                       </div>
                       <p className="text-[9px] font-semibold text-slate-400 uppercase mt-0.5">{item.dept}</p>
                     </div>
-                    <span className="text-[9px] font-mono font-bold text-slate-400 bg-slate-50 border border-slate-200/60 px-1.5 py-0.5 rounded">
+                    <span className="text-[9px] font-mono font-bold text-slate-400 bg-[#f0f2f5] shadow-neu-inset border-none/60 px-1.5 py-0.5 rounded">
                       {item.id}
                     </span>
                   </div>
@@ -239,14 +239,14 @@ const OnboardingPage = () => {
         </div>
 
         {/* Right: Detailed Checklist */}
-        <div className="flex-1 bg-slate-50 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+        <div className="flex-1 bg-transparent overflow-y-auto p-6 md:p-8 custom-scrollbar">
           {selectedEmployee ? (
             <div className="max-w-3xl mx-auto space-y-6">
               
               {/* Employee Detail Card */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="bg-transparent border border-white/50 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="h-14 w-14 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-lg font-bold text-slate-700 uppercase tracking-tight">
+                  <div className="h-14 w-14 bg-[#f0f2f5] shadow-neu-inset border-none rounded-xl flex items-center justify-center text-lg font-bold text-slate-700 uppercase tracking-tight">
                     {selectedEmployee.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
                   </div>
                   <div>
@@ -264,7 +264,7 @@ const OnboardingPage = () => {
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                         {activeMode === 'onboarding' ? 'Tanggal Mulai:' : 'Tanggal Efektif:'}
                       </span>
-                      <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded-md">
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md">
                         <IconClock size={11} className={activeMode === 'onboarding' ? 'text-[#E31E24]' : 'text-slate-600'} />
                         <span className="text-[9px] font-bold text-slate-650 uppercase tracking-wider font-mono">
                           {selectedEmployee.date}
@@ -283,7 +283,7 @@ const OnboardingPage = () => {
                         ? activeMode === 'onboarding' 
                           ? 'bg-[#E31E24] text-white hover:bg-[#C1181E]' 
                           : 'bg-slate-850 text-white hover:bg-slate-900'
-                        : 'bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed'
+                        : 'bg-slate-100 border border-white/50 text-slate-400 cursor-not-allowed'
                     }`}
                   >
                     <span>{activeMode === 'onboarding' ? 'Selesaikan Onboarding' : 'Selesaikan Offboarding'}</span>
@@ -293,8 +293,8 @@ const OnboardingPage = () => {
               </div>
 
               {/* Checklist Card */}
-              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-                <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+              <div className="bg-transparent border border-white/50 rounded-2xl overflow-hidden shadow-xs">
+                <div className="px-6 py-4 border-b border-white/50 bg-slate-50/50 flex items-center justify-between">
                   <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                     Daftar Tugas Alur Kerja
                   </h3>
@@ -310,14 +310,14 @@ const OnboardingPage = () => {
                       <div 
                         key={task.id} 
                         className={`px-6 py-4 flex items-center justify-between transition-colors ${
-                          selectedEmployee.isCompleted ? 'opacity-85' : 'hover:bg-slate-50/20'
+                          selectedEmployee.isCompleted ? 'opacity-85' : 'hover:shadow-neu-inset/20'
                         }`}
                       >
                         <div className="flex items-center gap-4">
                           <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${
                             isDone 
                               ? 'text-emerald-600 bg-emerald-50 border-emerald-100' 
-                              : 'text-slate-450 bg-slate-50 border-slate-200'
+                              : 'text-slate-450 bg-slate-50 border-white/50'
                           }`}>
                             {renderTaskIcon(task.icon)}
                           </div>
@@ -339,7 +339,7 @@ const OnboardingPage = () => {
                             className={`h-9 w-9 rounded-lg flex items-center justify-center transition-all ${
                               isDone 
                                 ? 'bg-emerald-50 border border-emerald-100 text-emerald-600 shadow-xs' 
-                                : 'bg-white border border-slate-200 text-slate-350 hover:text-slate-800 hover:bg-slate-50 shadow-xs active:scale-95'
+                                : 'bg-transparent border border-white/50 text-slate-350 hover:text-slate-800 hover:shadow-neu-inset shadow-xs active:scale-95'
                             }`}
                           >
                             {isDone ? <IconCircleCheck size={18} /> : <IconCircleDashed size={18} />}

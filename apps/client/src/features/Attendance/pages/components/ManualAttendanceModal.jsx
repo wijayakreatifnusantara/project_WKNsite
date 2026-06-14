@@ -32,7 +32,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
   const fetchEmployees = async () => {
     // We can fetch via our apiClient employees endpoint, or directly use the generic one if available
     try {
-      const response = await apiClient.get('/api/employees');
+      const response = await apiClient.get('/employees');
       // map only active employees if needed or assume backend filters
       const data = response.data.data.filter(e => !e.is_resigned && e["Status *"] !== "RESIGNED");
       setEmployees(data || []);
@@ -46,7 +46,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await apiClient.post('/api/attendance/direct', {
+      await apiClient.post('/attendance/direct', {
         ...formData,
         is_manual: true,
         created_at: new Date().toISOString()
@@ -66,10 +66,10 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-md bg-[#f0f2f5] border-white border-[4px] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] rounded-[2.5rem] p-8 relative overflow-hidden">
+      <div className="w-full max-w-md bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] text-slate-400 hover:text-[#E31E24] transition-all"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all"
         >
           <IconX size={20} />
         </button>
@@ -93,7 +93,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
               required
               value={formData.employee_id}
               onChange={(e) => setFormData({...formData, employee_id: e.target.value})}
-              className="w-full h-12 px-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
+              className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
             >
               <option value="">Choose Employee...</option>
               {employees.map(emp => (
@@ -114,7 +114,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.date}
                 onChange={(e) => setFormData({...formData, date: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
               />
             </div>
 
@@ -127,7 +127,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
               <select 
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
+                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
               >
                 <option>Present</option>
                 <option>Late</option>
@@ -148,7 +148,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
                 type="time"
                 value={formData.clock_in}
                 onChange={(e) => setFormData({...formData, clock_in: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
               />
             </div>
             {/* Clock Out */}
@@ -160,7 +160,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
                 type="time"
                 value={formData.clock_out}
                 onChange={(e) => setFormData({...formData, clock_out: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
               />
             </div>
           </div>
@@ -175,14 +175,14 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
               placeholder="Why is this manual entry being made?"
               value={formData.notes}
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
-              className="w-full h-24 p-4 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none resize-none placeholder:text-slate-300"
+              className="w-full h-24 p-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none resize-none placeholder:text-slate-300"
             />
           </div>
 
           <Button 
             type="submit"
             disabled={loading}
-            className="w-full h-14 mt-4 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.2em] shadow-[5px_5px_15px_rgba(227,30,36,0.3)] hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
+            className="w-full h-14 mt-4 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.2em] shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
           >
             {loading ? 'Processing...' : 'Authorize Manual Entry'}
           </Button>

@@ -30,7 +30,7 @@ def init_firebase():
 # Call init right away (but it handles missing gracefully)
 init_firebase()
 
-def send_fcm_notification(token: str, title: str, body: str, data: dict = None):
+def send_fcm_notification(token: str, title: str, body: str, data: dict = None, channel_id: str = 'wkn_approval_channel'):
     """
     Send a push notification to a specific device token.
     """
@@ -60,7 +60,7 @@ def send_fcm_notification(token: str, title: str, body: str, data: dict = None):
                 priority='high',
                 notification=messaging.AndroidNotification(
                     sound='default',
-                    channel_id='wkn_approval_channel'
+                    channel_id=channel_id
                 )
             )
         )

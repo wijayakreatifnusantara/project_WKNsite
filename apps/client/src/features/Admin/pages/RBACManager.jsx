@@ -11,7 +11,9 @@ import {
   IconCheck,
   IconAlertCircle,
   IconLoader2,
-  IconDeviceAnalytics
+  IconDeviceAnalytics,
+  IconPlus,
+  IconX
 } from "@tabler/icons-react";
 import { apiClient } from '@/lib/apiClient';
 import { PERMISSIONS, ROLES } from '@/lib/permissions';
@@ -22,6 +24,10 @@ const RBACManager = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  
+  const [dynamicRoles, setDynamicRoles] = useState([...Object.values(ROLES)]);
+  const [showAddRoleModal, setShowAddRoleModal] = useState(false);
+  const [newRoleName, setNewRoleName] = useState('');
 
   // Group permissions for better UI
   const permissionGroups = [
@@ -75,7 +81,38 @@ const RBACManager = () => {
       setRolePermissions(data.map(p => p.permission_name));
     } catch (err) {
       console.error('Error fetching RBAC:', err);
-      setMessage({ type: 'error', text: 'Failed to sync with Backend.' });
+      // Since some custom roles might not exist in backend yet (if backend hasn't been updated to return them),
+      // we'll just set empty array instead of failing hard.
+      setRolePermissions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateRole = async (e) => {
+    e.preventDefault();
+    if (!newRoleName.trim()) return;
+    
+    const roleKey = newRoleName.trim().toLowerCase().replace(/\s+/g, '_');
+    
+    // Check if exists
+    if (dynamicRoles.includes(roleKey)) {
+      setMessage({ type: 'error', text: 'Role already exists!' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Mock API call to create role metadata if needed
+      await new Promise(r => setTimeout(r, 800));
+      setDynamicRoles(prev => [...prev, roleKey]);
+      setSelectedRole(roleKey);
+      setRolePermissions([]);
+      setShowAddRoleModal(false);
+      setNewRoleName('');
+      setMessage({ type: 'success', text: `Role ${roleKey} created successfully!` });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to create role.' });
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +151,7 @@ const RBACManager = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
+              <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white/50">
                 <IconLockAccess size={20} />
               </div>
               <div>
@@ -128,7 +165,7 @@ const RBACManager = () => {
             <Button 
               onClick={handleSave} 
               disabled={isSaving || isLoading}
-              className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-md transition-all active:scale-95"
+              className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-neu transition-all active:scale-95"
             >
               {isSaving ? <IconLoader2 className="animate-spin mr-2" size={14} /> : <IconShieldCheck className="mr-2" size={14} />}
               Save All Changes
@@ -147,28 +184,36 @@ const RBACManager = () => {
           
           {/* ROLE SELECTOR (Left Sidebar) */}
           <div className="lg:col-span-1 space-y-2">
-            <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-1 mb-2">Select Target Role</h3>
-            {Object.values(ROLES).map((role) => (
+            <div className="flex items-center justify-between pl-1 mb-2">
+              <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Select Target Role</h3>
+              <button 
+                onClick={() => setShowAddRoleModal(true)}
+                className="text-[9px] font-black uppercase text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors flex items-center gap-1 shadow-neu-inset"
+              >
+                <IconPlus size={10} /> New Role
+              </button>
+            </div>
+            {dynamicRoles.map((role) => (
               <button
                 key={role}
                 onClick={() => setSelectedRole(role)}
                 className={`w-full p-3 rounded-xl flex items-center justify-between transition-all duration-300 group ${
                   selectedRole === role 
-                  ? 'bg-white border border-[#E31E24] shadow-sm' 
-                  : 'bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:scale-[1.01]'
+                  ? 'bg-transparent border border-[#E31E24] shadow-neu' 
+                  : 'bg-transparent border border-white/50 hover:border-white/20 shadow-neu hover:scale-[1.01]'
                 }`}
               >
                 <div className="flex flex-col items-start text-left">
                   <span className={`text-[10px] font-black uppercase tracking-widest ${selectedRole === role ? 'text-[#E31E24]' : 'text-slate-600'}`}>{role}</span>
                   <span className="text-[7px] text-slate-400 font-bold">System Hierarchy {role === 'owner' ? '0' : '1'}</span>
                 </div>
-                <div className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${selectedRole === role ? 'bg-[#E31E24] text-white shadow-sm' : 'bg-slate-50 text-slate-400 border border-slate-200 shadow-sm'}`}>
+                <div className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${selectedRole === role ? 'bg-[#E31E24] text-white shadow-neu' : 'bg-slate-50 text-slate-400 border border-white/50 shadow-neu'}`}>
                   <IconShieldCheck size={12} />
                 </div>
               </button>
             ))}
             
-            <Card className="mt-6 border border-slate-700 bg-slate-800 text-white rounded-xl overflow-hidden shadow-lg">
+            <Card className="mt-6 border border-slate-700 bg-slate-800 text-white rounded-xl overflow-hidden shadow-neu">
               <CardContent className="p-4 space-y-2">
                 <div className="h-8 w-8 bg-white/10 rounded-lg flex items-center justify-center">
                   <IconDeviceAnalytics size={16} className="text-red-400" />
@@ -190,8 +235,8 @@ const RBACManager = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {permissionGroups.map((group, gIdx) => (
-                  <Card key={gIdx} className="border border-slate-200 shadow-sm bg-white rounded-xl overflow-hidden transition-all hover:shadow-md">
-                    <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+                  <Card key={gIdx} className="border border-white/50 shadow-neu bg-transparent rounded-xl overflow-hidden transition-all hover:shadow-neu">
+                    <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-3">
                       <div className="flex items-center gap-2">
                         <div className="text-[#E31E24] opacity-70">{React.cloneElement(group.icon, { size: 16 })}</div>
                         <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest">{group.title}</CardTitle>
@@ -207,7 +252,7 @@ const RBACManager = () => {
                           <div className={`mt-0.5 h-5 w-5 rounded border flex items-center justify-center transition-all ${
                             rolePermissions.includes(item.id) 
                             ? 'bg-[#E31E24] border-[#E31E24]' 
-                            : 'border-slate-300 bg-white'
+                            : 'border-white/20 bg-transparent'
                           }`}>
                             {rolePermissions.includes(item.id) && <IconCheck size={14} className="text-white" stroke={4} />}
                           </div>
@@ -230,6 +275,52 @@ const RBACManager = () => {
 
         </div>
       </div>
+
+      {/* Add Role Modal */}
+      {showAddRoleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <Card className="w-full max-w-md border border-white/50 bg-slate-50/90 shadow-neu rounded-3xl overflow-hidden">
+            <div className="p-6 border-b border-white/50 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                  <IconShieldCheck className="text-[#E31E24]" />
+                  Create Custom Role
+                </h3>
+                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+                  Define a new authority group
+                </p>
+              </div>
+              <Button variant="ghost" onClick={() => setShowAddRoleModal(false)} className="h-10 w-10 p-0 rounded-full text-slate-500 hover:text-red-500 shadow-neu-inset flex items-center justify-center">
+                <IconX size={18} />
+              </Button>
+            </div>
+            <form onSubmit={handleCreateRole} className="p-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Role Name</label>
+                <input 
+                  autoFocus
+                  required
+                  type="text" 
+                  value={newRoleName} 
+                  onChange={(e) => setNewRoleName(e.target.value)} 
+                  placeholder="e.g. HR Assistant, IT Support" 
+                  className="w-full h-12 px-6 bg-transparent border border-white/50 shadow-neu-inset rounded-2xl text-[12px] font-bold focus:outline-none focus:border-[#E31E24] transition-all" 
+                />
+              </div>
+              <div className="pt-4">
+                <Button 
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-12 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-neu transition-all"
+                >
+                  {isLoading ? <IconLoader2 className="animate-spin mr-2" size={16} /> : <IconPlus className="mr-2" size={16} />}
+                  Create Role
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

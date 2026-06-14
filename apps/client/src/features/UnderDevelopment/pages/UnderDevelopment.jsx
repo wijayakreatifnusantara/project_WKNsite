@@ -20,7 +20,7 @@ const UnderDevelopment = ({ moduleName }) => {
         <div className="absolute inset-[-20px] bg-[#E31E24]/3 rounded-full animate-ping" style={{ animationDuration: '4000ms' }}></div>
         
         {/* Core Icon Container */}
-        <div className="relative h-40 w-40 bg-[#f0f2f5] shadow-[15px_15px_30px_#d1d9e6,-15px_-15px_30px_#ffffff] rounded-[3rem] flex items-center justify-center border-4 border-white group overflow-hidden">
+        <div className="relative h-40 w-40 bg-[#f0f2f5] shadow-neu rounded-[3rem] flex items-center justify-center border-4 border-white group overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#E31E24]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
           <IconBrain size={64} className="text-[#E31E24] animate-pulse" />
         </div>
@@ -47,7 +47,7 @@ const UnderDevelopment = ({ moduleName }) => {
         <div className="pt-12">
           <Button 
             onClick={() => navigate('/dashboard')}
-            className="h-14 px-10 rounded-2xl bg-[#f0f2f5] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] hover:shadow-none transition-all active:scale-95 flex gap-4"
+            className="h-14 px-10 rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] hover:shadow-none transition-all active:scale-95 flex gap-4"
           >
             <IconArrowLeft size={18} />
             Return to Strategic Hub
@@ -60,7 +60,7 @@ const UnderDevelopment = ({ moduleName }) => {
 
 const StatusIndicator = ({ icon, label, status }) => (
   <div className="flex flex-col items-center gap-3">
-    <div className="h-12 w-12 bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-xl flex items-center justify-center text-slate-400">
+    <div className="h-12 w-12 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-slate-400">
       {icon}
     </div>
     <div className="flex flex-col items-center">

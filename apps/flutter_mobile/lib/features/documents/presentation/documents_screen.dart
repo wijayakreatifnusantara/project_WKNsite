@@ -17,7 +17,7 @@ class DocumentsScreen extends StatefulWidget {
 
 class _DocumentsScreenState extends State<DocumentsScreen> {
   final _secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  static String baseUrl = AppConstants.apiUrl;
   
   bool _isLoading = false;
   bool _submitLoading = false;
@@ -348,7 +348,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-      filled: true, fillColor: const Color(0xFFF8F9FB),
+      filled: true, fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),

@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 
 const Wellness = () => {
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-[#f0f2f5] custom-scrollbar animate-fade-in">
+    <div className="flex-1 overflow-y-auto p-8 bg-transparent custom-scrollbar animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
@@ -32,7 +32,7 @@ const Wellness = () => {
 
         {/* Health Profile Card */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="border-white border-[4px] shadow-[12px_12px_24px_#d1d9e6,-12px_-10px_20px_#ffffff] bg-[#f0f2f5] rounded-[2.5rem] p-8 space-y-8 relative overflow-hidden">
+          <Card className="border-white border-[4px] shadow-neu bg-[#f0f2f5] rounded-[2.5rem] p-8 space-y-8 relative overflow-hidden">
              <div className="relative z-10">
                <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">Medical Profile</h3>
                <div className="space-y-4">
@@ -46,12 +46,12 @@ const Wellness = () => {
              <IconStethoscope size={160} className="absolute -bottom-10 -right-10 text-slate-200 rotate-12 opacity-50" />
           </Card>
 
-          <Card className="border-white border-[4px] shadow-[12px_12px_24px_#d1d9e6,-12px_-10px_20px_#ffffff] bg-[#f0f2f5] rounded-[2.5rem] p-8">
+          <Card className="border-white border-[4px] shadow-neu bg-[#f0f2f5] rounded-[2.5rem] p-8">
              <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">Wellness Activity</h3>
              <div className="h-64 flex items-end justify-around gap-2 px-4 pb-4">
                {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
                  <div key={i} className="flex-1 flex flex-col items-center gap-3">
-                   <div className="w-full bg-[#f0f2f5] shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] rounded-full h-48 relative overflow-hidden flex items-end">
+                   <div className="w-full bg-[#f0f2f5] shadow-neu rounded-full h-48 relative overflow-hidden flex items-end">
                      <div className="w-full bg-[#E31E24] rounded-t-full transition-all duration-1000" style={{ height: `${h}%` }}></div>
                    </div>
                    <span className="text-[8px] font-black text-slate-400 uppercase">Day {i+1}</span>
@@ -66,8 +66,8 @@ const Wellness = () => {
 };
 
 const WellnessMetric = ({ label, value, icon, color }) => (
-  <Card className="border-white border-[2px] shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] bg-[#f0f2f5] rounded-[1.5rem] p-6 flex flex-col items-center gap-3">
-    <div className={`h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] flex items-center justify-center
+  <Card className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6 flex flex-col items-center gap-3">
+    <div className={`h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
       ${color === 'indigo' ? 'text-indigo-500' : color === 'rose' ? 'text-rose-500' : color === 'sky' ? 'text-sky-500' : 'text-emerald-500'}`}>
       {icon}
     </div>

@@ -100,7 +100,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
       setError(null);
 
       // 1. Fetch employee mapping to get internal PKs
-      const response = await apiClient.get('/api/employees');
+      const response = await apiClient.get('/employees');
       const employeeMap = response.data.data;
 
       const idMap = {};
@@ -142,7 +142,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
         throw new Error(`The following Employee IDs were not found in the system: ${[...new Set(missingIds)].join(', ')}`);
       }
 
-      await apiClient.post('/api/attendance/bulk-insert', formattedData);
+      await apiClient.post('/attendance/bulk-insert', formattedData);
 
       setSuccess(true);
       setTimeout(() => {
@@ -163,12 +163,12 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-[#f0f2f5] rounded-[2.5rem] shadow-[20px_20px_60px_#d1d9e6,-20px_-20px_60px_#ffffff] border-white border-[6px] overflow-hidden">
+      <div className="w-full max-w-2xl bg-[#f0f2f5] rounded-[2.5rem] shadow-neu border-white border-[6px] overflow-hidden">
         
         {/* Header */}
         <div className="px-8 py-6 border-b border-white/50 flex justify-between items-center bg-white/30">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#E31E24]">
+            <div className="h-12 w-12 rounded-2xl bg-transparent shadow-neu flex items-center justify-center text-[#E31E24]">
               <IconCloudUpload size={24} />
             </div>
             <div>
@@ -187,7 +187,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
             <Button 
               onClick={downloadTemplate}
               variant="outline"
-              className="h-10 px-6 rounded-xl border-white border-2 shadow-sm text-[9px] font-black uppercase tracking-widest text-slate-600 flex gap-2"
+              className="h-10 px-6 rounded-xl border-white border-2 shadow-neu text-[9px] font-black uppercase tracking-widest text-slate-600 flex gap-2"
             >
               <IconDownload size={14} />
               Get Template (.xlsx)
@@ -197,7 +197,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
           {/* Upload Zone */}
           {!file ? (
             <label className="block w-full cursor-pointer group">
-              <div className="h-48 rounded-[2rem] border-4 border-dashed border-slate-200 bg-white/20 flex flex-col items-center justify-center gap-4 group-hover:border-[#E31E24]/30 group-hover:bg-white/40 transition-all">
+              <div className="h-48 rounded-[2rem] border-4 border-dashed border-white/50 bg-white/20 flex flex-col items-center justify-center gap-4 group-hover:border-[#E31E24]/30 group-hover:bg-white/40 transition-all">
                 <IconFileSpreadsheet size={48} className="text-slate-200 group-hover:text-[#E31E24]/30 group-hover:scale-110 transition-all" />
                 <div className="text-center">
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Excel or CSV File</p>
@@ -219,7 +219,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
               </div>
 
               {previewData.length > 0 && (
-                <div className="rounded-2xl border-white border-4 shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] bg-[#f0f2f5] overflow-hidden">
+                <div className="rounded-2xl border-white border-4 shadow-neu bg-[#f0f2f5] overflow-hidden">
                   <div className="bg-white/50 px-6 py-3 border-b border-white flex justify-between items-center">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Preview (First 5 records)</p>
                     <span className="text-[8px] font-black text-[#E31E24] bg-[#E31E24]/10 px-2 py-0.5 rounded-full uppercase">Review Logs</span>
@@ -274,14 +274,14 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
         <div className="px-8 py-6 bg-white/30 border-t border-white/50 flex justify-end gap-4">
           <Button 
             onClick={onClose}
-            className="h-11 px-8 rounded-xl bg-white text-slate-400 font-black text-[9px] uppercase tracking-widest hover:bg-slate-50 transition-all border border-slate-100"
+            className="h-11 px-8 rounded-xl bg-transparent text-slate-400 font-black text-[9px] uppercase tracking-widest hover:shadow-neu-inset transition-all border border-white/50"
           >
             Abort
           </Button>
           <Button 
             onClick={handleUpload}
             disabled={!file || previewData.length === 0 || loading || success}
-            className="h-11 px-10 rounded-xl bg-slate-800 text-white font-black text-[9px] uppercase tracking-widest hover:bg-slate-900 shadow-lg disabled:opacity-50 flex gap-3 items-center"
+            className="h-11 px-10 rounded-xl bg-slate-800 text-white font-black text-[9px] uppercase tracking-widest hover:bg-slate-900 shadow-neu disabled:opacity-50 flex gap-3 items-center"
           >
             {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconCheck size={16} />}
             Execute Sync ({previewData.length} Records)

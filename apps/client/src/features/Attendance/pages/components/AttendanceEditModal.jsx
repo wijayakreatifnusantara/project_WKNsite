@@ -77,7 +77,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
       } else {
         // Insert
         try {
-          await apiClient.post('/api/attendance/direct', payload);
+          await apiClient.post('/attendance/direct', payload);
         } catch (e) {
           error = e;
         }
@@ -128,10 +128,10 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
       <div 
-        className="w-full max-w-md bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col border border-slate-150 animate-in zoom-in-95 duration-300"
+        className="w-full max-w-md bg-transparent shadow-neu rounded-2xl overflow-hidden flex flex-col border border-slate-150 animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-slate-50 border-b border-slate-100 p-4 px-6 flex items-center justify-between">
+        <div className="bg-slate-50 border-b border-white/50 p-4 px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${record ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>
               <IconCalendar size={18} />
@@ -165,7 +165,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 value={formData.date}
                 onChange={handleChange}
                 disabled={!!record}
-                className={`w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all ${record ? 'cursor-not-allowed opacity-70' : ''}`}
+                className={`w-full h-10 pl-10 pr-3 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all ${record ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                   name="clock_in"
                   value={formData.clock_in}
                   onChange={handleChange}
-                  className="w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase"
+                  className="w-full h-10 pl-10 pr-3 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase"
                 />
               </div>
             </div>
@@ -193,7 +193,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                   name="clock_out"
                   value={formData.clock_out}
                   onChange={handleChange}
-                  className="w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase"
+                  className="w-full h-10 pl-10 pr-3 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase"
                 />
               </div>
             </div>
@@ -207,7 +207,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full h-10 pl-10 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase appearance-none"
+                className="w-full h-10 pl-10 pr-3 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase appearance-none"
               >
                 <option value="Present">PRESENT</option>
                 <option value="Late">LATE</option>
@@ -227,7 +227,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 value={formData.notes}
                 onChange={handleChange}
                 rows="3"
-                className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all resize-none"
+                className="w-full pl-10 pr-3 py-2.5 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all resize-none"
                 placeholder="Optional notes..."
               ></textarea>
             </div>
@@ -235,7 +235,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
 
         </div>
 
-        <div className="p-4 px-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+        <div className="p-4 px-6 bg-slate-50 border-t border-white/50 flex items-center justify-between">
           <div>
             {record && (
               <Button 
@@ -264,7 +264,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
             <Button 
               onClick={handleSave}
               disabled={loading || deleting}
-              className="h-10 px-6 rounded-xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-md hover:bg-[#C1181E] flex gap-2 items-center"
+              className="h-10 px-6 rounded-xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-neu hover:bg-[#C1181E] flex gap-2 items-center"
             >
               <IconDeviceFloppy size={14} />
               {loading ? 'Saving...' : 'Save'}

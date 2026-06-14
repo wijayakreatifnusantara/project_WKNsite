@@ -22,6 +22,10 @@ from api.recruitment import router as recruitment_router
 from api.announcements import router as announcements_router
 from api.master import router as master_router
 from api.tracking import router as tracking_router
+from api.whatsapp import router as whatsapp_router
+from api.finance import router as finance_router
+from api.notifications import router as notifications_router
+from api.approval_matrix import router as approval_matrix_router
 from fastapi.staticfiles import StaticFiles
 import os
 import sentry_sdk
@@ -97,6 +101,10 @@ app.include_router(recruitment_router, prefix="/api", tags=["recruitment"])
 app.include_router(announcements_router, prefix="/api", tags=["announcements"])
 app.include_router(master_router, prefix="/api/master", tags=["master"])
 app.include_router(tracking_router, prefix="/api", tags=["tracking"])
+app.include_router(whatsapp_router, prefix="/api", tags=["whatsapp"])
+app.include_router(finance_router, prefix="/api", tags=["finance"])
+app.include_router(notifications_router, prefix="/api", tags=["notifications"])
+app.include_router(approval_matrix_router, prefix="/api", tags=["settings"])
 
 @app.on_event("startup")
 async def startup_event():

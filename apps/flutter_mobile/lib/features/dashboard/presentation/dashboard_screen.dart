@@ -546,8 +546,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: context.backgroundColor,
         body: SafeArea(
           child: Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            baseColor: context.isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300,
+            highlightColor: context.isDarkMode ? Colors.grey.shade700 : Colors.grey.shade100,
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -597,9 +597,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             backgroundColor: context.surfaceColor,
             elevation: 0,
             iconTheme: IconThemeData(color: context.textPrimary),
-            shape: const RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-              side: BorderSide(color: AppConstants.slate200, width: 1),
+              side: BorderSide(color: context.borderColor, width: 1),
             ),
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 12),
@@ -672,7 +672,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             SizedBox(width: 16),
                             Container(
                               padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppConstants.slate200)),
+                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(12), border: Border.all(color: context.borderColor)),
                               child: Icon(Icons.notifications_outlined, color: context.textPrimary, size: 24),
                             ),
                           ],
@@ -684,7 +684,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppConstants.slate200),
+                            border: Border.all(color: context.borderColor),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -857,8 +857,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppConstants.slate200, width: 1),
-        boxShadow: AppConstants.flatShadow,
+        border: Border.all(color: context.borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: context.isDarkMode ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.05),
+            offset: const Offset(4, 4), blurRadius: 10, spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: context.isDarkMode ? Colors.white.withValues(alpha: 0.02) : Colors.white.withValues(alpha: 0.9),
+            offset: const Offset(-4, -4), blurRadius: 10, spreadRadius: 1,
+          ),
+        ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -903,7 +912,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppConstants.slate200),
+              border: Border.all(color: context.borderColor),
             ),
             child: Column(
               children: [
@@ -1024,9 +1033,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 width: 50, height: 50,
                 decoration: BoxDecoration(
-                  color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.05) : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.05) : context.surfaceColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.2) : AppConstants.slate200, width: 1),
+                  border: Border.all(color: isAllButton ? AppConstants.primaryColor.withValues(alpha: 0.2) : context.borderColor, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: context.isDarkMode ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.03),
+                      offset: const Offset(2, 2), blurRadius: 6, spreadRadius: 0,
+                    ),
+                    BoxShadow(
+                      color: context.isDarkMode ? Colors.white.withValues(alpha: 0.01) : Colors.white.withValues(alpha: 0.8),
+                      offset: const Offset(-2, -2), blurRadius: 6, spreadRadius: 0,
+                    ),
+                  ],
                 ),
                 child: Icon(
                   action['icon'] as IconData,
