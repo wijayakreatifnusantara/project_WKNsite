@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-// Get API URL from env, fallback to localhost in dev
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+let API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// Ensure the API_URL always has the /api suffix to match the backend router prefix
+if (!API_URL.endsWith('/api') && !API_URL.endsWith('/api/')) {
+  API_URL = API_URL.replace(/\/$/, '') + '/api';
+}
 
 // Create a configured axios instance
 export const apiClient = axios.create({
