@@ -209,23 +209,23 @@ const UserManager = () => {
     <div className="flex flex-col h-full bg-[#f8fafc] animate-fade-in relative overflow-hidden">
       
       {/* PROFESSIONAL FIXED HEADER */}
-      <div className="p-4 space-y-4 bg-[#f8fafc]/90 backdrop-blur-lg border-b border-white/50 shadow-neu z-10">
+      <div className="p-4 space-y-4 bg-[#f8fafc]/90 backdrop-blur-lg border-b border-slate-200 shadow-sm z-10">
         <div className="max-w-[1200px] mx-auto space-y-4">
           
           {/* CORPORATE TITLE */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white/50">
+              <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
                 <IconKey size={20} stroke={2.5} />
               </div>
               <div>
                 <h1 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">User Management</h1>
-                <p className="text-[8px] font-black text-[#E31E24] uppercase tracking-[0.3em] mt-1 opacity-80">Corporate Security Governance</p>
+                <p className="text-[11px] font-black text-[#E31E24] uppercase tracking-[0.3em] mt-1 opacity-80">Corporate Security Governance</p>
               </div>
             </div>
             <Button 
               onClick={() => setShowAddForm(!showAddForm)}
-              className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-neu transition-all active:scale-95"
+              className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-lg shadow-sm transition-all active:scale-95"
             >
               {showAddForm ? 'CANCEL' : <><IconUserPlus className="mr-2" size={14} /> REGISTER USER</>}
             </Button>
@@ -233,19 +233,19 @@ const UserManager = () => {
 
           {/* STATS SECTION */}
           <div className="grid grid-cols-3 gap-4">
-            <StatCard title="TOTAL REGISTRY" count={users.length} icon={<IconUsers size={16} />} color="text-slate-800" />
-            <StatCard title="AUTHORIZED" count={activeUsers.length} icon={<IconUsersGroup size={16} />} color="text-green-600" />
-            <StatCard title="RESTRICTED" count={inactiveUsers.length} icon={<IconUserOff size={16} />} color="text-red-500" />
+            <StatCard data-tooltip="TOTAL REGISTRY" count={users.length} icon={<IconUsers size={16} />} color="text-slate-800" />
+            <StatCard data-tooltip="AUTHORIZED" count={activeUsers.length} icon={<IconUsersGroup size={16} />} color="text-green-600" />
+            <StatCard data-tooltip="RESTRICTED" count={inactiveUsers.length} icon={<IconUserOff size={16} />} color="text-red-500" />
           </div>
 
           {/* NAVIGATION & SEARCH */}
           <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="flex p-1 bg-slate-100/80 border border-white/50/60 rounded-xl">
+            <div className="flex p-1 bg-slate-100/80 border border-slate-200/60 rounded-xl">
               <TabButton label="ACTIVE USERS" isActive={activeTab === 'active'} onClick={() => { setActiveTab('active'); setSelectedUsers([]); }} count={activeUsers.length} />
               <TabButton label="INACTIVE USERS" isActive={activeTab === 'resign'} onClick={() => { setActiveTab('resign'); setSelectedUsers([]); }} count={inactiveUsers.length} />
             </div>
             {selectedUsers.length > 0 && (
-              <Button onClick={handleBulkSuspend} disabled={isActionLoading} className="h-10 px-4 bg-orange-100 text-orange-600 hover:bg-orange-200 border border-orange-200 text-[9px] font-black uppercase tracking-widest shadow-neu transition-all">
+              <Button onClick={handleBulkSuspend} disabled={isActionLoading} className="h-10 px-4 bg-orange-100 text-orange-600 hover:bg-orange-200 border border-orange-200 text-xs font-black uppercase tracking-widest shadow-sm transition-all">
                 <IconUserOff size={14} className="mr-2" /> Suspend Selected ({selectedUsers.length})
               </Button>
             )}
@@ -256,7 +256,7 @@ const UserManager = () => {
                 placeholder="SEARCH BY IDENTITY OR EMAIL..." 
                 value={searchTerm} 
                 onChange={(e) => setSearchTerm(e.target.value)} 
-                className="w-full h-10 pl-11 pr-6 bg-transparent border border-white/50 rounded-xl text-[10px] font-black text-slate-800 uppercase tracking-widest focus:outline-none focus:border-[#E31E24]/30 focus:shadow-neu transition-all" 
+                className="w-full h-10 pl-11 pr-6 bg-transparent border border-slate-200 rounded-xl text-xs font-black text-slate-800 uppercase tracking-widest focus:outline-none focus:border-[#E31E24]/30 focus:shadow-sm transition-all" 
               />
             </div>
           </div>
@@ -272,18 +272,18 @@ const UserManager = () => {
           {message.text && (
             <div className={`p-3 rounded-xl flex items-center gap-3 mb-2 animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
               {message.type === 'success' ? <IconCheck size={16} /> : <IconAlertCircle size={16} />}
-              <span className="text-[10px] font-black uppercase tracking-widest">{message.text}</span>
+              <span className="text-xs font-black uppercase tracking-widest">{message.text}</span>
             </div>
           )}
 
           {/* ADD USER FORM - SYNCED WITH EMPLOYEES */}
           {showAddForm && (
-            <Card className="border border-white/50 bg-transparent shadow-neu rounded-2xl overflow-hidden mb-4 animate-in zoom-in-95 duration-300">
+            <Card className="border border-slate-200 bg-transparent shadow-sm rounded-2xl overflow-hidden mb-4 animate-in zoom-in-95 duration-300">
               <CardContent className="p-6">
                 <form onSubmit={handleAddUser} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                   
                   <div className="md:col-span-4 space-y-1 mb-2">
-                    <label className="text-[9px] font-black text-[#E31E24] uppercase tracking-widest ml-1">Quick Select Employee</label>
+                    <label className="text-xs font-black text-[#E31E24] uppercase tracking-widest ml-1">Quick Select Employee</label>
                     <div className="relative group">
                       <IconUsers size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                       <select 
@@ -291,7 +291,7 @@ const UserManager = () => {
                           const emp = availableEmployees.find(x => x.email === e.target.value);
                           if (emp) handleSelectEmployee(emp);
                         }}
-                        className="w-full h-10 pl-11 pr-10 bg-transparent border border-white/50 rounded-xl text-[11px] font-bold appearance-none focus:outline-none cursor-pointer focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
+                        className="w-full h-10 pl-11 pr-10 bg-transparent border border-slate-200 rounded-xl text-[11px] font-bold appearance-none focus:outline-none cursor-pointer focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all"
                       >
                         <option value="">-- Choose Employee --</option>
                         {availableEmployees.map(emp => (
@@ -303,31 +303,31 @@ const UserManager = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Identity</label>
-                    <input required type="email" value={newUser.username} onChange={(e) => setNewUser({...newUser, username: e.target.value})} className="w-full h-10 px-4 bg-transparent border border-white/50 rounded-lg text-[11px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Email Identity</label>
+                    <input required type="email" value={newUser.username} onChange={(e) => setNewUser({...newUser, username: e.target.value})} className="w-full h-10 px-4 bg-transparent border border-slate-200 rounded-lg text-[11px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                    <input required type="text" value={newUser.full_name} onChange={(e) => setNewUser({...newUser, full_name: e.target.value})} className="w-full h-10 px-4 bg-transparent border border-white/50 rounded-lg text-[11px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                    <input required type="text" value={newUser.full_name} onChange={(e) => setNewUser({...newUser, full_name: e.target.value})} className="w-full h-10 px-4 bg-transparent border border-slate-200 rounded-lg text-[11px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Secure Password (Opsional)</label>
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Secure Password (Opsional)</label>
                     <div className="relative">
-                      <input type={showPass ? "text" : "password"} value={newUser.password} onChange={(e) => setNewUser({...newUser, password: e.target.value})} placeholder="Kosongkan untuk kirim Setup Link via email" className="w-full h-10 px-4 pr-10 bg-transparent border border-white/50 rounded-lg text-[11px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                      <input type={showPass ? "text" : "password"} value={newUser.password} onChange={(e) => setNewUser({...newUser, password: e.target.value})} placeholder="Kosongkan untuk kirim Setup Link via email" className="w-full h-10 px-4 pr-10 bg-transparent border border-slate-200 rounded-lg text-[11px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                       <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#E31E24]">
                         {showPass ? <IconEyeOff size={14} /> : <IconEye size={14} />}
                       </button>
                     </div>
                   </div>
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Authority Role</label>
-                      <input list="roles" value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} className="w-full h-10 px-4 bg-transparent border border-white/50 rounded-lg text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Authority Role</label>
+                      <input list="roles" value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} className="w-full h-10 px-4 bg-transparent border border-slate-200 rounded-lg text-xs font-black uppercase tracking-widest focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                       <datalist id="roles">
                         {availableRoles.map(role => <option key={role} value={role}>{role.toUpperCase()}</option>)}
                       </datalist>
                     </div>
                   <div className="md:col-span-4 flex justify-end mt-2">
-                    <Button type="submit" disabled={isActionLoading} className="h-10 px-8 bg-slate-800 hover:bg-slate-700 text-white font-black text-[10px] uppercase tracking-widest rounded-lg shadow-neu">PROVISION ACCOUNT</Button>
+                    <Button type="submit" disabled={isActionLoading} className="h-10 px-8 bg-slate-800 hover:bg-slate-700 text-white font-black text-xs uppercase tracking-widest rounded-lg shadow-sm">PROVISION ACCOUNT</Button>
                   </div>
                 </form>
               </CardContent>
@@ -355,38 +355,38 @@ const UserManager = () => {
 
       {/* EDIT MODAL */}
       {editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <Card className="w-full max-w-lg border border-white/50 bg-transparent shadow-neu rounded-3xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+          <Card className="w-full max-w-lg border border-slate-200 bg-transparent shadow-sm rounded-xl overflow-hidden">
             <CardContent className="p-10 space-y-8">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Modify Authority</h3>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{editingUser.username}</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{editingUser.username}</p>
                 </div>
-                <button onClick={() => setEditingUser(null)} className="h-10 w-10 rounded-full bg-transparent shadow-neu flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors"><IconX size={20} /></button>
+                <button onClick={() => setEditingUser(null)} className="h-10 w-10 rounded-full bg-transparent shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors"><IconX size={20} /></button>
               </div>
               <form onSubmit={handleUpdateUser} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Legal Identity Name</label>
-                  <input required type="text" value={editingUser.full_name} onChange={(e) => setEditingUser({...editingUser, full_name: e.target.value})} className="w-full h-14 px-6 bg-transparent border border-white/50 rounded-2xl text-[13px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Legal Identity Name</label>
+                  <input required type="text" value={editingUser.full_name} onChange={(e) => setEditingUser({...editingUser, full_name: e.target.value})} className="w-full h-14 px-6 bg-transparent border border-slate-200 rounded-2xl text-[13px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Access Password</label>
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Access Password</label>
                   <div className="relative">
-                    <input required type={showEditPass ? "text" : "password"} value={editingUser.password} onChange={(e) => setEditingUser({...editingUser, password: e.target.value})} className="w-full h-14 px-6 pr-14 bg-transparent border border-white/50 rounded-2xl text-[13px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                    <input required type={showEditPass ? "text" : "password"} value={editingUser.password} onChange={(e) => setEditingUser({...editingUser, password: e.target.value})} className="w-full h-14 px-6 pr-14 bg-transparent border border-slate-200 rounded-2xl text-[13px] font-bold focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                     <button type="button" onClick={() => setShowEditPass(!showEditPass)} className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#E31E24]">
                       {showEditPass ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                     </button>
                   </div>
                 </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Authority Role</label>
-                    <input list="edit-roles" value={editingUser.role} onChange={(e) => setEditingUser({...editingUser, role: e.target.value})} className="w-full h-14 px-6 bg-transparent border border-white/50 rounded-2xl text-[11px] font-black uppercase tracking-widest focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Authority Role</label>
+                    <input list="edit-roles" value={editingUser.role} onChange={(e) => setEditingUser({...editingUser, role: e.target.value})} className="w-full h-14 px-6 bg-transparent border border-slate-200 rounded-2xl text-[11px] font-black uppercase tracking-widest focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24] transition-all" />
                     <datalist id="edit-roles">
                       {availableRoles.map(role => <option key={role} value={role}>{role.toUpperCase()}</option>)}
                     </datalist>
                   </div>
-                <Button type="submit" disabled={isActionLoading} className="w-full h-14 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[11px] uppercase tracking-widest rounded-2xl shadow-neu">Save Authorization Changes</Button>
+                <Button type="submit" disabled={isActionLoading} className="w-full h-14 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[11px] uppercase tracking-widest rounded-2xl shadow-sm">Save Authorization Changes</Button>
               </form>
             </CardContent>
           </Card>
@@ -398,13 +398,13 @@ const UserManager = () => {
 
 // COMPONENTS
 const StatCard = ({ title, count, icon, color }) => (
-  <Card className="border border-white/50 bg-transparent shadow-neu rounded-xl overflow-hidden transition-all hover:scale-[1.01]">
+  <Card className="border border-slate-200 bg-transparent shadow-sm rounded-xl overflow-hidden transition-all hover:scale-[1.01]">
     <CardContent className="p-3 flex items-center justify-between">
       <div className="space-y-0.5">
-        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{title}</p>
+        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{title}</p>
         <p className={`text-lg font-black tracking-tight ${color}`}>{count}</p>
       </div>
-      <div className={`h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center ${color} opacity-70`}>
+      <div className={`h-8 w-8 rounded-lg bg-white shadow-sm border-none flex items-center justify-center ${color} opacity-70`}>
         {icon}
       </div>
     </CardContent>
@@ -414,29 +414,29 @@ const StatCard = ({ title, count, icon, color }) => (
 const TabButton = ({ label, isActive, onClick, count }) => (
   <button 
     onClick={onClick} 
-    className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+    className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
       isActive 
-      ? 'bg-transparent shadow-neu text-[#E31E24] border border-white/50 font-bold' 
+      ? 'bg-transparent shadow-sm text-[#E31E24] border border-slate-200 font-bold' 
       : 'text-slate-500 hover:text-slate-700 font-medium'
     }`}
   >
-    {label} <span className={`px-1.5 py-0.5 rounded-full text-[8px] ${isActive ? 'bg-red-50 text-[#E31E24]' : 'bg-slate-200 text-slate-600'}`}>{count}</span>
+    {label} <span className={`px-1.5 py-0.5 rounded-full text-[11px] ${isActive ? 'bg-red-50 text-[#E31E24]' : 'bg-slate-200 text-slate-600'}`}>{count}</span>
   </button>
 );
 
 const UserCard = ({ user, onToggle, onEdit, onDelete, isSelected, onSelect, onSendLink }) => (
-  <div className={`bg-transparent border ${isSelected ? 'border-[#E31E24] bg-red-50/30' : 'border-white/50'} shadow-neu px-4 py-3 rounded-xl flex items-center justify-between transition-all hover:shadow-neu ${!user.is_active ? 'opacity-70 bg-slate-50/50' : ''}`}>
+  <div className={`bg-transparent border ${isSelected ? 'border-[#E31E24] bg-red-50/30' : 'border-slate-200'} shadow-sm px-4 py-3 rounded-xl flex items-center justify-between transition-all hover:shadow-sm ${!user.is_active ? 'opacity-70 bg-slate-50/50' : ''}`}>
     <div className="flex items-center gap-4">
-      <input type="checkbox" checked={isSelected} onChange={onSelect} className="w-4 h-4 rounded border-slate-300 text-[#E31E24] focus:ring-[#E31E24] cursor-pointer" />
-      <div className={`h-10 w-10 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none flex items-center justify-center ${user.is_active ? 'text-[#E31E24]' : 'text-slate-300'}`}>
+      <input type="checkbox" checked={isSelected} onChange={onSelect} className="w-4 h-4 rounded border-slate-300 text-[#E31E24] cursor-pointer focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" />
+      <div className={`h-10 w-10 rounded-lg bg-white shadow-sm border-none flex items-center justify-center ${user.is_active ? 'text-[#E31E24]' : 'text-slate-300'}`}>
         {user.is_active ? <IconUserCircle size={20} /> : <IconLock size={20} />}
       </div>
       <div className="space-y-0.5">
         <h4 className="text-[12px] font-black text-slate-800 tracking-tight uppercase flex items-center gap-2">
           {user.full_name}
-          {!user.is_active && <span className="text-[7px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full tracking-widest font-black uppercase">Restricted</span>}
+          {!user.is_active && <span className="text-[11px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full tracking-widest font-black uppercase">Restricted</span>}
         </h4>
-        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
           <span className="flex items-center gap-1"><IconMail size={12} /> {user.username}</span>
           <span className="text-slate-200">|</span>
           <span className="uppercase text-[#E31E24] font-black tracking-widest">{user.role}</span>
@@ -445,14 +445,14 @@ const UserCard = ({ user, onToggle, onEdit, onDelete, isSelected, onSelect, onSe
     </div>
     <div className="flex items-center gap-6">
       <div className="flex flex-col items-center gap-1">
-        <span className={`text-[7px] font-black uppercase tracking-widest ${user.is_active ? 'text-green-600' : 'text-slate-400'}`}>
+        <span className={`text-[11px] font-black uppercase tracking-widest ${user.is_active ? 'text-green-600' : 'text-slate-400'}`}>
           {user.is_active ? 'Authorized' : 'Restricted'}
         </span>
         <button 
           onClick={() => onToggle(user)} 
           disabled={user.role === 'owner'} 
           className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 flex items-center border ${
-            user.is_active ? 'bg-red-50 border-red-200' : 'bg-slate-100 border-white/50'
+            user.is_active ? 'bg-red-50 border-red-200' : 'bg-slate-100 border-slate-200'
           }`}
         >
           <div className={`h-3.5 w-3.5 rounded-full transition-all duration-300 transform ${user.is_active ? 'translate-x-5 bg-[#E31E24]' : 'translate-x-0 bg-slate-400'}`}></div>
@@ -460,18 +460,18 @@ const UserCard = ({ user, onToggle, onEdit, onDelete, isSelected, onSelect, onSe
       </div>
       <div className="h-8 w-[1px] bg-slate-200"></div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" onClick={() => onSendLink(user)} title="Send Setup/Reset Password Link" className="h-8 w-8 p-0 rounded-lg text-slate-500 hover:text-green-600 hover:shadow-neu-inset border border-white/50 hover:scale-105"><IconLink size={14} /></Button>
-        <Button variant="ghost" onClick={() => onEdit(user)} title="Edit User" className="h-8 w-8 p-0 rounded-lg text-slate-500 hover:text-blue-600 hover:shadow-neu-inset border border-white/50 hover:scale-105"><IconEdit size={14} /></Button>
-        <Button variant="ghost" onClick={() => onDelete(user.id, user.username)} title="Delete User" disabled={user.role === 'owner'} className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-[#E31E24] hover:shadow-neu-inset border border-white/50 hover:scale-105"><IconTrash size={14} /></Button>
+        <Button variant="ghost" onClick={() => onSendLink(user)} data-tooltip="Send Setup/Reset Password Link" className="h-8 w-8 p-0 rounded-lg text-slate-500 hover:text-green-600 hover:shadow-sm border border-slate-200 hover:scale-105"><IconLink size={14} /></Button>
+        <Button variant="ghost" onClick={() => onEdit(user)} data-tooltip="Edit User" className="h-8 w-8 p-0 rounded-lg text-slate-500 hover:text-blue-600 hover:shadow-sm border border-slate-200 hover:scale-105"><IconEdit size={14} /></Button>
+        <Button variant="ghost" onClick={() => onDelete(user.id, user.username)} data-tooltip="Delete User" disabled={user.role === 'owner'} className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-[#E31E24] hover:shadow-sm border border-slate-200 hover:scale-105"><IconTrash size={14} /></Button>
       </div>
     </div>
   </div>
 );
 
 const EmptyState = ({ message }) => (
-  <div className="py-24 flex flex-col items-center justify-center gap-6 bg-transparent border-2 border-dashed border-white/50 rounded-2xl">
+  <div className="py-24 flex flex-col items-center justify-center gap-6 bg-transparent border-2 border-dashed border-slate-200 rounded-2xl">
     <IconChartBar size={48} className="text-slate-300" />
-    <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em]">{message}</p>
+    <p className="text-[12px] font-black text-slate-400 uppercase tracking-wider">{message}</p>
   </div>
 );
 

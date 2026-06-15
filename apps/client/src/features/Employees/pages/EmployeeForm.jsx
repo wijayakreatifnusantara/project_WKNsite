@@ -19,7 +19,7 @@ const API_URL = _rawApi ? (_rawApi.endsWith('/api') ? _rawApi : _rawApi.replace(
 const InputWrapper = ({ label, icon: Icon, children, labelRight }) => (
   <div className="space-y-1.5">
     <div className="flex justify-between items-center pl-1">
-      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
+      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
       {labelRight && <div>{labelRight}</div>}
     </div>
     <div className="relative">
@@ -29,8 +29,8 @@ const InputWrapper = ({ label, icon: Icon, children, labelRight }) => (
   </div>
 );
 
-const inputStyle = "w-full h-10 pl-10 pr-3 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
-const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
+const inputStyle = "w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
+const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
 
 const initialFormData = {
   employee_id: '', name: '', nickname: '', email: '', phone: '', gender: 'Laki-laki',
@@ -359,7 +359,7 @@ const EmployeeForm = () => {
     <div className="space-y-8 animate-fade-in">
       {/* SEKSI KEPEGAWAIAN & FOTO */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Informasi Kepegawaian</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Kepegawaian</h3>
         
         <div className="flex flex-col lg:flex-row gap-8">
           {/* KOLOM KIRI: FORM */}
@@ -426,7 +426,7 @@ const EmployeeForm = () => {
           {/* KOLOM KANAN: FOTO */}
           <div className="w-full lg:w-56 shrink-0 flex flex-col gap-3">
             <h4 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider text-center">Foto Karyawan</h4>
-            <div className={`relative w-full aspect-[3/4] rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all border-2 ${formData.employee_id ? 'bg-blue-50 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400' : 'bg-slate-50 border-white/50 opacity-50'}`}>
+            <div className={`relative w-full aspect-[3/4] rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all border-2 ${formData.employee_id ? 'bg-blue-50 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400' : 'bg-slate-50 border-slate-200 opacity-50'}`}>
               {formData.photo ? (
                 <>
                   <img src={formData.photo} alt="Foto Karyawan" className="w-full h-full object-cover" />
@@ -436,8 +436,8 @@ const EmployeeForm = () => {
                       e.preventDefault();
                       setFormData(prev => ({ ...prev, photo: '' }));
                     }}
-                    className="absolute top-2 right-2 bg-slate-900/50 hover:bg-red-500 text-white p-1.5 rounded-full backdrop-blur-sm transition-all hover:scale-110 z-20"
-                    title="Hapus Foto"
+                    className="absolute top-2 right-2 bg-slate-900/50 hover:bg-red-500 text-white p-1.5 rounded-full  transition-all hover:scale-110 z-20"
+                    data-tooltip="Hapus Foto"
                   >
                     <IconX size={16} stroke={2.5} />
                   </button>
@@ -445,24 +445,24 @@ const EmployeeForm = () => {
               ) : (
                 <div className="flex flex-col items-center text-blue-400 p-4 text-center">
                   <IconUserCircle size={48} className="mb-2 opacity-50" />
-                  <span className="text-[10px] font-bold uppercase tracking-wide opacity-80">Pilih Foto</span>
+                  <span className="text-xs font-bold uppercase tracking-wide opacity-80">Pilih Foto</span>
                 </div>
               )}
               <input 
                 type="file" 
                 accept=".jpg,.jpeg,.png"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
                 onChange={handlePhotoUpload}
                 disabled={uploadingDoc === 'photo' || !formData.employee_id}
               />
               {uploadingDoc === 'photo' && (
                 <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center gap-2">
                   <IconLoader2 className="animate-spin text-blue-600" size={24} />
-                  <span className="text-[9px] font-bold text-blue-600 uppercase">Mengunggah...</span>
+                  <span className="text-xs font-bold text-blue-600 uppercase">Mengunggah...</span>
                 </div>
               )}
             </div>
-            <p className="text-[9px] font-medium text-slate-500 leading-relaxed text-center bg-slate-50 p-2 rounded-lg border border-white/50 mt-1">
+            <p className="text-xs font-medium text-slate-500 leading-relaxed text-center bg-slate-50 p-2 rounded-lg border border-slate-200 mt-1">
               Latar belakang biru. Format JPG/PNG (Maks 2MB).
             </p>
           </div>
@@ -478,7 +478,7 @@ const EmployeeForm = () => {
 
       {/* SEKSI DATA PRIBADI */}
       <div className={`transition-opacity duration-300 ${!formData.employee_id ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Informasi Pribadi</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Pribadi</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="NIK KTP" icon={IconId}>
@@ -518,9 +518,9 @@ const EmployeeForm = () => {
               <button 
                 type="button" 
                 onClick={() => setFormData(p => ({...p, mobile_password: p.nik}))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition-colors"
                 disabled={!formData.employee_id || !formData.nik}
-                title="Gunakan NIK sebagai Password"
+                data-tooltip="Gunakan NIK sebagai Password"
               >
                 Samakan NIK
               </button>
@@ -587,7 +587,7 @@ const EmployeeForm = () => {
             label="Alamat Domisili" 
             icon={IconMapPin}
             labelRight={
-              <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 cursor-pointer hover:text-slate-700">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 cursor-pointer hover:text-slate-700">
                 <input 
                   type="checkbox" 
                   checked={formData.domicile_address && formData.domicile_address === formData.ktp_address} 
@@ -598,7 +598,7 @@ const EmployeeForm = () => {
                       setFormData(prev => ({...prev, domicile_address: ''}));
                     }
                   }} 
-                  className="rounded border-white/20 text-[#E31E24] focus:ring-[#E31E24]"
+                  className="rounded border-slate-200 text-[#E31E24] focus:ring-[#E31E24]"
                   disabled={!formData.employee_id || !formData.ktp_address}
                 />
                 <span>Sama dengan KTP</span>
@@ -616,7 +616,7 @@ const EmployeeForm = () => {
     <div className="space-y-8 animate-fade-in">
       {/* INFORMASI REKENING & PAJAK */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Informasi Rekening & Pajak</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Informasi Rekening & Pajak</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="Nama Bank" icon={IconBuildingSkyscraper}>
             <input name="bank_name" value={formData.bank_name} onChange={handleChange} placeholder="BCA / MANDIRI" className={inputStyle} disabled={!formData.employee_id} />
@@ -655,7 +655,7 @@ const EmployeeForm = () => {
 
       {/* NOMOR BPJS (REFERENSI) */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Nomor BPJS (Referensi)</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Nomor BPJS (Referensi)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="No. BPJS Ketenagakerjaan" icon={IconId}>
             <input name="bpjs_tk_number" value={formData.bpjs_tk_number} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
@@ -668,7 +668,7 @@ const EmployeeForm = () => {
 
       {/* KOMPONEN GAJI: FIXED INCOME */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Komponen Gaji - Fixed Income</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Fixed Income</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="Gaji Pokok (Base Salary)" icon={IconCreditCard}>
             <RupiahInput name="base_salary" value={formData.base_salary} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
@@ -684,8 +684,8 @@ const EmployeeForm = () => {
           </InputWrapper>
           
           <div className="col-span-full mt-2">
-            <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Tunjangan BPJS Ketenagakerjaan (Dibayarkan Perusahaan)</label>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-lg border border-white/50">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Tunjangan BPJS Ketenagakerjaan (Dibayarkan Perusahaan)</label>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-lg border border-slate-200">
               <InputWrapper label="JKK" icon={IconCreditCard}>
                 <RupiahInput value={formData.payroll_components?.fixed_income?.bpjs_tk_jkk || ''} onChange={(e) => handlePayrollChange('fixed_income', 'bpjs_tk_jkk', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
@@ -708,7 +708,7 @@ const EmployeeForm = () => {
 
       {/* KOMPONEN GAJI: VARIABLE INCOME */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Komponen Gaji - Variable Income</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Variable Income</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="Work Order Allowance" icon={IconCreditCard}>
             <RupiahInput value={formData.payroll_components?.variable_income?.work_order_allowance || ''} onChange={(e) => handlePayrollChange('variable_income', 'work_order_allowance', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
@@ -727,7 +727,7 @@ const EmployeeForm = () => {
 
       {/* KOMPONEN GAJI: NON-WAGE INCOME */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Komponen Gaji - Non-Wage Income</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Non-Wage Income</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="THR" icon={IconCreditCard}>
             <RupiahInput value={formData.payroll_components?.non_wage_income?.thr || ''} onChange={(e) => handlePayrollChange('non_wage_income', 'thr', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
@@ -746,15 +746,15 @@ const EmployeeForm = () => {
 
       {/* KOMPONEN GAJI: DEDUCTION */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Komponen Gaji - Deduction (Potongan)</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Komponen Gaji - Deduction (Potongan)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InputWrapper label="PPh21" icon={IconCreditCard}>
             <RupiahInput value={formData.payroll_components?.deductions?.pph21 || ''} onChange={(e) => handlePayrollChange('deductions', 'pph21', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
           </InputWrapper>
           
           <div className="col-span-full mt-2">
-            <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Potongan BPJS Ketenagakerjaan</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50/50 rounded-lg border border-white/50">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Potongan BPJS Ketenagakerjaan</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50/50 rounded-lg border border-slate-200">
               <InputWrapper label="JHT" icon={IconCreditCard}>
                 <RupiahInput value={formData.payroll_components?.deductions?.bpjs_tk_jht || ''} onChange={(e) => handlePayrollChange('deductions', 'bpjs_tk_jht', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
               </InputWrapper>
@@ -804,7 +804,7 @@ const EmployeeForm = () => {
     <div className="space-y-8 animate-fade-in">
       {/* KONTAK DARURAT */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Kontak Darurat (Utama)</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Kontak Darurat (Utama)</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <InputWrapper label="Nama Kontak 1" icon={IconUserCircle}>
             <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name || ''} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
@@ -861,22 +861,22 @@ const EmployeeForm = () => {
 
       {/* DATA KELUARGA DINAMIS */}
       <div>
-        <div className="flex justify-between items-center border-b border-white/50 pb-2 mb-4">
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Daftar Anggota Keluarga</h3>
-          <button type="button" onClick={() => addArrayItem('family_members', { name: '', relation: '', occupation: '', phone: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('family_members', { name: '', relation: '', occupation: '', phone: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Keluarga
           </button>
         </div>
         <div className="space-y-4">
           {formData.family_members?.map((member, idx) => (
-            <div key={idx} className="relative bg-[#f0f2f5] shadow-neu-inset border-none p-4 rounded-xl">
+            <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl">
               <button type="button" onClick={() => removeArrayItem('family_members', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500">
                 <IconX size={16} />
               </button>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pr-6">
-                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama</label><input value={member.name} onChange={e => handleArrayChange('family_members', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nama</label><input value={member.name} onChange={e => handleArrayChange('family_members', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Hubungan</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase">Hubungan</label>
                   <select 
                     value={member.relation || ''} 
                     onChange={e => handleArrayChange('family_members', idx, 'relation', e.target.value)} 
@@ -899,8 +899,8 @@ const EmployeeForm = () => {
                     <option value="Lain-lain">Lain-lain</option>
                   </select>
                 </div>
-                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Pekerjaan</label><input value={member.occupation} onChange={e => handleArrayChange('family_members', idx, 'occupation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-                <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">No. Telepon</label><input value={member.phone} onChange={e => handleArrayChange('family_members', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Pekerjaan</label><input value={member.occupation} onChange={e => handleArrayChange('family_members', idx, 'occupation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">No. Telepon</label><input value={member.phone} onChange={e => handleArrayChange('family_members', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
               </div>
             </div>
           ))}
@@ -916,19 +916,19 @@ const EmployeeForm = () => {
     <div className="space-y-8 animate-fade-in">
       {/* PENDIDIKAN */}
       <div>
-        <div className="flex justify-between items-center border-b border-white/50 pb-2 mb-4">
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Histori Pendidikan</h3>
-          <button type="button" onClick={() => addArrayItem('education_history', { level: '', major: '', institution: '', year: '', certificate_number: '', city: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('education_history', { level: '', major: '', institution: '', year: '', certificate_number: '', city: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Pendidikan
           </button>
         </div>
         <div className="space-y-4">
           {formData.education_history?.map((edu, idx) => (
-            <div key={idx} className="relative bg-[#f0f2f5] shadow-neu-inset border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
+            <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('education_history', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
               
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 uppercase">Tingkat</label>
+                <label className="text-xs font-bold text-slate-500 uppercase">Tingkat</label>
                 <select value={edu.level || edu.degree || ''} onChange={e => handleArrayChange('education_history', idx, 'level', e.target.value)} className={inputStyle} disabled={!formData.employee_id}>
                   <option value="">Pilih Tingkat</option>
                   <option value="SD">SD</option>
@@ -940,11 +940,11 @@ const EmployeeForm = () => {
                 </select>
               </div>
               
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Jurusan</label><input value={edu.major || ''} onChange={e => handleArrayChange('education_history', idx, 'major', e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi/Sekolah</label><input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={edu.city || ''} onChange={e => handleArrayChange('education_history', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year || ''} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Ijazah</label><input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Jurusan</label><input value={edu.major || ''} onChange={e => handleArrayChange('education_history', idx, 'major', e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Institusi/Sekolah</label><input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Kota</label><input value={edu.city || ''} onChange={e => handleArrayChange('education_history', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year || ''} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Ijazah</label><input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
             </div>
           ))}
           {(!formData.education_history || formData.education_history.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada histori pendidikan.</div>}
@@ -953,22 +953,22 @@ const EmployeeForm = () => {
 
       {/* PENGALAMAN KERJA */}
       <div>
-        <div className="flex justify-between items-center border-b border-white/50 pb-2 mb-4">
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pengalaman Kerja</h3>
-          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '', city: '', manager_name: '', manager_phone: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '', city: '', manager_name: '', manager_phone: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Pengalaman
           </button>
         </div>
         <div className="space-y-4">
           {formData.work_experience?.map((work, idx) => (
-            <div key={idx} className="relative bg-[#f0f2f5] shadow-neu-inset border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
+            <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('work_experience', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Perusahaan</label><input value={work.company || ''} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Posisi</label><input value={work.position || ''} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={work.city || ''} onChange={e => handleArrayChange('work_experience', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Durasi (Bulan & Tahun)</label><input value={work.duration || ''} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="Contoh: Jan 2018 - Des 2021" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama Atasan/HRD</label><input value={work.manager_name || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Telp Atasan/HRD</label><input value={work.manager_phone || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Perusahaan</label><input value={work.company || ''} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Posisi</label><input value={work.position || ''} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Kota</label><input value={work.city || ''} onChange={e => handleArrayChange('work_experience', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Durasi (Bulan & Tahun)</label><input value={work.duration || ''} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="Contoh: Jan 2018 - Des 2021" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nama Atasan/HRD</label><input value={work.manager_name || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Telp Atasan/HRD</label><input value={work.manager_phone || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
             </div>
           ))}
           {(!formData.work_experience || formData.work_experience.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada pengalaman kerja.</div>}
@@ -977,22 +977,22 @@ const EmployeeForm = () => {
 
       {/* KURSUS & SERTIFIKASI */}
       <div>
-        <div className="flex justify-between items-center border-b border-white/50 pb-2 mb-4">
+        <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Kursus atau Sertifikasi</h3>
-          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', city: '', phone: '', year: '', certificate_number: '' })} className="flex items-center gap-1 text-[10px] font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', city: '', phone: '', year: '', certificate_number: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Sertifikasi
           </button>
         </div>
         <div className="space-y-4">
           {formData.certifications?.map((cert, idx) => (
-            <div key={idx} className="relative bg-[#f0f2f5] shadow-neu-inset border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
+            <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('certifications', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nama Sertifikasi</label><input value={cert.name || ''} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Institusi / Penyelenggara</label><input value={cert.institution || ''} onChange={e => handleArrayChange('certifications', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Kota</label><input value={cert.city || ''} onChange={e => handleArrayChange('certifications', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Telp Institusi</label><input value={cert.phone || ''} onChange={e => handleArrayChange('certifications', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Tahun</label><input value={cert.year || ''} onChange={e => handleArrayChange('certifications', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-[10px] font-bold text-slate-500 uppercase">Nomor Sertifikat</label><input value={cert.certificate_number || ''} onChange={e => handleArrayChange('certifications', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nama Sertifikasi</label><input value={cert.name || ''} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Institusi / Penyelenggara</label><input value={cert.institution || ''} onChange={e => handleArrayChange('certifications', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Kota</label><input value={cert.city || ''} onChange={e => handleArrayChange('certifications', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Telp Institusi</label><input value={cert.phone || ''} onChange={e => handleArrayChange('certifications', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Tahun</label><input value={cert.year || ''} onChange={e => handleArrayChange('certifications', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
+              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Sertifikat</label><input value={cert.certificate_number || ''} onChange={e => handleArrayChange('certifications', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
             </div>
           ))}
           {(!formData.certifications || formData.certifications.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada kursus atau sertifikasi.</div>}
@@ -1001,7 +1001,7 @@ const EmployeeForm = () => {
 
       {/* KEAHLIAN */}
       <div>
-        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-white/50 pb-2 mb-4">Keahlian (Skills)</h3>
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2 mb-4">Keahlian (Skills)</h3>
         <textarea 
           name="skills" 
           value={formData.skills || ''} 
@@ -1031,7 +1031,7 @@ const EmployeeForm = () => {
           const isUploading = uploadingDoc === doc.id;
 
           return (
-            <div key={doc.id} className="border border-white/50 rounded-xl p-4 flex flex-col justify-between bg-slate-50 relative overflow-hidden group">
+            <div key={doc.id} className="border border-slate-200 rounded-xl p-4 flex flex-col justify-between bg-slate-50 relative overflow-hidden group">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
                   <div className={`p-2 rounded-lg ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-slate-200 text-slate-500'}`}>
@@ -1039,7 +1039,7 @@ const EmployeeForm = () => {
                   </div>
                   <div>
                     <h5 className="text-xs font-bold text-slate-800">{doc.label}</h5>
-                    <span className="text-[10px] text-slate-500">{isUploaded ? 'Terunggah' : 'Belum diunggah'}</span>
+                    <span className="text-xs text-slate-500">{isUploaded ? 'Terunggah' : 'Belum diunggah'}</span>
                   </div>
                 </div>
               </div>
@@ -1047,7 +1047,7 @@ const EmployeeForm = () => {
               <div className="flex gap-2">
                 {isUploaded ? (
                   <>
-                    <a href={formData.documents[doc.id]} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 h-8 bg-transparent border border-white/20 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all">
+                    <a href={formData.documents[doc.id]} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 h-8 bg-transparent border border-slate-200 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all">
                       Lihat File
                     </a>
                     <button type="button" onClick={() => handleRemoveDocument(doc.id)} className="h-8 w-8 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-all">
@@ -1059,11 +1059,11 @@ const EmployeeForm = () => {
                     <input 
                       type="file" 
                       accept=".pdf,.jpg,.jpeg,.png"
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
                       onChange={(e) => handleFileUpload(e, doc.id)}
                       disabled={isUploading || !formData.employee_id}
                     />
-                    <button type="button" disabled={isUploading || !formData.employee_id} className="w-full flex items-center justify-center gap-2 h-8 bg-transparent border border-white/20 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all disabled:opacity-50">
+                    <button type="button" disabled={isUploading || !formData.employee_id} className="w-full flex items-center justify-center gap-2 h-8 bg-transparent border border-slate-200 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all disabled:opacity-50">
                       {isUploading ? <IconLoader2 size={14} className="animate-spin" /> : <IconFileUpload size={14} />}
                       {isUploading ? 'Mengunggah...' : 'Pilih File'}
                     </button>
@@ -1071,7 +1071,7 @@ const EmployeeForm = () => {
                 )}
               </div>
               {!formData.employee_id && !isUploaded && (
-                <div className="absolute inset-x-0 bottom-0 text-center py-1 bg-red-100 text-red-600 text-[9px] font-bold">
+                <div className="absolute inset-x-0 bottom-0 text-center py-1 bg-red-100 text-red-600 text-xs font-bold">
                   Simpan data awal karyawan terlebih dahulu
                 </div>
               )}
@@ -1085,31 +1085,31 @@ const EmployeeForm = () => {
   return (
     <div className="flex flex-col h-full bg-slate-50 font-inter">
       {/* HEADER */}
-      <header className="h-16 bg-transparent border-b border-white/50 px-6 flex items-center justify-between shrink-0">
+      <header className="h-16 bg-transparent border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/master/employees')} className="h-8 w-8 flex items-center justify-center bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 transition-all border border-white/50">
+          <button onClick={() => navigate('/master/employees')} className="h-8 w-8 flex items-center justify-center bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 transition-all border border-slate-200">
             <IconArrowLeft size={16} />
           </button>
           <div>
             <h1 className="text-sm font-bold text-slate-800 uppercase tracking-tight">{id ? 'Update Data Karyawan' : 'Tambah Karyawan Baru'}</h1>
-            <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mt-0.5">Lengkapi form rekam medis, kepegawaian, dan gaji</p>
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-0.5">Lengkapi form rekam medis, kepegawaian, dan gaji</p>
           </div>
         </div>
         
         {/* TAB NAVIGATION */}
-        <div className="flex p-1 bg-slate-100 border border-white/50/60 rounded-lg">
-          <button type="button" onClick={() => setActiveTab('main')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'main' ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Utama</button>
-          <button type="button" onClick={() => setActiveTab('family')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'family' ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Keluarga</button>
-          <button type="button" onClick={() => setActiveTab('history')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'history' ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Pendidikan & Pengalaman</button>
-          <button type="button" onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
-          <button type="button" onClick={() => setActiveTab('documents')} className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === 'documents' ? 'bg-transparent shadow-neu text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Dokumen</button>
+        <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg">
+          <button type="button" onClick={() => setActiveTab('main')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'main' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Utama</button>
+          <button type="button" onClick={() => setActiveTab('family')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'family' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Keluarga</button>
+          <button type="button" onClick={() => setActiveTab('history')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'history' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Pendidikan & Pengalaman</button>
+          <button type="button" onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
+          <button type="button" onClick={() => setActiveTab('documents')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'documents' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Dokumen</button>
         </div>
       </header>
 
       {/* FORM CONTENT */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div className="max-w-6xl mx-auto">
-          <form id="employee-form" onSubmit={handleSubmit} className="bg-transparent p-6 md:p-8 rounded-2xl shadow-neu border border-white/50">
+          <form id="employee-form" onSubmit={handleSubmit} className="bg-transparent p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
             {activeTab === 'main' && renderMainTab()}
             {activeTab === 'family' && renderFamilyTab()}
             {activeTab === 'history' && renderHistoryTab()}
@@ -1120,15 +1120,15 @@ const EmployeeForm = () => {
       </div>
 
       {/* STICKY ACTION BAR */}
-      <div className="h-16 bg-transparent border-t border-white/50 px-6 flex items-center justify-between shrink-0 shadow-neu">
-        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+      <div className="h-16 bg-transparent border-t border-slate-200 px-6 flex items-center justify-between shrink-0 shadow-sm">
+        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
           Pastikan semua data mandatory terisi sebelum menyimpan
         </div>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => navigate('/master/employees')} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-slate-50 text-slate-600 border border-white/50 hover:bg-slate-100 transition-all">
+          <button type="button" onClick={() => navigate('/master/employees')} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all">
             Batal
           </button>
-          <button type="submit" form="employee-form" disabled={loading} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-[#E31E24] text-white shadow-neu hover:bg-[#C1181E] disabled:opacity-50 transition-all flex items-center gap-2">
+          <button type="submit" form="employee-form" disabled={loading} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-[#E31E24] text-white shadow-sm hover:bg-[#C1181E] disabled:opacity-50 transition-all flex items-center gap-2">
             {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconDeviceFloppy size={16} />}
             Simpan Data
           </button>

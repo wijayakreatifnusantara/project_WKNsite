@@ -249,7 +249,7 @@ const Employees = () => {
     <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
-      <div className="bg-transparent border-b border-white/50 z-30 shadow-neu shrink-0">
+      <div className="bg-transparent border-b border-slate-200 z-30 shadow-sm shrink-0">
         <div className="w-full mx-auto p-4 space-y-3 px-6">
           
           {/* HEADER ROW */}
@@ -260,17 +260,17 @@ const Employees = () => {
               </div>
               <div>
                 <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">Database Karyawan</h1>
-                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1.5">Sistem Manajemen & Informasi Karyawan</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-1.5">Sistem Manajemen & Informasi Karyawan</p>
               </div>
               {/* View toggle removed */}
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-transparent text-slate-600 shadow-neu border border-white/50 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:text-blue-600 hover:shadow-neu-inset transition-all flex items-center justify-center gap-1.5">
+              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-transparent text-slate-600 shadow-sm border border-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider hover:text-blue-600 hover:shadow-sm transition-all flex items-center justify-center gap-1.5">
                 <IconTable size={14} className="text-blue-500" /> Impor Bulk
               </Button>
               {isAdmin() && (
-                <Button onClick={() => navigate('/master/employees/create')} className="h-9 px-4 bg-[#E31E24] text-white shadow-neu rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
+                <Button onClick={() => navigate('/master/employees/create')} className="h-9 px-4 bg-[#E31E24] text-white shadow-sm rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
                   <IconPlus size={14} /> Tambah Karyawan
                 </Button>
               )}
@@ -307,7 +307,7 @@ const Employees = () => {
                 placeholder="Cari karyawan berdasarkan nama atau ID..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-10 pl-11 pr-10 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-transparent focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400"
+                className="w-full h-10 pl-11 pr-10 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-transparent focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400"
               />
               {searchTerm && (
                 <button 
@@ -352,11 +352,11 @@ const Employees = () => {
             {isFilterActive && (
               <button 
                 onClick={resetFilters}
-                className="h-9 px-4 bg-transparent shadow-neu border border-white/50 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
-                title="Reset All Filters"
+                className="h-9 px-4 bg-transparent shadow-sm border border-slate-200 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
+                data-tooltip="Reset All Filters"
               >
                 <IconRefresh size={14} className="group-hover:rotate-180 transition-all duration-500" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Reset</span>
+                <span className="text-xs font-bold uppercase tracking-wider">Reset</span>
               </button>
             )}
           </div>
@@ -373,10 +373,10 @@ const Employees = () => {
                   </div>
                 ) : filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp, idx) => (
-                    <div key={idx} className="bg-transparent border border-white/50 rounded-xl p-4 shadow-neu flex flex-col space-y-3">
+                    <div key={idx} className="bg-transparent border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
+                          <div className="h-10 w-10 rounded-lg bg-white shadow-sm border-none/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                             {emp["Photo"] || emp.photo ? (
                               <img src={emp["Photo"] || emp.photo} alt={emp["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
                             ) : (
@@ -385,10 +385,10 @@ const Employees = () => {
                           </div>
                           <div>
                             <h4 className="text-xs font-bold text-slate-800 uppercase leading-none">{emp["EMPLOYEE NAME"]}</h4>
-                            <p className="text-[9px] text-slate-400 font-mono tracking-tight mt-1">{emp["EMPLOYEE ID"]}</p>
+                            <p className="text-xs text-slate-400 font-mono tracking-tight mt-1">{emp["EMPLOYEE ID"]}</p>
                           </div>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
                           emp["Status *"] === 'Permanent' 
                             ? 'bg-blue-50 text-blue-600 border-blue-100' 
                             : emp["Status *"] === 'RESIGNED'
@@ -399,7 +399,7 @@ const Employees = () => {
                         </span>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/50 text-[10px]">
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-xs">
                         <div>
                           <span className="text-slate-400 font-bold uppercase block">Departemen</span>
                           <span className="text-slate-700 font-bold uppercase mt-0.5 block truncate">{emp["Department Name *"] || emp["Division Name *"]}</span>
@@ -410,22 +410,22 @@ const Employees = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-white/50">
+                      <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-slate-200">
                         <button 
                           onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} 
-                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-md hover:bg-slate-100 transition-colors"
                         >
                           Lihat
                         </button>
                         <button 
                           onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} 
-                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-md hover:bg-slate-100 transition-colors"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={() => {setESignTargetEmployee(emp); setIsESignOpen(true);}} 
-                          className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-600 bg-[#f0f2f5] shadow-neu-inset border-none rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-md hover:bg-slate-100 transition-colors"
                         >
                           TTD
                         </button>
@@ -434,27 +434,27 @@ const Employees = () => {
                             {emp.is_resigned || String(emp["Status *"] || emp.status || "").toUpperCase() === 'RESIGNED' ? (
                               <button 
                                 onClick={() => handleActivateEmployee(emp.id || emp["EMPLOYEE ID"])} 
-                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-md hover:bg-emerald-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-md hover:bg-emerald-100/50 transition-colors"
                               >
                                 Aktifkan
                               </button>
                             ) : (
                               <button 
                                 onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} 
-                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-100 rounded-md hover:bg-rose-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-100 rounded-md hover:bg-rose-100/50 transition-colors"
                               >
                                 Resign
                               </button>
                             )}
                             <button 
                                 onClick={() => setResetPasswordEmployee(emp)} 
-                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-100 rounded-md hover:bg-blue-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-100 rounded-md hover:bg-blue-100/50 transition-colors"
                             >
                                 PWD
                             </button>
                             <button 
                                 onClick={() => handleResetDevice(emp)} 
-                                className="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 border border-purple-100 rounded-md hover:bg-purple-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 border border-purple-100 rounded-md hover:bg-purple-100/50 transition-colors"
                             >
                                 DEV
                             </button>
@@ -467,28 +467,28 @@ const Employees = () => {
                   <div className="py-12">
                     <EmptyState 
                       icon={IconUsersGroup} 
-                      title="Tidak Ada Data Karyawan" 
+                      data-tooltip="Tidak Ada Data Karyawan" 
                       description="Tidak ada karyawan yang sesuai dengan filter saat ini, atau departemen masih kosong."
                     />
                   </div>
                 )}
 
                 {/* Mobile Pagination Control */}
-                <div className="bg-transparent border border-white/50 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-neu">
+                <div className="bg-transparent border border-slate-200 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-sm">
                   <button 
                     disabled={currentPage === 1 || loading}
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    className="h-8 px-3 rounded border border-white/50 bg-transparent text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
+                    className="h-8 px-3 rounded border border-slate-200 bg-transparent text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-xs font-bold"
                   >
                     Prev
                   </button>
-                  <span className="text-[9px] font-black text-slate-600 uppercase tracking-wider">
+                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider">
                     {currentPage} / {Math.ceil(totalEmployees / pageSize) || 1}
                   </span>
                   <button 
                     disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
                     onClick={() => setCurrentPage(p => p + 1)}
-                    className="h-8 px-3 rounded border border-white/50 bg-transparent text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-[10px] font-bold"
+                    className="h-8 px-3 rounded border border-slate-200 bg-transparent text-slate-500 disabled:opacity-30 transition-all flex items-center justify-center text-xs font-bold"
                   >
                     Next
                   </button>
@@ -497,8 +497,8 @@ const Employees = () => {
             ) : (
               <div className="bg-transparent flex flex-col flex-1 min-h-0 border-t-0">
                 {/* 📌 STATIONARY HEADER TABLE */}
-                <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0">
-                  <thead className="bg-slate-50 border-b border-white/50">
+                <table className="w-full text-left border-separate border-spacing-0 table-fixed shrink-0 min-w-max">
+                  <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
                       <th className="w-[4%] pl-6 py-3.5 bg-slate-50">
                         <div 
@@ -512,8 +512,8 @@ const Employees = () => {
                           }}
                           className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                             filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length
-                            ? 'bg-[#E31E24] border-[#E31E24] shadow-neu' 
-                            : 'bg-transparent border-white/20 hover:border-[#E31E24]'
+                            ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
+                            : 'bg-transparent border-slate-200 hover:border-[#E31E24]'
                           }`}
                         >
                           {filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length && <IconCheck size={10} className="text-white" stroke={4} />}
@@ -556,7 +556,7 @@ const Employees = () => {
                         ))
                       ) : filteredEmployees.length > 0 ? (
                         filteredEmployees.map((emp, idx) => (
-                          <tr key={idx} className={`group hover:shadow-neu-inset/50 transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
+                          <tr key={idx} className={`group hover:shadow-sm transition-all duration-150 ${selectedIds.has(emp["EMPLOYEE ID"]) ? 'bg-blue-50/20' : ''}`}>
                             <td className="w-[4%] pl-6 py-2.5">
                               <div 
                                 onClick={(e) => {
@@ -565,8 +565,8 @@ const Employees = () => {
                                 }}
                                 className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                                   selectedIds.has(emp["EMPLOYEE ID"]) 
-                                  ? 'bg-[#E31E24] border-[#E31E24] shadow-neu' 
-                                  : 'bg-transparent border-white/20 hover:border-[#E31E24]'
+                                  ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
+                                  : 'bg-transparent border-slate-200 hover:border-[#E31E24]'
                                 }`}
                               >
                                 {selectedIds.has(emp["EMPLOYEE ID"]) && <IconCheck size={10} className="text-white" stroke={4} />}
@@ -577,7 +577,7 @@ const Employees = () => {
                             </td>
                             <td className="w-[24%] px-4 py-2.5">
                               <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-lg bg-slate-100 border border-white/50/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
+                                <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
                                   {emp["Photo"] || emp.photo ? (
                                     <img src={emp["Photo"] || emp.photo} alt={emp["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
                                   ) : (
@@ -586,7 +586,7 @@ const Employees = () => {
                                 </div>
                                 <div className="flex flex-col min-w-0 leading-none">
                                   <span className="text-xs font-bold text-slate-800 uppercase tracking-tight truncate mb-1">{emp["EMPLOYEE NAME"]}</span>
-                                  <span className="text-[10px] text-slate-400 truncate tracking-wide lowercase">{emp["EMAIL"]}</span>
+                                  <span className="text-xs text-slate-400 truncate tracking-wide lowercase">{emp["EMAIL"]}</span>
                                 </div>
                               </div>
                             </td>
@@ -600,7 +600,7 @@ const Employees = () => {
                               <span className="text-xs font-medium text-slate-600 uppercase tracking-tight truncate block">{emp["Job Level *"] || '-'}</span>
                             </td>
                             <td className="w-[11%] px-4 py-2.5 text-center">
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider border ${
                                 emp["Status *"] === 'Permanent' 
                                   ? 'bg-blue-50 text-blue-600 border-blue-100' 
                                   : emp["Status *"] === 'RESIGNED'
@@ -635,7 +635,7 @@ const Employees = () => {
                           <td colSpan="7" className="py-16">
                             <EmptyState 
                               icon={IconUsersGroup} 
-                              title="Tidak Ada Data Karyawan" 
+                              data-tooltip="Tidak Ada Data Karyawan" 
                               description="Tidak ada karyawan yang sesuai dengan filter saat ini, atau departemen masih kosong."
                             />
                           </td>
@@ -646,14 +646,14 @@ const Employees = () => {
                 </div>
 
                 {/* 📌 STRUCTURAL FOOTER */}
-                <div className="h-11 bg-slate-50 border-t border-white/50 px-6 flex items-center justify-between shrink-0">
+                <div className="h-11 bg-slate-50 border-t border-slate-200 px-6 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">System Operational</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">System Operational</span>
                     </div>
                     <div className="h-4 w-[1px] bg-slate-250"></div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                       Terpilih: <span className="text-[#E31E24]">{selectedIds.size}</span> item
                     </span>
                     
@@ -663,17 +663,17 @@ const Employees = () => {
                       <button 
                         disabled={currentPage === 1 || loading}
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-white/50 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-neu"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
                       >
                         <IconChevronDown size={14} className="rotate-90" />
                       </button>
-                      <span className="text-[9px] font-bold text-slate-600 uppercase tracking-wider min-w-[70px] text-center">
+                      <span className="text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[70px] text-center">
                         HALAMAN {currentPage} / {Math.ceil(totalEmployees / pageSize) || 1}
                       </span>
                       <button 
                         disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
                         onClick={() => setCurrentPage(p => p + 1)}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-white/50 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-neu"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
                       >
                         <IconChevronDown size={14} className="-rotate-90" />
                       </button>
@@ -684,7 +684,7 @@ const Employees = () => {
                         <div className="h-4 w-[1px] bg-slate-200 mx-1"></div>
                         <button 
                           onClick={handleBulkResign}
-                          className="px-2.5 py-1 bg-slate-800 text-white text-[9px] font-bold uppercase tracking-wider rounded-md hover:bg-slate-700 transition-all flex items-center gap-1"
+                          className="px-2.5 py-1 bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-slate-700 transition-all flex items-center gap-1"
                         >
                           <IconUserX size={12} /> Bulk Resign
                         </button>
@@ -692,15 +692,15 @@ const Employees = () => {
                     )}
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wider">Total: {totalEmployees} Records</span>
+                    <span className="text-xs font-bold text-slate-450 uppercase tracking-wider">Total: {totalEmployees} Records</span>
                     <div className="h-4 w-[1px] bg-slate-200"></div>
-                    <span className="text-[9px] font-bold text-slate-405 uppercase tracking-wider">WKNsite CMS v1.2</span>
+                    <span className="text-xs font-bold text-slate-405 uppercase tracking-wider">WKNsite CMS v1.2</span>
                   </div>
                 </div>
             </div>
           )
         ) : (
-            <div className="flex-1 bg-transparent shadow-neu border border-white/50 rounded-xl overflow-hidden">
+            <div className="flex-1 bg-transparent shadow-sm border border-slate-200 rounded-xl overflow-hidden">
               <OrgChart employees={filteredEmployees} />
             </div>
           )}
@@ -735,9 +735,9 @@ const Employees = () => {
 const ViewToggle = ({ active, onClick, label, icon }) => (
   <button 
     onClick={onClick} 
-    className={`px-4 py-1.5 rounded-lg flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-all ${
+    className={`px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all ${
       active 
-        ? 'bg-slate-900 text-white shadow-neu' 
+        ? 'bg-slate-900 text-white shadow-sm' 
         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'
     }`}
   >
@@ -749,21 +749,21 @@ const MiniStat = ({ label, value, color, icon, onClick, isActive }) => (
   <div 
     onClick={onClick}
     className={`p-3 rounded-xl border flex items-center justify-between w-full transition-all ${
-      onClick ? 'cursor-pointer hover:border-white/20 hover:shadow-neu' : 'shadow-neu'
+      onClick ? 'cursor-pointer hover:border-slate-200 hover:shadow-sm' : 'shadow-sm'
     } ${
       isActive 
-        ? 'bg-blue-50/50 border-blue-200 shadow-neu ring-1 ring-blue-100' 
-        : 'bg-transparent border-white/50'
+        ? 'bg-blue-50/50 border-blue-200 shadow-sm ring-1 ring-blue-100' 
+        : 'bg-transparent border-slate-200'
     }`}
   >
     <div className="space-y-1 min-w-0">
-      <p className={`text-[9px] font-bold uppercase tracking-wider truncate ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>{label}</p>
+      <p className={`text-xs font-bold uppercase tracking-wider truncate ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>{label}</p>
       <p className={`text-xl font-bold leading-none ${color}`}>{value}</p>
     </div>
     <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
       isActive 
         ? 'bg-blue-100 text-blue-600 border border-blue-200' 
-        : 'bg-[#f0f2f5] shadow-neu-inset border-none text-slate-400'
+        : 'bg-white shadow-sm border-none text-slate-400'
     }`}>
       {icon}
     </div>
@@ -773,9 +773,9 @@ const MiniStat = ({ label, value, color, icon, onClick, isActive }) => (
 const TabButton = ({ active, onClick, label }) => (
   <button 
     onClick={onClick} 
-    className={`px-4 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
+    className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
       active 
-        ? 'bg-transparent text-[#E31E24] shadow-neu border border-white/50/40' 
+        ? 'bg-transparent text-[#E31E24] shadow-sm border border-slate-200/40' 
         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/30'
     }`}
   >
@@ -785,12 +785,12 @@ const TabButton = ({ active, onClick, label }) => (
 
 const FilterSelect = ({ label, value, options, onChange }) => (
   <div className="flex flex-col gap-1 flex-1 min-w-0">
-    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider ml-0.5">{label}</label>
+    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-0.5">{label}</label>
     <div className="relative">
       <select 
         value={value} 
         onChange={(e) => onChange(e.target.value)} 
-        className="w-full appearance-none h-9 pl-3 pr-8 bg-transparent border border-white/50 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all hover:shadow-neu-inset cursor-pointer uppercase tracking-wide"
+        className="w-full appearance-none h-9 pl-3 pr-8 bg-transparent border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all hover:shadow-sm cursor-pointer uppercase tracking-wide"
       >
         {options.map((opt, i) => (
           <option key={i} value={opt}>{opt}</option>
@@ -804,7 +804,7 @@ const FilterSelect = ({ label, value, options, onChange }) => (
 const TableHead = ({ label, center, right, width }) => (
   <th 
     style={{ width }} 
-    className={`px-4 py-3 bg-slate-50 border-b border-white/50 text-[9px] font-bold text-slate-400 uppercase tracking-wider ${
+    className={`px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider ${
       center ? 'text-center' : ''
     } ${right ? 'text-right' : ''}`}
   >
@@ -816,11 +816,11 @@ const ActionButton = ({ onClick, icon, hover, label }) => (
   <div className="group/tip relative flex items-center justify-center">
     <button 
       onClick={onClick} 
-      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-md border border-transparent hover:border-white/50 transition-all`}
+      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-md border border-transparent hover:border-slate-200 transition-all`}
     >
       {icon}
     </button>
-    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[8px] font-bold uppercase tracking-wider rounded shadow-neu opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider rounded shadow-sm opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
       {label}
     </div>
   </div>

@@ -44,15 +44,15 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-[#f0f2f5] w-full max-w-lg rounded-[2.5rem] shadow-neu border-white border-[6px] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-sm border-white border-[6px] overflow-hidden">
         <div className="p-8">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight">Upload <span className="text-[#E31E24]">Document</span></h2>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Add New Resource to Registry</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Add New Resource to Registry</p>
             </div>
-            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
+            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
               <IconX size={20} />
             </button>
           </div>
@@ -65,17 +65,17 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
                 onChange={(e) => setFile(e.target.files[0])}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-              <div className={`h-32 rounded-2xl bg-[#f0f2f5] shadow-neu flex flex-col items-center justify-center border-2 border-dashed ${file ? 'border-[#E31E24]' : 'border-white/50'} transition-all`}>
+              <div className={`h-32 rounded-2xl bg-white shadow-sm flex flex-col items-center justify-center border-2 border-dashed ${file ? 'border-[#E31E24]' : 'border-slate-200'} transition-all`}>
                 <IconUpload size={24} className={file ? 'text-[#E31E24]' : 'text-slate-300'} />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-2">
                   {file ? file.name : 'Drag & Drop or Click to Select'}
                 </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Document Name</label>
-              <div className="h-12 px-4 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center gap-3">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Document Name</label>
+              <div className="h-12 px-4 rounded-2xl bg-white shadow-sm flex items-center gap-3">
                 <IconFileText size={18} className="text-[#E31E24]" />
                 <input 
                   type="text" 
@@ -90,8 +90,8 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
-                <div className="h-12 px-4 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center gap-3">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
+                <div className="h-12 px-4 rounded-2xl bg-white shadow-sm flex items-center gap-3">
                   <IconTag size={18} className="text-[#E31E24]" />
                   <select 
                     value={formData.category}
@@ -107,8 +107,8 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Link Employee ID</label>
-                <div className="h-12 px-4 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center gap-3">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Link Employee ID</label>
+                <div className="h-12 px-4 rounded-2xl bg-white shadow-sm flex items-center gap-3">
                   <IconUserCircle size={18} className="text-[#E31E24]" />
                   <input 
                     type="text" 
@@ -123,16 +123,16 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
 
             <div className="flex items-center justify-between px-2">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-slate-700 uppercase tracking-tight">Private Document</span>
-                <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Restricted to Administrators only</span>
+                <span className="text-xs font-black text-slate-700 uppercase tracking-tight">Private Document</span>
+                <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Restricted to Administrators only</span>
               </div>
               <button 
                 type="button"
                 onClick={() => setFormData({...formData, is_private: !formData.is_private})}
-                className={`w-12 h-6 rounded-full transition-all flex items-center px-1 shadow-neu
+                className={`w-12 h-6 rounded-full transition-all flex items-center px-1 shadow-sm
                   ${formData.is_private ? 'bg-[#E31E24]' : 'bg-slate-200'}`}
               >
-                <div className={`h-4 w-4 rounded-full bg-transparent shadow-neu transition-transform ${formData.is_private ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                <div className={`h-4 w-4 rounded-full bg-transparent shadow-sm transition-transform ${formData.is_private ? 'translate-x-6' : 'translate-x-0'}`}></div>
               </button>
             </div>
 
@@ -141,14 +141,14 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
               <Button 
                 type="button" 
                 onClick={onClose}
-                className="flex-1 h-14 rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all"
+                className="flex-1 h-14 rounded-2xl bg-white shadow-sm text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit"
                 disabled={loading || !file}
-                className="flex-1 h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all disabled:opacity-50"
+                className="flex-1 h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all disabled:opacity-50"
               >
                 {loading ? 'Processing...' : 'Upload File'}
               </Button>

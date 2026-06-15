@@ -34,33 +34,33 @@ const AssignAssetModal = ({ isOpen, asset, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-[#f0f2f5] w-full max-w-lg rounded-[2.5rem] shadow-neu border-white border-[6px] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-sm border-white border-[6px] overflow-hidden">
         <div className="p-8">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight">Assign <span className="text-[#E31E24]">Asset</span></h2>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Resource Handover Protocol</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Resource Handover Protocol</p>
             </div>
-            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
+            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
               <IconX size={20} />
             </button>
           </div>
 
-          <div className="mb-8 p-5 rounded-2xl bg-transparent shadow-neu flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center text-[#E31E24]">
+          <div className="mb-8 p-5 rounded-2xl bg-transparent shadow-sm flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#E31E24]">
               <IconDeviceLaptop size={24} />
             </div>
             <div>
               <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{asset.name}</h4>
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{asset.asset_tag}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{asset.asset_tag}</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Employee ID</label>
-              <div className="h-12 px-4 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center gap-3">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Select Employee ID</label>
+              <div className="h-12 px-4 rounded-2xl bg-white shadow-sm flex items-center gap-3">
                 <IconUserCircle size={18} className="text-[#E31E24]" />
                 <input 
                   type="text" 
@@ -74,8 +74,8 @@ const AssignAssetModal = ({ isOpen, asset, onClose, onSuccess }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Initial Condition</label>
-              <div className="h-12 px-4 rounded-2xl bg-[#f0f2f5] shadow-neu flex items-center gap-3">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Initial Condition</label>
+              <div className="h-12 px-4 rounded-2xl bg-white shadow-sm flex items-center gap-3">
                 <IconClipboardCheck size={18} className="text-[#E31E24]" />
                 <select 
                   value={formData.condition}
@@ -94,14 +94,14 @@ const AssignAssetModal = ({ isOpen, asset, onClose, onSuccess }) => {
               <Button 
                 type="button" 
                 onClick={onClose}
-                className="flex-1 h-14 rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all"
+                className="flex-1 h-14 rounded-2xl bg-white shadow-sm text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit"
                 disabled={loading}
-                className="flex-1 h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all disabled:opacity-50 flex gap-2 items-center justify-center"
+                className="flex-1 h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all disabled:opacity-50 flex gap-2 items-center justify-center"
               >
                 {loading ? 'Processing...' : (
                   <>

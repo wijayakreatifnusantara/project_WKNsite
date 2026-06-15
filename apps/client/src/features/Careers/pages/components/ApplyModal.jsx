@@ -43,8 +43,8 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
 
   if (success) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="w-full max-w-md bg-transparent rounded-[2rem] shadow-neu p-10 text-center animate-in zoom-in-95 duration-200">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-200">
+        <div className="w-full max-w-md bg-transparent rounded-2xl shadow-sm p-10 text-center animate-in zoom-in-95 duration-200">
           <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <IconSend size={32} className="text-emerald-500" />
           </div>
@@ -56,16 +56,16 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-lg bg-transparent rounded-[2rem] shadow-neu overflow-hidden animate-in zoom-in-95 duration-200"
+        className="w-full max-w-lg bg-transparent rounded-2xl shadow-sm overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-8 bg-slate-900 relative">
           <button onClick={onClose} className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors">
             <IconX size={24} />
           </button>
-          <div className="inline-block px-3 py-1 rounded-full bg-[#E31E24]/20 border border-[#E31E24]/30 text-[#E31E24] text-[10px] font-black uppercase tracking-widest mb-4">
+          <div className="inline-block px-3 py-1 rounded-full bg-[#E31E24]/20 border border-[#E31E24]/30 text-[#E31E24] text-xs font-black uppercase tracking-widest mb-4">
             {job.department}
           </div>
           <h2 className="text-2xl font-black text-white font-outfit uppercase tracking-tight">{job.title}</h2>
@@ -74,7 +74,7 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
 
         <form onSubmit={handleSubmit} className="p-8 space-y-5">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <IconUser size={14} /> Full Name
             </label>
             <input 
@@ -83,14 +83,14 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g. John Doe"
-              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
+              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 border border-slate-200 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <IconMail size={14} /> Email Address
               </label>
               <input 
@@ -99,12 +99,12 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="john@example.com"
-                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
+                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 border border-slate-200 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
                 required
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <IconPhone size={14} /> Phone Number
               </label>
               <input 
@@ -113,14 +113,14 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+62 812..."
-                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
+                className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 border border-slate-200 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <IconLink size={14} /> Resume / CV Link
             </label>
             <input 
@@ -129,17 +129,17 @@ const ApplyModal = ({ isOpen, onClose, job, submitApplication }) => {
               value={formData.resume_url}
               onChange={handleChange}
               placeholder="Link to Google Drive, LinkedIn, etc."
-              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/50 border border-white/50"
+              className="w-full h-12 bg-slate-50 rounded-xl px-4 text-sm font-bold text-slate-800 border border-slate-200 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
               required
             />
-            <p className="text-[9px] text-slate-400 mt-1">Make sure the link is publicly accessible.</p>
+            <p className="text-xs text-slate-400 mt-1">Make sure the link is publicly accessible.</p>
           </div>
 
           <div className="pt-4 flex gap-3">
             <Button 
               type="submit"
               disabled={loading}
-              className="w-full h-14 rounded-xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[11px] uppercase tracking-widest shadow-neu transition-all flex items-center justify-center gap-2"
+              className="w-full h-14 rounded-xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[11px] uppercase tracking-widest shadow-sm transition-all flex items-center justify-center gap-2"
             >
               {loading ? 'Submitting...' : (
                 <>Submit Application <IconSend size={16} /></>

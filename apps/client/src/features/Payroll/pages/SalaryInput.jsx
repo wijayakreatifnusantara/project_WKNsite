@@ -130,27 +130,27 @@ export default function SalaryInput() {
 
   const InputField = ({ label, fieldKey }) => (
     <div>
-      <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">{label}</label>
+      <label className="text-xs font-bold text-slate-500 uppercase block mb-2">{label}</label>
       <input 
         type="number" 
         value={salaryData[fieldKey]} 
         onChange={(e) => setSalaryData({...salaryData, [fieldKey]: e.target.value})} 
-        className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#F97316] transition-all" 
+        className="w-full h-12 px-4 bg-white shadow-sm rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#F97316] transition-all" 
       />
     </div>
   );
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5] animate-fade-in">
-      <header className="h-20 bg-[#f0f2f5] border-b border-white/50 flex items-center justify-between px-10 shrink-0 z-10">
+    <div className="flex-1 flex flex-col overflow-hidden bg-white animate-fade-in">
+      <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-10">
         <div>
           <h2 className="text-xl font-black text-slate-800 uppercase">Input Master Gaji</h2>
-          <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Kelola Komponen Gaji Karyawan</p>
+          <p className="text-xs text-slate-400 font-bold uppercase mt-1">Kelola Komponen Gaji Karyawan</p>
         </div>
         <Button 
           onClick={handleSave}
           disabled={!selectedEmployee || saving}
-          className="h-12 px-6 rounded-2xl bg-[#E31E24] hover:bg-[#C1181E] disabled:opacity-50 text-white font-black text-[10px] uppercase shadow-neu"
+          className="h-12 px-6 rounded-2xl bg-[#E31E24] hover:bg-[#C1181E] disabled:opacity-50 text-white font-black text-xs uppercase shadow-sm"
         >
           <IconDeviceFloppy size={18} className="mr-2" /> {saving ? 'Menyimpan...' : 'Simpan Gaji'}
         </Button>
@@ -171,7 +171,7 @@ export default function SalaryInput() {
             
             {/* Sidebar: Karyawan */}
             <div className="col-span-4 space-y-6">
-              <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6 h-[800px] flex flex-col">
+              <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6 h-[800px] flex flex-col">
                 <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6 shrink-0">Pilih Karyawan</CardTitle>
                 <div className="h-12 relative group shrink-0 mb-4">
                   <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -180,7 +180,7 @@ export default function SalaryInput() {
                     placeholder="Cari nama karyawan..." 
                     value={employeeSearch}
                     onChange={(e) => setEmployeeSearch(e.target.value)}
-                    className="w-full h-full pl-12 pr-6 bg-[#f0f2f5] shadow-neu border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#F97316]"
+                    className="w-full h-full pl-12 pr-6 bg-white shadow-sm border-none rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#F97316]"
                   />
                 </div>
                 
@@ -191,12 +191,12 @@ export default function SalaryInput() {
                       onClick={() => handleSelectEmployee(emp)}
                       className={`p-4 rounded-xl cursor-pointer transition-all ${
                         selectedEmployee?.id === emp.id 
-                        ? 'bg-green-50 border-2 border-green-200 shadow-neu' 
+                        ? 'bg-green-50 border-2 border-green-200 shadow-sm' 
                         : 'bg-white/50 border border-white hover:bg-transparent'
                       }`}
                     >
                       <p className="text-sm font-black text-slate-800">{emp.name}</p>
-                      <p className="text-[10px] font-bold text-slate-500">{emp.job_position || 'Staff'}</p>
+                      <p className="text-xs font-bold text-slate-500">{emp.job_position || 'Staff'}</p>
                     </div>
                   ))}
                   {filteredEmployees.length === 0 && (
@@ -209,7 +209,7 @@ export default function SalaryInput() {
             {/* Form Gaji */}
             <div className="col-span-8">
               {!selectedEmployee ? (
-                <div className="h-full flex items-center justify-center border-2 border-dashed border-white/20 rounded-3xl">
+                <div className="h-full flex items-center justify-center border-2 border-dashed border-slate-200 rounded-xl">
                   <p className="text-slate-400 font-bold uppercase">Pilih karyawan dari daftar untuk mengedit gaji</p>
                 </div>
               ) : loading ? (
@@ -219,7 +219,7 @@ export default function SalaryInput() {
               ) : (
                 <div className="space-y-6">
                   {/* Status Card */}
-                  <div className="p-4 bg-green-500 text-white rounded-2xl shadow-neu flex items-center gap-4">
+                  <div className="p-4 bg-green-500 text-white rounded-2xl shadow-sm flex items-center gap-4">
                     <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center">
                       <IconUser size={24} />
                     </div>
@@ -229,19 +229,19 @@ export default function SalaryInput() {
                     </div>
                   </div>
 
-                  <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
+                  <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
                     <CardTitle className="text-sm font-black text-[#F97316] uppercase mb-6 border-b pb-4">Profil Gaji Pokok</CardTitle>
                     <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Grade / Golongan</label>
-                        <input type="text" value={salaryData.grade || ''} onChange={(e) => setSalaryData({...salaryData, grade: e.target.value})} className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu rounded-xl text-sm font-bold text-slate-700 outline-none" />
+                        <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Grade / Golongan</label>
+                        <input type="text" value={salaryData.grade || ''} onChange={(e) => setSalaryData({...salaryData, grade: e.target.value})} className="w-full h-12 px-4 bg-white shadow-sm rounded-xl text-sm font-bold text-slate-700 outline-none" />
                       </div>
                       <InputField label="Gaji Pokok (Basic Salary)" fieldKey="basic_salary" />
                     </div>
                   </Card>
 
                   <div className="grid grid-cols-2 gap-6">
-                    <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
+                    <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
                       <CardTitle className="text-sm font-black text-blue-500 uppercase mb-6 border-b pb-4">Tunjangan Tetap</CardTitle>
                       <div className="space-y-4">
                         <InputField label="Tunjangan Posisi" fieldKey="position_allowance" />
@@ -256,7 +256,7 @@ export default function SalaryInput() {
                       </div>
                     </Card>
 
-                    <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
+                    <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
                       <CardTitle className="text-sm font-black text-indigo-500 uppercase mb-6 border-b pb-4">Tunjangan Variabel & Non-Upah</CardTitle>
                       <div className="space-y-4">
                         <InputField label="Tunjangan Work Order" fieldKey="work_order_allowance" />
@@ -272,7 +272,7 @@ export default function SalaryInput() {
                     </Card>
                   </div>
 
-                  <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
+                  <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
                     <CardTitle className="text-sm font-black text-rose-500 uppercase mb-6 border-b pb-4">Potongan (Deductions)</CardTitle>
                     <div className="grid grid-cols-2 gap-6">
                       <InputField label="PPh 21" fieldKey="pph21" />

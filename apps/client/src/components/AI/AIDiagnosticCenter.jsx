@@ -59,7 +59,7 @@ const AIDiagnosticCenter = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h1 className="text-base font-bold text-slate-800 font-outfit uppercase tracking-tight leading-none">AI Diagnostic Center</h1>
-              <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Intelligent Data Integrity Engine</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Intelligent Data Integrity Engine</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ const AIDiagnosticCenter = ({ isOpen, onClose }) => {
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-5xl font-black text-slate-800">{data?.health_score || 0}%</span>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Health Score</span>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Health Score</span>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -152,7 +152,7 @@ const AIDiagnosticCenter = ({ isOpen, onClose }) => {
                   <button
                     key={s}
                     onClick={() => setActiveFilter(s)}
-                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeFilter === s ? 'bg-[#E31E24] text-white shadow-neu' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeFilter === s ? 'bg-[#E31E24] text-white shadow-neu' : 'text-slate-400 hover:text-slate-600'}`}
                   >
                     {s} ({s === 'all' ? data?.issues.length : data?.stats.severity_counts[s] || 0})
                   </button>
@@ -182,7 +182,7 @@ const AIDiagnosticCenter = ({ isOpen, onClose }) => {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <h5 className="text-sm font-black text-slate-800 uppercase tracking-tight">{issue.message}</h5>
-                          <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-neu ${
+                          <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest text-white shadow-neu ${
                             issue.severity === 'critical' ? 'bg-red-500' : 
                             issue.severity === 'high' ? 'bg-orange-500' : 
                             'bg-blue-500'
@@ -192,16 +192,16 @@ const AIDiagnosticCenter = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex items-center gap-6 mt-4">
                           <div>
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Source Entity</p>
+                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Source Entity</p>
                             <p className="text-xs font-black text-slate-600">{issue.employee_name} ({issue.employee_id})</p>
                           </div>
                           <div>
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Suggested Fix</p>
+                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Suggested Fix</p>
                             <p className="text-xs font-black text-[#E31E24]">{issue.suggestion}</p>
                           </div>
                         </div>
                       </div>
-                      <button className="self-center h-12 px-6 rounded-2xl bg-transparent shadow-neu text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#E31E24] hover:text-white transition-all">
+                      <button className="self-center h-12 px-6 rounded-2xl bg-transparent shadow-neu text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-[#E31E24] hover:text-white transition-all">
                         Auto-Repair
                       </button>
                     </div>

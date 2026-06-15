@@ -32,22 +32,22 @@ const AssetQRModal = ({ isOpen, onClose, asset }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-sm bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 relative overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="w-full max-w-sm bg-white border-white border-[4px] shadow-sm rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-[#E31E24] transition-all"
         >
           <IconX size={20} />
         </button>
 
         <div className="text-center mb-8">
           <h3 className="text-lg font-black text-slate-800 font-outfit uppercase tracking-tight">Asset QR Label</h3>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Physical Tracking Identification</p>
+          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Physical Tracking Identification</p>
         </div>
 
         <div className="flex flex-col items-center gap-6">
-          <div className="p-6 bg-transparent rounded-[2rem] shadow-neu border-4 border-white print:shadow-none print:border-0">
+          <div className="p-6 bg-transparent rounded-2xl shadow-sm border-4 border-white print:shadow-none print:border-0">
             <QRCodeSVG 
               id="asset-qr-code"
               value={asset.asset_tag || asset.id}
@@ -67,20 +67,20 @@ const AssetQRModal = ({ isOpen, onClose, asset }) => {
 
           <div className="text-center">
             <p className="text-xs font-black text-slate-800 uppercase tracking-widest">{asset.name}</p>
-            <p className="text-[10px] font-bold text-[#E31E24] mt-1 font-mono">{asset.asset_tag}</p>
+            <p className="text-xs font-bold text-[#E31E24] mt-1 font-mono">{asset.asset_tag}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 w-full pt-4 no-print">
             <Button 
               onClick={downloadQR}
-              className="h-12 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:shadow-none transition-all flex gap-2 items-center"
+              className="h-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all flex gap-2 items-center"
             >
               <IconDownload size={16} />
               Download
             </Button>
             <Button 
               onClick={printLabel}
-              className="h-12 rounded-2xl bg-[#E31E24] text-white font-black text-[10px] uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-2 items-center"
+              className="h-12 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-2 items-center"
             >
               <IconPrinter size={16} />
               Print Label
@@ -90,7 +90,7 @@ const AssetQRModal = ({ isOpen, onClose, asset }) => {
 
         {/* Print Only Info */}
         <div className="hidden print:block text-center mt-4">
-          <p className="text-[8px] font-black text-slate-400 uppercase">WKNsite Corporate Asset Tracking</p>
+          <p className="text-[11px] font-black text-slate-400 uppercase">WKNsite Corporate Asset Tracking</p>
         </div>
       </div>
 

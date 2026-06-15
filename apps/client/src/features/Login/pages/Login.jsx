@@ -40,30 +40,30 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center p-4 bg-[#f0f2f5] overflow-hidden animate-fade-in">
+    <div className="h-screen w-full flex items-center justify-center p-4 bg-white overflow-hidden animate-fade-in">
       <div className="w-full max-w-[420px] transition-all duration-500 ease-out">
         {/* Embossed Card with Integrated Logo */}
-        <Card className="border-white shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] bg-[#f0f2f5] rounded-[2.5rem] overflow-hidden border-[4px] sm:border-[5px]">
+        <Card className="border-white shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] bg-white rounded-[2.5rem] overflow-hidden border-[4px] sm:border-[5px]">
           <CardContent className="p-6 sm:p-8">
             <div className="flex flex-col items-center text-center mb-4 sm:mb-5 space-y-2 sm:space-y-3">
               <img src="/assets/wkn_logo.png" alt="WKN Logo" className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-md" />
               <div className="space-y-1">
                 <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">WKN<span className="text-[#E31E24]">site</span></h1>
-                <p className="text-slate-400 text-[10px] sm:text-xs font-black uppercase tracking-widest opacity-60">Corporate Management System</p>
+                <p className="text-slate-400 text-xs sm:text-xs font-black uppercase tracking-widest opacity-60">Corporate Management System</p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               <div className="space-y-3 sm:space-y-4">
                 <div className="space-y-1">
-                  <Label htmlFor="email" className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</Label>
+                  <Label htmlFor="email" className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</Label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="name@company.com"
-                      className="h-10 sm:h-11 pl-11 border-transparent bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-[#E31E24]/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                      className="h-10 sm:h-11 pl-11 border-transparent bg-white shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-[#E31E24]/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -72,14 +72,14 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label htmlFor="password" className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</Label>
+                  <Label htmlFor="password" className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="h-10 sm:h-11 pl-11 pr-11 border-transparent bg-[#f0f2f5] shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-[#E31E24]/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                      className="h-10 sm:h-11 pl-11 pr-11 border-transparent bg-white shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-[#E31E24]/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -96,7 +96,7 @@ const Login = () => {
               </div>
 
               {error && (
-                <div className="p-2.5 bg-red-50 text-red-500 rounded-xl text-[9px] font-black uppercase tracking-wider flex items-center gap-2 border border-red-100 animate-shake">
+                <div className="p-2.5 bg-red-50 text-red-500 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 border border-red-100 animate-shake">
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                   {error}
                 </div>
@@ -120,22 +120,22 @@ const Login = () => {
 
             <div className="mt-6 flex flex-col items-center space-y-4">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1.5 text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                <div className="flex items-center space-x-1.5 text-[11px] font-black text-slate-300 uppercase tracking-wider">
                   <Shield className="w-3 h-3 text-[#E31E24]/40" />
                   <span>Secure SSL</span>
                 </div>
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
-                <div className="flex items-center space-x-1.5 text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                <div className="flex items-center space-x-1.5 text-[11px] font-black text-slate-300 uppercase tracking-wider">
                   <CheckCircle className="w-3 h-3 text-emerald-500/40" />
                   <span>Encrypted</span>
                 </div>
               </div>
 
               <div className="text-center space-y-1.5">
-                <p className="text-[8px] text-slate-300 font-black uppercase tracking-[0.2em]">
+                <p className="text-[11px] text-slate-300 font-black uppercase tracking-wider">
                   &copy; 2026 Wijaya Kreatif Nusantara
                 </p>
-                <div className="inline-block text-[8px] text-slate-400 font-black bg-white/50 px-2.5 py-0.5 rounded-full border border-slate-100 uppercase tracking-widest">
+                <div className="inline-block text-[11px] text-slate-400 font-black bg-white/50 px-2.5 py-0.5 rounded-full border border-slate-100 uppercase tracking-widest">
                   IMS VERSION 1.2.0 • OPTIMIZED FOR MOBILE
                 </div>
               </div>

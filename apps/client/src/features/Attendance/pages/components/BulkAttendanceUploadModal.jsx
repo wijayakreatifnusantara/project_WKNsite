@@ -162,18 +162,18 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-[#f0f2f5] rounded-[2.5rem] shadow-neu border-white border-[6px] overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="w-full max-w-2xl bg-white rounded-[2.5rem] shadow-sm border-white border-[6px] overflow-hidden">
         
         {/* Header */}
-        <div className="px-8 py-6 border-b border-white/50 flex justify-between items-center bg-white/30">
+        <div className="px-8 py-6 border-b border-slate-200 flex justify-between items-center bg-white/30">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-transparent shadow-neu flex items-center justify-center text-[#E31E24]">
+            <div className="h-12 w-12 rounded-2xl bg-transparent shadow-sm flex items-center justify-center text-[#E31E24]">
               <IconCloudUpload size={24} />
             </div>
             <div>
               <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight leading-none">Bulk Attendance Ingestion</h3>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">High-Volume Data Sync Engine</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">High-Volume Data Sync Engine</p>
             </div>
           </div>
           <button onClick={onClose} className="h-10 w-10 rounded-xl hover:bg-white/50 flex items-center justify-center text-slate-400 transition-all">
@@ -187,7 +187,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
             <Button 
               onClick={downloadTemplate}
               variant="outline"
-              className="h-10 px-6 rounded-xl border-white border-2 shadow-neu text-[9px] font-black uppercase tracking-widest text-slate-600 flex gap-2"
+              className="h-10 px-6 rounded-xl border-white border-2 shadow-sm text-xs font-black uppercase tracking-widest text-slate-600 flex gap-2"
             >
               <IconDownload size={14} />
               Get Template (.xlsx)
@@ -197,11 +197,11 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
           {/* Upload Zone */}
           {!file ? (
             <label className="block w-full cursor-pointer group">
-              <div className="h-48 rounded-[2rem] border-4 border-dashed border-white/50 bg-white/20 flex flex-col items-center justify-center gap-4 group-hover:border-[#E31E24]/30 group-hover:bg-white/40 transition-all">
+              <div className="h-48 rounded-2xl border-4 border-dashed border-slate-200 bg-white/20 flex flex-col items-center justify-center gap-4 group-hover:border-[#E31E24]/30 group-hover:bg-white/40 transition-all">
                 <IconFileSpreadsheet size={48} className="text-slate-200 group-hover:text-[#E31E24]/30 group-hover:scale-110 transition-all" />
                 <div className="text-center">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Excel or CSV File</p>
-                  <p className="text-[8px] font-bold text-slate-300 uppercase tracking-tight mt-1">Maximum 1000 records per upload</p>
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Select Excel or CSV File</p>
+                  <p className="text-[11px] font-bold text-slate-300 uppercase tracking-tight mt-1">Maximum 1000 records per upload</p>
                 </div>
                 <input type="file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileChange} />
               </div>
@@ -211,7 +211,7 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
               <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white">
                 <div className="flex items-center gap-4">
                   <IconFileSpreadsheet className="text-[#E31E24]" />
-                  <span className="text-[10px] font-black text-slate-700 uppercase tracking-tight">{file.name}</span>
+                  <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{file.name}</span>
                 </div>
                 <button onClick={() => {setFile(null); setPreviewData([]);}} className="text-rose-500 hover:scale-110 transition-all">
                   <IconX size={18} />
@@ -219,24 +219,24 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
               </div>
 
               {previewData.length > 0 && (
-                <div className="rounded-2xl border-white border-4 shadow-neu bg-[#f0f2f5] overflow-hidden">
+                <div className="rounded-2xl border-white border-4 shadow-sm bg-white overflow-hidden">
                   <div className="bg-white/50 px-6 py-3 border-b border-white flex justify-between items-center">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Preview (First 5 records)</p>
-                    <span className="text-[8px] font-black text-[#E31E24] bg-[#E31E24]/10 px-2 py-0.5 rounded-full uppercase">Review Logs</span>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Preview (First 5 records)</p>
+                    <span className="text-[11px] font-black text-[#E31E24] bg-[#E31E24]/10 px-2 py-0.5 rounded-full uppercase">Review Logs</span>
                   </div>
                   <div className="p-4 space-y-3">
                     {previewData.slice(0, 5).map((row, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-[10px] font-bold text-slate-600 border-b border-white/50 pb-2 last:border-none">
+                      <div key={idx} className="flex items-center justify-between text-xs font-bold text-slate-600 border-b border-slate-200 pb-2 last:border-none">
                         <div className="flex flex-col gap-0.5">
                            <span className="font-black text-slate-800">{row['Employee ID']}</span>
-                           <span className="text-[8px] text-slate-400">{row['Date']}</span>
+                           <span className="text-[11px] text-slate-400">{row['Date']}</span>
                         </div>
                         <div className="flex gap-4 items-center">
                            <div className="flex flex-col items-end">
-                              <span className="text-[8px] uppercase text-slate-400">Time</span>
-                              <span className="font-mono text-[9px]">{row['Clock In'] || '--:--'} - {row['Clock Out'] || '--:--'}</span>
+                              <span className="text-[11px] uppercase text-slate-400">Time</span>
+                              <span className="font-mono text-xs">{row['Clock In'] || '--:--'} - {row['Clock Out'] || '--:--'}</span>
                            </div>
-                           <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                           <span className={`px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-widest ${
                              row['Status'] === 'Present' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
                            }`}>
                              {row['Status']}
@@ -245,8 +245,8 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
                       </div>
                     ))}
                     {previewData.length > 5 && (
-                      <div className="pt-2 text-center border-t border-white/50">
-                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">... and {previewData.length - 5} more records awaiting sync</p>
+                      <div className="pt-2 text-center border-t border-slate-200">
+                        <p className="text-[11px] font-black text-slate-300 uppercase tracking-wider">... and {previewData.length - 5} more records awaiting sync</p>
                       </div>
                     )}
                   </div>
@@ -258,30 +258,30 @@ const BulkAttendanceUploadModal = ({ isOpen, onClose, onRefresh }) => {
           {error && (
             <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 animate-shake">
               <IconAlertTriangle size={18} />
-              <p className="text-[9px] font-black uppercase tracking-tight">{error}</p>
+              <p className="text-xs font-black uppercase tracking-tight">{error}</p>
             </div>
           )}
 
           {success && (
             <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 text-emerald-600">
               <IconCheck size={18} />
-              <p className="text-[9px] font-black uppercase tracking-tight">Bulk synchronization successful! Updating logs...</p>
+              <p className="text-xs font-black uppercase tracking-tight">Bulk synchronization successful! Updating logs...</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 bg-white/30 border-t border-white/50 flex justify-end gap-4">
+        <div className="px-8 py-6 bg-white/30 border-t border-slate-200 flex justify-end gap-4">
           <Button 
             onClick={onClose}
-            className="h-11 px-8 rounded-xl bg-transparent text-slate-400 font-black text-[9px] uppercase tracking-widest hover:shadow-neu-inset transition-all border border-white/50"
+            className="h-11 px-8 rounded-xl bg-transparent text-slate-400 font-black text-xs uppercase tracking-widest hover:shadow-sm transition-all border border-slate-200"
           >
             Abort
           </Button>
           <Button 
             onClick={handleUpload}
             disabled={!file || previewData.length === 0 || loading || success}
-            className="h-11 px-10 rounded-xl bg-slate-800 text-white font-black text-[9px] uppercase tracking-widest hover:bg-slate-900 shadow-neu disabled:opacity-50 flex gap-3 items-center"
+            className="h-11 px-10 rounded-xl bg-slate-800 text-white font-black text-xs uppercase tracking-widest hover:bg-slate-900 shadow-sm disabled:opacity-50 flex gap-3 items-center"
           >
             {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconCheck size={16} />}
             Execute Sync ({previewData.length} Records)

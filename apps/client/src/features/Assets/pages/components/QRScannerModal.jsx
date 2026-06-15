@@ -38,11 +38,11 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="w-full max-w-lg bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 relative overflow-hidden">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="w-full max-w-lg bg-white border-white border-[4px] shadow-sm rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all z-20"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-[#E31E24] transition-all z-20"
         >
           <IconX size={20} />
         </button>
@@ -52,10 +52,10 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
             <IconCamera size={24} className="text-[#E31E24]" />
             Asset Intelligence Scanner
           </h3>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Point your camera at an Asset QR Code</p>
+          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Point your camera at an Asset QR Code</p>
         </div>
 
-        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-neu border-4 border-white aspect-square">
+        <div className="relative rounded-2xl overflow-hidden bg-black shadow-sm border-4 border-white aspect-square">
           <div id="qr-reader" className="w-full h-full"></div>
           
           {/* Scanning Overlay UI */}
@@ -64,8 +64,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
           </div>
         </div>
 
-        <div className="mt-8 p-4 rounded-2xl bg-white/40 border border-white/50 text-center">
-          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+        <div className="mt-8 p-4 rounded-2xl bg-white/40 border border-slate-200 text-center">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
             Scanning allows instant access to asset identification, assignment history, and lifecycle management.
           </p>
         </div>

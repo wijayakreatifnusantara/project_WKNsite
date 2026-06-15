@@ -9,9 +9,11 @@ import {
   IconCalendarStats,
   IconChevronDown,
   IconEdit,
-  IconWand
+  IconWand,
+  IconFileText
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { apiClient } from '@/lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -124,49 +126,21 @@ const ScheduleManager = () => {
     <div className="flex-1 overflow-y-auto p-6 bg-transparent custom-scrollbar animate-fade-in">
       <div className="w-full mx-auto space-y-4">
         
-        {/* HEADER */}
-        <div className="flex items-center justify-between bg-[#f0f2f5] p-3 px-6 rounded-3xl border-none shadow-neu backdrop-blur-md">
-          <div className="flex items-center gap-5">
-            <button 
-              onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
-            >
-              <IconArrowLeft size={16} />
-            </button>
-            <div>
-              <h2 className="text-base font-black text-slate-800 uppercase tracking-tight flex items-center gap-3 leading-none">
-                <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 flex items-center justify-center">
-                  <IconCalendarTime size={20} className="text-[#E31E24]" />
-                </div>
-                JADWAL & <span className="text-[#E31E24] font-black opacity-90">SHIFT KERJA</span>
-              </h2>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-             <Button 
-                onClick={() => toast.info("Fitur Bulk Assign akan segera hadir!")}
-                className="h-10 px-6 rounded-xl bg-[#E31E24] text-white font-bold text-[10px] uppercase tracking-widest hover:bg-[#C1181E] shadow-neu shadow-neu/20 flex gap-3 items-center transition-all hover:translate-y-[-1px]"
-              >
-                <IconWand size={14} />
-                BULK ASSIGN
-              </Button>
-          </div>
-        </div>
+        {/* Header removed as per Phase 2 Audit (redundant with breadcrumb) */}
 
         {/* CONTROL CENTER */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white/60 p-2.5 rounded-2xl border border-white shadow-neu backdrop-blur-sm">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-2.5 rounded-2xl border border-white shadow-sm ">
             {/* Month Selector */}
-            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 relative group">
+            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24] relative group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
                <IconCalendarStats size={14} className="text-[#E31E24]" />
                <div className="flex flex-col flex-1">
-                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Pilih Bulan</span>
+                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Pilih Bulan</span>
                   <div className="relative flex items-center">
                     <input 
                       type="month" 
                       value={selectedMonth}
                       onChange={(e) => handleMonthChange(e.target.value)}
-                      className="bg-transparent border-none text-slate-800 font-black text-[10px] uppercase focus:outline-none cursor-pointer p-0 w-full appearance-none pr-6 z-10"
+                      className="bg-transparent border-none text-slate-800 font-black text-xs uppercase focus:outline-none cursor-pointer p-0 w-full appearance-none pr-6 z-10"
                     />
                     <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-[#E31E24] transition-all" />
                   </div>
@@ -174,51 +148,69 @@ const ScheduleManager = () => {
             </div>
 
             {/* Search Input */}
-            <div className="md:col-span-5 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-neu group">
+            <div className="md:col-span-5 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]  group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
                 <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
                 <div className="flex flex-col flex-1">
-                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Cari Karyawan</span>
+                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Cari Karyawan</span>
                   <input 
                       type="text" 
                       placeholder="NAMA, ID KARYAWAN..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-transparent border-none w-full text-[10px] font-black text-slate-700 placeholder:text-slate-200 focus:outline-none uppercase tracking-widest p-0"
+                      className="bg-transparent border-none w-full text-xs font-black text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
                   />
                 </div>
             </div>
 
-            {/* Legend / Information */}
-            <div className="md:col-span-4 flex items-center justify-between px-5 py-2 rounded-xl bg-[#f0f2f5] shadow-neu-inset border-none shadow-inner">
-                <div className="flex flex-col">
-                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1">Informasi Total</span>
-                  <p className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
+            {/* Legend & Actions */}
+            <div className="md:col-span-4 flex gap-2">
+                <div className="flex-1 flex flex-col justify-center px-4 py-2 rounded-xl bg-white shadow-sm border-none">
+                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Informasi Total</span>
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-tighter truncate">
                     {filteredEmployees.length} Karyawan Aktif
                   </p>
                 </div>
-                <IconFilter size={16} className="text-slate-200" />
+                <Button 
+                  onClick={() => toast.info("Fitur Bulk Assign akan segera hadir!")}
+                  className="h-full px-4 rounded-xl bg-[#E31E24] text-white hover:bg-[#C1181E] shadow-sm flex flex-col justify-center items-center gap-1 transition-all active:scale-95 shrink-0"
+                  data-tooltip="Bulk Assign"
+                >
+                  <IconWand size={14} />
+                  <span className="text-[11px] font-bold tracking-widest uppercase">Assign</span>
+                </Button>
             </div>
         </div>
 
         {/* SCHEDULE GRID */}
-        <div className="bg-transparent rounded-3xl border border-white/50 shadow-neu overflow-hidden">
+        <div className="bg-transparent rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto relative">
             {loading ? (
-              <div className="p-20 text-center flex flex-col items-center justify-center gap-4">
-                <IconClock className="animate-spin text-slate-300" size={32} />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Memuat jadwal...</span>
+              <div className="p-10">
+                <div className="animate-pulse flex flex-col gap-4">
+                  {Array(5).fill(0).map((_, idx) => (
+                    <div key={idx} className="flex gap-4 items-center">
+                      <div className="h-10 bg-slate-200 rounded w-48"></div>
+                      <div className="flex-1 flex gap-2">
+                        {Array(7).fill(0).map((_, i) => (
+                          <div key={i} className="h-10 bg-slate-100 rounded flex-1"></div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
-              <table className="w-full text-left border-collapse min-w-max">
+              <div className="overflow-x-auto custom-scrollbar w-full">
+<table className="w-full text-left border-collapse min-w-max">
                 <thead>
-                  <tr className="bg-slate-50/80 border-b border-white/50/60 backdrop-blur-md">
-                    <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] sticky left-0 z-10 bg-slate-50/90 w-64 shadow-neu border-r border-white/50/60">
+                  <tr className="bg-slate-50/80 border-b border-slate-200/60 ">
+                    <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider sticky left-0 z-10 bg-slate-50/90 w-64 shadow-sm border-r border-slate-200/60">
                       Karyawan
                     </th>
                     {dateList.map((d, i) => (
-                      <th key={i} className="px-3 py-4 text-center border-r border-white/50 min-w-[50px]">
+                      <th key={i} className="px-3 py-4 text-center border-r border-slate-200 min-w-[50px]">
                         <div className="flex flex-col items-center">
-                          <span className={`text-[8px] font-bold uppercase tracking-widest ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-400' : 'text-slate-400'}`}>
+                          <span className={`text-[11px] font-bold uppercase tracking-widest ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-400' : 'text-slate-400'}`}>
                             {d.toLocaleDateString('id-ID', { weekday: 'short' })}
                           </span>
                           <span className={`text-[11px] font-black ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-500' : 'text-slate-700'}`}>
@@ -232,17 +224,21 @@ const ScheduleManager = () => {
                 <tbody className="divide-y divide-slate-50 text-xs">
                   {filteredEmployees.length === 0 ? (
                     <tr>
-                      <td colSpan={dateList.length + 1} className="py-20 text-center text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                        Tidak ada data karyawan
+                      <td colSpan={dateList.length + 1} className="py-24">
+                         <EmptyState 
+                            icon={IconFileText}
+                            data-tooltip="Tidak Ada Data"
+                            description="Silakan sesuaikan filter pencarian Anda."
+                         />
                       </td>
                     </tr>
                   ) : (
                     filteredEmployees.map((emp) => (
-                      <tr key={emp['EMPLOYEE ID']} className="hover:shadow-neu-inset/50 transition-colors group">
-                        <td className="px-6 py-3 sticky left-0 z-10 bg-transparent group-hover:shadow-neu-inset shadow-neu border-r border-white/50">
+                      <tr key={emp['EMPLOYEE ID']} className="transition-colors group hover:bg-slate-50 transition-colors cursor-pointer">
+                        <td className="px-6 py-3 sticky left-0 z-10 bg-transparent group-hover:shadow-sm shadow-sm border-r border-slate-200">
                           <div className="flex flex-col">
                             <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate w-56">{emp['EMPLOYEE NAME']}</span>
-                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{emp['EMPLOYEE ID']} &bull; {emp['JOB POSITION']}</span>
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{emp['EMPLOYEE ID']} &bull; {emp['JOB POSITION']}</span>
                           </div>
                         </td>
                         {dateList.map((d, i) => {
@@ -262,10 +258,10 @@ const ScheduleManager = () => {
                                   }}
                                   title={`${shift.name} (${shift.time_in?.substring(0,5)} - ${shift.time_out?.substring(0,5)})`}
                                 >
-                                  <span className="text-[9px] font-black text-slate-800">{shift.code}</span>
+                                  <span className="text-xs font-black text-slate-800">{shift.code}</span>
                                 </div>
                               ) : (
-                                <div className="mx-auto w-[40px] h-[30px] rounded flex items-center justify-center border border-dashed border-white/50 text-slate-300 hover:border-[#E31E24]/40 hover:text-[#E31E24] cursor-pointer transition-colors bg-transparent">
+                                <div className="mx-auto w-[40px] h-[30px] rounded flex items-center justify-center border border-dashed border-slate-200 text-slate-300 hover:border-[#E31E24]/40 hover:text-[#E31E24] cursor-pointer transition-colors bg-transparent">
                                   <IconEdit size={12} />
                                 </div>
                               )}
@@ -277,6 +273,7 @@ const ScheduleManager = () => {
                   )}
                 </tbody>
               </table>
+</div>
             )}
           </div>
         </div>

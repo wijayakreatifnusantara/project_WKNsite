@@ -85,28 +85,28 @@ export default function PayslipTemplateBuilder() {
   };
 
   if (loading) {
-    return <div className="flex-1 flex items-center justify-center bg-[#f0f2f5]"><p className="text-[#F97316] font-bold animate-pulse">Memuat Template...</p></div>;
+    return <div className="flex-1 flex items-center justify-center bg-white"><p className="text-[#F97316] font-bold animate-pulse">Memuat Template...</p></div>;
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#f0f2f5] animate-fade-in">
-      <header className="h-20 bg-[#f0f2f5] border-b border-white/50 flex items-center justify-between px-10 shrink-0 z-10">
+    <div className="flex-1 flex flex-col overflow-hidden bg-white animate-fade-in">
+      <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-10">
         <div>
           <h2 className="text-xl font-black text-slate-800 uppercase">Payslip Template Builder</h2>
-          <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Desain Kop Surat & Format Slip Gaji</p>
+          <p className="text-xs text-slate-400 font-bold uppercase mt-1">Desain Kop Surat & Format Slip Gaji</p>
         </div>
         <div className="flex gap-4">
           <Button 
             variant="outline" 
             onClick={() => setPreviewMode(!previewMode)}
-            className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-neu border-white text-slate-600 font-black uppercase text-[10px]"
+            className="h-12 px-6 rounded-2xl bg-white shadow-sm border-white text-slate-600 font-black uppercase text-xs"
           >
             {previewMode ? <><IconBrush size={18} className="mr-2"/> Edit Mode</> : <><IconEye size={18} className="mr-2"/> Preview PDF</>}
           </Button>
           <Button 
             onClick={handleSave}
             disabled={saving}
-            className="h-12 px-6 rounded-2xl bg-[#F97316] hover:bg-[#EA580C] text-white font-black text-[10px] uppercase shadow-neu disabled:opacity-50"
+            className="h-12 px-6 rounded-2xl bg-[#F97316] hover:bg-[#EA580C] text-white font-black text-xs uppercase shadow-sm disabled:opacity-50"
           >
             <IconDeviceFloppy size={18} className="mr-2" /> {saving ? 'Menyimpan...' : 'Simpan Template'}
           </Button>
@@ -118,50 +118,50 @@ export default function PayslipTemplateBuilder() {
         {/* Editor Sidebar */}
         {!previewMode && (
           <div className="w-[400px] shrink-0 space-y-6">
-            <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
+            <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
               <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6">Kop Surat (Header)</CardTitle>
               
               <div className="space-y-5">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Logo Perusahaan</label>
-                  <div className="border-2 border-dashed border-white/20 rounded-xl p-4 flex flex-col items-center justify-center bg-white/50 relative overflow-hidden">
+                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Logo Perusahaan</label>
+                  <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center bg-white/50 relative overflow-hidden">
                     {template.headerLogo ? (
                       <img src={template.headerLogo} alt="Logo" className="max-h-20 object-contain" />
                     ) : (
                       <>
                         <IconUpload className="text-slate-400 mb-2" size={24} />
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">Upload Logo / Kop Surat</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase">Upload Logo / Kop Surat</span>
                       </>
                     )}
-                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleLogoUpload} />
+                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" onChange={handleLogoUpload} />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Nama Perusahaan</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Nama Perusahaan</label>
                   <input 
                     type="text" 
                     value={template.companyName}
                     onChange={(e) => setTemplate(prev => ({ ...prev, companyName: e.target.value }))}
-                    className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu rounded-xl text-sm font-bold text-slate-700 outline-none"
+                    className="w-full h-12 px-4 bg-white shadow-sm rounded-xl text-sm font-bold text-slate-700 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Alamat Perusahaan (Opsional)</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Alamat Perusahaan (Opsional)</label>
                   <textarea 
                     value={template.addressText}
                     onChange={(e) => setTemplate(prev => ({ ...prev, addressText: e.target.value }))}
-                    className="w-full h-24 p-4 bg-[#f0f2f5] shadow-neu rounded-xl text-xs font-medium text-slate-700 outline-none resize-none"
+                    className="w-full h-24 p-4 bg-white shadow-sm rounded-xl text-xs font-medium text-slate-700 outline-none resize-none"
                   />
                 </div>
               </div>
             </Card>
 
-            <Card className="border-white border-2 shadow-neu bg-[#f0f2f5] rounded-3xl p-6">
+            <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
               <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6">Warna & Tema</CardTitle>
               <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">Warna Aksen Utama</label>
+                <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Warna Aksen Utama</label>
                 <div className="flex gap-4 items-center">
                   <input 
                     type="color" 
@@ -178,7 +178,7 @@ export default function PayslipTemplateBuilder() {
 
         {/* Live Preview Pane */}
         <div className="flex-1 flex justify-center">
-          <div className="w-[600px] bg-transparent shadow-neu rounded-sm p-12 overflow-y-auto" style={{ height: '800px', transform: previewMode ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }}>
+          <div className="w-[600px] bg-transparent shadow-sm rounded-sm p-12 overflow-y-auto" style={{ height: '800px', transform: previewMode ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }}>
             
             {/* Template Header / Kop Surat */}
             <div className="border-b-2 pb-6 mb-8 text-center" style={{ borderColor: template.primaryColor }}>
@@ -241,7 +241,7 @@ export default function PayslipTemplateBuilder() {
             </div>
 
             {template.watermarkEnabled && (
-              <div className="mt-16 text-center text-[9px] text-slate-400">
+              <div className="mt-16 text-center text-xs text-slate-400">
                 <p>Dokumen ini dihasilkan secara otomatis oleh sistem WKNsite dan sah tanpa tanda tangan basah.</p>
                 <p className="mt-1">Diunduh oleh: John Doe pada Rabu, 27 Mei 2026 14:30:00</p>
               </div>

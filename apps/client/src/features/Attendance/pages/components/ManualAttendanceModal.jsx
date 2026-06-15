@@ -65,11 +65,11 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-md bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] p-8 relative overflow-hidden">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="w-full max-w-md bg-white border-white border-[4px] shadow-sm rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-[#E31E24] transition-all"
         >
           <IconX size={20} />
         </button>
@@ -79,13 +79,13 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
             <IconClock size={24} className="text-[#E31E24]" />
             Manual Attendance
           </h3>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Administrative Correction Override</p>
+          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Administrative Correction Override</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Employee Selection */}
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
               <IconUser size={12} />
               Select Personnel
             </label>
@@ -93,7 +93,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
               required
               value={formData.employee_id}
               onChange={(e) => setFormData({...formData, employee_id: e.target.value})}
-              className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
+              className="w-full h-12 px-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
             >
               <option value="">Choose Employee...</option>
               {employees.map(emp => (
@@ -105,7 +105,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="grid grid-cols-2 gap-4">
             {/* Date Selection */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
                 <IconCalendar size={12} />
                 Date
               </label>
@@ -114,20 +114,20 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.date}
                 onChange={(e) => setFormData({...formData, date: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+                className="w-full h-12 px-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
               />
             </div>
 
             {/* Status Selection */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
                 <IconCheck size={12} />
                 Status
               </label>
               <select 
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
+                className="w-full h-12 px-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none appearance-none"
               >
                 <option>Present</option>
                 <option>Late</option>
@@ -141,33 +141,33 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="grid grid-cols-2 gap-4">
             {/* Clock In */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
                 Clock In
               </label>
               <input 
                 type="time"
                 value={formData.clock_in}
                 onChange={(e) => setFormData({...formData, clock_in: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+                className="w-full h-12 px-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
               />
             </div>
             {/* Clock Out */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
                 Clock Out
               </label>
               <input 
                 type="time"
                 value={formData.clock_out}
                 onChange={(e) => setFormData({...formData, clock_out: e.target.value})}
-                className="w-full h-12 px-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+                className="w-full h-12 px-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
               <IconNote size={12} />
               Reason / Notes
             </label>
@@ -175,14 +175,14 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
               placeholder="Why is this manual entry being made?"
               value={formData.notes}
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
-              className="w-full h-24 p-4 bg-[#f0f2f5] shadow-neu border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none resize-none placeholder:text-slate-300"
+              className="w-full h-24 p-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-700 focus:outline-none resize-none placeholder:text-slate-300"
             />
           </div>
 
           <Button 
             type="submit"
             disabled={loading}
-            className="w-full h-14 mt-4 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-[0.2em] shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
+            className="w-full h-14 mt-4 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-wider shadow-sm hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
           >
             {loading ? 'Processing...' : 'Authorize Manual Entry'}
           </Button>

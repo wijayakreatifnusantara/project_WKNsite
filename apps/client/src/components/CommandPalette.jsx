@@ -112,7 +112,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           />
           <button 
             onClick={onClose}
-            className="text-[10px] font-bold text-slate-400 border border-white/20 bg-transparent px-2 py-1 rounded-md ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="text-xs font-bold text-slate-400 border border-white/20 bg-transparent px-2 py-1 rounded-md ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           >
             ESC
           </button>
@@ -135,7 +135,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                 }, {})
               ).map(([group, items]) => (
                 <div key={group} className="mb-4 last:mb-0">
-                  <h3 className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  <h3 className="px-3 text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
                     {group}
                   </h3>
                   <div className="space-y-1">
@@ -162,7 +162,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                             {item.title}
                           </span>
                           {isSelected && (
-                            <span className="ml-auto text-[10px] font-bold text-[#E31E24]/70 mr-2 flex items-center gap-1">
+                            <span className="ml-auto text-xs font-bold text-[#E31E24]/70 mr-2 flex items-center gap-1">
                               <span className="border border-[#E31E24]/30 bg-[#E31E24]/10 px-1.5 py-0.5 rounded">Enter</span> untuk buka
                             </span>
                           )}
@@ -177,7 +177,7 @@ export default function CommandPalette({ isOpen, onClose }) {
         </div>
         
         {/* Footer */}
-        <div className="bg-slate-50 px-4 py-3 border-t border-white/20 flex items-center justify-between text-[10px] font-medium text-slate-500">
+        <div className="bg-slate-50 px-4 py-3 border-t border-white/20 flex items-center justify-between text-xs font-medium text-slate-500">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">↑</span>

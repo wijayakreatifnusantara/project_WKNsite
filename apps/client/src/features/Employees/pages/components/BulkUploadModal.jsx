@@ -149,24 +149,24 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-[460px] bg-transparent border border-white/50 rounded-2xl shadow-neu overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
+        className="w-full max-w-[460px] bg-transparent border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="h-16 bg-transparent border-b border-white/50 flex items-center justify-between px-6 shrink-0">
+        <header className="h-16 bg-transparent border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
               <IconFileUpload size={18} />
             </div>
             <div>
               <h2 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-none">Impor Massal Karyawan</h2>
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sinkronisasi Data Massal</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sinkronisasi Data Massal</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="h-8 w-8 flex items-center justify-center bg-transparent border border-white/50 rounded-lg text-slate-400 hover:text-[#E31E24] hover:shadow-neu-inset transition-all shadow-neu"
+            className="h-8 w-8 flex items-center justify-center bg-transparent border border-slate-200 rounded-lg text-slate-400 hover:text-[#E31E24] hover:shadow-sm transition-all shadow-sm"
           >
             <IconX size={16} />
           </button>
@@ -180,7 +180,7 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">Impor Berhasil</p>
-                <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mt-1">{progress.total} Data Karyawan Diproses</p>
+                <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mt-1">{progress.total} Data Karyawan Diproses</p>
               </div>
             </div>
           ) : loading ? (
@@ -188,17 +188,17 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
               <div className="relative">
                 <IconLoader2 size={48} className="text-[#E31E24] animate-spin" strokeWidth={1.5} />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[9px] font-bold text-slate-500">{Math.round((progress.current / progress.total) * 100)}%</span>
+                  <span className="text-xs font-bold text-slate-500">{Math.round((progress.current / progress.total) * 100)}%</span>
                 </div>
               </div>
               <div className="w-full space-y-2">
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-white/50/50">
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
                   <div 
                     className="h-full bg-[#E31E24] transition-all duration-300" 
                     style={{ width: `${(progress.current / progress.total) * 100}%` }}
                   ></div>
                 </div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Mengimpor: <span className="text-[#E31E24] font-mono">{progress.current}</span> / {progress.total} Data
                 </p>
               </div>
@@ -208,12 +208,12 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
               <div className="w-full">
                 <div 
                   onClick={() => document.getElementById('bulk-upload-input').click()}
-                  className="w-full aspect-video bg-slate-55/40 hover:bg-red-50/10 border-2 border-dashed border-white/50 hover:border-[#E31E24]/30 rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group"
+                  className="w-full aspect-video bg-slate-55/40 hover:bg-red-50/10 border-2 border-dashed border-slate-200 hover:border-[#E31E24]/30 rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group"
                 >
                   <IconFileSpreadsheet size={40} className="text-slate-300 group-hover:text-[#E31E24] transition-colors" strokeWidth={1.2} />
                   <div>
-                    <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">Drop Excel File or Click</p>
-                    <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Supports .xlsx, .xls, .csv</p>
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Drop Excel File or Click</p>
+                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Supports .xlsx, .xls, .csv</p>
                   </div>
                   <input 
                     id="bulk-upload-input" 
@@ -227,20 +227,20 @@ const BulkUploadModal = ({ isOpen, onClose, onRefresh }) => {
                 {error && (
                   <div className="flex items-center gap-3 p-3 bg-rose-50 border border-rose-100 rounded-xl mt-4 animate-in slide-in-from-top-2">
                     <IconAlertTriangle size={16} className="text-[#E31E24] shrink-0" />
-                    <p className="text-[9px] font-bold text-rose-600 text-left leading-relaxed">{error}</p>
+                    <p className="text-xs font-bold text-rose-600 text-left leading-relaxed">{error}</p>
                   </div>
                 )}
               </div>
 
-              <div className="w-full pt-6 border-t border-white/50 flex flex-col gap-4">
+              <div className="w-full pt-6 border-t border-slate-200 flex flex-col gap-4">
                 <button 
                   onClick={downloadTemplate}
-                  className="w-full h-10 flex items-center justify-center gap-2 bg-transparent border border-white/50 rounded-lg text-slate-650 hover:text-[#E31E24] hover:shadow-neu-inset transition-all shadow-neu group"
+                  className="w-full h-10 flex items-center justify-center gap-2 bg-transparent border border-slate-200 rounded-lg text-slate-650 hover:text-[#E31E24] hover:shadow-sm transition-all shadow-sm group"
                 >
                   <IconDownload size={14} className="group-hover:bounce text-slate-400 group-hover:text-[#E31E24]" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">Download Data Template</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">Download Data Template</span>
                 </button>
-                <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest leading-normal">
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-normal">
                   Gunakan template resmi untuk keselarasan data.<br/>Penghasilan ID otomatis jika dikosongkan.
                 </p>
               </div>

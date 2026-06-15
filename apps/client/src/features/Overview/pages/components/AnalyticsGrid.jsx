@@ -45,14 +45,14 @@ const AnalyticsGrid = ({ employees }) => {
     <div className="grid grid-cols-12 gap-4">
       
       {/* 1. Headcount Distribution by Department */}
-      <Card className="col-span-12 md:col-span-4 border-white border-[4px] shadow-neu bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
-        <CardHeader className="px-6 py-4 border-b border-white/50 flex flex-row items-center gap-3">
-          <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
+      <Card className="col-span-12 md:col-span-4 border-white border-[4px] shadow-sm bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="px-6 py-4 border-b border-slate-200 flex flex-row items-center gap-3">
+          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
             <IconChartPie size={20} />
           </div>
           <div>
             <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Division Distribution</CardTitle>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Top 5 Departments</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Top 5 Departments</p>
           </div>
         </CardHeader>
         <CardContent className="p-4 h-64 flex items-center">
@@ -88,14 +88,14 @@ const AnalyticsGrid = ({ employees }) => {
       </Card>
 
       {/* 2. Workforce Mutation Trends */}
-      <Card className="col-span-12 md:col-span-8 border-white border-[4px] shadow-neu bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
-        <CardHeader className="px-6 py-4 border-b border-white/50 flex flex-row items-center gap-3">
-          <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
+      <Card className="col-span-12 md:col-span-8 border-white border-[4px] shadow-sm bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="px-6 py-4 border-b border-slate-200 flex flex-row items-center gap-3">
+          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
             <IconChartAreaLine size={20} />
           </div>
           <div>
             <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Workforce Mutation Trends</CardTitle>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Monthly Hired vs Resigned</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Monthly Hired vs Resigned</p>
           </div>
         </CardHeader>
         <CardContent className="p-4 h-64">
@@ -131,14 +131,14 @@ const AnalyticsGrid = ({ employees }) => {
       </Card>
 
       {/* 3. Employment Status Bar Chart */}
-      <Card className="col-span-12 border-white border-[4px] shadow-neu bg-[#f0f2f5] rounded-[2rem] overflow-hidden">
-        <CardHeader className="px-6 py-4 border-b border-white/50 flex flex-row items-center gap-3">
-          <div className="h-10 w-10 bg-[#f0f2f5] shadow-neu rounded-xl flex items-center justify-center text-[#E31E24]">
+      <Card className="col-span-12 border-white border-[4px] shadow-sm bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="px-6 py-4 border-b border-slate-200 flex flex-row items-center gap-3">
+          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
             <IconChartBar size={20} />
           </div>
           <div>
             <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Workforce Status Distribution</CardTitle>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Aggregated by Contract Type</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Aggregated by Contract Type</p>
           </div>
         </CardHeader>
         <CardContent className="p-6 h-72">
@@ -161,7 +161,7 @@ const AnalyticsGrid = ({ employees }) => {
                 fill="#E31E24" 
                 radius={[0, 10, 10, 0]} 
                 barSize={40} 
-                className="shadow-neu"
+                className="shadow-sm"
               />
             </BarChart>
           </ResponsiveContainer>

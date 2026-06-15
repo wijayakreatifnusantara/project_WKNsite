@@ -26,7 +26,7 @@ const ErrorFallback = ({ error, resetError }) => {
           <h1 className="text-xl font-black text-slate-800 tracking-tight uppercase leading-none">
             System Exception Intercepted
           </h1>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em]">
+          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.25em]">
             Application Crash Isolated & Reported
           </p>
         </div>
@@ -37,7 +37,7 @@ const ErrorFallback = ({ error, resetError }) => {
         </p>
 
         {/* Error Message Box */}
-        <div className="p-4 bg-slate-50 border border-white/20 rounded-2xl text-left font-mono text-[9px] font-bold text-slate-600 break-all select-all flex items-start gap-2.5">
+        <div className="p-4 bg-slate-50 border border-white/20 rounded-2xl text-left font-mono text-xs font-bold text-slate-600 break-all select-all flex items-start gap-2.5">
           <IconTerminal size={14} className="text-[#E31E24] mt-0.5 shrink-0" />
           <span>{error?.message || "Unknown Application Exception"}</span>
         </div>
@@ -45,7 +45,7 @@ const ErrorFallback = ({ error, resetError }) => {
         {/* Control Button */}
         <Button
           onClick={handleReload}
-          className="w-full h-11 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-neu transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          className="w-full h-11 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-neu transition-all active:scale-[0.98] flex items-center justify-center gap-2"
         >
           <IconRefresh size={14} />
           Reload Application
@@ -55,7 +55,7 @@ const ErrorFallback = ({ error, resetError }) => {
         <div className="pt-2 border-t border-white/20">
           <button
             onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center justify-center gap-1.5 mx-auto text-[8px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-all"
+            className="flex items-center justify-center gap-1.5 mx-auto text-[11px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-all"
           >
             {showDetails ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />}
             {showDetails ? "Hide Exception Trace" : "Show Exception Trace"}
@@ -63,7 +63,7 @@ const ErrorFallback = ({ error, resetError }) => {
 
           {showDetails && error?.stack && (
             <div className="mt-3 text-left p-3.5 bg-slate-900 border border-slate-800 rounded-xl max-h-48 overflow-y-auto custom-scrollbar shadow-inner animate-in slide-in-from-top-2 duration-200">
-              <pre className="font-mono text-[8px] text-emerald-400/90 whitespace-pre-wrap leading-normal selection:bg-slate-700">
+              <pre className="font-mono text-[11px] text-emerald-400/90 whitespace-pre-wrap leading-normal selection:bg-slate-700">
                 {error.stack}
               </pre>
             </div>

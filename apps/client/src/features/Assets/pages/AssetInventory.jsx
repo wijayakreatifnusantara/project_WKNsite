@@ -64,19 +64,19 @@ const AssetInventory = () => {
             <h2 className="text-2xl font-black text-slate-800 font-outfit tracking-tight uppercase">
               Asset <span className="text-[#E31E24]">Tracking Hub</span>
             </h2>
-            <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Infrastructure & Inventory Lifecycle</p>
+            <p className="text-slate-400 text-xs mt-1 font-black uppercase tracking-[0.3em] opacity-70">Infrastructure & Inventory Lifecycle</p>
           </div>
           <div className="flex gap-4">
             <Button 
               onClick={() => setIsScannerOpen(true)}
-              className="h-12 px-6 rounded-2xl bg-[#f0f2f5] shadow-neu border-white border-2 text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all flex gap-3 items-center"
+              className="h-12 px-6 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-600 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all flex gap-3 items-center"
             >
               <IconCamera size={16} className="text-[#E31E24]" />
               Scan Asset QR
             </Button>
             <Button 
               onClick={() => setIsFormOpen(true)}
-              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center"
+              className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-3 items-center"
             >
               <IconPlus size={16} />
               Add New Asset
@@ -87,14 +87,14 @@ const AssetInventory = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat, i) => (
-            <Card key={i} className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6">
+            <Card key={i} className="border-white border-[2px] shadow-sm bg-white rounded-xl p-6">
               <div className="flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
+                <div className={`h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center
                   ${stat.color === 'emerald' ? 'text-emerald-500' : stat.color === 'indigo' ? 'text-indigo-500' : 'text-slate-500'}`}>
                   {stat.icon}
                 </div>
                 <div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
                   <h3 className="text-xl font-black text-slate-800 font-outfit">{stat.value}</h3>
                 </div>
               </div>
@@ -111,7 +111,7 @@ const AssetInventory = () => {
               placeholder="Search by Tag or Asset Name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-14 pl-12 pr-6 bg-[#f0f2f5] shadow-neu border-none rounded-2xl text-xs font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
+              className="w-full h-14 pl-12 pr-6 bg-white shadow-sm border-none rounded-2xl text-xs font-black text-slate-800 focus:outline-none placeholder:text-slate-300 uppercase tracking-widest"
             />
           </div>
           <div className="flex gap-2">
@@ -119,10 +119,10 @@ const AssetInventory = () => {
               <button
                 key={status}
                 onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
-                className={`px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all
+                className={`px-6 rounded-2xl text-xs font-black uppercase tracking-widest transition-all
                   ${selectedStatus === status 
-                    ? 'bg-[#E31E24] text-white shadow-neu' 
-                    : 'bg-[#f0f2f5] shadow-neu text-slate-500 hover:shadow-none'}`}
+                    ? 'bg-[#E31E24] text-white shadow-sm' 
+                    : 'bg-white shadow-sm text-slate-500 hover:shadow-none'}`}
               >
                 {status}
               </button>
@@ -193,27 +193,27 @@ const AssetCard = ({ asset, onAssign, onReturn, onHistory, onQR }) => {
   };
 
   return (
-    <Card className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2rem] p-6 group hover:scale-[1.02] transition-all relative overflow-hidden">
+    <Card className="border-white border-[3px] shadow-sm bg-white rounded-2xl p-6 group hover:scale-[1.02] transition-all relative overflow-hidden">
       <div className="flex justify-between items-start mb-6">
-        <div className="h-14 w-14 bg-[#f0f2f5] rounded-2xl shadow-neu flex items-center justify-center text-[#E31E24]">
+        <div className="h-14 w-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#E31E24]">
           {getCategoryIcon(asset.category)}
         </div>
         <div className="flex gap-1.5">
           <button 
             onClick={onHistory}
-            className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
-            title="Assignment History"
+            className="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
+            data-tooltip="Assignment History"
           >
             <IconHistory size={16} />
           </button>
           <button 
             onClick={onQR}
-            className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
-            title="View QR Label"
+            className="h-8 w-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all"
+            data-tooltip="View QR Label"
           >
             <IconQrcode size={16} />
           </button>
-          <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-neu
+          <div className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm
             ${asset.status === 'Available' ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'}`}>
             {asset.status}
           </div>
@@ -224,20 +224,20 @@ const AssetCard = ({ asset, onAssign, onReturn, onHistory, onQR }) => {
       <div className="space-y-1 mb-6">
         <div className="flex items-center gap-2">
           <IconQrcode size={12} className="text-slate-300" />
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{asset.asset_tag}</span>
+          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{asset.asset_tag}</span>
         </div>
         <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight line-clamp-1">{asset.name}</h4>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{asset.serial_number || 'No Serial'}</p>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{asset.serial_number || 'No Serial'}</p>
       </div>
 
       {asset.status === 'Assigned' && (
-        <div className="p-3 rounded-xl bg-white/40 border border-white/50 mb-6 animate-in slide-in-from-bottom-2 duration-300">
-          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Current Holder</p>
+        <div className="p-3 rounded-xl bg-white/40 border border-slate-200 mb-6 animate-in slide-in-from-bottom-2 duration-300">
+          <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Current Holder</p>
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-[#E31E24] flex items-center justify-center text-[8px] font-black text-white">
+            <div className="h-6 w-6 rounded-full bg-[#E31E24] flex items-center justify-center text-[11px] font-black text-white">
               {asset.employees?.name?.charAt(0)}
             </div>
-            <span className="text-[10px] font-black text-slate-700 uppercase tracking-tight">{asset.employees?.name}</span>
+            <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{asset.employees?.name}</span>
           </div>
         </div>
       )}
@@ -246,7 +246,7 @@ const AssetCard = ({ asset, onAssign, onReturn, onHistory, onQR }) => {
         {asset.status === 'Available' ? (
           <Button 
             onClick={onAssign}
-            className="flex-1 h-10 rounded-xl bg-[#f0f2f5] shadow-neu text-[#E31E24] font-black text-[9px] uppercase tracking-widest hover:shadow-none transition-all flex gap-2 items-center justify-center"
+            className="flex-1 h-10 rounded-xl bg-white shadow-sm text-[#E31E24] font-black text-xs uppercase tracking-widest hover:shadow-none transition-all flex gap-2 items-center justify-center"
           >
             <IconArrowsLeftRight size={14} />
             Assign
@@ -254,7 +254,7 @@ const AssetCard = ({ asset, onAssign, onReturn, onHistory, onQR }) => {
         ) : (
           <Button 
             onClick={onReturn}
-            className="flex-1 h-10 rounded-xl bg-slate-800 text-white font-black text-[9px] uppercase tracking-widest shadow-neu hover:bg-slate-900 transition-all flex gap-2 items-center justify-center"
+            className="flex-1 h-10 rounded-xl bg-slate-800 text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all flex gap-2 items-center justify-center"
           >
             <IconHistory size={14} />
             Return Asset

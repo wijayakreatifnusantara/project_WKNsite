@@ -51,7 +51,8 @@ import {
   IconEditCircle,
   IconClockPlay,
   IconPlus,
-  IconDatabase
+  IconDatabase,
+  IconStar
 } from "@tabler/icons-react";
 import { Card } from "@/components/ui/card";
 import { Clock, Users, CreditCard, Settings, Calendar, Bell } from "lucide-react";
@@ -76,6 +77,20 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
     if (isMobileViewport) return true;
     return localStorage.getItem('sidebar_collapsed') === 'true';
   });
+
+  const [activeNavGroup, setActiveNavGroup] = useState(null);
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('/master/')) setActiveNavGroup('Data Master');
+    else if (path.includes('/attendance/') || path.includes('/leave') || path.includes('/overtime')) setActiveNavGroup('Time & Attendance');
+    else if (path.includes('/employees/') || path.includes('/performance') || path.includes('/academy') || path.includes('/documents')) setActiveNavGroup('Core HR');
+    else if (path.includes('/finance') || path.includes('/payroll')) setActiveNavGroup('Finance & Payroll');
+    else if (path.includes('/assets') || path.includes('/crm') || path.includes('/recruitment')) setActiveNavGroup('Operations');
+    else if (path.includes('/company/announcements') || path.includes('/company/surveys') || path.includes('/company/wellness') || path.includes('/company/wiki')) setActiveNavGroup('Engagement & Komunikasi');
+    else if (path.includes('/company/')) setActiveNavGroup('Pengembangan Organisasi');
+    else if (path.includes('/reports/')) setActiveNavGroup('Data & Analytics');
+  }, [location.pathname]);
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => {
@@ -247,7 +262,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden font-inter animate-fade-in text-sm">
+    <div className="admin-dashboard-layout flex h-screen bg-background overflow-hidden font-inter animate-fade-in text-sm">
       {/* Sidebar Backdrop on Mobile */}
       {!isSidebarCollapsed && (
         <div 
@@ -265,9 +280,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
         <div className={`h-16 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-6 gap-3'}`}>
           <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
           {!isSidebarCollapsed && (
-            <div className="flex flex-col animate-fade-in">
-              <h1 className="font-outfit font-black text-base text-slate-800 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
-              <span className="text-[9px] font-bold text-slate-400 tracking-widest uppercase mt-0.5 whitespace-nowrap">Corporate Management System</span>
+            <div className="flex flex-col animate-fade-in min-w-0">
+              <h1 className="font-outfit font-black text-lg text-slate-800 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
+              <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 truncate">Corporate Management System</span>
             </div>
           )}
         </div>
@@ -279,8 +294,32 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <NavItem icon={<IconLayoutDashboard size={15} />} label="Overview" to="/overview" isCollapsed={isSidebarCollapsed} />
           </div>
 
+          {/* Quick Access / Favorites */}
+          <div className={`py-4 space-y-1 transition-all duration-300 ${isSidebarCollapsed ? 'hidden' : 'block'}`}>
+             <div className="px-6 mb-2 flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
+               <IconStar size={12} className="text-amber-400 fill-amber-400" />
+               <span>Quick Access</span>
+             </div>
+             {can(PERMISSIONS.VIEW_WORKFORCE) && (
+               <NavItem icon={<IconClock size={15} />} label="Log Kehadiran" to="/attendance/report" isCollapsed={isSidebarCollapsed} />
+             )}
+             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
+               <NavItem icon={<IconClipboardCheck size={15} />} label="Cuti & Izin" to="/leave" isCollapsed={isSidebarCollapsed} />
+             )}
+             {can(PERMISSIONS.VIEW_WORKFORCE) && (
+               <NavItem icon={<IconUsers size={15} />} label="Data Karyawan" to="/master/employees" isCollapsed={isSidebarCollapsed} />
+             )}
+          </div>
+
+          <div className="h-px bg-slate-100 mx-4 my-2"></div>
+
           {/* Data Master Group */}
-          <NavGroup label="Data Master" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Data Master" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Data Master'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Data Master' ? null : 'Data Master')}
+          >
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconUsers size={15} />} label="Database Karyawan" to="/master/employees" />
             )}
@@ -290,7 +329,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Time & Attendance Group */}
-          <NavGroup label="Time & Attendance" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Time & Attendance" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Time & Attendance'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Time & Attendance' ? null : 'Time & Attendance')}
+          >
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconClock size={15} />} label="Log Kehadiran" to="/attendance/report" />
             )}
@@ -318,7 +362,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Core HR Group */}
-          <NavGroup label="Core HR" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Core HR" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Core HR'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Core HR' ? null : 'Core HR')}
+          >
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconUserPlus size={15} />} label="Onboarding Karyawan" to="/employees/onboarding" />
             )}
@@ -337,7 +386,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Finance & Payroll Group */}
-          <NavGroup label="Finance & Payroll" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Finance & Payroll" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Finance & Payroll'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Finance & Payroll' ? null : 'Finance & Payroll')}
+          >
             {can(PERMISSIONS.MANAGE_PAYROLL) && (
               <NavItem icon={<IconReceipt size={15} />} label="Data Gaji Karyawan" to="/finance/salary" />
             )}
@@ -347,7 +401,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Operations Group */}
-          <NavGroup label="Operations" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Operations" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Operations'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Operations' ? null : 'Operations')}
+          >
             {can(PERMISSIONS.VIEW_CRM) && (
               <NavItem icon={<IconTrendingUp size={15} />} label="CRM Sales" to="/crm" />
             )}
@@ -363,7 +422,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Komunikasi & Engagement */}
-          <NavGroup label="Engagement & Komunikasi" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Engagement & Komunikasi" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Engagement & Komunikasi'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Engagement & Komunikasi' ? null : 'Engagement & Komunikasi')}
+          >
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconBell size={15} />} label="Pengumuman (News)" to="/company/announcements" />
             )}
@@ -385,7 +449,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Pengembangan Organisasi */}
-          <NavGroup label="Pengembangan Organisasi" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Pengembangan Organisasi" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Pengembangan Organisasi'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Pengembangan Organisasi' ? null : 'Pengembangan Organisasi')}
+          >
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconHierarchy2 size={15} />} label="Struktur Org" to="/company/org-chart" />
             )}
@@ -401,7 +470,12 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </NavGroup>
 
           {/* Data & Analytics */}
-          <NavGroup label="Data & Analytics" isCollapsed={isSidebarCollapsed}>
+          <NavGroup 
+            label="Data & Analytics" 
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={activeNavGroup === 'Data & Analytics'}
+            onToggle={() => setActiveNavGroup(activeNavGroup === 'Data & Analytics' ? null : 'Data & Analytics')}
+          >
             {can(PERMISSIONS.VIEW_WORKFORCE) && (
               <NavItem icon={<IconFileExport size={15} />} label="Report Builder" to="/reports/builder" />
             )}
@@ -419,13 +493,13 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <button 
             onClick={onLogout}
             title={isSidebarCollapsed ? "Sign Out Session" : undefined}
-            className={`flex items-center justify-center bg-slate-50 text-slate-600 font-semibold hover:bg-red-50 hover:text-[#E31E24] transition-colors group ${
+            className={`flex items-center justify-center bg-slate-50 text-slate-600 font-semibold hover:bg-red-50 hover:text-[#E31E24] active:scale-[0.96] transition-all duration-200 group ${
               isSidebarCollapsed 
                 ? 'w-10 h-10 rounded-lg mx-auto' 
                 : 'w-full h-11 gap-3 px-4 rounded-lg text-sm'
             }`}
           >
-            <IconPower size={18} className="text-slate-400 group-hover:text-[#E31E24] transition-colors" />
+            <IconPower size={18} className="text-slate-500 group-hover:text-[#E31E24] transition-colors" />
             {!isSidebarCollapsed && <span>Sign Out Session</span>}
           </button>
         </div>
@@ -439,7 +513,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               {/* Toggle Sidebar Button */}
               <button 
                 onClick={toggleSidebar}
-                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-[#E31E24] transition-colors select-none shrink-0"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-[#E31E24] active:scale-[0.92] transition-all duration-200 select-none shrink-0"
                 title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               >
                 <IconMenu2 size={18} />
@@ -457,18 +531,18 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                 {/* Minimalist Breadcrumbs */}
                 <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                   <span className="hover:text-[#E31E24] cursor-pointer transition-colors text-slate-700">WKNsite</span>
-                  <span className="text-slate-300">/</span>
+                  <span className="text-slate-400">/</span>
                   {getBreadcrumbs().map((part, index, arr) => (
                     <React.Fragment key={index}>
                       <span className={index === arr.length - 1 ? 'text-slate-800 font-bold' : ''}>{part}</span>
-                      {index < arr.length - 1 && <span className="text-slate-300">/</span>}
+                      {index < arr.length - 1 && <span className="text-slate-400">/</span>}
                     </React.Fragment>
                   ))}
                 </div>
                 {/* Clock directly under WKNsite */}
                 <div className="flex items-center gap-1.5 pl-0.5 mt-0.5">
                   <span className="text-xs text-slate-500">{formatDate(currentTime)}</span>
-                  <span className="text-slate-300 text-xs">•</span>
+                  <span className="text-slate-400 text-xs">•</span>
                   <span className="text-xs font-mono font-medium text-slate-600">{formatTime(currentTime)}</span>
                 </div>
               </div>
@@ -477,7 +551,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
               <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
                 <div className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">System Healthy</span>
+                <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">System Healthy</span>
               </div>
             </div>
           </div>
@@ -486,9 +560,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             {/* Visual Trigger for Command Palette */}
             <button 
               onClick={() => setIsCommandPaletteOpen(true)}
-              className="hidden lg:flex items-center w-full max-w-sm bg-slate-100 hover:bg-slate-200 transition-colors rounded-lg px-4 py-2 text-slate-500 group"
+              className="hidden lg:flex items-center w-full max-w-sm bg-slate-100 hover:bg-slate-200 active:scale-[0.98] transition-all duration-200 rounded-lg px-4 py-2 text-slate-500 group"
             >
-              <IconSearch size={16} className="text-slate-400 group-hover:text-slate-500 mr-2" />
+              <IconSearch size={16} className="text-slate-500 group-hover:text-slate-500 mr-2" />
               <span className="text-sm font-medium mr-auto text-slate-500">Cari menu, halaman, dsb...</span>
               <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 font-mono text-xs font-semibold text-slate-500 bg-white border border-slate-200 rounded-md">
                 <span>Ctrl</span>K
@@ -499,7 +573,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 bg-transparent p-1 relative" id="notification-container">
               <button 
-                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-lg transition-colors text-sm font-semibold shadow-sm"
+                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-lg active:scale-[0.96] hover:shadow-md transition-all duration-200 text-sm font-semibold shadow-sm"
                 title="Tindakan Cepat"
               >
                 <IconPlus size={16} />
@@ -508,14 +582,14 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               
               <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
-                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-slate-100 text-[#E31E24] transition-colors relative group"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-slate-100 text-[#E31E24] active:scale-[0.92] transition-all duration-200 relative group"
                 title="AI Diagnostics"
               >
                 <IconBrain size={18} />
               </button>
               <button 
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                className={`h-10 w-10 flex items-center justify-center rounded-lg transition-colors relative ${
+                className={`h-10 w-10 flex items-center justify-center rounded-lg active:scale-[0.92] transition-all duration-200 relative ${
                   isNotificationOpen ? 'bg-slate-200 text-[#E31E24]' : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
                 }`}
                 title="Notifications"
@@ -529,7 +603,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                 <div className="absolute top-14 right-0 w-80 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden animate-fade-in-down z-50">
                   <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Notifikasi</h3>
-                    <button className="text-[10px] font-bold text-slate-400 hover:text-[#E31E24]">Tandai Dibaca</button>
+                    <button className="text-xs font-bold text-slate-500 hover:text-[#E31E24]">Tandai Dibaca</button>
                   </div>
                   <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                     {notifications.map(notif => (
@@ -546,8 +620,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                           </div>
                           <div>
                             <h4 className={`text-[11px] font-bold ${!notif.isRead ? 'text-slate-800' : 'text-slate-600'}`}>{notif.title}</h4>
-                            <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">{notif.desc}</p>
-                            <span className="text-[9px] font-semibold text-slate-400 mt-1 block">{notif.time}</span>
+                            <p className="text-xs text-slate-500 mt-0.5 leading-snug">{notif.desc}</p>
+                            <span className="text-xs font-semibold text-slate-500 mt-1 block">{notif.time}</span>
                           </div>
                           {!notif.isRead && (
                             <div className="h-2 w-2 bg-[#E31E24] rounded-full shrink-0 mt-1"></div>
@@ -557,7 +631,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                     ))}
                   </div>
                   <div className="p-2 bg-slate-50 border-t border-white/20 text-center">
-                    <button className="text-[10px] font-bold text-[#E31E24] uppercase tracking-widest w-full py-1.5 hover:bg-[#E31E24]/10 rounded-lg transition-colors">
+                    <button className="text-xs font-bold text-[#E31E24] uppercase tracking-widest w-full py-1.5 hover:bg-[#E31E24]/10 rounded-lg transition-colors">
                       Lihat Semua
                     </button>
                   </div>
@@ -570,7 +644,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             <div className="relative" id="profile-container">
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-3 p-1.5 rounded-full transition-colors hover:bg-slate-100 border border-transparent hover:border-slate-200"
+                className="flex items-center gap-3 p-1.5 rounded-full active:scale-[0.98] transition-all duration-200 hover:bg-slate-100 border border-transparent hover:border-slate-200"
               >
                 <div className="hidden md:flex flex-col items-end pl-2">
                   <span className="text-sm font-semibold text-slate-800 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
@@ -590,11 +664,11 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                   </div>
                   <div className="p-2 space-y-1">
                     <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
-                      <IconId size={16} className="text-slate-400" />
+                      <IconId size={16} className="text-slate-500" />
                       My Profile
                     </button>
                     <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
-                      <IconSettings size={16} className="text-slate-400" />
+                      <IconSettings size={16} className="text-slate-500" />
                       Preferences
                     </button>
                     <button 
@@ -604,9 +678,9 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                       }}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors"
                     >
-                      <IconMoon size={16} className="text-slate-400" />
+                      <IconMoon size={16} className="text-slate-500" />
                       {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                      <span className="ml-auto text-[9px] font-bold bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded uppercase">New</span>
+                      <span className="ml-auto text-xs font-bold bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded uppercase">New</span>
                     </button>
                   </div>
                   <div className="p-2 border-t border-white/20">
@@ -635,9 +709,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   );
 };
 
-const NavGroup = ({ label, isCollapsed, children }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-
+const NavGroup = ({ label, isCollapsed, isExpanded, onToggle, children }) => {
   // Check if any of children exist (are visible based on permission checks)
   const hasVisibleChildren = React.Children.toArray(children).some(child => child !== null && child !== undefined && child !== false);
 
@@ -645,7 +717,7 @@ const NavGroup = ({ label, isCollapsed, children }) => {
 
   if (isCollapsed) {
     return (
-      <div className="py-2 border-t border-white/20/80 my-2 first:border-t-0 space-y-1">
+      <div className="py-2 border-t border-slate-100 my-2 first:border-t-0 space-y-1">
         {React.Children.map(children, child => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, { isCollapsed: true });
@@ -659,11 +731,11 @@ const NavGroup = ({ label, isCollapsed, children }) => {
   return (
     <div className="mb-2">
       <div 
-        className="px-6 py-3 flex items-center justify-between text-xs font-semibold text-slate-500 tracking-wider select-none cursor-pointer hover:text-slate-700 transition-colors group"
-        onClick={() => setIsExpanded(!isExpanded)}
+        className={`px-6 py-3 flex items-center justify-between text-xs font-semibold tracking-wider select-none cursor-pointer transition-colors group ${isExpanded ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+        onClick={onToggle}
       >
         <span>{label}</span>
-        <IconChevronRight size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} text-slate-300 group-hover:text-slate-500`} />
+        <IconChevronRight size={14} className={`transition-transform duration-200 ${isExpanded ? 'rotate-90 text-slate-500' : 'text-slate-400 group-hover:text-slate-500'}`} />
       </div>
       <div className={`space-y-0.5 overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
         {children}
@@ -690,7 +762,7 @@ const NavItem = ({ icon, label, to, isCollapsed, end = true }) => (
         {isActive && (
           <span className={`absolute bg-[#E31E24] rounded-r transition-all ${isCollapsed ? 'left-0 top-2 bottom-2 w-[3px]' : 'left-0 top-1.5 bottom-1.5 w-[3px]'}`} />
         )}
-        <span className={`transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-3 ${isActive ? 'text-[#E31E24]' : 'text-slate-400 group-hover:text-[#E31E24]'}`}>
+        <span className={`transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-3 ${isActive ? 'text-[#E31E24]' : 'text-slate-500 group-hover:text-[#E31E24]'}`}>
           {icon}
         </span>
         {!isCollapsed && <span className="animate-fade-in transition-transform duration-300 ease-out group-hover:translate-x-1">{label}</span>}

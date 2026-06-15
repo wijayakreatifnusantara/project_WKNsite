@@ -13,12 +13,12 @@ import { Card, CardContent } from "@/components/ui/card";
 // Placeholder for Job Titles / Positions
 const PositionsPlaceholder = () => (
   <div className="p-6 h-full flex items-center justify-center animate-fade-in">
-    <Card className="max-w-md w-full border border-white/50 bg-slate-50/50 shadow-neu rounded-2xl text-center p-8">
-      <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-4 shadow-neu-inset">
+    <Card className="max-w-md w-full border border-slate-200 bg-slate-50/50 shadow-sm rounded-2xl text-center p-8">
+      <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-4 shadow-sm">
         <IconBriefcase size={32} />
       </div>
       <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Manajemen Jabatan</h2>
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
         Modul ini sedang dalam tahap pengembangan. Nantinya Anda dapat mengatur tingkatan jabatan, eselon, dan benefit per jabatan dari halaman ini.
       </p>
     </Card>
@@ -28,12 +28,12 @@ const PositionsPlaceholder = () => (
 // Placeholder for Leave Types
 const LeaveTypesPlaceholder = () => (
   <div className="p-6 h-full flex items-center justify-center animate-fade-in">
-    <Card className="max-w-md w-full border border-white/50 bg-slate-50/50 shadow-neu rounded-2xl text-center p-8">
-      <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-4 shadow-neu-inset">
+    <Card className="max-w-md w-full border border-slate-200 bg-slate-50/50 shadow-sm rounded-2xl text-center p-8">
+      <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-4 shadow-sm">
         <IconCalendarCancel size={32} />
       </div>
       <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Tipe Cuti & Izin</h2>
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
         Modul ini sedang dalam tahap pengembangan. Nantinya Anda dapat menambah dan mengonfigurasi jenis cuti, jatah tahunan, dan aturan carry-over.
       </p>
     </Card>
@@ -53,29 +53,29 @@ const MasterDataHub = () => {
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-[#f8fafc] font-outfit animate-fade-in">
       {/* PREMIUM FLAT SUB-HEADER & TAB BAR */}
-      <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-white/50 z-10 shrink-0 shadow-neu">
+      <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-slate-200 z-10 shrink-0 shadow-sm">
         <div className="max-w-[1400px] mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white/50">
+            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
               <IconDatabase size={22} stroke={2.5} />
             </div>
             <div>
               <h1 className="text-lg font-black text-slate-800 tracking-tighter uppercase leading-none">Data Dictionary</h1>
-              <p className="text-[7px] font-black text-[#E31E24] uppercase tracking-[0.2em] mt-0.5 opacity-80">Unified Master Data</p>
+              <p className="text-[11px] font-black text-[#E31E24] uppercase tracking-wider mt-0.5 opacity-80">Unified Master Data</p>
             </div>
           </div>
 
           {/* Premium Flat Tab Selector */}
-          <div className="flex p-1 bg-slate-100/80 rounded-xl border border-white/50/60 overflow-x-auto no-scrollbar">
+          <div className="flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/60 overflow-x-auto no-scrollbar">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
                     isActive 
-                      ? 'bg-transparent shadow-neu border border-white/50/50 text-[#E31E24]' 
+                      ? 'bg-transparent shadow-sm border border-slate-200/50 text-[#E31E24]' 
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >

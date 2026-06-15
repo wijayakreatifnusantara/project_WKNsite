@@ -98,21 +98,21 @@ const LiveTracking = () => {
         
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Update Terakhir</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Update Terakhir</p>
             <p className="text-sm font-medium text-slate-700">{dayjs(lastUpdated).format('HH:mm:ss')}</p>
           </div>
           <button 
             onClick={() => { setLoading(true); fetchLocations(); }}
-            className="h-10 w-10 bg-transparent border border-white/50 rounded-xl flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-neu"
+            className="h-10 w-10 bg-transparent border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm"
           >
             <IconRefresh size={18} className={loading ? "animate-spin" : ""} />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 bg-transparent rounded-2xl shadow-neu border border-white/50 overflow-hidden relative">
+      <div className="flex-1 bg-transparent rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
         {loading && employees.length === 0 ? (
-          <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="absolute inset-0 z-10 bg-white/80  flex items-center justify-center">
             <IconRadar className="text-blue-600 animate-spin" size={48} />
           </div>
         ) : null}
@@ -134,7 +134,7 @@ const LiveTracking = () => {
                   <div className="p-1">
                     <h3 className="font-bold text-slate-800 text-sm">{emp.name}</h3>
                     <p className="text-xs text-slate-500 mb-2">{emp.job_position} • {emp.division_name}</p>
-                    <div className="flex items-center gap-1.5 text-[10px] bg-slate-50 p-2 rounded-md border border-white/50">
+                    <div className="flex items-center gap-1.5 text-xs bg-slate-50 p-2 rounded-md border border-slate-200">
                       <IconMapPin size={12} className="text-rose-500" />
                       <span className="text-slate-600">
                         Diperbarui: <strong className="text-slate-800">{dayjs().to(dayjs(emp.last_location_update))}</strong>
@@ -148,14 +148,14 @@ const LiveTracking = () => {
         </MapContainer>
         
         {/* Radar Overlay Indicator */}
-        <div className="absolute bottom-6 right-6 z-[1000] bg-white/90 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-neu border border-white/50 flex items-center gap-3">
+        <div className="absolute bottom-6 right-6 z-[1000] bg-white/90  px-4 py-3 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3">
           <div className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
           </div>
           <div>
             <p className="text-xs font-bold text-slate-800">{employees.length} Karyawan Aktif</p>
-            <p className="text-[10px] text-slate-500">Memancarkan sinyal GPS</p>
+            <p className="text-xs text-slate-500">Memancarkan sinyal GPS</p>
           </div>
         </div>
       </div>

@@ -46,16 +46,16 @@ const LiveFeed = ({ loading: parentLoading }) => {
   const isLoading = parentLoading || localLoading;
 
   return (
-    <Card className="h-full bg-[#f0f2f5] border-none shadow-neu rounded-3xl overflow-hidden flex flex-col">
-      <div className="px-4 py-3 border-b border-white/50 flex items-center justify-between bg-slate-50/50">
+    <Card className="h-full bg-white border-none shadow-sm rounded-xl overflow-hidden flex flex-col">
+      <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
         <div>
-          <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+          <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
             <IconActivity size={14} className="text-[#E31E24]" />
             Live Status
           </h3>
-          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Real-time Check-in Feed</p>
+          <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Real-time Check-in Feed</p>
         </div>
-        <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse shadow-neu"></div>
+        <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse shadow-sm"></div>
       </div>
       <CardContent className="p-0 flex-1 overflow-y-auto custom-scrollbar min-h-[300px]">
         {isLoading ? (
@@ -64,27 +64,27 @@ const LiveFeed = ({ loading: parentLoading }) => {
           </div>
         ) : activities.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">No activity recorded</p>
+            <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">No activity recorded</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-50" style={{ contentVisibility: 'auto' }}>
             {activities.map((item, idx) => (
-              <div key={idx} className="px-4 py-2 hover:shadow-neu-inset transition-all cursor-pointer group flex items-center justify-between" style={{ contentVisibility: 'auto' }}>
+              <div key={idx} className="px-4 py-2 hover:shadow-sm transition-all cursor-pointer group flex items-center justify-between" style={{ contentVisibility: 'auto' }}>
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 font-black text-[9px] group-hover:bg-transparent group-hover:text-[#E31E24] transition-all border border-transparent group-hover:border-white/50">
+                  <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 font-black text-xs group-hover:bg-transparent group-hover:text-[#E31E24] transition-all border border-transparent group-hover:border-slate-200">
                     {item.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
-                    <h5 className="text-[10px] font-black text-slate-700 group-hover:text-[#E31E24] transition-colors uppercase truncate tracking-tight leading-none mb-1">{item.name}</h5>
-                    <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest leading-none">{item.id}</p>
-                    {item.notes && <p className="text-[8px] text-slate-400 italic truncate mt-1">{item.notes}</p>}
+                    <h5 className="text-xs font-black text-slate-700 group-hover:text-[#E31E24] transition-colors uppercase truncate tracking-tight leading-none mb-1">{item.name}</h5>
+                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-none">{item.id}</p>
+                    {item.notes && <p className="text-[11px] text-slate-400 italic truncate mt-1">{item.notes}</p>}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className={`flex items-center gap-1 justify-end text-[8px] font-black uppercase ${item.status === 'Present' ? 'text-emerald-500' : item.status === 'Late' ? 'text-amber-500' : 'text-rose-500'}`}>
+                  <div className={`flex items-center gap-1 justify-end text-[11px] font-black uppercase ${item.status === 'Present' ? 'text-emerald-500' : item.status === 'Late' ? 'text-amber-500' : 'text-rose-500'}`}>
                     {item.status}
                   </div>
-                  <p className="text-[7px] text-slate-300 font-black mt-0.5">{item.time}</p>
+                  <p className="text-[11px] text-slate-300 font-black mt-0.5">{item.time}</p>
                 </div>
               </div>
             ))}

@@ -24,9 +24,9 @@ const Offboarding = () => {
             <h2 className="text-2xl font-black text-slate-800 font-outfit tracking-tight uppercase">
               Exit <span className="text-[#E31E24]">Management</span>
             </h2>
-            <p className="text-slate-400 text-[9px] mt-1 font-black uppercase tracking-[0.3em] opacity-70">Corporate Offboarding & Asset Retrieval</p>
+            <p className="text-slate-400 text-xs mt-1 font-black uppercase tracking-[0.3em] opacity-70">Corporate Offboarding & Asset Retrieval</p>
           </div>
-          <Button className="h-12 px-6 rounded-2xl bg-slate-800 text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-slate-900 transition-all flex gap-3 items-center">
+          <Button className="h-12 px-6 rounded-2xl bg-slate-800 text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all flex gap-3 items-center">
             <IconLogout size={16} />
             Initiate Resignation
           </Button>
@@ -41,32 +41,32 @@ const Offboarding = () => {
 
         {/* Exit Pipeline */}
         <div className="space-y-4">
-          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Resignation Pipeline</h3>
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider px-1">Resignation Pipeline</h3>
           <div className="grid grid-cols-1 gap-4">
             {pendingExit.map(ex => (
-              <Card key={ex.id} className="border-white border-[3px] shadow-neu bg-[#f0f2f5] rounded-[2rem] p-6 flex flex-col gap-6 group">
+              <Card key={ex.id} className="border-white border-[3px] shadow-sm bg-white rounded-2xl p-6 flex flex-col gap-6 group">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-6">
-                    <div className="h-14 w-14 bg-[#f0f2f5] rounded-full shadow-neu overflow-hidden p-1">
+                    <div className="h-14 w-14 bg-white rounded-full shadow-sm overflow-hidden p-1">
                       <img src={`https://i.pravatar.cc/150?u=${ex.id}`} alt={ex.name} className="h-full w-full object-cover rounded-full" />
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">{ex.name}</h4>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{ex.role} • Exit Date: {ex.date}</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{ex.role} • Exit Date: {ex.date}</p>
                     </div>
                   </div>
-                  <Button variant="outline" className="h-10 px-4 rounded-xl text-[9px] font-black uppercase text-slate-500 hover:text-rose-500 hover:bg-rose-50 flex gap-2">
+                  <Button variant="outline" className="h-10 px-4 rounded-xl text-xs font-black uppercase text-slate-500 hover:text-rose-500 hover:bg-rose-50 flex gap-2">
                     <IconClipboardCheck size={14} />
                     View Checklist
                   </Button>
                 </div>
 
                 <div className="space-y-2 px-2">
-                  <div className="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                  <div className="flex justify-between items-center text-xs font-black text-slate-400 uppercase tracking-widest">
                     <span>Offboarding Progress</span>
                     <span>{ex.progress}%</span>
                   </div>
-                  <div className="w-full h-3 bg-[#f0f2f5] shadow-neu rounded-full overflow-hidden">
+                  <div className="w-full h-3 bg-white shadow-sm rounded-full overflow-hidden">
                     <div className="h-full bg-[#E31E24] transition-all duration-1000" style={{ width: `${ex.progress}%` }}></div>
                   </div>
                 </div>
@@ -80,14 +80,14 @@ const Offboarding = () => {
 };
 
 const StatCard = ({ label, value, icon, color }) => (
-  <Card className="border-white border-[2px] shadow-neu bg-[#f0f2f5] rounded-[1.5rem] p-6">
+  <Card className="border-white border-[2px] shadow-sm bg-white rounded-xl p-6">
     <div className="flex items-center gap-4">
-      <div className={`h-12 w-12 rounded-xl bg-[#f0f2f5] shadow-neu flex items-center justify-center
+      <div className={`h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center
         ${color === 'emerald' ? 'text-emerald-500' : color === 'indigo' ? 'text-indigo-500' : 'text-amber-500'}`}>
         {icon}
       </div>
       <div>
-        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{label}</p>
         <h3 className="text-xl font-black text-slate-800 font-outfit">{value}</h3>
       </div>
     </div>

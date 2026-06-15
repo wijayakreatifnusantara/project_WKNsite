@@ -35,10 +35,10 @@ const OverviewDashboard = () => {
   }, []);
 
   const MetricCard = ({ title, value, icon, color, suffix = '%', trend }) => (
-    <Card className="border border-white/50 bg-transparent shadow-neu rounded-2xl overflow-hidden hover:shadow-neu transition-all">
+    <Card className="border border-slate-200 bg-transparent shadow-sm rounded-2xl overflow-hidden hover:shadow-sm transition-all">
       <CardContent className="p-5 flex items-center justify-between">
         <div className="space-y-2">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+          <p className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
             {icon} {title}
           </p>
           <div className="flex items-baseline gap-2">
@@ -47,14 +47,14 @@ const OverviewDashboard = () => {
               <span className="text-sm font-bold text-slate-400 ml-1">{suffix}</span>
             </h3>
             {trend && (
-              <span className={`text-[9px] font-black flex items-center ${trend > 0 ? 'text-red-500' : 'text-green-500'}`}>
+              <span className={`text-xs font-black flex items-center ${trend > 0 ? 'text-red-500' : 'text-green-500'}`}>
                 {trend > 0 ? <IconArrowUpRight size={12} /> : <IconArrowDownRight size={12} />}
                 {Math.abs(trend)}%
               </span>
             )}
           </div>
         </div>
-        <div className={`h-16 w-16 rounded-full bg-slate-50 border border-white/50 shadow-neu-inset flex items-center justify-center ${color}`}>
+        <div className={`h-16 w-16 rounded-full bg-slate-50 border border-slate-200 shadow-sm flex items-center justify-center ${color}`}>
           <div className="text-current opacity-80 scale-150">
             {icon}
           </div>
@@ -71,16 +71,16 @@ const OverviewDashboard = () => {
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-transparent shadow-neu rounded-xl flex items-center justify-center text-[#E31E24] border border-white/50">
+              <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
                 <IconActivity size={20} />
               </div>
               <div>
                 <h1 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">System Telemetry</h1>
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Real-time infrastructure health</p>
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Real-time infrastructure health</p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-neu">
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
             System Operational
           </div>
@@ -89,27 +89,27 @@ const OverviewDashboard = () => {
         {/* METRICS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <MetricCard 
-            title="CPU Usage" 
+            data-tooltip="CPU Usage" 
             value={metrics.cpu} 
             icon={<IconCpu />} 
             color={metrics.cpu > 80 ? 'text-red-500' : 'text-[#E31E24]'} 
             trend={+2.4} 
           />
           <MetricCard 
-            title="Memory Load" 
+            data-tooltip="Memory Load" 
             value={metrics.memory} 
             icon={<IconServer />} 
             color="text-blue-500" 
             trend={-1.2} 
           />
           <MetricCard 
-            title="DB Storage" 
+            data-tooltip="DB Storage" 
             value={metrics.dbStorage} 
             icon={<IconDatabase />} 
             color="text-emerald-500" 
           />
           <MetricCard 
-            title="Active Conn." 
+            data-tooltip="Active Conn." 
             value={metrics.activeConnections} 
             icon={<IconActivity />} 
             suffix="usr"
@@ -117,14 +117,14 @@ const OverviewDashboard = () => {
             trend={+12} 
           />
           <MetricCard 
-            title="System Uptime" 
+            data-tooltip="System Uptime" 
             value={metrics.uptime} 
             icon={<IconClock />} 
             suffix=""
             color="text-indigo-500" 
           />
           <MetricCard 
-            title="Error Rate" 
+            data-tooltip="Error Rate" 
             value={metrics.errorRate} 
             icon={<IconBug />} 
             color="text-rose-500" 
@@ -133,40 +133,42 @@ const OverviewDashboard = () => {
         </div>
 
         {/* RECENT ALERTS / LOGS MOCK */}
-        <Card className="border border-white/50 bg-transparent shadow-neu rounded-2xl overflow-hidden mt-6">
-          <CardHeader className="border-b border-white/50 bg-slate-50/50 px-5 py-4 flex flex-row items-center justify-between">
-            <CardTitle className="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+        <Card className="border border-slate-200 bg-transparent shadow-sm rounded-2xl overflow-hidden mt-6">
+          <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-4 flex flex-row items-center justify-between">
+            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
               <IconBug size={14} className="text-[#E31E24]" />
               Recent Infrastructure Alerts
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto custom-scrollbar w-full">
+<table className="w-full text-left border-collapse min-w-max">
               <thead>
-                <tr className="bg-slate-100/50 border-b border-white/50">
-                  <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Time</th>
-                  <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Severity</th>
-                  <th className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Message</th>
+                <tr className="bg-slate-100/50 border-b border-slate-200">
+                  <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Time</th>
+                  <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Severity</th>
+                  <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Message</th>
                 </tr>
               </thead>
               <tbody className="text-[11px] font-bold text-slate-600">
-                <tr className="border-b border-white/50 hover:bg-white/50 transition-colors">
+                <tr className="border-b border-slate-200 hover:bg-white/50 transition-colors">
                   <td className="px-5 py-3">10 mins ago</td>
-                  <td className="px-5 py-3"><span className="text-[8px] px-2 py-1 bg-yellow-100 text-yellow-600 rounded uppercase tracking-widest">Warning</span></td>
+                  <td className="px-5 py-3"><span className="text-[11px] px-2 py-1 bg-yellow-100 text-yellow-600 rounded uppercase tracking-widest">Warning</span></td>
                   <td className="px-5 py-3">High memory utilization on Worker Node 2</td>
                 </tr>
-                <tr className="border-b border-white/50 hover:bg-white/50 transition-colors">
+                <tr className="border-b border-slate-200 hover:bg-white/50 transition-colors">
                   <td className="px-5 py-3">2 hours ago</td>
-                  <td className="px-5 py-3"><span className="text-[8px] px-2 py-1 bg-red-100 text-red-600 rounded uppercase tracking-widest">Critical</span></td>
+                  <td className="px-5 py-3"><span className="text-[11px] px-2 py-1 bg-red-100 text-red-600 rounded uppercase tracking-widest">Critical</span></td>
                   <td className="px-5 py-3">Database connection timeout (recovered)</td>
                 </tr>
                 <tr className="hover:bg-white/50 transition-colors">
                   <td className="px-5 py-3">Yesterday</td>
-                  <td className="px-5 py-3"><span className="text-[8px] px-2 py-1 bg-blue-100 text-blue-600 rounded uppercase tracking-widest">Info</span></td>
+                  <td className="px-5 py-3"><span className="text-[11px] px-2 py-1 bg-blue-100 text-blue-600 rounded uppercase tracking-widest">Info</span></td>
                   <td className="px-5 py-3">Automated backup completed successfully</td>
                 </tr>
               </tbody>
             </table>
+</div>
           </CardContent>
         </Card>
 

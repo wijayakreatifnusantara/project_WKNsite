@@ -213,11 +213,11 @@ const AttendanceRecap = () => {
       <div className="w-full mx-auto space-y-4">
         
         {/* 🚀 ULTRA-COMPACT HEADER */}
-        <div className="flex items-center justify-between bg-transparent p-3 px-5 rounded-2xl border border-white/50 shadow-neu backdrop-blur-md">
+        <div className="flex items-center justify-between bg-transparent p-3 px-5 rounded-2xl border border-slate-200 shadow-sm ">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-[#f0f2f5] shadow-neu-inset border-none shadow-neu flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
+              className="h-8 w-8 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>
@@ -228,31 +228,31 @@ const AttendanceRecap = () => {
           </div>
 
           <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-white/50">
-               <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Cycle:</span>
+             <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+               <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Cycle:</span>
                <input 
                   type="month" 
                   value={selectedMonth}
                   onChange={(e) => handleMonthChange(e.target.value)}
-                  className="bg-transparent border-none text-slate-800 font-black text-[9px] uppercase focus:outline-none cursor-pointer"
+                  className="bg-transparent border-none text-slate-800 font-black text-xs uppercase focus:outline-none cursor-pointer"
                />
              </div>
              <div className="h-6 w-[1px] bg-slate-200"></div>
              <div className="flex items-center gap-2">
-                <span className="text-[8px] font-black text-slate-400 uppercase">{dateRange.start}</span>
+                <span className="text-[11px] font-black text-slate-400 uppercase">{dateRange.start}</span>
                 <span className="text-slate-300">-</span>
-                <span className="text-[8px] font-black text-slate-400 uppercase">{dateRange.end}</span>
+                <span className="text-[11px] font-black text-slate-400 uppercase">{dateRange.end}</span>
              </div>
              <Button 
                 onClick={handleExportCSV}
-                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[8px] uppercase tracking-widest hover:bg-slate-900 shadow-neu flex gap-2 items-center print:hidden"
+                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-900 shadow-sm flex gap-2 items-center print:hidden"
               >
                 <IconDownload size={12} />
                 CSV
               </Button>
               <Button 
                 onClick={() => setIsPreviewMode(true)}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[8px] uppercase tracking-widest hover:bg-[#c8191f] shadow-neu flex gap-2 items-center print:hidden"
+                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[11px] uppercase tracking-widest hover:bg-[#c8191f] shadow-sm flex gap-2 items-center print:hidden"
               >
                 <IconClipboardList size={12} />
                 PDF
@@ -262,14 +262,14 @@ const AttendanceRecap = () => {
         
         {/* 👁️ PREVIEW MODE FLOATING BAR */}
         {isPreviewMode && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-6 py-3 rounded-full shadow-neu flex items-center gap-6 border border-slate-700 print:hidden animate-fade-in-down">
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white px-6 py-3 rounded-full shadow-sm flex items-center gap-6 border border-slate-700 print:hidden animate-fade-in-down">
             <span className="text-xs font-bold flex items-center gap-2"><IconClipboardList size={16}/> Mode Pratinjau Cetak</span>
             <div className="h-4 w-[1px] bg-slate-600"></div>
             <div className="flex gap-2">
-              <Button onClick={() => setIsPreviewMode(false)} variant="ghost" className="h-8 text-slate-300 hover:text-white hover:bg-slate-700 text-[10px] font-bold">
+              <Button onClick={() => setIsPreviewMode(false)} variant="ghost" className="h-8 text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold">
                 BATAL
               </Button>
-              <Button onClick={() => window.print()} className="h-8 bg-[#E31E24] hover:bg-[#c8191f] text-white text-[10px] font-bold shadow-neu">
+              <Button onClick={() => window.print()} className="h-8 bg-[#E31E24] hover:bg-[#c8191f] text-white text-xs font-bold shadow-sm">
                 <IconDownload size={14} className="mr-1" />
                 UNDUH PDF
               </Button>
@@ -286,22 +286,22 @@ const AttendanceRecap = () => {
 
         {/* 📊 COMPACT STATS BAR */}
         <div className={`flex flex-wrap items-center gap-3 print:hidden ${isPreviewMode ? 'hidden' : ''}`}>
-            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu">
-                <div className="h-8 w-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg flex items-center justify-center text-[#E31E24] shadow-neu">
+            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="h-8 w-8 bg-white shadow-sm border-none rounded-lg flex items-center justify-center text-[#E31E24] shadow-sm">
                     <IconCalendarStats size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Base Target</h4>
-                    <p className="text-xs font-black text-slate-800 leading-none">{calculateWorkingDays(dateRange.start, dateRange.end, 0)} <span className="text-[8px] text-slate-400">Days</span></p>
+                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Base Target</h4>
+                    <p className="text-xs font-black text-slate-800 leading-none">{calculateWorkingDays(dateRange.start, dateRange.end, 0)} <span className="text-[11px] text-slate-400">Days</span></p>
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu">
-                <div className="h-8 w-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg flex items-center justify-center text-amber-500 shadow-neu">
+            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="h-8 w-8 bg-white shadow-sm border-none rounded-lg flex items-center justify-center text-amber-500 shadow-sm">
                     <IconSettings size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
                       Holidays <span className="text-amber-500 font-bold">(Auto {autoHolidays} + Adj)</span>
                     </h4>
                     <input 
@@ -313,53 +313,53 @@ const AttendanceRecap = () => {
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu">
-                <div className="h-8 w-8 bg-[#f0f2f5] shadow-neu-inset border-none rounded-lg flex items-center justify-center text-emerald-500 shadow-neu">
+            <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="h-8 w-8 bg-white shadow-sm border-none rounded-lg flex items-center justify-center text-emerald-500 shadow-sm">
                     <IconBriefcase size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Net Target</h4>
-                    <p className="text-xs font-black text-slate-800 leading-none">{workingDaysTarget} <span className="text-[8px] text-slate-400">Days</span></p>
+                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Net Target</h4>
+                    <p className="text-xs font-black text-slate-800 leading-none">{workingDaysTarget} <span className="text-[11px] text-slate-400">Days</span></p>
                 </div>
             </div>
 
-            <div className="flex-[2] flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-white/50 shadow-neu transition-all focus-within:border-[#E31E24]/30 focus-within:shadow-neu group">
+            <div className="flex-[2] flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]  group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
                 <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
                 <input 
                     type="text" 
                     placeholder="Search Personnel..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="bg-transparent border-none w-full text-[9px] font-black text-slate-700 placeholder:text-slate-300 focus:outline-none uppercase tracking-widest"
+                    className="bg-transparent border-none w-full text-xs font-black text-slate-700 placeholder:text-slate-300 focus:outline-none uppercase tracking-widest"
                 />
             </div>
         </div>
 
         {/* 📜 HIGH DENSITY TABLE */}
-        <div className="bg-transparent shadow-neu rounded-3xl border border-white/50 overflow-hidden">
+        <div className="bg-transparent shadow-sm rounded-xl border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-max">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-white/50 backdrop-blur-md">
-                  <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Employee</th>
-                  <th className="px-6 py-3 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
-                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Target</th>
-                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Present</th>
-                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Late</th>
-                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Sick/Leave</th>
-                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Absent</th>
-                  <th className="px-6 py-3 text-center text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Overtime (Jam)</th>
-                  <th className="px-6 py-3 text-right text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Achievement</th>
+                <tr className="bg-slate-50/80 border-b border-slate-200 ">
+                  <th className="px-6 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Employee</th>
+                  <th className="px-6 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Target</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Present</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Late</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Sick/Leave</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Absent</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Overtime (Jam)</th>
+                  <th className="px-6 py-3 text-right text-[11px] font-black text-slate-400 uppercase tracking-wider">Achievement</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="py-12 text-center text-[9px] font-black text-slate-300 uppercase tracking-widest animate-pulse">Syncing Metrics...</td>
+                    <td colSpan="8" className="py-12 text-center text-xs font-black text-slate-300 uppercase tracking-widest animate-pulse">Syncing Metrics...</td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="py-12 text-center text-[9px] font-black text-slate-300 uppercase tracking-widest">No matching records found</td>
+                    <td colSpan="8" className="py-12 text-center text-xs font-black text-slate-300 uppercase tracking-widest">No matching records found</td>
                   </tr>
                 ) : (
                   filteredData.map((emp) => {
@@ -370,36 +370,36 @@ const AttendanceRecap = () => {
                       <React.Fragment key={emp.id}>
                         <tr 
                           onClick={() => setExpandedRow(isExpanded ? null : emp.id)}
-                          className="hover:shadow-neu-inset/50 transition-all group border-b border-transparent hover:border-white/50 cursor-pointer"
+                          className="hover:shadow-sm transition-all group border-b border-transparent hover:border-slate-200 cursor-pointer"
                         >
                           <td className="px-6 py-2">
                             <div className="flex items-center gap-3">
-                              <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 border border-[#E31E24]/5 flex items-center justify-center text-[10px] font-black text-[#E31E24]">
+                              <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 border border-[#E31E24]/5 flex items-center justify-center text-xs font-black text-[#E31E24]">
                                 {emp.name?.charAt(0)}
                               </div>
                               <div>
-                                <p className="text-[10px] font-black text-slate-800 uppercase tracking-tight leading-none">{emp.name}</p>
-                                <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">{emp.id}</p>
+                                <p className="text-xs font-black text-slate-800 uppercase tracking-tight leading-none">{emp.name}</p>
+                                <p className="text-[11px] font-bold text-slate-400 uppercase mt-1">{emp.id}</p>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-2">
-                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{emp.organization}</span>
+                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{emp.organization}</span>
                           </td>
-                          <td className="px-6 py-2 text-center text-[10px] font-black text-slate-400">{workingDaysTarget}</td>
-                          <td className="px-6 py-2 text-center text-[10px] font-black text-emerald-600">{emp.present}</td>
-                          <td className="px-6 py-2 text-center text-[10px] font-black text-amber-500">
+                          <td className="px-6 py-2 text-center text-xs font-black text-slate-400">{workingDaysTarget}</td>
+                          <td className="px-6 py-2 text-center text-xs font-black text-emerald-600">{emp.present}</td>
+                          <td className="px-6 py-2 text-center text-xs font-black text-amber-500">
                             {emp.late}
                             {emp.late_minutes > 0 && (
-                              <span className="block text-[7px] text-rose-500 mt-0.5">({emp.late_minutes}m)</span>
+                              <span className="block text-[11px] text-rose-500 mt-0.5">({emp.late_minutes}m)</span>
                             )}
                           </td>
-                          <td className="px-6 py-2 text-center text-[10px] font-black text-indigo-500">{emp.sick + emp.leave}</td>
-                          <td className="px-6 py-2 text-center text-[10px] font-black text-rose-500">{emp.absent}</td>
-                          <td className="px-6 py-2 text-center text-[10px] font-black text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
+                          <td className="px-6 py-2 text-center text-xs font-black text-indigo-500">{emp.sick + emp.leave}</td>
+                          <td className="px-6 py-2 text-center text-xs font-black text-rose-500">{emp.absent}</td>
+                          <td className="px-6 py-2 text-center text-xs font-black text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
                           <td className="px-6 py-2 text-right">
                             <div className="flex flex-col items-end gap-1">
-                              <span className={`text-[10px] font-black ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>
+                              <span className={`text-xs font-black ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>
                                 {achievement}%
                               </span>
                               <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden">
@@ -413,28 +413,28 @@ const AttendanceRecap = () => {
                         </tr>
                         {isExpanded && (
                           <tr className="bg-slate-50/50">
-                            <td colSpan="9" className="px-6 py-4 border-b border-white/50">
-                              <div className="bg-transparent rounded-xl border border-white/50 p-4 shadow-neu">
-                                <h4 className="text-[9px] font-black text-slate-800 uppercase tracking-widest mb-3">Detail Pelanggaran Kehadiran</h4>
+                            <td colSpan="9" className="px-6 py-4 border-b border-slate-200">
+                              <div className="bg-transparent rounded-xl border border-slate-200 p-4 shadow-sm">
+                                <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-3">Detail Pelanggaran Kehadiran</h4>
                                 {emp.logs && emp.logs.filter(l => l.status !== 'Present').length > 0 ? (
                                   <div className="grid grid-cols-3 gap-3">
                                     {emp.logs.filter(l => l.status !== 'Present').map((log, idx) => (
-                                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-white/50 bg-slate-50">
+                                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-slate-200 bg-slate-50">
                                         <div>
-                                          <p className="text-[10px] font-black text-slate-700">{log.date}</p>
-                                          <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{log.status}</p>
+                                          <p className="text-xs font-black text-slate-700">{log.date}</p>
+                                          <p className="text-[11px] font-bold text-slate-400 uppercase mt-0.5">{log.status}</p>
                                         </div>
                                         {log.late_minutes > 0 && (
                                           <div className="text-right">
-                                            <span className="text-[9px] font-black text-rose-500">Telat {log.late_minutes}m</span>
-                                            <p className="text-[7px] text-slate-400 uppercase">{log.clock_in?.slice(0,5)}</p>
+                                            <span className="text-xs font-black text-rose-500">Telat {log.late_minutes}m</span>
+                                            <p className="text-[11px] text-slate-400 uppercase">{log.clock_in?.slice(0,5)}</p>
                                           </div>
                                         )}
                                       </div>
                                     ))}
                                   </div>
                                 ) : (
-                                  <p className="text-[9px] text-slate-400 italic">Tidak ada catatan telat, izin, atau alpa.</p>
+                                  <p className="text-xs text-slate-400 italic">Tidak ada catatan telat, izin, atau alpa.</p>
                                 )}
                               </div>
                             </td>

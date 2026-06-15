@@ -25,12 +25,12 @@ const GeolocationRadar = () => {
   }, []);
 
   return (
-    <div className="bg-[#0f172a] rounded-2xl p-4 shadow-neu flex flex-col justify-between items-center text-center relative overflow-hidden border border-slate-800 h-full">
+    <div className="bg-[#0f172a] rounded-2xl p-4 shadow-sm flex flex-col justify-between items-center text-center relative overflow-hidden border border-slate-800 h-full">
 
       
       {/* Header */}
       <div className="z-10 w-full flex justify-between items-center mb-2">
-        <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-1.5">
+        <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
           <IconScan size={14} className="text-[#E31E24]" /> Live Geofence
         </h4>
         <div className="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-full">
@@ -51,7 +51,7 @@ const GeolocationRadar = () => {
         <div className="radar-sweep"></div>
         
         {/* HQ Pin */}
-        <IconMapPin size={16} className="text-[#E31E24] absolute z-10 drop-shadow-neu" />
+        <IconMapPin size={16} className="text-[#E31E24] absolute z-10 drop-shadow-sm" />
 
         {/* Dynamic Blips */}
         {blips.map(blip => (

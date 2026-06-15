@@ -29,8 +29,8 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="w-full max-w-4xl h-[80vh] bg-[#f0f2f5] border-white border-[4px] shadow-neu rounded-[2.5rem] relative overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm  animate-in fade-in duration-300">
+      <div className="w-full max-w-4xl h-[80vh] bg-white border-white border-[4px] shadow-sm rounded-[2.5rem] relative overflow-hidden flex flex-col">
         {/* Header */}
         <div className="px-10 py-8 flex justify-between items-center border-b border-white/30">
           <div>
@@ -38,11 +38,11 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
               <IconSignature size={28} className="text-[#E31E24]" />
               Digital Signing Room
             </h3>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Authorized Authorization Workflow</p>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Authorized Authorization Workflow</p>
           </div>
           <button 
             onClick={onClose}
-            className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[#f0f2f5] shadow-neu text-slate-400 hover:text-[#E31E24] transition-all"
+            className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-[#E31E24] transition-all"
           >
             <IconX size={24} />
           </button>
@@ -52,13 +52,13 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
         <div className="flex-1 flex overflow-hidden">
           {/* Document Preview (Left) */}
           <div className="flex-1 bg-slate-200/50 p-10 flex items-center justify-center relative overflow-auto custom-scrollbar">
-            <div className="relative bg-transparent shadow-neu border border-white/20 min-h-[500px] w-full max-w-[400px] flex items-center justify-center group">
-              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Document Preview: {doc.name}</span>
+            <div className="relative bg-transparent shadow-sm border border-slate-200 min-h-[500px] w-full max-w-[400px] flex items-center justify-center group">
+              <span className="text-xs font-black text-slate-300 uppercase tracking-widest">Document Preview: {doc.name}</span>
               
               {/* Signature Overlay (if in placement step) */}
               {signature && step === 'placement' && (
                 <div 
-                  className="absolute cursor-move border-2 border-dashed border-[#E31E24] p-1 bg-white/50 backdrop-blur-sm"
+                  className="absolute cursor-move border-2 border-dashed border-[#E31E24] p-1 bg-white/50 "
                   style={{ top: `${position.y}%`, left: `${position.x}%`, transform: 'translate(-50%, -50%)' }}
                   onMouseDown={(e) => {
                     const rect = e.currentTarget.parentElement.getBoundingClientRect();
@@ -75,19 +75,19 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
                   }}
                 >
                   <img src={signature} alt="Signature" className="h-12 w-auto" />
-                  <div className="absolute -top-6 left-0 bg-[#E31E24] text-white text-[8px] font-bold px-2 py-0.5 rounded-sm uppercase">Drag to Position</div>
+                  <div className="absolute -top-6 left-0 bg-[#E31E24] text-white text-[11px] font-bold px-2 py-0.5 rounded-sm uppercase">Drag to Position</div>
                 </div>
               )}
             </div>
           </div>
 
           {/* Controls (Right) */}
-          <div className="w-96 border-l border-white/30 p-10 flex flex-col gap-8 bg-[#f0f2f5]">
+          <div className="w-96 border-l border-white/30 p-10 flex flex-col gap-8 bg-white">
             {step === 'preview' && (
               <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                <div className="p-6 rounded-[2rem] bg-[#f0f2f5] shadow-neu border-white border-2">
-                  <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">Document Info</h4>
-                  <p className="text-[9px] text-slate-500 font-bold leading-relaxed">
+                <div className="p-6 rounded-2xl bg-white shadow-sm border-white border-2">
+                  <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-2">Document Info</h4>
+                  <p className="text-xs text-slate-500 font-bold leading-relaxed">
                     Type: {doc.type || 'SOP'}<br/>
                     Owner: {doc.owner || 'HR Dept'}<br/>
                     Status: {doc.status || 'Pending'}
@@ -95,7 +95,7 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
                 </div>
                 <Button 
                   onClick={() => setStep('sign')}
-                  className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
+                  className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
                 >
                   <IconSignature size={20} />
                   Initiate Signing
@@ -105,7 +105,7 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
 
             {step === 'sign' && (
               <div className="animate-in zoom-in-95 duration-300">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 px-1">Draw your signature</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 px-1">Draw your signature</h4>
                 <SignaturePad 
                   onSave={handleSignatureSave} 
                   onCancel={() => setStep('preview')} 
@@ -115,23 +115,23 @@ const DocumentSignerModal = ({ isOpen, onClose, document: doc, onSave }) => {
 
             {step === 'placement' && (
               <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                <div className="p-6 rounded-[2rem] bg-emerald-50 border-2 border-white shadow-neu">
-                  <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Final Step</h4>
-                  <p className="text-[9px] text-emerald-500 font-bold leading-relaxed">
+                <div className="p-6 rounded-2xl bg-emerald-50 border-2 border-white shadow-sm">
+                  <h4 className="text-xs font-black text-emerald-600 uppercase tracking-widest mb-2">Final Step</h4>
+                  <p className="text-xs text-emerald-500 font-bold leading-relaxed">
                     Tanda tangan telah dibuat. Silakan geser kotak merah pada dokumen untuk menentukan posisi tanda tangan yang tepat.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3">
                   <Button 
                     onClick={finalizeSigning}
-                    className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-neu hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
+                    className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
                   >
                     <IconFileCheck size={20} />
                     Authorize & Save
                   </Button>
                   <button 
                     onClick={() => setStep('sign')}
-                    className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+                    className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
                   >
                     Redraw Signature
                   </button>
