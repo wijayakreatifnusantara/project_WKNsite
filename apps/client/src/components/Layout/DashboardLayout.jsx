@@ -58,6 +58,7 @@ import { Card } from "@/components/ui/card";
 import { Clock, Users, CreditCard, Settings, Calendar, Bell } from "lucide-react";
 import AIDiagnosticCenter from '../AI/AIDiagnosticCenter';
 import CommandPalette from '../CommandPalette';
+import QuickAccessModal from './QuickAccessModal';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -69,8 +70,35 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isQuickAccessModalOpen, setIsQuickAccessModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const user = profile || legacyUser;
+
+  // Define available quick access menus
+  const AVAILABLE_QUICK_ACCESS_MENUS = [
+    { id: 'attendance_log', category: 'Time & Attendance', label: 'Log Kehadiran', path: '/attendance/report', iconNode: <IconClock size={15} />, permission: PERMISSIONS.VIEW_WORKFORCE },
+    { id: 'leave', category: 'Time & Attendance', label: 'Cuti & Izin', path: '/leave', iconNode: <IconClipboardCheck size={15} />, permission: PERMISSIONS.MANAGE_ATTENDANCE },
+    { id: 'attendance_correction', category: 'Time & Attendance', label: 'Koreksi Absen', path: '/attendance/correction', iconNode: <IconEditCircle size={15} />, permission: PERMISSIONS.MANAGE_ATTENDANCE },
+    { id: 'overtime', category: 'Time & Attendance', label: 'Manajemen Lembur', path: '/attendance/overtime', iconNode: <IconClockPlay size={15} />, permission: PERMISSIONS.MANAGE_ATTENDANCE },
+    { id: 'employees', category: 'Data Master', label: 'Data Karyawan', path: '/master/employees', iconNode: <IconUsers size={15} />, permission: PERMISSIONS.VIEW_WORKFORCE },
+    { id: 'payroll', category: 'Finance & Payroll', label: 'Penggajian', path: '/payroll', iconNode: <IconCreditCard size={15} />, permission: PERMISSIONS.MANAGE_PAYROLL },
+    { id: 'documents', category: 'Core HR', label: 'Dokumen Hub', path: '/documents', iconNode: <IconFileText size={15} />, permission: PERMISSIONS.VIEW_WORKFORCE },
+    { id: 'crm', category: 'Operations', label: 'CRM Sales', path: '/crm', iconNode: <IconTrendingUp size={15} />, permission: PERMISSIONS.VIEW_CRM },
+    { id: 'assets', category: 'Operations', label: 'Inventaris Aset', path: '/assets', iconNode: <IconBox size={15} />, permission: PERMISSIONS.VIEW_WORKFORCE }
+  ];
+
+  const [quickAccessItems, setQuickAccessItems] = useState(() => {
+    const saved = localStorage.getItem('quick_access_menus');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { return ['attendance_log', 'leave', 'employees']; }
+    }
+    return ['attendance_log', 'leave', 'employees']; // Defaults
+  });
+
+  const handleSaveQuickAccess = (selectedIds) => {
+    setQuickAccessItems(selectedIds);
+    localStorage.setItem('quick_access_menus', JSON.stringify(selectedIds));
+  };
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const isMobileViewport = window.innerWidth < 1024;
@@ -296,19 +324,34 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
           {/* Quick Access / Favorites */}
           <div className={`py-3 space-y-1 transition-all duration-300 ${isSidebarCollapsed ? 'hidden' : 'block'}`}>
-             <div className="px-4 mb-1.5 flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest">
-               <IconStar size={12} className="text-amber-400 fill-amber-400" />
-               <span>Quick Access</span>
+             <div className="px-4 mb-1.5 flex items-center justify-between text-[11px] font-black text-slate-500 uppercase tracking-widest group">
+               <div className="flex items-center gap-2">
+                 <IconStar size={12} className="text-amber-400 fill-amber-400" />
+                 <span>Quick Access</span>
+               </div>
+               <button 
+                 onClick={() => setIsQuickAccessModalOpen(true)}
+                 className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-100 hover:text-[#E31E24] rounded transition-all text-slate-400"
+                 title="Edit Quick Access"
+               >
+                 <IconSettings size={12} />
+               </button>
              </div>
-             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-               <NavItem icon={<IconClock size={15} />} label="Log Kehadiran" to="/attendance/report" isCollapsed={isSidebarCollapsed} />
-             )}
-             {can(PERMISSIONS.MANAGE_ATTENDANCE) && (
-               <NavItem icon={<IconClipboardCheck size={15} />} label="Cuti & Izin" to="/leave" isCollapsed={isSidebarCollapsed} />
-             )}
-             {can(PERMISSIONS.VIEW_WORKFORCE) && (
-               <NavItem icon={<IconUsers size={15} />} label="Data Karyawan" to="/master/employees" isCollapsed={isSidebarCollapsed} />
-             )}
+             {quickAccessItems.map(id => {
+               const menu = AVAILABLE_QUICK_ACCESS_MENUS.find(m => m.id === id);
+               if (!menu) return null;
+               if (!can(menu.permission)) return null;
+               
+               return (
+                 <NavItem 
+                   key={menu.id} 
+                   icon={menu.iconNode} 
+                   label={menu.label} 
+                   to={menu.path} 
+                   isCollapsed={isSidebarCollapsed} 
+                 />
+               );
+             })}
           </div>
 
           <div className="h-px bg-slate-100 mx-4 my-2"></div>
@@ -705,6 +748,13 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
       <AIDiagnosticCenter isOpen={isDiagnosticsOpen} onClose={() => setIsDiagnosticsOpen(false)} />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
+      <QuickAccessModal 
+        isOpen={isQuickAccessModalOpen} 
+        onClose={() => setIsQuickAccessModalOpen(false)} 
+        availableMenus={AVAILABLE_QUICK_ACCESS_MENUS.filter(m => can(m.permission))}
+        currentSelection={quickAccessItems}
+        onSave={handleSaveQuickAccess}
+      />
     </div>
   );
 };
