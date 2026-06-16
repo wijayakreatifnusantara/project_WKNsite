@@ -262,7 +262,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   };
 
   return (
-    <div className="admin-dashboard-layout flex h-screen bg-background overflow-hidden font-inter animate-fade-in text-sm">
+    <div className="admin-dashboard-layout flex h-screen bg-background overflow-hidden font-inter animate-fade-in text-[13px]">
       {/* Sidebar Backdrop on Mobile */}
       {!isSidebarCollapsed && (
         <div 
@@ -295,8 +295,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           </div>
 
           {/* Quick Access / Favorites */}
-          <div className={`py-4 space-y-1 transition-all duration-300 ${isSidebarCollapsed ? 'hidden' : 'block'}`}>
-             <div className="px-6 mb-2 flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
+          <div className={`py-3 space-y-1 transition-all duration-300 ${isSidebarCollapsed ? 'hidden' : 'block'}`}>
+             <div className="px-4 mb-1.5 flex items-center gap-2 text-[11px] font-black text-slate-500 uppercase tracking-widest">
                <IconStar size={12} className="text-amber-400 fill-amber-400" />
                <span>Quick Access</span>
              </div>
@@ -731,7 +731,7 @@ const NavGroup = ({ label, isCollapsed, isExpanded, onToggle, children }) => {
   return (
     <div className="mb-2">
       <div 
-        className={`px-6 py-3 flex items-center justify-between text-xs font-semibold tracking-wider select-none cursor-pointer transition-colors group ${isExpanded ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+        className={`px-4 py-2 flex items-center justify-between text-[11px] font-bold tracking-wider select-none cursor-pointer transition-colors group ${isExpanded ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
         onClick={onToggle}
       >
         <span>{label}</span>
@@ -750,8 +750,8 @@ const NavItem = ({ icon, label, to, isCollapsed, end = true }) => (
     end={end}
     title={isCollapsed ? label : undefined}
     className={({ isActive }) => `
-      relative flex items-center rounded-lg text-sm font-medium transition-all duration-200 group
-      ${isCollapsed ? 'w-12 h-12 justify-center mx-auto' : 'w-full px-6 py-3 gap-4'}
+      relative flex items-center rounded-lg text-[13px] font-medium transition-all duration-200 group
+      ${isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'w-full px-4 py-2.5 gap-3'}
       ${isActive 
         ? 'bg-red-50 text-[#E31E24]' 
         : 'text-slate-600 hover:text-[#E31E24] hover:bg-slate-50'}

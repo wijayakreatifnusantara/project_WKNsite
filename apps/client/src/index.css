@@ -160,11 +160,15 @@
     @apply text-slate-600 !important;
   }
 
-  /* Global normalization for unreadable tiny text across the dashboard */
-  .text-\[8px\], .text-\[9px\], .text-\[10px\], .text-\[11px\] {
-    font-size: 12px !important;
-    line-height: 1.4 !important;
-    letter-spacing: 0.02em !important;
+  /* Global normalization for tiny text (allow compact text but ensure readability) */
+  .text-\[8px\], .text-\[9px\] {
+    font-size: 10px !important;
+  }
+  .text-\[10px\] {
+    font-size: 10px !important;
+  }
+  .text-\[11px\] {
+    font-size: 11px !important;
   }
   
   /* Soften extreme uppercase tracking for better readability */
@@ -270,6 +274,10 @@
    ========================================================================== */
 
 /* Clean modern background overrides ONLY for admin dashboard */
+.admin-dashboard-layout {
+  /* Make the base font slightly smaller for a more compact dashboard feel */
+  font-size: 13px; 
+}
 .admin-dashboard-layout .bg-\[\#f0f2f5\] {
   background-color: #f8fafc !important; /* Soft modern slate bg */
 }
