@@ -50,8 +50,8 @@ class OvertimeProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _overtimeService.submitOvertimeRequest(payload);
-      return result;
+      await _overtimeService.submitOvertimeRequest(payload);
+      return {'status': 'success'};
     } catch (e) {
       debugPrint('Error submitting overtime: $e');
       return {'status': 'error', 'message': e.toString()};
