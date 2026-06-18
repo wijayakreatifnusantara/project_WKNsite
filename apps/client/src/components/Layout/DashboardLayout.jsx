@@ -71,6 +71,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isQuickAccessModalOpen, setIsQuickAccessModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const user = profile || legacyUser;
 
@@ -121,13 +122,15 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   }, [location.pathname]);
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed(prev => {
-      const next = !prev;
-      if (window.innerWidth >= 1024) {
+    if (window.innerWidth < 1024) {
+      setIsMobileMenuOpen(prev => !prev);
+    } else {
+      setIsSidebarCollapsed(prev => {
+        const next = !prev;
         localStorage.setItem('sidebar_collapsed', String(next));
-      }
-      return next;
-    });
+        return next;
+      });
+    }
   };
 
   useEffect(() => {
