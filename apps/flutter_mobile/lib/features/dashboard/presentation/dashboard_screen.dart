@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,8 @@ import 'dart:convert';
 import '../../auth/data/auth_provider.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/widgets/cached_avatar.dart';
+import '../../../core/widgets/animated_tap_button.dart';
+import '../../../core/theme/theme_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../attendance/data/attendance_service.dart';
 import 'dart:async';
@@ -434,10 +437,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _showCustomizeModal() {
     List<String> tempSelected = List.from(_activeActionIds);
 
-    showModalBottomSheet(
+    showCupertinoModalPopup(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -447,7 +448,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: context.surfaceColor,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              child: Column(
+              child: SafeArea(
+                child: Column(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -508,30 +510,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))],
                     ),
                     child: SafeArea(
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: tempSelected.isNotEmpty && tempSelected.length <= 7 
-                            ? () {
-                                _savePreferences(tempSelected);
-                                Navigator.pop(context);
-                              }
-                            : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppConstants.primaryColor,
-                            foregroundColor: context.surfaceColor,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: AnimatedTapButton(
+                        onTap: tempSelected.isNotEmpty && tempSelected.length <= 7 
+                          ? () {
+                              final hapticEnabled = context.read<ThemeProvider>().hapticEnabled;
+                              if (hapticEnabled) HapticFeedback.lightImpact();
+                              _savePreferences(tempSelected);
+                              Navigator.pop(context);
+                            }
+                          : () {},
+                        scaleDown: 0.95,
+                        child: Container(
+                          width: double.infinity,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: tempSelected.isNotEmpty && tempSelected.length <= 7 ? AppConstants.primaryColor : CupertinoColors.systemGrey,
+                            borderRadius: BorderRadius.circular(12)
                           ),
-                          child: const Text('SIMPAN PERUBAHAN', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                          alignment: Alignment.center,
+                          child: Text('SIMPAN PERUBAHAN', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1, color: context.surfaceColor)),
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
-            );
-          },
+            ),
+          );
+        },
         );
       },
     );
@@ -540,11 +546,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().userData;
-    
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: context.backgroundColor,
-        body: SafeArea(
+        if (_isLoading) {
+        return CupertinoPageScaffold(
+          backgroundColor: context.backgroundColor,
+          child: SafeArea(
           child: Shimmer.fromColors(
             baseColor: context.isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300,
             highlightColor: context.isDarkMode ? Colors.grey.shade700 : Colors.grey.shade100,
@@ -584,9 +589,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      body: CustomScrollView(
+      return CupertinoPageScaffold(
+        backgroundColor: context.backgroundColor,
+        child: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
           // Dynamic Header with Scroll Transition
@@ -617,8 +622,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0),
-                          child: InkWell(
-                            onTap: () => context.push('/id-card'),
+                          child: AnimatedTapButton(
+                            onTap: () {
+                              final hapticEnabled = context.read<ThemeProvider>().hapticEnabled;
+                              if (hapticEnabled) HapticFeedback.selectionClick();
+                              context.push('/id-card');
+                            },
+                            scaleDown: 0.9,
                             child: CachedAvatar(
                               imageUrl: user?['avatar_url'],
                               name: user?['name'] ?? 'User',
@@ -803,15 +813,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            ElevatedButton(
-                              onPressed: _isSyncing ? null : () => _syncOfflineData(isSilent: false),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: context.surfaceColor,
+                            AnimatedTapButton(
+                              onTap: _isSyncing ? () {} : () {
+                                final hapticEnabled = context.read<ThemeProvider>().hapticEnabled;
+                                if (hapticEnabled) HapticFeedback.mediumImpact();
+                                _syncOfflineData(isSilent: false);
+                              },
+                              scaleDown: 0.95,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: CupertinoColors.activeOrange,
+                                  borderRadius: BorderRadius.circular(8)
+                                ),
+                                child: _isSyncing 
+                                  ? SizedBox(width: 16, height: 16, child: CupertinoActivityIndicator(color: context.surfaceColor))
+                                  : Text('Sync', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold)),
                               ),
-                              child: _isSyncing 
-                                ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: context.surfaceColor, strokeWidth: 2))
-                                : const Text('Sync'),
                             ),
                           ],
                         ),
@@ -823,15 +841,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Layanan Mandiri', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
-                          InkWell(
-                            onTap: _showCustomizeModal,
+                          AnimatedTapButton(
+                            onTap: () {
+                              final hapticEnabled = context.read<ThemeProvider>().hapticEnabled;
+                              if (hapticEnabled) HapticFeedback.selectionClick();
+                              _showCustomizeModal();
+                            },
+                            scaleDown: 0.95,
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(20)),
                               child: Row(
                                 children: [
                                   Icon(Icons.edit, size: 12, color: context.textPrimary),
-                                  SizedBox(width: 4),
+                                  const SizedBox(width: 4),
                                   Text('Atur Pintasan', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textPrimary)),
                                 ],
                               ),
@@ -945,27 +968,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: () {
-                HapticFeedback.heavyImpact();
-                context.push('/attendance-form?type=${_hasClockedIn ? 'OUT' : 'IN'}');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.textPrimary,
-                foregroundColor: context.surfaceColor,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.fingerprint, size: 24),
-                  const SizedBox(width: 12),
-                  Text(_hasClockedIn ? 'ABSEN PULANG SEKARANG' : 'ABSEN MASUK SEKARANG', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1)),
-                ],
+          AnimatedTapButton(
+            onTap: () {
+              if (context.read<ThemeProvider>().hapticEnabled) HapticFeedback.heavyImpact();
+              final type = _hasClockedIn ? "OUT" : "IN";
+              context.push('/attendance-form?type=$type');
+            },
+            enableHaptic: false,
+            scaleDown: 0.95,
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.textPrimary,
+                  borderRadius: BorderRadius.circular(16)
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.fingerprint, size: 24),
+                    const SizedBox(width: 12),
+                    Text(_hasClockedIn ? 'ABSEN PULANG SEKARANG' : 'ABSEN MASUK SEKARANG', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1)),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1022,11 +1048,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final action = displayActions[index];
         final isAllButton = action['id'] == 'all';
 
-        return InkWell(
+        return AnimatedCard(
           onTap: () {
+            final hapticEnabled = context.read<ThemeProvider>().hapticEnabled;
+            if (hapticEnabled) HapticFeedback.selectionClick();
             if (action['route'] != null) context.push(action['route'] as String);
           },
-          borderRadius: BorderRadius.circular(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

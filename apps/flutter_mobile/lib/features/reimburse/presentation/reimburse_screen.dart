@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
@@ -49,33 +50,31 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
   }
 
   void _showImageSourceActionSheet() {
-    showModalBottomSheet(
+    showCupertinoModalPopup(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('Lampirkan Bukti', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppConstants.primaryColor),
-              title: const Text('Kamera'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library, color: AppConstants.primaryColor),
-              title: const Text('Galeri Foto'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('Lampirkan Bukti'),
+        message: const Text('Pilih dari mana Anda ingin melampirkan foto nota atau struk.'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.camera);
+            },
+            child: const Text('Kamera'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+            child: const Text('Galeri Foto'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
         ),
       ),
     );
@@ -87,28 +86,27 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
     });
 
     if (!_formKey.currentState!.validate() || _selectedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Form Tidak Lengkap. Harap perbaiki isian yang salah dan lampirkan bukti pembayaran.'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Form Tidak Lengkap. Harap perbaiki isian yang salah dan lampirkan bukti pembayaran.'), backgroundColor: CupertinoColors.destructiveRed));
       return;
     }
 
-    // Confirm dialog
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => CupertinoAlertDialog(
         title: const Text('Kirim Pengajuan?'),
         content: const Text('Apakah Anda yakin data reimburse sudah benar?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Batal'),
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal', style: TextStyle(color: CupertinoColors.systemGrey)),
           ),
-          ElevatedButton(
+          CupertinoDialogAction(
+            isDefaultAction: true,
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context);
               _processSubmit();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor),
-            child: Text('Kirim', style: TextStyle(color: context.surfaceColor)),
+            child: const Text('Kirim'),
           ),
         ],
       ),
@@ -135,14 +133,14 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
       if (!mounted) return;
 
       if (result['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pengajuan reimburse Anda telah terkirim.'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pengajuan reimburse Anda telah terkirim.'), backgroundColor: CupertinoColors.activeGreen));
         context.pop();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'Error'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'Error'), backgroundColor: CupertinoColors.destructiveRed));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim data: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim data: $e'), backgroundColor: CupertinoColors.destructiveRed));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -151,145 +149,140 @@ class _ReimburseScreenState extends State<ReimburseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Pengajuan Reimburse', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
-        ),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Pengajuan Reimburse'),
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: context.surfaceColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2))],
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text('Form Klaim Pengeluaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
-              SizedBox(height: 4),
-              Text('Silakan isi data pengeluaran operasional atau medis Anda di bawah ini beserta bukti struk/nota yang sah.', style: TextStyle(fontSize: 11, color: context.textSecondary, height: 1.5)),
-              SizedBox(height: 24),
-              
-              Text('NOMINAL (RP)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: _amountCtrl,
-                keyboardType: TextInputType.number,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Nominal tidak boleh kosong';
-                  return null;
-                },
-                decoration: InputDecoration(
-                  hintText: 'Contoh: 150000',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-                  filled: true,
-                  fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
-                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 2)),
-                ),
-              ),
-              SizedBox(height: 16),
-              
-              Text('KETERANGAN PENGELUARAN', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: _descCtrl,
-                maxLines: 3,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Keterangan tidak boleh kosong';
-                  if (value.length < 5) return 'Keterangan terlalu singkat';
-                  return null;
-                },
-                decoration: InputDecoration(
-                  hintText: 'Misal: Biaya bensin dinas ke site A...',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-                  filled: true,
-                  fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
-                  focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 2)),
-                ),
-              ),
-              SizedBox(height: 16),
-              
-              Text('LAMPIRAN BUKTI (FOTO/PDF)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: context.textSecondary, letterSpacing: 0.5)),
-              const SizedBox(height: 6),
-              GestureDetector(
-                onTap: _showImageSourceActionSheet,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
-                    border: Border.all(color: (_hasAttemptedSubmit && _selectedImage == null) ? Colors.red : context.borderColor, style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(12),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5))
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Form Klaim Pengeluaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+                  const SizedBox(height: 4),
+                  const Text('Silakan isi data pengeluaran operasional atau medis Anda di bawah ini beserta bukti struk/nota yang sah.', style: TextStyle(fontSize: 11, color: CupertinoColors.systemGrey, height: 1.5)),
+                  const SizedBox(height: 24),
+                  
+                  const Text('NOMINAL (RP)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  CupertinoTextFormFieldRow(
+                    controller: _amountCtrl,
+                    keyboardType: TextInputType.number,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    placeholder: 'Contoh: 150000',
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Nominal tidak boleh kosong';
+                      return null;
+                    },
                   ),
-                  child: _selectedImage != null
-                    ? Row(
-                        children: [
-                          const Icon(Icons.check_circle, color: Colors.green, size: 24),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(_selectedImage!.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.textPrimary)),
-                                Text('Bukti Terlampir', style: TextStyle(fontSize: 10, color: context.textSecondary)),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.cancel, color: Colors.red),
-                            onPressed: () => setState(() => _selectedImage = null),
-                          )
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          const Icon(Icons.camera_alt_outlined, size: 28, color: Colors.grey),
-                          const SizedBox(height: 8),
-                          Text('Tap untuk foto atau pilih dokumen struk', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
-                        ],
+                  const SizedBox(height: 16),
+                  
+                  const Text('KETERANGAN PENGELUARAN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  CupertinoTextFormFieldRow(
+                    controller: _descCtrl,
+                    maxLines: 3,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    placeholder: 'Misal: Biaya bensin dinas ke site A...',
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Keterangan tidak boleh kosong';
+                      if (value.length < 5) return 'Keterangan terlalu singkat';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  const Text('LAMPIRAN BUKTI (FOTO/PDF)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: _showImageSourceActionSheet,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: _selectedImage != null ? CupertinoColors.activeGreen.withValues(alpha: 0.1) : (isDark ? CupertinoColors.black : CupertinoColors.systemGrey6),
+                        border: Border.all(color: (_hasAttemptedSubmit && _selectedImage == null) ? CupertinoColors.destructiveRed : (_selectedImage != null ? CupertinoColors.activeGreen : CupertinoColors.systemGrey4.withValues(alpha: 0.5))),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: _isSubmitting ? null : _handleSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppConstants.primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
+                      child: _selectedImage != null
+                        ? Row(
+                            children: [
+                              const Icon(CupertinoIcons.check_mark_circled_solid, color: CupertinoColors.activeGreen, size: 24),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(_selectedImage!.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+                                    const Text('Bukti Terlampir', style: TextStyle(fontSize: 10, color: CupertinoColors.systemGrey)),
+                                  ],
+                                ),
+                              ),
+                              CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                child: const Icon(CupertinoIcons.xmark_circle_fill, color: CupertinoColors.destructiveRed),
+                                onPressed: () => setState(() => _selectedImage = null),
+                              )
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const Icon(CupertinoIcons.camera, size: 28, color: CupertinoColors.systemGrey),
+                              const SizedBox(height: 8),
+                              Text('Tap untuk foto atau pilih dokumen struk', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey.darkColor)),
+                            ],
+                          ),
+                    ),
                   ),
-                  icon: _isSubmitting ? SizedBox() : Icon(Icons.send, color: context.surfaceColor, size: 18),
-                  label: _isSubmitting
-                    ? CircularProgressIndicator(color: context.surfaceColor)
-                    : Text('KIRIM KLAIM', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                ),
+                  const SizedBox(height: 24),
+                  
+                  SizedBox(
+                    width: double.infinity,
+                    child: CupertinoButton.filled(
+                      onPressed: _isSubmitting ? null : _handleSubmit,
+                      child: _isSubmitting
+                        ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(CupertinoIcons.paperplane_fill, size: 18),
+                              SizedBox(width: 8),
+                              Text('KIRIM KLAIM', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                            ],
+                          ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

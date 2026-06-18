@@ -30,9 +30,9 @@ const OvertimeManagementPage = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/attendance/overtime');
-      if (response.status !== 'success') throw new Error('Failed to fetch');
-      setRequests(response.data || []);
+      const response = await apiClient.get('/overtime/requests');
+      if (response.data?.status !== 'success') throw new Error('Failed to fetch');
+      setRequests(response.data?.data || []);
     } catch (err) {
       console.error("Error fetching overtime requests:", err);
       toast.error("Gagal memuat data pengajuan lembur");
@@ -50,11 +50,11 @@ const OvertimeManagementPage = () => {
   const handleApprove = async (request, status) => {
     try {
       setLoading(true);
-      const response = await apiClient.put(`/api/attendance/overtime/${request.id}`, {
+      const response = await apiClient.patch(`/overtime/approve/${request.id}`, {
         status,
-        approved_by: profile?.employee_id
+        admin_id: profile?.employee_id
       });
-      if (response.status !== 'success') throw new Error('Failed');
+      if (response.data?.status !== 'success') throw new Error('Failed');
       toast.success(`Pengajuan lembur ${status === 'Approved' ? 'disetujui' : 'ditolak'} sukses`);
       fetchRequests();
     } catch (err) {

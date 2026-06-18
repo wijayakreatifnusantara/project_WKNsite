@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/payslip_service.dart';
 import '../data/payslip_model.dart';
+import '../../../widgets/ios_card.dart';
 
 class PayslipScreen extends StatefulWidget {
   const PayslipScreen({super.key});
@@ -102,142 +104,147 @@ class _PayslipScreenState extends State<PayslipScreen> {
         ? Color(int.parse(_template!.primaryColor.replaceFirst('#', '0xff')))
         : AppConstants.primaryColor;
 
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Slip Gaji Digital', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Slip Gaji Digital'),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.push('/salary-details'),
+          child: const Icon(CupertinoIcons.doc_text_search),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.document_scanner_outlined, color: context.textPrimary),
-            onPressed: () {
-              context.push('/salary-details');
-            },
-          ),
-        ],
       ),
-      body: _isLoading 
-        ? Center(child: CircularProgressIndicator(color: themeColor))
-        : _salaryData == null
-            ? _buildEmptyState()
-            : RefreshIndicator(
-                onRefresh: _fetchData,
-                color: themeColor,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+      child: SafeArea(
+        child: _isLoading 
+          ? Center(child: CupertinoActivityIndicator(radius: 16, color: themeColor))
+          : _salaryData == null
+              ? _buildEmptyState(isDark)
+              : CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Summary Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(30),
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(color: themeColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10)),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Total Gaji Bersih (Take Home Pay)', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8),
-                            Text(_formatCurrency(netSalary), style: TextStyle(color: context.surfaceColor, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1)),
-                            SizedBox(height: 20),
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(color: context.surfaceColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-                              child: Text(_selectedMonth, style: TextStyle(color: context.surfaceColor, fontSize: 12, fontWeight: FontWeight.bold)),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      
-                      // Earnings
-                      Text('PENERIMAAN / EARNINGS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: context.textSecondary)),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))]),
-                        child: Column(
-                          children: [
-                            ...earnings.map((e) => _buildDetailRow(e['label'], _formatCurrency(e['value']), context.textPrimary)),
-                            const Divider(height: 10),
-                            _buildTotalRow('Total Penerimaan Bruto', _formatCurrency(totalEarnings), Colors.green),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 25),
-
-                      // Deductions
-                      Text('POTONGAN / DEDUCTIONS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: context.textSecondary)),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))]),
-                        child: Column(
-                          children: [
-                            ...deductions.map((d) => _buildDetailRow(d['label'], '- ${_formatCurrency(d['value'])}', Colors.red)),
-                            const Divider(height: 10),
-                            _buildTotalRow('Total Potongan', _formatCurrency(totalDeductions), Colors.red),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-
-                      // Download Btn
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur unduh PDF menggunakan package printing (segera ditambahkan)')));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF1E293B),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            elevation: 5,
+                  slivers: [
+                    CupertinoSliverRefreshControl(
+                      onRefresh: _fetchData,
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          // Summary Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: themeColor,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(color: themeColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10)),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Total Gaji Bersih (Take Home Pay)', style: TextStyle(color: CupertinoColors.white.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                Text(_formatCurrency(netSalary), style: const TextStyle(color: CupertinoColors.white, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                                const SizedBox(height: 20),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(color: CupertinoColors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+                                  child: Text(_selectedMonth, style: const TextStyle(color: CupertinoColors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                )
+                              ],
+                            ),
                           ),
-                          icon: Icon(Icons.download, color: context.surfaceColor),
-                          label: Text('UNDUH PDF (E-PAYSLIP)', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                        ),
+                          const SizedBox(height: 24),
+                          
+                          // Earnings
+                          const Text('PENERIMAAN / EARNINGS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: CupertinoColors.systemGrey)),
+                          const SizedBox(height: 8),
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                ...earnings.asMap().entries.map((entry) {
+                                  int idx = entry.key;
+                                  var e = entry.value;
+                                  return _buildDetailRow(e['label'], _formatCurrency(e['value']), isDark ? CupertinoColors.white : CupertinoColors.black, isLast: idx == earnings.length - 1);
+                                }),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildTotalRow('Total Penerimaan Bruto', _formatCurrency(totalEarnings), CupertinoColors.activeGreen),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Deductions
+                          const Text('POTONGAN / DEDUCTIONS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: CupertinoColors.systemGrey)),
+                          const SizedBox(height: 8),
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                ...deductions.asMap().entries.map((entry) {
+                                  int idx = entry.key;
+                                  var d = entry.value;
+                                  return _buildDetailRow(d['label'], '- ${_formatCurrency(d['value'])}', CupertinoColors.destructiveRed, isLast: idx == deductions.length - 1);
+                                }),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildTotalRow('Total Potongan', _formatCurrency(totalDeductions), CupertinoColors.destructiveRed),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Download Btn
+                          SizedBox(
+                            width: double.infinity,
+                            child: CupertinoButton.filled(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur unduh PDF menggunakan package printing (segera ditambahkan)')));
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(CupertinoIcons.arrow_down_doc_fill, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('UNDUH PDF (E-PAYSLIP)', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            'Dokumen ini dihasilkan secara otomatis oleh sistem WKNsite dan merupakan bukti pembayaran gaji yang sah sesuai dengan regulasi perusahaan.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 10, color: CupertinoColors.systemGrey, height: 1.5),
+                          ),
+                          const SizedBox(height: 50),
+                        ]),
                       ),
-                      SizedBox(height: 25),
-                      Text(
-                        'Dokumen ini dihasilkan secara otomatis oleh sistem WKNsite dan merupakan bukti pembayaran gaji yang sah sesuai dengan regulasi perusahaan.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 10, color: context.textSecondary, height: 1.5),
-                      ),
-                      const SizedBox(height: 50),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
+      ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.document_scanner, size: 64, color: Colors.grey),
-            SizedBox(height: 20),
-            Text('Slip Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
-            SizedBox(height: 10),
-            Text('Admin belum mempublikasikan gaji Anda.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: context.textSecondary)),
+            const Icon(CupertinoIcons.doc_text_search, size: 64, color: CupertinoColors.systemGrey),
             const SizedBox(height: 20),
-            ElevatedButton(
+            Text('Slip Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+            const SizedBox(height: 10),
+            const Text('Admin belum mempublikasikan gaji Anda.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
+            const SizedBox(height: 24),
+            CupertinoButton.filled(
               onPressed: _fetchData,
               child: const Text('Coba Lagi'),
             )
@@ -247,26 +254,33 @@ class _PayslipScreenState extends State<PayslipScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, Color valueColor) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.textPrimary)),
-          Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor)),
-        ],
-      ),
+  Widget _buildDetailRow(String label, String value, Color valueColor, {bool isLast = false}) {
+    final isDark = context.isDarkMode;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label, style: TextStyle(fontSize: 14, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+              Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor)),
+            ],
+          ),
+        ),
+        if (!isLast) const Divider(height: 1, indent: 16, color: CupertinoColors.systemGrey4),
+      ],
     );
   }
 
   Widget _buildTotalRow(String label, String value, Color valueColor) {
+    final isDark = context.isDarkMode;
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
+          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
           Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: valueColor)),
         ],
       ),

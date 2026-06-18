@@ -1,17 +1,19 @@
+import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../../core/theme/theme_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:ntp/ntp.dart';
 import 'dart:io';
 
 import '../../../core/theme/theme_extension.dart';
-import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/attendance_service.dart';
 import '../data/offline_attendance_service.dart';
-import '../../../core/utils/notification_service.dart';
 
 class AttendanceFormScreen extends StatefulWidget {
   final String clockType;
@@ -31,21 +33,90 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
 
   Future<void> _submitAttendance() async {
     if (_photoPath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harap ambil foto selfie terlebih dahulu!'), backgroundColor: Colors.red),
+      showCupertinoDialog(
+        context: context,
+        builder: (ctx) => CupertinoAlertDialog(
+          title: const Text('Foto Belum Ada'),
+          content: const Text('Harap ambil foto selfie terlebih dahulu.'),
+          actions: [CupertinoDialogAction(child: const Text('OK'), onPressed: () => Navigator.pop(ctx))],
+        ),
       );
       return;
     }
 
-    setState(() {
-      _isProcessing = true;
-    });
+    setState(() { _isProcessing = true; });
+
+    // Cache semua nilai context sebelum await
+    final user = context.read<AuthProvider>().userData;
+    final hapticEnabled = context.read<ThemeProvider>().hapticEnabled;
+    final isWebOrWindows = kIsWeb || (!Platform.isAndroid && !Platform.isIOS);
 
     try {
-      final user = context.read<AuthProvider>().userData;
-      final isWebOrWindows = kIsWeb || (!Platform.isAndroid && !Platform.isIOS);
-      
+      if (user == null) {
+        throw Exception('Sesi login habis. Harap login kembali.');
+      }
+
+      // --- ANTI-FRAUD: NTP TIME CHECK ---
+      if (!isWebOrWindows) {
+        try {
+          DateTime deviceTime = DateTime.now();
+          DateTime ntpTime = await NTP.now(timeout: const Duration(seconds: 5));
+          int diff = deviceTime.difference(ntpTime).inSeconds.abs();
+          
+          if (diff > 60) {
+            if (!mounted) return;
+            showCupertinoDialog(
+              context: context,
+              builder: (context) => CupertinoAlertDialog(
+                title: const Text('Keamanan Waktu (Anti-Fraud)'),
+                content: const Text('Waktu perangkat Anda tidak sinkron dengan waktu global (NTP). Harap setel waktu HP Anda ke "Otomatis" (Jaringan) dan coba lagi.'),
+                actions: [
+                  CupertinoDialogAction(child: const Text('Tutup'), onPressed: () => Navigator.pop(context))
+                ],
+              ),
+            );
+            return;
+          }
+        } catch (e) {
+          debugPrint('NTP Error: $e'); // Continue if NTP fails due to network
+        }
+      }
+
+      // --- GPS: PERMISSION CHECK ---
+      if (!isWebOrWindows) {
+        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          throw Exception('Layanan GPS tidak aktif. Aktifkan GPS dan coba lagi.');
+        }
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) {
+            throw Exception('Izin akses lokasi ditolak.');
+          }
+        }
+        if (permission == LocationPermission.deniedForever) {
+          throw Exception('Akses lokasi diblokir permanen. Buka Pengaturan aplikasi untuk mengaktifkan.');
+        }
+      }
+
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+      // --- ANTI-FRAUD: MOCK LOCATION CHECK ---
+      if (!isWebOrWindows && position.isMocked) {
+        if (!mounted) return;
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Lokasi Palsu Terdeteksi'),
+            content: const Text('Anda menggunakan aplikasi pemalsu lokasi (Fake GPS). Absensi ditolak demi keamanan dan integritas.'),
+            actions: [
+              CupertinoDialogAction(child: const Text('Tutup'), isDestructiveAction: true, onPressed: () => Navigator.pop(context))
+            ],
+          ),
+        );
+        return;
+      }
 
       bool isOffline = false;
       if (!isWebOrWindows) {
@@ -55,7 +126,7 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
 
       if (isOffline) {
         await _offlineService.savePendingAttendance(
-          employeeId: user?['id'] ?? 'unknown',
+          employeeId: user['id'] ?? 'unknown',
           latitude: position.latitude,
           longitude: position.longitude,
           clockType: widget.clockType, 
@@ -63,13 +134,14 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
           photoPath: _photoPath!,
         );
         if (!mounted) return;
+        if (hapticEnabled) HapticFeedback.lightImpact();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('📶 Sinyal Terputus. Absen disimpan secara OFFLINE.'), backgroundColor: Colors.orange),
+          const SnackBar(content: Text('📶 Sinyal Terputus. Absen disimpan secara OFFLINE.'), backgroundColor: CupertinoColors.systemOrange),
         );
         context.go('/main');
       } else {
         final result = await _service.submitAttendance(
-          employeeId: user?['id'] ?? 'unknown',
+          employeeId: user['id'] ?? 'unknown',
           latitude: position.latitude,
           longitude: position.longitude,
           clockType: widget.clockType, 
@@ -79,175 +151,199 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
 
         if (!mounted) return;
         if (result['status'] == 'success') {
+          if (hapticEnabled) HapticFeedback.mediumImpact();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('✅ Absen berhasil disimpan'), backgroundColor: Colors.green),
+            const SnackBar(content: Text('✅ Absen berhasil disimpan'), backgroundColor: CupertinoColors.activeGreen),
           );
-          
-          final data = result['data'];
-          bool isOnTime = data != null && data['late_minutes'] == 0;
-          
           context.go('/main');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result['message']), backgroundColor: Colors.red),
+          final msg = result['message'] ?? 'Gagal absensi. Coba lagi.';
+          showCupertinoDialog(
+            context: context,
+            builder: (ctx) => CupertinoAlertDialog(
+              title: const Text('Absensi Gagal'),
+              content: Text(msg),
+              actions: [
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengirim absen: $e')),
+        final errMsg = e.toString().replaceAll('Exception: ', '');
+        showCupertinoDialog(
+          context: context,
+          builder: (ctx) => CupertinoAlertDialog(
+            title: const Text('Terjadi Kesalahan'),
+            content: Text(errMsg),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: const Text('OK'),
+                onPressed: () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isProcessing = false;
-        });
+        setState(() { _isProcessing = false; });
       }
     }
   }
 
+  void _showImagePreview() {
+    if (_photoPath == null) return;
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        content: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(File(_photoPath!), fit: BoxFit.contain, height: MediaQuery.of(context).size.height * 0.5),
+            ),
+          ],
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Tutup'),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        title: Text(widget.clockType == 'IN' ? 'Form Absen Masuk' : 'Form Absen Pulang', style: TextStyle(color: context.textPrimary, fontSize: 16)),
-        backgroundColor: context.surfaceColor,
-        iconTheme: IconThemeData(color: context.textPrimary),
-        elevation: 0.5,
+    final isDark = context.isDarkMode;
+    
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(widget.clockType == 'IN' ? 'Form Absen Masuk' : 'Form Absen Pulang'),
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        border: Border(bottom: BorderSide(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5), width: 0.5)),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              height: 300,
-              decoration: BoxDecoration(
-                color: context.surfaceColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: context.surfaceColor.withValues(alpha: 0.2)),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5)),
-                ]
-              ),
-              child: _photoPath != null
-                  ? GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => Dialog(
-                            insetPadding: EdgeInsets.zero,
-                            backgroundColor: Colors.black,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.height,
-                                  child: InteractiveViewer(
-                                    child: Image.file(File(_photoPath!), fit: BoxFit.contain),
-                                  ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              GestureDetector(
+                onTap: _photoPath != null ? _showImagePreview : null,
+                child: Container(
+                  height: 300,
+                  decoration: BoxDecoration(
+                    color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                  ),
+                  child: _photoPath != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Image.file(File(_photoPath!), fit: BoxFit.contain),
+                              Container(
+                                color: CupertinoColors.black.withValues(alpha: 0.2),
+                                child: const Center(
+                                  child: Icon(CupertinoIcons.zoom_in, color: CupertinoColors.white, size: 32),
                                 ),
-                                Positioned(
-                                  top: 40,
-                                  right: 16,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              )
+                            ],
                           ),
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Stack(
-                          fit: StackFit.expand,
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.file(File(_photoPath!), fit: BoxFit.contain),
-                            Container(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              child: const Center(
-                                child: Icon(Icons.zoom_out_map, color: Colors.white, size: 32),
-                              ),
-                            )
+                            Icon(CupertinoIcons.camera_viewfinder, size: 60, color: CupertinoColors.systemGrey.withValues(alpha: 0.5)),
+                            const SizedBox(height: 16),
+                            const Text('Foto Selfie (Liveness)', style: TextStyle(color: CupertinoColors.systemGrey)),
+                          ],
+                        ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoButton.filled(
+                  onPressed: () async {
+                    final photoPath = await context.push<String>('/camera?type=${widget.clockType}');
+                    if (photoPath != null) {
+                      setState(() {
+                        _photoPath = photoPath;
+                      });
+                    }
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(CupertinoIcons.camera_fill, size: 20),
+                      const SizedBox(width: 8),
+                      Text(_photoPath == null ? "AMBIL FOTO WAJAH" : "ULANGI FOTO", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              Text('Catatan Kehadiran', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+              const SizedBox(height: 8),
+              
+              CupertinoTextField(
+                controller: _notesController,
+                maxLines: 3,
+                placeholder: 'Tambahkan catatan (opsional)...',
+                onChanged: (val) {
+                  if (context.read<ThemeProvider>().hapticEnabled) {
+                    HapticFeedback.selectionClick();
+                  }
+                },
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                ),
+              ),
+              
+              const SizedBox(height: 32),
+
+              _isProcessing
+                  ? const Center(child: CupertinoActivityIndicator(radius: 16))
+                  : SizedBox(
+                      width: double.infinity,
+                      child: CupertinoButton(
+                        color: CupertinoColors.activeGreen,
+                        disabledColor: CupertinoColors.systemGrey3,
+                        onPressed: _photoPath != null ? () {
+                          HapticFeedback.lightImpact();
+                          _submitAttendance();
+                        } : null,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(CupertinoIcons.check_mark_circled_solid, size: 20),
+                            SizedBox(width: 8),
+                            Text("SIMPAN ABSENSI", style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_front, size: 60, color: Colors.grey.withValues(alpha: 0.5)),
-                        const SizedBox(height: 16),
-                        const Text('Foto Selfie (Liveness)', style: TextStyle(color: Colors.grey)),
-                      ],
                     ),
-            ),
-            const SizedBox(height: 16),
-
-            ElevatedButton.icon(
-              onPressed: () async {
-                final photoPath = await context.push<String>('/camera?type=${widget.clockType}');
-                if (photoPath != null) {
-                  setState(() {
-                    _photoPath = photoPath;
-                  });
-                }
-              },
-              icon: const Icon(Icons.camera_alt),
-              label: Text(_photoPath == null ? "AMBIL FOTO WAJAH" : "ULANGI FOTO"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _photoPath == null ? AppConstants.primaryColor : Colors.orange,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            Text('Catatan Kehadiran', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: context.textPrimary)),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: context.surfaceColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: context.surfaceColor.withValues(alpha: 0.2)),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                controller: _notesController,
-                maxLines: 3,
-                style: TextStyle(color: context.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'Tambahkan catatan (opsional)...',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            _isProcessing
-                ? const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor))
-                : ElevatedButton.icon(
-                    onPressed: _photoPath != null ? _submitAttendance : null,
-                    icon: const Icon(Icons.check_circle),
-                    label: const Text("SIMPAN ABSENSI"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      disabledBackgroundColor: Colors.grey.withValues(alpha: 0.5),
-                    ),
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
     );

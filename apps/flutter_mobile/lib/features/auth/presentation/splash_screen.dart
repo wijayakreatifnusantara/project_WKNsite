@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 
@@ -6,9 +7,9 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return CupertinoPageScaffold(
       backgroundColor: context.backgroundColor,
-      body: Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -18,14 +19,15 @@ class SplashScreen extends StatelessWidget {
               height: 100,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.business,
+                CupertinoIcons.building_2_fill,
                 size: 100,
                 color: Color(0xFFE31E24),
               ),
             ),
             const SizedBox(height: 24),
-            const CircularProgressIndicator(
+            const CupertinoActivityIndicator(
               color: Color(0xFFE31E24),
+              radius: 14,
             ),
           ],
         ),

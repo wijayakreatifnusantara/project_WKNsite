@@ -1,21 +1,16 @@
-import 'package:flutter/material.dart';
-import '../../../core/theme/theme_extension.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:camera/camera.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/foundation.dart'; // Added for kIsWeb
+import 'package:flutter/foundation.dart';
 import 'dart:io'; 
-import 'dart:ui';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/attendance_service.dart';
-import '../data/offline_attendance_service.dart';
 import '../utils/liveness_checker.dart';
 import '../../../core/utils/watermark_service.dart';
-import '../../../core/utils/notification_service.dart';
 
 class CameraScreen extends StatefulWidget {
   final String clockType;
@@ -34,14 +29,13 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   bool _isFakeGps = false;
   Position? _currentPosition;
   final AttendanceService _service = AttendanceService();
-  final OfflineAttendanceService _offlineService = OfflineAttendanceService();
   final LivenessChecker _livenessChecker = LivenessChecker();
 
   // Geo-Fencing Sync (Admin Control)
   Map<String, dynamic>? _targetLocation;
   double _distanceToLocation = 0.0;
   bool _isInsideZone = false;
-  double _allowedRadius = 100.0; // Default until loaded
+  double _allowedRadius = 100.0;
 
   @override
   void initState() {
@@ -81,7 +75,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
 
       _controller = CameraController(
         frontCamera,
-        ResolutionPreset.medium, // Lowered from high for faster init and preview
+        ResolutionPreset.medium,
         enableAudio: false,
         imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
       );
@@ -109,14 +103,14 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error Camera: $e')));
+        // Fallback or warning
+        debugPrint('Camera init error: $e');
       }
     }
   }
 
   Future<void> _initLocationAndSettings() async {
     try {
-      // 1. Get Location
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -126,15 +120,13 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       }
       
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium, // Changed to medium for much faster lock
+        desiredAccuracy: LocationAccuracy.medium,
       );
       
-      // Anti Fake GPS (Mock Location Detection)
       if (_currentPosition!.isMocked) {
         if (mounted) setState(() => _isFakeGps = true);
       }
 
-      // Sinkronisasi Geo-Fence dari Web Admin
       if (mounted) {
         final userData = context.read<AuthProvider>().userData;
         final settingsRes = await _service.getAttendanceSettings();
@@ -153,7 +145,6 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
               'isFlexible': true
             };
           } else {
-            // Check specific working location
             final workingLocName = userData['working_location'];
             final locations = (data['working_locations'] as List<dynamic>?) ?? [];
             
@@ -184,21 +175,18 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             }
           }
         } else {
-          // Fallback if failed to fetch
           _targetLocation = {'name': 'Gagal memuat konfigurasi. Pastikan internet menyala.', 'lat': 0.0, 'lng': 0.0, 'isFlexible': true};
         }
         
         _calculateDistance();
-        setState(() {}); // Trigger rebuild to show updated UI
+        setState(() {});
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error Lokasi: $e')));
+        debugPrint('Location error: $e');
       }
     }
   }
-      
-
 
   @override
   void dispose() {
@@ -210,21 +198,15 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? cameraController = _controller;
-
-    // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
+    if (cameraController == null || !cameraController.value.isInitialized) return;
 
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
-      // Bebaskan resource kamera saat aplikasi di background
       cameraController.dispose();
       _controller = null;
       setState(() {
         _isReady = false;
       });
     } else if (state == AppLifecycleState.resumed) {
-      // Inisialisasi ulang kamera saat aplikasi aktif kembali
       _initCamera();
     }
   }
@@ -232,35 +214,25 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
   Future<void> _takePictureAndPreview() async {
     if (!_controller!.value.isInitialized || _isProcessing || _isFakeGps || !_isInsideZone) return;
 
-    // Ekstra Keamanan dinonaktifkan sementara agar absen lebih cepat
-    // final biometricHelper = BiometricHelper();
-    // bool authenticated = await biometricHelper.authenticate();
-    bool authenticated = true;
-    
-    if (!authenticated) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verifikasi Biometrik gagal atau dibatalkan. Absensi tidak dapat diproses.'), backgroundColor: Colors.red),
-        );
-      }
-      return;
-    }
+    setState(() => _isProcessing = true);
 
-    setState(() {
-      _isProcessing = true;
-    });
+    // Cache context-dependent values BEFORE any await
+    final user = context.read<AuthProvider>().userData;
+    final currentPos = _currentPosition;
+    final targetLoc = _targetLocation;
 
     try {
-      final user = context.read<AuthProvider>().userData;
-      final image = await _controller!.takePicture();
-
-      if (user == null || _currentPosition == null) {
-        throw Exception('Data sesi atau lokasi tidak valid');
+      if (user == null || currentPos == null) {
+        throw Exception('Data sesi atau lokasi tidak valid. Coba tutup dan buka kembali kamera.');
       }
 
-      // ----------------------------------------------------
-      // TERAPKAN WATERMARK / TIMESTAMP WKN VERIFIED
-      // ----------------------------------------------------
+      // Hentikan image stream sebelum mengambil foto
+      if (_controller!.value.isStreamingImages) {
+        await _controller!.stopImageStream();
+      }
+
+      final image = await _controller!.takePicture();
+
       final watermarkedFile = await WatermarkService.addWatermark(
         imageFile: File(image.path),
         employeeName: user['name'] ?? user['email'] ?? 'Unknown',
@@ -268,59 +240,75 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             (user['id'] != null && user['id'].toString().length > 8
                 ? user['id'].toString().substring(0, 8)
                 : (user['id']?.toString() ?? 'ID')),
-        latitude: _currentPosition!.latitude,
-        longitude: _currentPosition!.longitude,
-        address: 'Titik Absen: ${_targetLocation?['name'] ?? 'Unknown'} (${_isInsideZone ? 'Dalam Zona' : 'Luar Zona'})', 
+        latitude: currentPos.latitude,
+        longitude: currentPos.longitude,
+        address: 'Titik Absen: ${targetLoc?['name'] ?? 'Unknown'} (${_isInsideZone ? 'Dalam Zona' : 'Luar Zona'})', 
         isCheckOut: widget.clockType == 'OUT',
       );
       final finalPhotoPath = watermarkedFile.path;
-      // ----------------------------------------------------
 
       if (mounted) {
         context.pop(finalPhotoPath);
       }
     } catch (e) {
+      debugPrint('Capture error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengambil gambar: $e')),
+        showCupertinoDialog(
+          context: context,
+          builder: (ctx) => CupertinoAlertDialog(
+            title: const Text('Gagal Mengambil Foto'),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  // Coba mulai ulang kamera
+                  _initCamera();
+                },
+                child: const Text('Coba Lagi'),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  context.go('/main');
+                },
+                child: const Text('Keluar'),
+              ),
+            ],
+          ),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isProcessing = false;
-        });
-      }
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     if (!_isReady || _controller == null) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
+      return CupertinoPageScaffold(
+        backgroundColor: CupertinoColors.black,
+        child: Stack(
           children: [
-            Center(
+            const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppConstants.primaryColor),
+                  CupertinoActivityIndicator(radius: 16),
                   SizedBox(height: 16),
-                  Text('Menyiapkan Kamera & Lokasi...', style: TextStyle(color: context.surfaceColor)),
+                  Text('Menyiapkan Kamera & Lokasi...', style: TextStyle(color: CupertinoColors.white)),
                 ],
               ),
             ),
             Positioned(
               top: 50,
               right: 16,
-              child: IconButton(
-                icon: Icon(Icons.close, color: context.surfaceColor, size: 30),
-                onPressed: () {
-                  context.go('/main');
-                },
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => context.go('/main'),
+                child: const Icon(CupertinoIcons.clear, color: CupertinoColors.white, size: 30),
               ),
             )
           ],
@@ -328,9 +316,9 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
+    return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.black,
+      child: Stack(
         children: [
           SizedBox.expand(
             child: FittedBox(
@@ -343,15 +331,14 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             ),
           ),
           
-          // Overlay overlay to show location/time/geofence
           Positioned(
-            top: 50,
+            top: 60,
             left: 16,
-            right: 16,
+            right: 60, // give space for close button
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.black54,
+                color: CupertinoColors.black.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -360,14 +347,19 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('📍 Titik Absen (Dikunci Admin)', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      const Text('📍 Titik Absen (Dikunci Admin)', style: TextStyle(color: CupertinoColors.systemGrey3, fontSize: 12)),
                       if (_targetLocation != null)
-                         Text(
-                           _targetLocation!['name'],
-                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                         Expanded(
+                           child: Text(
+                             _targetLocation!['name'],
+                             style: const TextStyle(color: CupertinoColors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                             textAlign: TextAlign.right,
+                             maxLines: 1,
+                             overflow: TextOverflow.ellipsis,
+                           ),
                          )
                       else if (_currentPosition != null)
-                         const Text('Memuat konfigurasi...', style: TextStyle(color: Colors.amber, fontSize: 12)),
+                         const Text('Memuat konfigurasi...', style: TextStyle(color: CupertinoColors.systemYellow, fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -375,8 +367,8 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                     Row(
                       children: [
                         Icon(
-                          _isInsideZone ? Icons.check_circle : Icons.cancel,
-                          color: _isInsideZone ? Colors.greenAccent : Colors.redAccent,
+                          _isInsideZone ? CupertinoIcons.check_mark_circled_solid : CupertinoIcons.xmark_circle_fill,
+                          color: _isInsideZone ? CupertinoColors.activeGreen : CupertinoColors.destructiveRed,
                           size: 16,
                         ),
                         const SizedBox(width: 8),
@@ -388,7 +380,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                                     ? 'Di Dalam Zona (Jarak: ${_distanceToLocation.toStringAsFixed(0)}m)'
                                     : 'DI LUAR ZONA! Jarak: ${_distanceToLocation.toStringAsFixed(0)}m / ${_allowedRadius.toStringAsFixed(0)} m',
                             style: TextStyle(
-                              color: _isInsideZone ? Colors.greenAccent : Colors.redAccent, 
+                              color: _isInsideZone ? CupertinoColors.activeGreen : CupertinoColors.destructiveRed, 
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -397,24 +389,24 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                       ],
                     )
                   else
-                    const Text('Mencari sinyal GPS...', style: TextStyle(color: Colors.amber)),
+                    const Text('Mencari sinyal GPS...', style: TextStyle(color: CupertinoColors.systemYellow, fontSize: 12)),
                   
                   if (_isFakeGps)
                     Container(
                       margin: const EdgeInsets.only(top: 8),
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent.withValues(alpha: 0.9),
+                        color: CupertinoColors.destructiveRed.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
-                          Icon(Icons.gpp_bad_rounded, color: context.surfaceColor, size: 16),
+                          Icon(CupertinoIcons.exclamationmark_shield_fill, color: CupertinoColors.white, size: 16),
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'FAKE GPS TERDETEKSI! Matikan Mock Location untuk absen.',
-                              style: TextStyle(color: context.surfaceColor, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: CupertinoColors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -425,7 +417,6 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             ),
           ),
 
-          // Liveness Instruction
           if (!_isLivenessPassed)
             Positioned(
               bottom: 140,
@@ -434,25 +425,24 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.redAccent.withValues(alpha: 0.9),
+                  color: CupertinoColors.destructiveRed.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: Text(
+                child: const Text(
                   'Arahkan wajah ke kamera, lalu Tersenyum atau Berkedip!',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(color: CupertinoColors.white, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
             ),
 
-          // Capture Button
           Positioned(
             bottom: 40,
             left: 0,
             right: 0,
             child: Center(
               child: _isProcessing 
-                ? const CircularProgressIndicator(color: AppConstants.primaryColor)
+                ? const CupertinoActivityIndicator(radius: 16)
                 : GestureDetector(
                     onTap: (_isLivenessPassed && !_isFakeGps) ? _takePictureAndPreview : null,
                     child: Container(
@@ -460,12 +450,12 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: (_isLivenessPassed && !_isFakeGps) ? context.surfaceColor : Colors.grey, width: 4),
-                        color: (_isLivenessPassed && !_isFakeGps) ? AppConstants.primaryColor : Colors.grey.withValues(alpha: 0.5),
+                        border: Border.all(color: (_isLivenessPassed && !_isFakeGps) ? CupertinoColors.white : CupertinoColors.systemGrey, width: 4),
+                        color: (_isLivenessPassed && !_isFakeGps) ? AppConstants.primaryColor : CupertinoColors.systemGrey.withValues(alpha: 0.5),
                       ),
                       child: Icon(
-                        (_isLivenessPassed && !_isFakeGps) ? Icons.camera_alt : Icons.lock_outline, 
-                        color: context.surfaceColor, 
+                        (_isLivenessPassed && !_isFakeGps) ? CupertinoIcons.camera_fill : CupertinoIcons.lock_fill, 
+                        color: CupertinoColors.white, 
                         size: 36
                       ),
                     ),
@@ -473,15 +463,13 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             ),
           ),
 
-          // Close button
           Positioned(
             top: 50,
             right: 16,
-            child: IconButton(
-              icon: Icon(Icons.close, color: context.surfaceColor, size: 30),
-              onPressed: () {
-                context.go('/main');
-              },
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => context.go('/main'),
+              child: const Icon(CupertinoIcons.clear, color: CupertinoColors.white, size: 30),
             ),
           )
         ],

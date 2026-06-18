@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/payslip_service.dart';
 import '../data/payslip_model.dart';
+import '../../../widgets/ios_card.dart';
 
 class SalaryDetailsScreen extends StatefulWidget {
   const SalaryDetailsScreen({super.key});
@@ -53,6 +55,8 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+
     double fixedTotal = 0;
     double variableTotal = 0;
     double nonWageTotal = 0;
@@ -69,174 +73,239 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
       netSalary = totalEarnings - totalDeductions;
     }
 
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Rincian Gaji', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
+    if (_isLoading) {
+      return CupertinoPageScaffold(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+          middle: const Text('Rincian Gaji'),
+        ),
+        child: const Center(child: CupertinoActivityIndicator(radius: 16)),
+      );
+    }
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Rincian Gaji'),
+        previousPageTitle: 'Gaji',
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: _fetchData,
+          child: const Icon(CupertinoIcons.refresh),
         ),
       ),
-      body: _isLoading
-        ? const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor))
-        : _salaryData == null
-            ? _buildEmptyState()
-            : RefreshIndicator(
-                onRefresh: _fetchData,
-                color: AppConstants.primaryColor,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Summary THP
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppConstants.primaryColor,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [BoxShadow(color: AppConstants.primaryColor.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8))],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Take Home Pay (THP)', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8),
-                            Text(_formatCurrency(netSalary), style: TextStyle(color: context.surfaceColor, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: -1)),
-                            const SizedBox(height: 16),
-                            const Divider(color: Colors.white24, height: 1),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Total Penerimaan', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold)),
-                                      Text(_formatCurrency(totalEarnings), style: TextStyle(color: context.surfaceColor, fontSize: 16, fontWeight: FontWeight.w800)),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Total Potongan', style: TextStyle(color: context.surfaceColor.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold)),
-                                      Text(_formatCurrency(totalDeductions), style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 16, fontWeight: FontWeight.w800)),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Grade
-                      _buildCard([_buildInputRow('Grade / Golongan', _salaryData!.grade)]),
-
-                      // Fixed Allowance
-                      _buildSectionTitle('FIXED ALLOWANCE', Icons.account_balance_wallet_outlined),
-                      _buildCard([
-                        _buildInputRow('1. Gaji Pokok (Basic Salary)', _formatCurrency(_salaryData!.basicSalary)),
-                        _buildInputRow('2. Tunjangan Posisi', _formatCurrency(_salaryData!.positionAllowance)),
-                        _buildInputRow('3. Tunjangan Keahlian', _formatCurrency(_salaryData!.skillAllowance)),
-                        _buildInputRow('4. Tunjangan Komunikasi', _formatCurrency(_salaryData!.communicationAllowance)),
-                        _buildInputRow('5. BPJS TK JKK', _formatCurrency(_salaryData!.bpjsTkJkk)),
-                        _buildInputRow('6. BPJS TK JKM', _formatCurrency(_salaryData!.bpjsTkJkm)),
-                        _buildInputRow('7. BPJS TK JHT', _formatCurrency(_salaryData!.bpjsTkJht)),
-                        _buildInputRow('8. BPJS TK Pensiun', _formatCurrency(_salaryData!.bpjsTkPensiun)),
-                        _buildInputRow('9. BPJS Kesehatan', _formatCurrency(_salaryData!.bpjsKesehatan)),
-                        _buildInputRow('10. Tunjangan Pajak', _formatCurrency(_salaryData!.taxAllowance)),
-                        const Divider(height: 24),
-                        _buildTotalRow('Total Fixed Allowance', _formatCurrency(fixedTotal), Colors.green),
-                      ]),
-
-                      // Variable Allowance
-                      _buildSectionTitle('VARIABLE ALLOWANCE', Icons.trending_up),
-                      _buildCard([
-                        _buildInputRow('1. Tunjangan Work Order', _formatCurrency(_salaryData!.workOrderAllowance)),
-                        _buildInputRow('2. Tunjangan Makan', _formatCurrency(_salaryData!.mealsAllowance)),
-                        _buildInputRow('3. Tunjangan Transport', _formatCurrency(_salaryData!.transportAllowance)),
-                        _buildInputRow('4. Tunjangan Lembur', _formatCurrency(_salaryData!.overtimeAllowance)),
-                        const Divider(height: 24),
-                        _buildTotalRow('Total Variable Allowance', _formatCurrency(variableTotal), Colors.green),
-                      ]),
-
-                      // Non Wage
-                      _buildSectionTitle('NON-WAGE INCOME', Icons.card_giftcard),
-                      _buildCard([
-                        _buildInputRow('1. THR', _formatCurrency(_salaryData!.thr)),
-                        _buildInputRow('2. Bonus', _formatCurrency(_salaryData!.bonus)),
-                        _buildInputRow('3. Insentif', _formatCurrency(_salaryData!.incentive)),
-                        _buildInputRow('4. Penerimaan Lain-lain', _formatCurrency(_salaryData!.miscEarnings)),
-                        const Divider(height: 24),
-                        _buildTotalRow('Total Non-Wage Income', _formatCurrency(nonWageTotal), Colors.green),
-                      ]),
-
-                      // Deductions
-                      _buildSectionTitle('DEDUCTIONS / POTONGAN', Icons.remove_circle_outline),
-                      _buildCard([
-                        _buildInputRow('1. PPh 21', _formatCurrency(_salaryData!.pph21)),
-                        _buildInputRow('2. BPJS TK JHT', _formatCurrency(_salaryData!.deductionJht)),
-                        _buildInputRow('3. BPJS TK Pensiun', _formatCurrency(_salaryData!.deductionPensiun)),
-                        _buildInputRow('4. BPJS Kesehatan', _formatCurrency(_salaryData!.deductionKesehatan)),
-                        _buildInputRow('5. Pinjaman / Loan', _formatCurrency(_salaryData!.loan)),
-                        _buildInputRow('6. Potongan Lain-lain', _formatCurrency(_salaryData!.miscDeductions)),
-                        const Divider(height: 24),
-                        _buildTotalRow('Total Potongan', _formatCurrency(totalDeductions), Colors.red),
-                      ]),
-
-                      // Correction Button
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            context.push('/salary-correction');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            elevation: 5,
-                          ),
-                          icon: Icon(Icons.warning_amber_rounded, color: context.surfaceColor),
-                          label: Text('AJUKAN KOREKSI GAJI', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Ini adalah rincian gaji resmi Anda yang diinput oleh HR/Admin. Karyawan tidak dapat mengubah rincian ini. Jika ada ketidaksesuaian nominal, segera ajukan form koreksi gaji.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 11, color: context.textSecondary, height: 1.5),
-                      ),
-                      const SizedBox(height: 40),
-                    ],
+      child: SafeArea(
+        child: _salaryData == null
+            ? _buildEmptyState(isDark)
+            : CustomScrollView(
+                slivers: [
+                  CupertinoSliverRefreshControl(
+                    onRefresh: _fetchData,
                   ),
-                ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Summary THP
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: AppConstants.primaryColor,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [BoxShadow(color: AppConstants.primaryColor.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8))],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Take Home Pay (THP)', style: TextStyle(color: CupertinoColors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                Text(_formatCurrency(netSalary), style: const TextStyle(color: CupertinoColors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                                const SizedBox(height: 20),
+                                const Divider(color: Colors.white30, height: 1),
+                                const SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text('Total Penerimaan', style: TextStyle(color: CupertinoColors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 4),
+                                          Text(_formatCurrency(totalEarnings), style: const TextStyle(color: CupertinoColors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text('Total Potongan', style: TextStyle(color: CupertinoColors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 4),
+                                          Text(_formatCurrency(totalDeductions), style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 15, fontWeight: FontWeight.w800)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Grade
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: _buildInputRow('Grade / Golongan', _salaryData!.grade, isDark),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Fixed Allowance
+                          _buildSectionTitle('FIXED ALLOWANCE', CupertinoIcons.money_dollar_circle),
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                _buildInputRow('1. Gaji Pokok (Basic Salary)', _formatCurrency(_salaryData!.basicSalary), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('2. Tunjangan Posisi', _formatCurrency(_salaryData!.positionAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('3. Tunjangan Keahlian', _formatCurrency(_salaryData!.skillAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('4. Tunj. Komunikasi', _formatCurrency(_salaryData!.communicationAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('5. BPJS TK JKK', _formatCurrency(_salaryData!.bpjsTkJkk), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('6. BPJS TK JKM', _formatCurrency(_salaryData!.bpjsTkJkm), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('7. BPJS TK JHT', _formatCurrency(_salaryData!.bpjsTkJht), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('8. BPJS TK Pensiun', _formatCurrency(_salaryData!.bpjsTkPensiun), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('9. BPJS Kesehatan', _formatCurrency(_salaryData!.bpjsKesehatan), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('10. Tunjangan Pajak', _formatCurrency(_salaryData!.taxAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildTotalRow('Total Fixed Allowance', _formatCurrency(fixedTotal), CupertinoColors.activeGreen, isDark),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Variable Allowance
+                          _buildSectionTitle('VARIABLE ALLOWANCE', CupertinoIcons.chart_bar_alt_fill),
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                _buildInputRow('1. Tunjangan Work Order', _formatCurrency(_salaryData!.workOrderAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('2. Tunjangan Makan', _formatCurrency(_salaryData!.mealsAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('3. Tunjangan Transport', _formatCurrency(_salaryData!.transportAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('4. Tunjangan Lembur', _formatCurrency(_salaryData!.overtimeAllowance), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildTotalRow('Total Variable Allowance', _formatCurrency(variableTotal), CupertinoColors.activeGreen, isDark),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Non Wage
+                          _buildSectionTitle('NON-WAGE INCOME', CupertinoIcons.gift_fill),
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                _buildInputRow('1. THR', _formatCurrency(_salaryData!.thr), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('2. Bonus', _formatCurrency(_salaryData!.bonus), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('3. Insentif', _formatCurrency(_salaryData!.incentive), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('4. Penerimaan Lain', _formatCurrency(_salaryData!.miscEarnings), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildTotalRow('Total Non-Wage Income', _formatCurrency(nonWageTotal), CupertinoColors.activeGreen, isDark),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Deductions
+                          _buildSectionTitle('DEDUCTIONS / POTONGAN', CupertinoIcons.minus_circle_fill),
+                          IosCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                _buildInputRow('1. PPh 21', _formatCurrency(_salaryData!.pph21), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('2. BPJS TK JHT', _formatCurrency(_salaryData!.deductionJht), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('3. BPJS TK Pensiun', _formatCurrency(_salaryData!.deductionPensiun), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('4. BPJS Kesehatan', _formatCurrency(_salaryData!.deductionKesehatan), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('5. Pinjaman / Loan', _formatCurrency(_salaryData!.loan), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildInputRow('6. Potongan Lain-lain', _formatCurrency(_salaryData!.miscDeductions), isDark),
+                                const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                _buildTotalRow('Total Potongan', _formatCurrency(totalDeductions), CupertinoColors.destructiveRed, isDark),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Correction Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: CupertinoButton(
+                              color: CupertinoColors.destructiveRed.withValues(alpha: 0.1),
+                              onPressed: () => context.push('/salary-correction'),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(CupertinoIcons.exclamationmark_triangle_fill, color: CupertinoColors.destructiveRed, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('AJUKAN KOREKSI GAJI', style: TextStyle(color: CupertinoColors.destructiveRed, fontWeight: FontWeight.bold, fontSize: 14)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Ini adalah rincian gaji resmi Anda yang diinput oleh HR/Admin. Karyawan tidak dapat mengubah rincian ini. Jika ada ketidaksesuaian nominal, segera ajukan form koreksi gaji.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 11, color: CupertinoColors.systemGrey, height: 1.5),
+                          ),
+                          const SizedBox(height: 40),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ),
+      ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.document_scanner, size: 64, color: Colors.grey),
-            SizedBox(height: 20),
-            Text('Data Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: context.textPrimary)),
-            SizedBox(height: 10),
-            Text('Admin belum menginput data gaji Anda ke dalam sistem.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: context.textSecondary)),
+            const Icon(CupertinoIcons.doc_text_search, size: 64, color: CupertinoColors.systemGrey),
             const SizedBox(height: 20),
-            ElevatedButton(
+            Text('Data Gaji Belum Tersedia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+            const SizedBox(height: 10),
+            const Text('Admin belum menginput data gaji Anda ke dalam sistem.', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
+            const SizedBox(height: 20),
+            CupertinoButton.filled(
               onPressed: _fetchData,
               child: const Text('Coba Lagi'),
             )
@@ -248,57 +317,51 @@ class _SalaryDetailsScreenState extends State<SalaryDetailsScreen> {
 
   Widget _buildSectionTitle(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12, left: 4),
+      padding: const EdgeInsets.only(bottom: 8, left: 16),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppConstants.primaryColor),
-          const SizedBox(width: 8),
-          Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppConstants.primaryColor, letterSpacing: 1)),
+          Icon(icon, size: 16, color: CupertinoColors.systemGrey),
+          const SizedBox(width: 6),
+          Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
         ],
       ),
     );
   }
 
-  Widget _buildCard(List<Widget> children) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
-      child: Column(children: children),
-    );
-  }
-
-  Widget _buildInputRow(String label, String value) {
+  Widget _buildInputRow(String label, String value, bool isDark) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.textPrimary))),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
+          Expanded(
+            flex: 5,
+            child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? CupertinoColors.systemGrey2 : CupertinoColors.systemGrey)),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 4,
+            child: Text(value, textAlign: TextAlign.right, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
           )
         ],
       ),
     );
   }
 
-  Widget _buildTotalRow(String label, String value, Color valueColor) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: context.textPrimary)),
-        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: valueColor)),
-      ],
+  Widget _buildTotalRow(String label, String value, Color valueColor, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.systemGrey6,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16))
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+          Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: valueColor)),
+        ],
+      ),
     );
   }
 }

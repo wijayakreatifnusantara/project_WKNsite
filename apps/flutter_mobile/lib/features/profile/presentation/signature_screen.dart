@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../core/utils/constants.dart';
+import '../../../widgets/ios_card.dart';
 
 class SignatureScreen extends StatefulWidget {
   const SignatureScreen({super.key});
@@ -21,8 +23,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   final SignatureController _signatureController = SignatureController(
     penStrokeWidth: 3,
-    penColor: Colors.black,
-    exportBackgroundColor: Colors.white,
+    penColor: CupertinoColors.black,
+    exportBackgroundColor: CupertinoColors.white,
   );
 
   bool _isLoading = true;
@@ -67,7 +69,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   Future<void> _saveSignature() async {
     if (_signatureController.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tanda tangan kosong'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tanda tangan kosong'), backgroundColor: CupertinoColors.destructiveRed));
       return;
     }
 
@@ -90,14 +92,14 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
       final body = jsonDecode(response.body);
       if (response.statusCode == 200 && body['status'] == 'success') {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tanda tangan berhasil disimpan'), backgroundColor: Colors.green));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tanda tangan berhasil disimpan'), backgroundColor: CupertinoColors.activeGreen));
         _signatureController.clear();
         _fetchCurrentSignature();
       } else {
         throw Exception(body['message'] ?? 'Gagal menyimpan');
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: CupertinoColors.destructiveRed));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -105,124 +107,113 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Tanda Tangan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Tanda Tangan'),
+        trailing: _isLoading || _isSaving 
+          ? const CupertinoActivityIndicator() 
+          : CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _isSaving ? null : _saveSignature,
+              child: const Text('Simpan', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
       ),
-      body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('TANDA TANGAN SAAT INI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1)),
-                const SizedBox(height: 10),
-                Container(
-                  height: 160,
-                  width: double.infinity,
-                  decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), border: Border.all(color: context.borderColor)),
-                    child: _currentSignatureUrl != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: CachedNetworkImage(
-                            imageUrl: _currentSignatureUrl!,
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                            errorWidget: (context, url, error) => const Center(child: Icon(Icons.error_outline, color: Colors.red, size: 32)),
+      child: SafeArea(
+        child: _isLoading 
+          ? const Center(child: CupertinoActivityIndicator(radius: 16))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16, bottom: 8),
+                    child: Text('TANDA TANGAN SAAT INI', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
+                  ),
+                  IosCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Container(
+                      height: 160,
+                      width: double.infinity,
+                      decoration: BoxDecoration(color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white, borderRadius: BorderRadius.circular(16)),
+                      child: _currentSignatureUrl != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: CachedNetworkImage(
+                              imageUrl: _currentSignatureUrl!,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => const Center(child: CupertinoActivityIndicator()),
+                              errorWidget: (context, url, error) => const Center(child: Icon(CupertinoIcons.exclamationmark_triangle, color: CupertinoColors.destructiveRed, size: 32)),
+                            ),
+                          )
+                        : const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(CupertinoIcons.exclamationmark_triangle, size: 32, color: CupertinoColors.systemGrey),
+                                SizedBox(height: 8),
+                                Text('Belum ada tanda tangan', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 12, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 30),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16, bottom: 8),
+                    child: Text('BUAT / PERBARUI TANDA TANGAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
+                  ),
+                  IosCard(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          child: Signature(
+                            controller: _signatureController,
+                            height: 220,
+                            backgroundColor: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.systemGrey6,
+                          ),
+                        ),
+                        const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                        CupertinoButton(
+                          onPressed: () => _signatureController.clear(),
+                          child: const Text('Hapus Tanda Tangan', style: TextStyle(color: CupertinoColors.destructiveRed, fontWeight: FontWeight.bold, fontSize: 14)),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+                  IosCard(
+                    padding: const EdgeInsets.all(16),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(CupertinoIcons.checkmark_shield_fill, color: CupertinoColors.activeGreen),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Keamanan Terjamin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                              SizedBox(height: 4),
+                              Text('Tanda tangan digital Anda disimpan dengan enkripsi aman dan digunakan untuk persetujuan dokumen internal.', style: TextStyle(fontSize: 11, color: CupertinoColors.systemGrey)),
+                            ],
                           ),
                         )
-                    : const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.warning_amber_rounded, size: 32, color: Colors.grey),
-                            SizedBox(height: 8),
-                            Text('Belum ada tanda tangan', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                ),
-                
-                const SizedBox(height: 30),
-                const Text('BUAT / PERBARUI TANDA TANGAN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1)),
-                const SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppConstants.primaryColor, width: 2),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: Signature(
-                      controller: _signatureController,
-                      height: 220,
-                      backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                      ],
                     ),
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _signatureController.clear(),
-                        icon: const Icon(Icons.clear, color: Colors.red),
-                        label: const Text('Hapus', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          padding: const EdgeInsets.symmetric(vertical: 14)
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _isSaving ? null : _saveSignature,
-                        icon: _isSaving ? SizedBox.shrink() : Icon(Icons.cloud_upload_outlined, color: context.surfaceColor),
-                        label: _isSaving 
-                          ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: context.surfaceColor, strokeWidth: 2)) 
-                          : Text('Simpan', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppConstants.primaryColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          padding: const EdgeInsets.symmetric(vertical: 14)
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-
-                const SizedBox(height: 30),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: context.borderColor)),
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.shield_outlined, color: Colors.green),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Keamanan Terjamin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                            SizedBox(height: 4),
-                            Text('Tanda tangan digital Anda disimpan dengan enkripsi aman dan digunakan untuk persetujuan dokumen internal.', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-          )
+                  )
+                ],
+              ),
+            )
+      ),
     );
   }
 }

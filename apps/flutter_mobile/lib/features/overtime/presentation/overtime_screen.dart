@@ -1,17 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
-import '../data/overtime_service.dart';
-import '../data/overtime_model.dart';
+import '../data/overtime_provider.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../core/utils/watermark_service.dart';
+import '../../../widgets/ios_card.dart';
 
 class OvertimeScreen extends StatefulWidget {
   const OvertimeScreen({super.key});
@@ -21,12 +19,8 @@ class OvertimeScreen extends StatefulWidget {
 }
 
 class _OvertimeScreenState extends State<OvertimeScreen> {
-  final OvertimeService _overtimeService = OvertimeService();
-  bool _isLoading = false;
-  bool _isSubmitLoading = false;
   bool _showForm = false;
-  List<OvertimeRequest> _requests = [];
-  RealtimeChannel? _subscription;
+  bool _isPhotoLoading = false;
 
   // Form Fields
   final TextEditingController _dateCtrl = TextEditingController();
@@ -43,45 +37,21 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initScreen();
+      final user = context.read<AuthProvider>().userData;
+      if (user != null) {
+        context.read<OvertimeProvider>().subscribeToMyRequests(user['id']);
+        context.read<OvertimeProvider>().fetchOvertimeRequests(user['id']);
+      }
     });
   }
 
   @override
   void dispose() {
-    _subscription?.unsubscribe();
     _dateCtrl.dispose();
     _startTimeCtrl.dispose();
     _endTimeCtrl.dispose();
     _reasonCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _initScreen() async {
-    final user = context.read<AuthProvider>().userData;
-    if (user != null) {
-      await _fetchOvertimeRequests(user['id']);
-      _subscription = _overtimeService.subscribeToMyRequests(user['id'], () {
-        _fetchOvertimeRequests(user['id']);
-      });
-    }
-  }
-
-  Future<void> _fetchOvertimeRequests(String employeeId) async {
-    if (!mounted) return;
-    setState(() => _isLoading = true);
-    try {
-      final data = await _overtimeService.getMyRequests(employeeId);
-      if (mounted) {
-        setState(() {
-          _requests = data;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error fetching overtime: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
   }
 
   void _setFormDefaults() {
@@ -107,7 +77,7 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
       );
       
       if (photo != null) {
-        setState(() => _isSubmitLoading = true);
+        setState(() => _isPhotoLoading = true);
         
         bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
         if (!serviceEnabled) {
@@ -139,101 +109,182 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         
         setState(() {
           _proofPhotoPath = watermarkedFile.path;
-
+          _isPhotoLoading = false;
         });
         _showPhotoPreview();
-            }
+      }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil foto: $e'), backgroundColor: Colors.red));
-    } finally {
-      if (mounted) setState(() => _isSubmitLoading = false);
+      if (mounted) {
+        setState(() => _isPhotoLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil foto: $e'), backgroundColor: CupertinoColors.destructiveRed));
+      }
     }
   }
 
   void _showPhotoPreview() {
     if (_proofPhotoPath == null) return;
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Pratinjau Foto Lembur', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Pratinjau Foto Lembur'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               child: Image.file(File(_proofPhotoPath!)),
             ),
             const SizedBox(height: 12),
-            const Text('Pastikan wajah dan pekerjaan Anda terlihat jelas beserta keterangan waktu di dalam foto.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
+            const Text('Pastikan wajah dan pekerjaan Anda terlihat jelas beserta keterangan waktu di dalam foto.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
           ],
         ),
         actions: [
-          TextButton(onPressed: () {
-            setState(() => _proofPhotoPath = null);
-            Navigator.pop(context);
-          }, child: Text('Hapus Foto', style: TextStyle(color: Colors.red))),
-          ElevatedButton(onPressed: () => Navigator.pop(context), style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor), child: Text('Gunakan Foto', style: TextStyle(color: context.surfaceColor))),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              setState(() => _proofPhotoPath = null);
+              Navigator.pop(context);
+            }, 
+            child: const Text('Hapus Foto')
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(context), 
+            child: const Text('Gunakan')
+          ),
         ],
       )
     );
   }
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
-    final DateTime? picked = await showDatePicker(
+  void _showDatePickerModal(TextEditingController controller) {
+    showCupertinoModalPopup(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 30)),
-      lastDate: DateTime.now().add(const Duration(days: 30)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: AppConstants.primaryColor),
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          color: context.isDarkMode ? CupertinoColors.black : CupertinoColors.white,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    child: const Text('Batal'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  CupertinoButton(
+                    child: const Text('Selesai'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: DateTime.now(),
+                  minimumDate: DateTime.now().subtract(const Duration(days: 30)),
+                  maximumDate: DateTime.now().add(const Duration(days: 30)),
+                  onDateTimeChanged: (DateTime newDate) {
+                    setState(() {
+                      controller.text = newDate.toIso8601String().split('T')[0];
+                    });
+                  },
+                ),
+              ),
+            ],
           ),
-          child: child!,
         );
       },
     );
-    if (picked != null) {
-      setState(() {
-        controller.text = picked.toIso8601String().split('T')[0];
-      });
-    }
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
-    final TimeOfDay? picked = await showTimePicker(
+  void _showTimePickerModal(TextEditingController controller) {
+    showCupertinoModalPopup(
       context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: AppConstants.primaryColor),
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          color: context.isDarkMode ? CupertinoColors.black : CupertinoColors.white,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    child: const Text('Batal'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  CupertinoButton(
+                    child: const Text('Selesai'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  use24hFormat: true,
+                  initialDateTime: DateTime.now(),
+                  onDateTimeChanged: (DateTime newTime) {
+                    setState(() {
+                      final hour = newTime.hour.toString().padLeft(2, '0');
+                      final minute = newTime.minute.toString().padLeft(2, '0');
+                      controller.text = '$hour:$minute';
+                    });
+                  },
+                ),
+              ),
+            ],
           ),
-          child: child!,
         );
       },
     );
-    if (picked != null && context.mounted) {
-      setState(() {
-        final hour = picked.hour.toString().padLeft(2, '0');
-        final minute = picked.minute.toString().padLeft(2, '0');
-        controller.text = '$hour:$minute';
-      });
-    }
+  }
+
+  void _showCompensationActionSheet() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('Pilih Kompensasi'),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              setState(() => _compensationType = 'Paid');
+              Navigator.pop(context);
+            },
+            child: const Text('Dibayar Uang (Sesuai Kemenaker)'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              setState(() => _compensationType = 'Time-off');
+              Navigator.pop(context);
+            },
+            child: const Text('Ditukar Cuti (Time-off in Lieu)'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+      ),
+    );
   }
 
   Future<void> _handleCreateRequest() async {
     final user = context.read<AuthProvider>().userData;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesi Berakhir. Silakan login kembali.')),
+        const SnackBar(content: Text('Sesi Berakhir. Silakan login kembali.'), backgroundColor: CupertinoColors.destructiveRed),
       );
       return;
     }
 
     if (_dateCtrl.text.isEmpty || _startTimeCtrl.text.isEmpty || _endTimeCtrl.text.isEmpty || _reasonCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Form Belum Lengkap')),
+        const SnackBar(content: Text('Form Belum Lengkap'), backgroundColor: CupertinoColors.destructiveRed),
       );
       return;
     }
@@ -242,20 +293,18 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
     final timeRegex = RegExp(r'^\d{2}:\d{2}$');
 
     if (!dateRegex.hasMatch(_dateCtrl.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Format Tanggal Salah (YYYY-MM-DD)')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Format Tanggal Salah (YYYY-MM-DD)'), backgroundColor: CupertinoColors.destructiveRed));
       return;
     }
     if (!timeRegex.hasMatch(_startTimeCtrl.text) || !timeRegex.hasMatch(_endTimeCtrl.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Format Jam Salah (HH:MM)')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Format Jam Salah (HH:MM)'), backgroundColor: CupertinoColors.destructiveRed));
       return;
     }
 
     if (_proofPhotoPath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Wajib melampirkan foto bukti lembur!')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Wajib melampirkan foto bukti lembur!'), backgroundColor: CupertinoColors.destructiveRed));
       return;
     }
-
-    setState(() => _isSubmitLoading = true);
 
     try {
       final partsStart = _startTimeCtrl.text.split(':');
@@ -283,37 +332,39 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
         'reason': _reasonCtrl.text.trim(),
         'compensation_type': _compensationType,
         'status': 'Pending',
-        'proof_base64': ?base64Image,
+        'proof_base64': base64Image,
       };
 
-      await _overtimeService.submitOvertimeRequest(payload);
+      final result = await context.read<OvertimeProvider>().submitOvertimeRequest(payload);
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pengajuan lembur berhasil dikirim!'), backgroundColor: Colors.green),
-      );
-      setState(() {
-        _showForm = false;
-      });
-      _fetchOvertimeRequests(user['id']);
+      if (result['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pengajuan lembur berhasil dikirim!'), backgroundColor: CupertinoColors.activeGreen),
+        );
+        setState(() {
+          _showForm = false;
+        });
+        context.read<OvertimeProvider>().fetchOvertimeRequests(user['id']);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'] ?? 'Error'), backgroundColor: CupertinoColors.destructiveRed),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Terjadi kesalahan: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Terjadi kesalahan: $e'), backgroundColor: CupertinoColors.destructiveRed),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitLoading = false);
       }
     }
   }
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'Approved': return Colors.green;
-      case 'Rejected': return Colors.red;
-      default: return Colors.orange;
+      case 'Approved': return CupertinoColors.activeGreen;
+      case 'Rejected': return CupertinoColors.destructiveRed;
+      default: return CupertinoColors.activeOrange;
     }
   }
 
@@ -327,126 +378,211 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Pengajuan Lembur', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Pengajuan Lembur'),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            if (_showForm) {
+              setState(() => _showForm = false);
+            } else {
+              _setFormDefaults();
+            }
+          },
+          child: Icon(_showForm ? CupertinoIcons.list_bullet : CupertinoIcons.add_circled),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(_showForm ? Icons.list : Icons.add_circle_outline, color: AppConstants.primaryColor),
-            onPressed: () {
-              if (_showForm) {
-                setState(() => _showForm = false);
-              } else {
-                _setFormDefaults();
-              }
-            },
-          ),
-        ],
       ),
-      body: _showForm ? _buildForm() : _buildHistoryList(),
+      child: SafeArea(
+        child: _showForm ? _buildForm(isDark) : _buildHistoryList(isDark),
+      ),
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(bool isDark) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
-          ],
-        ),
+      child: IosCard(
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Formulir Lembur Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            _buildTextField('TANGGAL LEMBUR', _dateCtrl, 'Pilih Tanggal', readOnly: true, onTap: () => _selectDate(context, _dateCtrl)),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: _buildTextField('JAM MULAI', _startTimeCtrl, 'Pilih Jam', readOnly: true, onTap: () => _selectTime(context, _startTimeCtrl))),
-                const SizedBox(width: 12),
-                Expanded(child: _buildTextField('JAM SELESAI', _endTimeCtrl, 'Pilih Jam', readOnly: true, onTap: () => _selectTime(context, _endTimeCtrl))),
-              ],
-            ),
-            SizedBox(height: 16),
-            _buildTextField('ALASAN / KEPERLUAN LEMBUR', _reasonCtrl, 'Sebutkan detail pekerjaan...', maxLines: 4),
-            SizedBox(height: 16),
-            Text('PILIHAN KOMPENSASI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _compensationType,
-                  isExpanded: true,
-                  icon: const Icon(Icons.arrow_drop_down, color: AppConstants.primaryColor),
-                  items: const [
-                    DropdownMenuItem(value: 'Paid', child: Text('Dibayar Uang (Sesuai Kemenaker)', style: TextStyle(fontSize: 12))),
-                    DropdownMenuItem(value: 'Time-off', child: Text('Ditukar Cuti (Time-off in Lieu)', style: TextStyle(fontSize: 12))),
+            Text('Formulir Lembur Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+            const SizedBox(height: 20),
+            
+            _buildLabel('TANGGAL LEMBUR'),
+            GestureDetector(
+              onTap: () => _showDatePickerModal(_dateCtrl),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(_dateCtrl.text.isEmpty ? 'Pilih Tanggal' : _dateCtrl.text, style: TextStyle(color: _dateCtrl.text.isEmpty ? CupertinoColors.systemGrey : (isDark ? CupertinoColors.white : CupertinoColors.black), fontSize: 14)),
+                    const Icon(CupertinoIcons.calendar, size: 16, color: CupertinoColors.systemGrey),
                   ],
-                  onChanged: (val) {
-                    if (val != null) setState(() => _compensationType = val);
-                  },
                 ),
               ),
             ),
             const SizedBox(height: 16),
+            
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel('JAM MULAI'),
+                      GestureDetector(
+                        onTap: () => _showTimePickerModal(_startTimeCtrl),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                          ),
+                          child: Text(_startTimeCtrl.text.isEmpty ? '--:--' : _startTimeCtrl.text, style: TextStyle(color: _startTimeCtrl.text.isEmpty ? CupertinoColors.systemGrey : (isDark ? CupertinoColors.white : CupertinoColors.black), fontSize: 14)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel('JAM SELESAI'),
+                      GestureDetector(
+                        onTap: () => _showTimePickerModal(_endTimeCtrl),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                          ),
+                          child: Text(_endTimeCtrl.text.isEmpty ? '--:--' : _endTimeCtrl.text, style: TextStyle(color: _endTimeCtrl.text.isEmpty ? CupertinoColors.systemGrey : (isDark ? CupertinoColors.white : CupertinoColors.black), fontSize: 14)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            _buildLabel('ALASAN / KEPERLUAN LEMBUR'),
+            CupertinoTextField(
+              controller: _reasonCtrl,
+              maxLines: 4,
+              placeholder: 'Sebutkan detail pekerjaan...',
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            _buildLabel('PILIHAN KOMPENSASI'),
+            GestureDetector(
+              onTap: _showCompensationActionSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5))
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _compensationType == 'Paid' ? 'Dibayar Uang (Sesuai Kemenaker)' : 'Ditukar Cuti (Time-off in Lieu)', 
+                        style: TextStyle(color: isDark ? CupertinoColors.white : CupertinoColors.black, fontSize: 14)
+                      )
+                    ),
+                    const Icon(CupertinoIcons.chevron_down, size: 16, color: CupertinoColors.systemGrey),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6, 
+                borderRadius: BorderRadius.circular(12), 
+                border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5))
+              ),
               child: Column(
                 children: [
-                  Icon(Icons.camera_alt, color: Colors.grey, size: 32),
-                  SizedBox(height: 8),
-                  Text('FOTO BUKTI LEMBUR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
-                  const SizedBox(height: 4),
-                  const Text('Wajib melampirkan foto diri sedang bekerja di lokasi', style: TextStyle(fontSize: 10, color: Colors.grey), textAlign: TextAlign.center),
+                  const Icon(CupertinoIcons.camera, color: CupertinoColors.systemGrey, size: 32),
+                  const SizedBox(height: 8),
+                  _buildLabel('FOTO BUKTI LEMBUR'),
+                  const Text('Wajib melampirkan foto diri sedang bekerja di lokasi', style: TextStyle(fontSize: 10, color: CupertinoColors.systemGrey), textAlign: TextAlign.center),
                   const SizedBox(height: 12),
                   if (_proofPhotoPath != null) ...[
                     ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.file(File(_proofPhotoPath!), height: 120, width: double.infinity, fit: BoxFit.cover)),
                     const SizedBox(height: 8),
-                    TextButton.icon(onPressed: _showPhotoPreview, icon: const Icon(Icons.preview, size: 16), label: const Text('Lihat Pratinjau')),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: _showPhotoPreview, 
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.eye, size: 16),
+                          SizedBox(width: 6),
+                          Text('Lihat Pratinjau', style: TextStyle(fontSize: 12))
+                        ],
+                      )
+                    ),
                   ],
-                  ElevatedButton.icon(
-                    onPressed: _isSubmitLoading ? null : _takePhoto,
-                    icon: const Icon(Icons.camera),
-                    label: Text(_proofPhotoPath == null ? 'Ambil Foto' : 'Ubah Foto'),
-                    style: ElevatedButton.styleFrom(backgroundColor: context.surfaceColor, foregroundColor: AppConstants.primaryColor, side: const BorderSide(color: AppConstants.primaryColor), elevation: 0),
+                  CupertinoButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    color: CupertinoColors.activeBlue,
+                    onPressed: _isPhotoLoading ? null : _takePhoto,
+                    child: Text(_proofPhotoPath == null ? 'Ambil Foto' : 'Ubah Foto', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   )
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: _isSubmitLoading ? null : _handleCreateRequest,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor,
-                  foregroundColor: context.surfaceColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: _isSubmitLoading ? SizedBox() : Icon(Icons.send),
-                label: _isSubmitLoading ? CircularProgressIndicator(color: context.surfaceColor) : Text('KIRIM PENGAJUAN', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
+            
+            Consumer<OvertimeProvider>(
+              builder: (context, provider, child) {
+                return SizedBox(
+                  width: double.infinity,
+                  child: CupertinoButton.filled(
+                    onPressed: provider.isSubmitLoading ? null : _handleCreateRequest,
+                    child: provider.isSubmitLoading 
+                      ? const CupertinoActivityIndicator(color: CupertinoColors.white) 
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(CupertinoIcons.paperplane_fill, size: 18),
+                            SizedBox(width: 8),
+                            Text('KIRIM PENGAJUAN', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -454,131 +590,125 @@ class _OvertimeScreenState extends State<OvertimeScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1, bool readOnly = false, VoidCallback? onTap}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          maxLines: maxLines,
-          readOnly: readOnly,
-          onTap: onTap,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-            filled: true,
-            fillColor: Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-          ),
-        ),
-      ],
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(text, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
     );
   }
 
-  Widget _buildHistoryList() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor));
-    }
+  Widget _buildHistoryList(bool isDark) {
+    return Consumer<OvertimeProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return const Center(child: CupertinoActivityIndicator(radius: 16));
+        }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        final user = context.read<AuthProvider>().userData;
-        if (user != null) await _fetchOvertimeRequests(user['id']);
-      },
-      color: AppConstants.primaryColor,
-      child: _requests.isEmpty
-          ? SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Container(
-                height: 400,
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.access_time, size: 48, color: Colors.grey),
-                    SizedBox(height: 12),
-                    Text('Belum ada riwayat pengajuan lembur.', style: TextStyle(color: context.textSecondary)),
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: _setFormDefaults,
-                      style: OutlinedButton.styleFrom(foregroundColor: AppConstants.primaryColor, side: const BorderSide(color: AppConstants.primaryColor)),
-                      child: const Text('Ajukan Lembur Baru'),
-                    )
-                  ],
-                ),
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: _requests.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final item = _requests[index];
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: context.surfaceColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item.date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                SizedBox(height: 2),
-                                Text('${item.startTime} - ${item.endTime} (${item.durationHours} Jam)', style: TextStyle(fontSize: 11, color: context.textSecondary, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(item.status).withValues(alpha: 0.1),
-                              border: Border.all(color: _getStatusColor(item.status)),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              _getStatusLabel(item.status),
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _getStatusColor(item.status)),
-                            ),
-                          )
-                        ],
-                      ),
-                      Divider(height: 24),
-                      Text('Alasan Kerja Lembur:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.textSecondary)),
-                      SizedBox(height: 4),
-                      Text(item.reason, style: TextStyle(fontSize: 12, color: context.textPrimary)),
-                      if (item.pdfUrl != null && item.pdfUrl!.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur Unduh Dokumen (memerlukan url_launcher)')));
-                            },
-                            icon: const Icon(Icons.picture_as_pdf, size: 16, color: AppConstants.primaryColor),
-                            label: const Text('Unduh TTD PDF', style: TextStyle(fontSize: 10, color: AppConstants.primaryColor)),
-                          ),
-                        )
-                      ]
-                    ],
-                  ),
-                );
+        return CustomScrollView(
+          slivers: [
+            CupertinoSliverRefreshControl(
+              onRefresh: () async {
+                final user = context.read<AuthProvider>().userData;
+                if (user != null) await provider.fetchOvertimeRequests(user['id']);
               },
             ),
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: provider.requests.isEmpty
+                ? SliverFillRemaining(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(CupertinoIcons.time, size: 48, color: CupertinoColors.systemGrey),
+                        const SizedBox(height: 12),
+                        const Text('Belum ada riwayat pengajuan lembur.', style: TextStyle(color: CupertinoColors.systemGrey)),
+                        const SizedBox(height: 16),
+                        CupertinoButton(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          color: CupertinoColors.activeBlue,
+                          onPressed: _setFormDefaults,
+                          child: const Text('Ajukan Lembur Baru'),
+                        )
+                      ],
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final item = provider.requests[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: IosCard(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(item.date, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+                                      const SizedBox(height: 4),
+                                      Text('${item.startTime} - ${item.endTime} (${item.durationHours} Jam)', style: const TextStyle(fontSize: 11, color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: _getStatusColor(item.status).withValues(alpha: 0.1),
+                                    border: Border.all(color: _getStatusColor(item.status).withValues(alpha: 0.5)),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    _getStatusLabel(item.status),
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _getStatusColor(item.status)),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              child: Divider(height: 1, color: CupertinoColors.systemGrey4),
+                            ),
+                            const Text('Alasan Kerja Lembur:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey)),
+                            const SizedBox(height: 4),
+                            Text(item.reason, style: TextStyle(fontSize: 12, color: isDark ? CupertinoColors.systemGrey2 : CupertinoColors.black)),
+                            if (item.pdfUrl != null && item.pdfUrl!.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur Unduh Dokumen (memerlukan url_launcher)')));
+                                  },
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(CupertinoIcons.doc_text_fill, size: 16),
+                                      SizedBox(width: 4),
+                                      Text('Unduh TTD PDF', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ]
+                          ],
+                        ),
+                      ),
+                    );
+                      },
+                      childCount: provider.requests.length,
+                    ),
+                  ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

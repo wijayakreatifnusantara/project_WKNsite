@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/utils/constants.dart';
 import '../data/profile_service.dart';
+import '../../../widgets/ios_card.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -55,14 +57,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     try {
       await _profileService.changePassword(currentPass, newPass);
       if (mounted) {
-        showDialog(
+        showCupertinoDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => AlertDialog(
+          builder: (context) => CupertinoAlertDialog(
             title: const Text('Sukses'),
             content: const Text('Password berhasil diubah. Harap ingat password baru Anda untuk login selanjutnya.'),
             actions: [
-              TextButton(
+              CupertinoDialogAction(
+                isDefaultAction: true,
                 onPressed: () {
                   Navigator.pop(context);
                   context.pop();
@@ -81,93 +84,89 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: CupertinoColors.destructiveRed));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
-        ),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Ubah Sandi'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        child: Column(
-          children: [
-            Container(
-              width: 70, height: 70,
-              decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), shape: BoxShape.circle),
-              child: Icon(Icons.vpn_key_outlined, size: 36, color: Colors.orange),
-            ),
-            SizedBox(height: 20),
-            Text('Ubah Kata Sandi', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.textPrimary)),
-            SizedBox(height: 10),
-            Text('Gunakan kombinasi yang mudah Anda ingat namun sulit ditebak orang lain.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.5)),
-            const SizedBox(height: 40),
-
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildPasswordField('PASSWORD SAAT INI', _currentPassCtrl, _showCurrent, (val) => setState(() => _showCurrent = val), Icons.lock_outline),
-                  Divider(height: 30, color: context.borderColor),
-                  _buildPasswordField('PASSWORD BARU', _newPassCtrl, _showNew, (val) => setState(() => _showNew = val), Icons.key_outlined, iconColor: Colors.orange),
-                  const SizedBox(height: 20),
-                  _buildPasswordField('KONFIRMASI PASSWORD BARU', _confirmPassCtrl, _showConfirm, (val) => setState(() => _showConfirm = val), Icons.check_circle_outline, iconColor: Colors.green),
-                ],
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            children: [
+              Container(
+                width: 70, height: 70,
+                decoration: BoxDecoration(color: CupertinoColors.activeOrange.withValues(alpha: 0.1), shape: BoxShape.circle),
+                child: const Icon(CupertinoIcons.lock_shield, size: 36, color: CupertinoColors.activeOrange),
               ),
-            ),
-            const SizedBox(height: 30),
+              const SizedBox(height: 20),
+              Text('Ubah Kata Sandi', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+              const SizedBox(height: 10),
+              const Text('Gunakan kombinasi yang mudah Anda ingat namun sulit ditebak orang lain.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: CupertinoColors.systemGrey, height: 1.5)),
+              const SizedBox(height: 40),
 
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _handleUpdatePassword,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 4,
+              IosCard(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildPasswordField('PASSWORD SAAT INI', _currentPassCtrl, _showCurrent, (val) => setState(() => _showCurrent = val), CupertinoIcons.lock_fill, isDark),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(height: 1, color: CupertinoColors.systemGrey4)),
+                    _buildPasswordField('PASSWORD BARU', _newPassCtrl, _showNew, (val) => setState(() => _showNew = val), CupertinoIcons.lock_fill, isDark, iconColor: CupertinoColors.activeOrange),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(height: 1, color: CupertinoColors.systemGrey4)),
+                    _buildPasswordField('KONFIRMASI PASSWORD BARU', _confirmPassCtrl, _showConfirm, (val) => setState(() => _showConfirm = val), CupertinoIcons.checkmark_seal_fill, isDark, iconColor: CupertinoColors.activeGreen),
+                  ],
                 ),
-                child: _isLoading 
-                  ? CircularProgressIndicator(color: context.surfaceColor)
-                  : Text('SIMPAN PASSWORD', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
-            ),
-          ],
+              const SizedBox(height: 30),
+
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoButton.filled(
+                  onPressed: _isLoading ? null : _handleUpdatePassword,
+                  child: _isLoading 
+                    ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                    : const Text('SIMPAN PASSWORD', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPasswordField(String label, TextEditingController controller, bool showPass, ValueChanged<bool> onToggle, IconData prefixIcon, {Color iconColor = Colors.grey}) {
+  Widget _buildPasswordField(String label, TextEditingController controller, bool showPass, ValueChanged<bool> onToggle, IconData prefixIcon, bool isDark, {Color iconColor = CupertinoColors.systemGrey}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1)),
+        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 1)),
         const SizedBox(height: 8),
-        TextField(
+        CupertinoTextField(
           controller: controller,
           obscureText: !showPass,
-          decoration: InputDecoration(
-            prefixIcon: Icon(prefixIcon, color: iconColor),
-            suffixIcon: IconButton(
-              icon: Icon(showPass ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-              onPressed: () => onToggle(!showPass),
-            ),
-            filled: true,
-            fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppConstants.primaryColor)),
+          prefix: Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Icon(prefixIcon, color: iconColor, size: 20),
+          ),
+          suffix: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => onToggle(!showPass),
+            child: Icon(showPass ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye_solid, color: CupertinoColors.systemGrey, size: 20),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
           ),
         ),
       ],

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:local_auth/local_auth.dart';
 import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/profile_service.dart';
+import '../../../widgets/ios_card.dart';
 
 class PersonalDataAuthScreen extends StatefulWidget {
   const PersonalDataAuthScreen({super.key});
@@ -63,7 +65,7 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
 
   Future<void> _handleVerify() async {
     if (_passwordCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Masukkan password Anda', style: TextStyle(color: context.surfaceColor)), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Masukkan password Anda'), backgroundColor: CupertinoColors.destructiveRed));
       return;
     }
 
@@ -78,7 +80,7 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''), style: TextStyle(color: context.surfaceColor)), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: CupertinoColors.destructiveRed));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -87,81 +89,94 @@ class _PersonalDataAuthScreenState extends State<PersonalDataAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
-        ),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Keamanan'),
+        previousPageTitle: 'Profil',
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Column(
-          children: [
-            Container(
-              width: 80, height: 80,
-              decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), shape: BoxShape.circle),
-              child: Icon(Icons.shield_outlined, size: 40, color: Colors.green),
-            ),
-            SizedBox(height: 20),
-            Text('Verifikasi Keamanan', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: context.textPrimary)),
-            SizedBox(height: 10),
-            Text('Sesuai standar keamanan, masukkan password Anda untuk melihat atau mengubah Data Pribadi & Rekening.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: context.textSecondary, height: 1.5)),
-            const SizedBox(height: 40),
-
-            TextField(
-              controller: _passwordCtrl,
-              obscureText: true,
-              autofocus: true,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
-                hintText: 'Password Aplikasi',
-                filled: true,
-                fillColor: context.surfaceColor,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.borderColor)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.borderColor)),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Container(
+                width: 80, height: 80,
+                decoration: BoxDecoration(color: CupertinoColors.activeGreen.withValues(alpha: 0.1), shape: BoxShape.circle),
+                child: const Icon(CupertinoIcons.shield_lefthalf_fill, size: 40, color: CupertinoColors.activeGreen),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 24),
+              Text('Verifikasi Akses', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+              const SizedBox(height: 12),
+              const Text(
+                'Sesuai standar keamanan, masukkan password Anda untuk melihat atau mengubah Data Pribadi & Rekening.', 
+                textAlign: TextAlign.center, 
+                style: TextStyle(fontSize: 13, color: CupertinoColors.systemGrey, height: 1.5)
+              ),
+              const SizedBox(height: 40),
 
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _handleVerify,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 4,
+              IosCard(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: CupertinoTextField(
+                  controller: _passwordCtrl,
+                  obscureText: true,
+                  autofocus: true,
+                  placeholder: 'Password Aplikasi',
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Icon(CupertinoIcons.lock_fill, color: CupertinoColors.systemGrey, size: 20),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                  decoration: const BoxDecoration(color: CupertinoColors.transparent),
                 ),
-                child: _isLoading 
-                  ? CircularProgressIndicator(color: context.surfaceColor)
-                  : Text('VERIFIKASI', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
-            ),
+              const SizedBox(height: 24),
 
-            if (_isBiometricAvailable) ...[
-              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                height: 56,
-                child: OutlinedButton.icon(
-                  onPressed: _handleBiometric,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppConstants.primaryColor,
-                    side: BorderSide(color: AppConstants.primaryColor.withValues(alpha: 0.3)),
-                    backgroundColor: AppConstants.primaryColor.withValues(alpha: 0.05),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  icon: const Icon(Icons.fingerprint),
-                  label: const Text('Gunakan Sidik Jari / Face ID', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: CupertinoButton.filled(
+                  onPressed: _isLoading ? null : _handleVerify,
+                  child: _isLoading 
+                    ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                    : const Text('VERIFIKASI', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
                 ),
               ),
-            ]
-          ],
+
+              if (_isBiometricAvailable) ...[
+                const SizedBox(height: 24),
+                const Row(
+                  children: [
+                    Expanded(child: Divider(color: CupertinoColors.systemGrey4)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('ATAU', style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                    Expanded(child: Divider(color: CupertinoColors.systemGrey4)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: CupertinoButton(
+                    onPressed: _handleBiometric,
+                    color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(CupertinoIcons.viewfinder, color: CupertinoColors.activeBlue),
+                        SizedBox(width: 8),
+                        Text('Gunakan Face ID / Touch ID', style: TextStyle(color: CupertinoColors.activeBlue, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+              ]
+            ],
+          ),
         ),
       ),
     );

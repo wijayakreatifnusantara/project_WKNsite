@@ -1,8 +1,13 @@
+import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
+import '../../../core/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../data/auth_provider.dart';
 import '../../../core/utils/biometric_helper.dart';
+import '../../../widgets/ios_card.dart';
+import '../../../core/utils/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -52,9 +57,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       final auth = Provider.of<AuthProvider>(context, listen: false);
       final error = await auth.biometricLogin();
       if (error != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: Colors.red),
-        );
+        _showErrorSnackBar(error);
       }
     }
   }
@@ -67,11 +70,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     super.dispose();
   }
 
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: CupertinoColors.destructiveRed),
+    );
+  }
+
   void _handleLogin() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email dan kata sandi harus diisi')),
-      );
+      _showErrorSnackBar('Email dan kata sandi harus diisi');
       return;
     }
 
@@ -83,9 +90,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
     if (error != null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: Colors.red),
-        );
+        _showErrorSnackBar(error);
       }
     }
     // Note: If no error, the GoRouter refreshListenable (AuthProvider) 
@@ -95,11 +100,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final isLoading = context.watch<AuthProvider>().isLoading;
-    final bgColor = context.backgroundColor;
+    final isDark = context.isDarkMode;
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      child: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Center(
@@ -110,23 +115,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 width: double.infinity,
                 constraints: const BoxConstraints(maxWidth: 420),
                 decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(color: context.surfaceColor, width: 4),
+                  color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: isDark ? CupertinoColors.systemGrey4 : CupertinoColors.systemGrey5),
                   boxShadow: [
                     BoxShadow(
-                      color: context.isDarkMode ? Colors.black.withValues(alpha: 0.4) : const Color(0xFFD1D9E6),
-                      offset: const Offset(12, 12),
-                      blurRadius: 24,
-                    ),
-                    BoxShadow(
-                      color: context.isDarkMode ? Colors.white.withValues(alpha: 0.02) : context.surfaceColor,
-                      offset: const Offset(-12, -12),
-                      blurRadius: 24,
+                      color: CupertinoColors.black.withValues(alpha: 0.05),
+                      offset: const Offset(0, 10),
+                      blurRadius: 30,
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(32.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -146,11 +146,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              color: context.textPrimary,
+                              color: isDark ? CupertinoColors.white : CupertinoColors.black,
                               letterSpacing: -0.5,
                             ),
                           ),
-                          TextSpan(
+                          const TextSpan(
                             text: 'site',
                             style: TextStyle(
                               fontSize: 24,
@@ -163,12 +163,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
+                    const Text(
                       'CORPORATE MANAGEMENT SYSTEM',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
-                        color: context.textSecondary,
+                        color: CupertinoColors.systemGrey,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -178,39 +178,42 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
                             'EMAIL ADDRESS',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: context.textSecondary,
+                              color: CupertinoColors.systemGrey,
                               letterSpacing: 1.5,
                             ),
                           ),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: context.isDarkMode ? context.surfaceColor : const Color(0xFFE8EBF0),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: context.isDarkMode ? context.borderColor : Colors.transparent),
+                        CupertinoTextField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          placeholder: 'name@company.com',
+                          onChanged: (val) {
+                            if (context.read<ThemeProvider>().hapticEnabled) {
+                              HapticFeedback.selectionClick();
+                            }
+                          },
+                          placeholderStyle: const TextStyle(color: CupertinoColors.systemGrey2),
+                          prefix: const Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: Icon(CupertinoIcons.mail, color: CupertinoColors.systemGrey2, size: 20),
                           ),
-                          child: TextField(
-                            controller: _emailController,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: context.textPrimary,
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              hintText: 'name@company.com',
-                              hintStyle: TextStyle(color: context.textSecondary.withValues(alpha: 0.5)),
-                              prefixIcon: Icon(Icons.mail_outline, color: context.textSecondary.withValues(alpha: 0.5), size: 20),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(vertical: 16),
-                            ),
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isDark ? CupertinoColors.systemGrey4 : CupertinoColors.systemGrey5),
+                          ),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? CupertinoColors.white : CupertinoColors.black,
                           ),
                         ),
                       ],
@@ -221,51 +224,56 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
                             'PASSWORD',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: context.textSecondary,
+                              color: CupertinoColors.systemGrey,
                               letterSpacing: 1.5,
                             ),
                           ),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: context.isDarkMode ? context.surfaceColor : const Color(0xFFE8EBF0),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: context.isDarkMode ? context.borderColor : Colors.transparent),
+                        CupertinoTextField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          placeholder: '••••••••',
+                          onChanged: (val) {
+                            if (context.read<ThemeProvider>().hapticEnabled) {
+                              HapticFeedback.selectionClick();
+                            }
+                          },
+                          placeholderStyle: const TextStyle(color: CupertinoColors.systemGrey2),
+                          prefix: const Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: Icon(CupertinoIcons.lock, color: CupertinoColors.systemGrey2, size: 20),
                           ),
-                          child: TextField(
-                            controller: _passwordController,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: context.textPrimary,
+                          suffix: CupertinoButton(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            minSize: 0,
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                            child: Icon(
+                              _obscurePassword ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+                              color: CupertinoColors.systemGrey2,
+                              size: 20,
                             ),
-                            obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              hintText: '••••••••',
-                              hintStyle: TextStyle(color: context.textSecondary.withValues(alpha: 0.5)),
-                              prefixIcon: Icon(Icons.lock_outline, color: context.textSecondary.withValues(alpha: 0.5), size: 20),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  color: context.textSecondary.withValues(alpha: 0.5),
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isDark ? CupertinoColors.systemGrey4 : CupertinoColors.systemGrey5),
+                          ),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? CupertinoColors.white : CupertinoColors.black,
                           ),
                         ),
                       ],
@@ -273,41 +281,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     const SizedBox(height: 32),
 
                     // Login Button
-                    Container(
+                    SizedBox(
                       width: double.infinity,
-                      height: 48,
-                      decoration: BoxDecoration(
+                      child: CupertinoButton(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        color: const Color(0xFFE31E24),
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromRGBO(227, 30, 36, 0.3),
-                            offset: Offset(5, 5),
-                            blurRadius: 15,
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
                         onPressed: isLoading ? null : _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE31E24),
-                          foregroundColor: context.surfaceColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         child: isLoading
-                            ? SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(color: context.surfaceColor, strokeWidth: 2),
-                              )
+                            ? const CupertinoActivityIndicator(color: CupertinoColors.white)
                             : const Text(
                                 'SIGN IN',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 2.0,
+                                  color: CupertinoColors.white,
                                 ),
                               ),
                       ),
@@ -316,31 +305,30 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     if (_canUseBiometric) ...[
                       const SizedBox(height: 24),
                       Center(
-                        child: InkWell(
+                        child: GestureDetector(
                           onTap: isLoading ? null : _handleBiometricLogin,
-                          borderRadius: BorderRadius.circular(50),
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: context.surfaceColor,
+                              color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
+                                  color: CupertinoColors.black.withValues(alpha: 0.05),
                                   blurRadius: 10,
                                   offset: const Offset(0, 5),
                                 ),
                               ],
-                              border: Border.all(color: const Color(0xFFE8EBF0), width: 2),
+                              border: Border.all(color: isDark ? CupertinoColors.systemGrey4 : CupertinoColors.systemGrey5, width: 2),
                             ),
-                            child: const Icon(Icons.fingerprint, size: 40, color: Color(0xFFE31E24)),
+                            child: const Icon(CupertinoIcons.lock_shield, size: 40, color: Color(0xFFE31E24)),
                           ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         'Fast Login',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black45),
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey),
                       ),
                     ],
 
@@ -350,40 +338,40 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.shield_outlined, color: context.textSecondary.withValues(alpha: 0.5), size: 14),
+                        Icon(CupertinoIcons.shield, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), size: 14),
                         const SizedBox(width: 4),
                         Text(
                           'SECURE SSL',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: context.textSecondary.withValues(alpha: 0.5), letterSpacing: 1.0),
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), letterSpacing: 1.0),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('•', style: TextStyle(color: context.textSecondary.withValues(alpha: 0.5))),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('•', style: TextStyle(color: CupertinoColors.systemGrey.withValues(alpha: 0.5))),
                         ),
-                        Icon(Icons.check_circle_outline, color: Colors.green.withValues(alpha: 0.5), size: 14),
+                        Icon(CupertinoIcons.check_mark_circled, color: CupertinoColors.activeGreen.withValues(alpha: 0.5), size: 14),
                         const SizedBox(width: 4),
                         Text(
                           'ENCRYPTED',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: context.textSecondary.withValues(alpha: 0.5), letterSpacing: 1.0),
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), letterSpacing: 1.0),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     Text(
                       '© 2026 WIJAYA KREATIF NUSANTARA',
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: context.textSecondary.withValues(alpha: 0.5), letterSpacing: 1.0),
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), letterSpacing: 1.0),
                     ),
                     const SizedBox(height: 4),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: context.surfaceColor.withValues(alpha: 0.5),
+                        color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: context.surfaceColor),
+                        border: Border.all(color: isDark ? CupertinoColors.systemGrey4 : CupertinoColors.systemGrey5),
                       ),
-                      child: Text(
+                      child: const Text(
                         'IMS VERSION 1.2.0 • OPTIMIZED FOR MOBILE',
-                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: context.textSecondary, letterSpacing: 1.0),
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey, letterSpacing: 1.0),
                       ),
                     ),
                   ],

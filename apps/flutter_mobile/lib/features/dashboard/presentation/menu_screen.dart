@@ -1,7 +1,12 @@
+import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/widgets/animated_tap_button.dart';
+import '../../../core/theme/theme_provider.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -36,16 +41,17 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return CupertinoPageScaffold(
       backgroundColor: context.backgroundColor,
-      appBar: AppBar(
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: context.surfaceColor,
-        elevation: 0,
-        title: Container(
+        border: null,
+        middle: Container(
           decoration: const BoxDecoration(border: Border(left: BorderSide(color: AppConstants.primaryColor, width: 4))),
           padding: EdgeInsets.only(left: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text('Menu Eksplorasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
               Text('Kelola pekerjaan dan informasi perusahaan', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
@@ -53,11 +59,12 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Stats Panel
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
@@ -89,8 +96,13 @@ class _MenuScreenState extends State<MenuScreen> {
             const SizedBox(height: 24),
 
             // Promo Banner
-            InkWell(
-              onTap: () => context.push('/academy'),
+            AnimatedTapButton(
+              onTap: () {
+                if (context.read<ThemeProvider>().hapticEnabled) HapticFeedback.lightImpact();
+                context.push('/academy');
+              },
+              enableHaptic: false,
+              scaleDown: 0.96,
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -118,6 +130,7 @@ class _MenuScreenState extends State<MenuScreen> {
             const SizedBox(height: 100),
           ],
         ),
+      ),
       ),
     );
   }
@@ -168,11 +181,15 @@ class _MenuScreenState extends State<MenuScreen> {
                     childAspectRatio: 0.75
                   ),
                   itemCount: items.length,
-                  itemBuilder: (context, index) {
+                   itemBuilder: (context, index) {
                     final item = items[index];
-                    return InkWell(
-                      onTap: () => context.push(item['route']),
-                      borderRadius: BorderRadius.circular(12),
+                    return AnimatedTapButton(
+                      onTap: () {
+                        if (context.read<ThemeProvider>().hapticEnabled) HapticFeedback.lightImpact();
+                        context.push(item['route']);
+                      },
+                      enableHaptic: false,
+                      scaleDown: 0.90,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
@@ -45,30 +46,38 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
     }
 
     // Confirmation Dialog
-    final confirm = await showDialog<bool>(
+    showCupertinoDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => CupertinoAlertDialog(
         title: const Text('Simpan Laporan?'),
         content: const Text('Apakah laporan aktivitas kerja harian Anda sudah benar?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal', style: TextStyle(color: Colors.grey))),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Simpan', style: TextStyle(color: AppConstants.primaryColor, fontWeight: FontWeight.bold))),
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal', style: TextStyle(color: CupertinoColors.systemGrey))
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(ctx);
+              _processSubmit(projectName, taskDesc, durationHours);
+            },
+            child: const Text('Simpan')
+          ),
         ],
       )
     );
+  }
 
-    if (confirm != true) return;
-
+  Future<void> _processSubmit(String projectName, String taskDesc, double durationHours) async {
     setState(() => _isLoading = true);
     try {
-      // API expects taskDesc to contain the project name conceptually, or we combine them.
-      // In RN it passed `task_description: taskDesc`. We will prefix the project name for clarity.
       final fullDesc = '[$projectName] $taskDesc';
       
       await _timesheetService.submitTimesheet(fullDesc, durationHours);
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Laporan Timesheet harian berhasil disimpan.'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Laporan Timesheet harian berhasil disimpan.'), backgroundColor: CupertinoColors.activeGreen));
         context.pop();
       }
     } catch (e) {
@@ -79,135 +88,143 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
   }
 
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: CupertinoColors.destructiveRed));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Logbook Harian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Logbook Harian'),
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: _isLoading ? null : _handleSubmit,
+          child: _isLoading 
+            ? const CupertinoActivityIndicator() 
+            : const Icon(CupertinoIcons.checkmark_alt, color: CupertinoColors.activeBlue),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20).copyWith(bottom: 100),
-        child: Column(
-          children: [
-            // Info Box
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16)),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(color: Colors.orange.shade100, borderRadius: BorderRadius.circular(20)),
-                    child: const Icon(Icons.access_time_filled, color: Colors.orange),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Timesheet / Logbook', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.deepOrange)),
-                        SizedBox(height: 4),
-                        Text('Catat aktivitas pekerjaan yang Anda lakukan hari ini beserta durasi pengerjaannya.', style: TextStyle(fontSize: 12, color: Colors.deepOrange, height: 1.5)),
-                      ],
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Info Box
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5))
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40, height: 40,
+                      decoration: BoxDecoration(color: CupertinoColors.activeOrange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                      child: const Icon(CupertinoIcons.time, color: CupertinoColors.activeOrange),
                     ),
-                  )
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Timesheet / Logbook', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+                          const SizedBox(height: 4),
+                          const Text('Catat aktivitas pekerjaan yang Anda lakukan hari ini beserta durasi pengerjaannya.', style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey, height: 1.5)),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Form
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))]),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLabel('Nama Proyek / Modul'),
-                  TextField(
-                    controller: _projectCtrl,
-                    textCapitalization: TextCapitalization.words,
-                    decoration: _inputDecoration('Contoh: Aplikasi WKN Mobile'),
-                  ),
-                  const SizedBox(height: 20),
-
-                  _buildLabel('Deskripsi Tugas (Task)'),
-                  TextField(
-                    controller: _taskDescCtrl,
-                    maxLines: 4,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: _inputDecoration('Deskripsikan pekerjaan yang Anda lakukan hari ini...'),
-                  ),
-                  const SizedBox(height: 20),
-
-                  _buildLabel('Durasi Pengerjaan (Jam)'),
-                  TextField(
-                    controller: _durationCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: _inputDecoration('Misal: 4.5').copyWith(
-                      suffixIcon: const Padding(
-                        padding: EdgeInsets.all(14.0),
-                        child: Text('Jam', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-                      )
+              // Form
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5))
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildLabel('Nama Proyek / Modul', isDark),
+                    CupertinoTextField(
+                      controller: _projectCtrl,
+                      textCapitalization: TextCapitalization.words,
+                      placeholder: 'Contoh: Aplikasi WKN Mobile',
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 20),
+
+                    _buildLabel('Deskripsi Tugas (Task)', isDark),
+                    CupertinoTextField(
+                      controller: _taskDescCtrl,
+                      maxLines: 4,
+                      textCapitalization: TextCapitalization.sentences,
+                      placeholder: 'Deskripsikan pekerjaan yang Anda lakukan hari ini...',
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildLabel('Durasi Pengerjaan (Jam)', isDark),
+                    CupertinoTextField(
+                      controller: _durationCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      placeholder: 'Misal: 4.5',
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: CupertinoColors.systemGrey4.withValues(alpha: 0.5)),
+                      ),
+                      suffix: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('Jam', style: TextStyle(color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    
+                    SizedBox(
+                      width: double.infinity,
+                      child: CupertinoButton.filled(
+                        onPressed: _isLoading ? null : _handleSubmit,
+                        child: _isLoading 
+                          ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                          : const Text('Simpan Timesheet', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _handleSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppConstants.primaryColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              elevation: 0,
-            ),
-            child: _isLoading 
-              ? CircularProgressIndicator(color: context.surfaceColor)
-              : Text('Simpan Timesheet', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, bool isDark) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 8),
-      child: Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: context.textPrimary)),
-    );
-  }
-
-  InputDecoration _inputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-      filled: true,
-      fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.borderColor)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.borderColor)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppConstants.primaryColor)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(text, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey, letterSpacing: 0.5)),
     );
   }
 }

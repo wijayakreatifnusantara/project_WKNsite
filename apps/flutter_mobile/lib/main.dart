@@ -19,6 +19,8 @@ import 'features/attendance/data/attendance_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/widgets/floating_assistant.dart';
+import 'features/leave/data/leave_provider.dart';
+import 'features/overtime/data/overtime_provider.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -113,6 +115,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: getIt<AuthProvider>()),
         ChangeNotifierProvider.value(value: getIt<AttendanceProvider>()),
+        ChangeNotifierProvider.value(value: getIt<LeaveProvider>()),
+        ChangeNotifierProvider.value(value: getIt<OvertimeProvider>()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),

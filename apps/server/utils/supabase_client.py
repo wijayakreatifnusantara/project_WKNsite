@@ -655,7 +655,7 @@ class WKNSupabaseClient:
             return None
 
     async def add_attendance_record(self, employee_id: str, date: str, status: str,
-                                    check_in_time: str, late_minutes: int = 0,
+                                    clock_in: str, late_minutes: int = 0,
                                     notes: str = "", photo_url: str = None,
                                     location_lat: float = None, location_lng: float = None,
                                     distance_meters: int = None, target_name: str = None) -> Dict[str, Any]:
@@ -672,7 +672,7 @@ class WKNSupabaseClient:
                 "employee_id": employee_id,
                 "date": date,
                 "status": status,
-                "check_in_time": check_in_time,
+                "clock_in": clock_in,
                 "late_minutes": late_minutes,
                 "notes": notes,
                 "photo_url": photo_url,
@@ -704,6 +704,20 @@ class WKNSupabaseClient:
                 return {"success": False, "already_checked_in": True}
             print(f"Error adding attendance for {employee_id}: {err_msg}")
             return {"success": False, "already_checked_in": False, "error": err_msg}
+
+    async def update_attendance_checkout(self, employee_id: str, date: str, clock_out: str) -> Dict[str, Any]:
+        """
+        Update an existing attendance record for Check Out.
+        """
+        if not self.client:
+            return {"success": False, "error": "No client"}
+        try:
+            res = self.client.table("attendance").update({"clock_out": clock_out}).eq("employee_id", employee_id).eq("date", date).execute()
+            if not res.data:
+                return {"success": False, "error": "Anda belum melakukan Check-In hari ini."}
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     async def get_late_alerts(self, days: int = 30, threshold: int = 3) -> List[Dict[str, Any]]:
         """

@@ -30,7 +30,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: lightBackground,
       useMaterial3: true,
-      textTheme: GoogleFonts.plusJakartaSansTextTheme().apply(
+      textTheme: GoogleFonts.interTextTheme().apply(
         bodyColor: lightTextPrimary,
         displayColor: lightTextPrimary,
       ),
@@ -47,7 +47,7 @@ class AppTheme {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
         },
@@ -66,7 +66,7 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: darkBackground,
       useMaterial3: true,
-      textTheme: GoogleFonts.plusJakartaSansTextTheme().apply(
+      textTheme: GoogleFonts.interTextTheme().apply(
         bodyColor: darkTextPrimary,
         displayColor: darkTextPrimary,
       ),
@@ -90,7 +90,7 @@ class AppTheme {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
         },

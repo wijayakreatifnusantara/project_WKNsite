@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/widgets/animated_tap_button.dart';
+import 'package:provider/provider.dart';
+import '../../../core/theme/theme_provider.dart';
+import 'package:flutter/services.dart';
 
 class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({super.key});
@@ -162,107 +167,153 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final hapticEnabled = context.watch<ThemeProvider>().hapticEnabled;
     final filteredDocs = _selectedCategoryFilter == 'Semua' ? _documents : _documents.where((d) => d['category'] == _selectedCategoryFilter).toList();
 
-    return Scaffold(
+    return CupertinoPageScaffold(
       backgroundColor: context.backgroundColor,
-      appBar: AppBar(
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: context.surfaceColor,
-        title: Text('Dokumen Saya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        actions: [
-          IconButton(
-            icon: Icon(_showForm ? Icons.list : Icons.cloud_upload_outlined, color: AppConstants.primaryColor),
-            onPressed: () => setState(() => _showForm = !_showForm),
-          )
-        ],
+        middle: Text('Dokumen Saya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.pop(),
+          child: const Icon(CupertinoIcons.back),
+        ),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            if (hapticEnabled) HapticFeedback.lightImpact();
+            setState(() => _showForm = !_showForm);
+          },
+          child: Icon(_showForm ? CupertinoIcons.list_bullet : CupertinoIcons.cloud_upload, color: AppConstants.primaryColor),
+        ),
       ),
-      body: _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : _showForm ? _buildForm() : _buildList(filteredDocs),
+      child: SafeArea(
+        child: _isLoading
+          ? const Center(child: CupertinoActivityIndicator())
+          : _showForm ? _buildForm(hapticEnabled) : _buildList(filteredDocs),
+      ),
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(bool hapticEnabled) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Unggah Dokumen Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            
-            const Text('KATEGORI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8, runSpacing: 8,
-              children: _categories.map((c) {
-                final isSelected = _docCategory == c;
-                return ChoiceChip(
-                  label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : Colors.black87, fontSize: 11)),
-                  selected: isSelected,
-                  selectedColor: AppConstants.primaryColor,
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  onSelected: (v) => setState(() => _docCategory = c),
-                  showCheckmark: false,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            
-            const Text('NAMA DOKUMEN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-            const SizedBox(height: 8),
-            TextField(controller: _docNameCtrl, decoration: _inputDecoration('Contoh: KTP_Budi')),
-            const SizedBox(height: 20),
+      child: FadeSlideIn(
+        delay: const Duration(milliseconds: 50),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Unggah Dokumen Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              
+              const Text('KATEGORI', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey)),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8, runSpacing: 8,
+                children: _categories.map((c) {
+                  final isSelected = _docCategory == c;
+                  return ChoiceChip(
+                    label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : CupertinoColors.black, fontSize: 11)),
+                    selected: isSelected,
+                    selectedColor: AppConstants.primaryColor,
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    onSelected: (v) {
+                      if (hapticEnabled) HapticFeedback.selectionClick();
+                      setState(() => _docCategory = c);
+                    },
+                    showCheckmark: false,
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              
+              const Text('NAMA DOKUMEN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey)),
+              const SizedBox(height: 8),
+              CupertinoTextField(
+                controller: _docNameCtrl, 
+                placeholder: 'Contoh: KTP_Budi',
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: context.isDarkMode ? context.surfaceColor : CupertinoColors.systemGrey6, borderRadius: BorderRadius.circular(12), border: Border.all(color: context.borderColor)),
+              ),
+              const SizedBox(height: 20),
 
-            const Text('KETERANGAN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-            const SizedBox(height: 8),
-            TextField(controller: _descCtrl, decoration: _inputDecoration('Opsional')),
-            const SizedBox(height: 20),
+              const Text('KETERANGAN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey)),
+              const SizedBox(height: 8),
+              CupertinoTextField(
+                controller: _descCtrl, 
+                placeholder: 'Opsional',
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: context.isDarkMode ? context.surfaceColor : CupertinoColors.systemGrey6, borderRadius: BorderRadius.circular(12), border: Border.all(color: context.borderColor)),
+              ),
+              const SizedBox(height: 20),
 
-            const Text('BERKAS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-            const SizedBox(height: 8),
-            InkWell(
-              onTap: _handlePickFile,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400, style: BorderStyle.solid), // changed from dashed for simplicity
-                  borderRadius: BorderRadius.circular(12),
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.attach_file, color: AppConstants.primaryColor),
-                    const SizedBox(width: 10),
-                    Expanded(child: Text(_pickedFile?.name ?? 'Pilih Berkas...', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                    if (_pickedFile != null)
-                      Text(_formatBytes(_pickedFile?.size), style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
-                  ],
+              const Text('BERKAS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: CupertinoColors.systemGrey)),
+              const SizedBox(height: 8),
+              AnimatedTapButton(
+                onTap: () {
+                  if (hapticEnabled) HapticFeedback.selectionClick();
+                  _handlePickFile();
+                },
+                scaleDown: 0.97,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: CupertinoColors.systemGrey4, style: BorderStyle.solid),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(CupertinoIcons.paperclip, color: AppConstants.primaryColor),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(_pickedFile?.name ?? 'Pilih Berkas...', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      if (_pickedFile != null)
+                        Text(_formatBytes(_pickedFile?.size), style: const TextStyle(fontSize: 10, color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            SizedBox(
-              width: double.infinity, height: 50,
-              child: ElevatedButton.icon(
-                onPressed: _submitLoading ? null : _handleUpload,
-                style: ElevatedButton.styleFrom(backgroundColor: AppConstants.primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                icon: _submitLoading ? SizedBox.shrink() : Icon(Icons.cloud_upload_outlined, color: context.surfaceColor),
-                label: _submitLoading ? CircularProgressIndicator(color: context.surfaceColor) : Text('UNGGAH SEKARANG', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold)),
-              ),
-            )
-          ],
+              AnimatedTapButton(
+                onTap: _submitLoading ? () {} : () {
+                  if (hapticEnabled) HapticFeedback.lightImpact();
+                  _handleUpload();
+                },
+                scaleDown: 0.95,
+                child: Container(
+                  width: double.infinity, 
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: _submitLoading ? CupertinoColors.systemGrey : AppConstants.primaryColor,
+                    borderRadius: BorderRadius.circular(12)
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _submitLoading 
+                      ? [const CupertinoActivityIndicator()] 
+                      : [
+                          Icon(CupertinoIcons.cloud_upload, color: context.surfaceColor, size: 20),
+                          const SizedBox(width: 8),
+                          Text('UNGGAH SEKARANG', style: TextStyle(color: context.surfaceColor, fontWeight: FontWeight.bold))
+                        ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildList(List<dynamic> filteredDocs) {
+    final hapticEnabled = context.watch<ThemeProvider>().hapticEnabled;
     return Column(
       children: [
         SingleChildScrollView(
@@ -274,11 +325,14 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: ChoiceChip(
-                  label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : Colors.black87, fontSize: 12, fontWeight: FontWeight.bold)),
+                  label: Text(c, style: TextStyle(color: isSelected ? context.surfaceColor : CupertinoColors.black, fontSize: 12, fontWeight: FontWeight.bold)),
                   selected: isSelected,
                   selectedColor: AppConstants.primaryColor,
                   backgroundColor: context.surfaceColor,
-                  onSelected: (v) => setState(() => _selectedCategoryFilter = c),
+                  onSelected: (v) {
+                    if (hapticEnabled) HapticFeedback.selectionClick();
+                    setState(() => _selectedCategoryFilter = c);
+                  },
                   showCheckmark: false,
                 ),
               );
@@ -286,72 +340,89 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           ),
         ),
         Expanded(
-          child: filteredDocs.isEmpty 
-            ? const Center(child: Text('Belum ada dokumen', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)))
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: filteredDocs.length,
-                itemBuilder: (context, index) {
-                  final doc = filteredDocs[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              CupertinoSliverRefreshControl(
+                onRefresh: () async {
+                  if (hapticEnabled) HapticFeedback.mediumImpact();
+                  await _fetchDocuments();
+                },
+              ),
+              if (filteredDocs.isEmpty)
+                const SliverFillRemaining(
+                  child: Center(child: Text('Belum ada dokumen', style: TextStyle(color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold))),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final doc = filteredDocs[index];
+                        return FadeSlideIn(
+                          delay: Duration(milliseconds: index * 50),
+                          child: AnimatedCard(
+                            onTap: () async {
+                              if (hapticEnabled) HapticFeedback.selectionClick();
+                              final url = Uri.parse(doc['file_url'] ?? '');
+                              if (await canLaunchUrl(url)) await launchUrl(url);
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(color: context.surfaceColor, borderRadius: BorderRadius.circular(16)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(doc['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                  const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-                                        child: Text(doc['category'] ?? '', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.blue)),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(doc['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  decoration: BoxDecoration(color: CupertinoColors.activeBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                                                  child: Text(doc['category'] ?? '', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: CupertinoColors.activeBlue)),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(_formatBytes(doc['file_size']), style: const TextStyle(fontSize: 10, color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold))
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(_formatBytes(doc['file_size']), style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold))
+                                      CupertinoButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () => _handleDelete(doc),
+                                        child: const Icon(CupertinoIcons.trash, color: CupertinoColors.destructiveRed, size: 20),
+                                      ),
                                     ],
-                                  )
+                                  ),
+                                  if (doc['description'] != null && doc['description'].toString().isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(doc['description'], style: const TextStyle(fontSize: 11, color: CupertinoColors.systemGrey)),
+                                    ),
                                 ],
                               ),
                             ),
-                            IconButton(icon: const Icon(Icons.remove_red_eye_outlined, color: Colors.blue), onPressed: () async {
-                              final url = Uri.parse(doc['file_url'] ?? '');
-                              if (await canLaunchUrl(url)) await launchUrl(url);
-                            }),
-                            IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _handleDelete(doc)),
-                          ],
-                        ),
-                        if (doc['description'] != null && doc['description'].toString().isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(doc['description'], style: const TextStyle(fontSize: 11, color: Colors.grey)),
                           ),
-                      ],
+                        );
+                      },
+                      childCount: filteredDocs.length,
                     ),
-                  );
-                },
-              )
+                  ),
+                ),
+            ],
+          ),
         )
       ],
-    );
-  }
-
-  InputDecoration _inputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-      filled: true, fillColor: context.isDarkMode ? context.surfaceColor : Colors.grey[50],
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.borderColor)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     );
   }
 }

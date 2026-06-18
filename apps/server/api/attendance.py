@@ -335,12 +335,33 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
     late_mins = metrics["late_minutes"]
     attendance_status = metrics["status"]
 
-    # Insert attendance record (handles double check-in)
+    current_time_str = now.strftime("%H:%M:%S")
+    
+    if body.clock_type == "OUT":
+        result = await supabase_client.update_attendance_checkout(
+            employee_id=employee_id,
+            date=today,
+            clock_out=current_time_str
+        )
+        if not result.get("success"):
+            raise HTTPException(status_code=500, detail=result.get("error", "Gagal menyimpan data check-out"))
+        
+        return {
+            "status": "success",
+            "data": {
+                "check_out_time": current_time_str,
+                "distance_meters": distance_m,
+                "target_name": target_name,
+                "message": f"Check-out berhasil. Selamat beristirahat."
+            }
+        }
+
+    # Handle Check-In
     result = await supabase_client.add_attendance_record(
         employee_id=employee_id,
         date=today,
         status=attendance_status,
-        check_in_time=check_in_time,
+        clock_in=current_time_str,
         late_minutes=late_mins,
         notes=body.notes or f"Geofencing check-in @ {target_name}",
         photo_url=body.photo_url or body.photo_base64,
@@ -350,12 +371,12 @@ async def ess_check_in(body: CheckInRequest, current_user: dict = Depends(get_cu
         target_name=target_name
     )
 
-    if result.get("already_checked_in") and body.clock_type != "OUT":
+    if result.get("already_checked_in"):
         existing = result.get("existing_record", {})
         return {
             "status": "already_checked_in",
             "data": {
-                "check_in_time": existing.get("check_in_time") if existing else check_in_time,
+                "check_in_time": existing.get("clock_in") if existing else current_time_str,
                 "message": "Anda sudah melakukan check-in hari ini."
             }
         }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/widgets/cached_avatar.dart';
+import '../../../widgets/ios_card.dart';
 
 class DirectoryScreen extends StatefulWidget {
   const DirectoryScreen({super.key});
@@ -20,7 +22,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   List<dynamic> _employees = [];
   List<dynamic> _filteredEmployees = [];
   bool _isLoading = true;
-  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   }
 
   Future<void> _fetchEmployees() async {
+    setState(() => _isLoading = true);
     try {
       final data = await _supabase
           .from('employees')
@@ -52,10 +54,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       debugPrint('Error fetching directory: $e');
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isRefreshing = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -81,7 +80,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('WhatsApp tidak terinstal')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('WhatsApp tidak terinstal'), backgroundColor: CupertinoColors.destructiveRed));
     }
   }
 
@@ -95,126 +94,102 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Direktori Karyawan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => context.pop(),
-        ),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Direktori Karyawan'),
+        previousPageTitle: 'Kembali',
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            color: context.backgroundColor,
-            child: Container(
-              height: 54,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: context.surfaceColor,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 2))],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchCtrl,
-                      decoration: const InputDecoration(
-                        hintText: 'Cari nama, jabatan, atau divisi...',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.textPrimary),
-                    ),
-                  ),
-                  if (_searchCtrl.text.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.grey, size: 18),
-                      onPressed: () => _searchCtrl.clear(),
-                    )
-                ],
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: CupertinoSearchTextField(
+                controller: _searchCtrl,
+                placeholder: 'Cari nama, jabatan, divisi...',
+                style: TextStyle(color: isDark ? CupertinoColors.white : CupertinoColors.black),
               ),
             ),
-          ),
 
-          // List
-          Expanded(
-            child: _isLoading && !_isRefreshing
-              ? const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor))
-              : _filteredEmployees.isEmpty
-                ? const Center(child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.people_outline, size: 60, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text('Tidak ada karyawan ditemukan', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
-                    ],
-                  ))
-                : RefreshIndicator(
-                    onRefresh: () async {
-                      setState(() => _isRefreshing = true);
-                      await _fetchEmployees();
-                    },
-                    color: AppConstants.primaryColor,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(20).copyWith(top: 0, bottom: 100),
-                      itemCount: _filteredEmployees.length,
-                      itemBuilder: (context, index) {
-                        final emp = _filteredEmployees[index];
-                        return _buildEmployeeCard(emp);
-                      },
+            // List
+            Expanded(
+              child: _isLoading
+                ? const Center(child: CupertinoActivityIndicator(radius: 16))
+                : _filteredEmployees.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.person_3_fill, size: 60, color: CupertinoColors.systemGrey.withValues(alpha: 0.5)),
+                          const SizedBox(height: 16),
+                          const Text('Tidak ada karyawan ditemukan', style: TextStyle(color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold)),
+                        ],
+                      )
+                    )
+                  : CustomScrollView(
+                      slivers: [
+                        CupertinoSliverRefreshControl(
+                          onRefresh: _fetchEmployees,
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          sliver: SliverToBoxAdapter(
+                            child: IosCard(
+                              padding: EdgeInsets.zero,
+                              child: ListView.separated(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: _filteredEmployees.length,
+                                separatorBuilder: (context, index) => const Divider(height: 1, color: CupertinoColors.systemGrey4),
+                                itemBuilder: (context, index) {
+                                  final emp = _filteredEmployees[index];
+                                  return _buildEmployeeCard(emp, isDark);
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+                      ],
                     ),
-                  ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildEmployeeCard(Map<String, dynamic> emp) {
+  Widget _buildEmployeeCard(Map<String, dynamic> emp, bool isDark) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 4))],
-      ),
       child: Row(
         children: [
           // Avatar
           CachedAvatar(
             imageUrl: emp['avatar_url'],
             name: emp['name'] ?? 'User',
-            radius: 27,
-            fontSize: 20,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            radius: 24,
+            fontSize: 18,
+            backgroundColor: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.systemGrey6,
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 12),
           
           // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(emp['name'] ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: context.textPrimary)),
+                Text(emp['name'] ?? '', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
                 const SizedBox(height: 2),
-                Text(emp['job_position'] ?? 'Staff', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppConstants.primaryColor)),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.business, size: 12, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(emp['departments']?['name'] ?? 'Wijaya KN', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey)),
-                  ],
-                )
+                Text(emp['job_position'] ?? 'Staff', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppConstants.primaryColor)),
+                const SizedBox(height: 2),
+                Text(emp['departments']?['name'] ?? 'Wijaya KN', style: const TextStyle(fontSize: 11, color: CupertinoColors.systemGrey)),
               ],
             ),
           ),
@@ -222,24 +197,28 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           // Actions
           Row(
             children: [
-              _buildActionBtn(Icons.message, Colors.green, () => _handleWhatsApp(emp['phone'])),
-              const SizedBox(width: 10),
-              _buildActionBtn(Icons.call, Colors.blue, () => _handleCall(emp['phone'])),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => _handleWhatsApp(emp['phone']),
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(color: CupertinoColors.activeGreen.withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: const Icon(CupertinoIcons.chat_bubble_text_fill, size: 18, color: CupertinoColors.activeGreen),
+                ),
+              ),
+              const SizedBox(width: 8),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => _handleCall(emp['phone']),
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(color: CupertinoColors.activeBlue.withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: const Icon(CupertinoIcons.phone_fill, size: 18, color: CupertinoColors.activeBlue),
+                ),
+              ),
             ],
           )
         ],
-      ),
-    );
-  }
-
-  Widget _buildActionBtn(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 40, height: 40,
-        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14)),
-        child: Icon(icon, size: 18, color: color),
       ),
     );
   }

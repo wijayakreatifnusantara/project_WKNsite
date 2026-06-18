@@ -1,11 +1,11 @@
-import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/utils/constants.dart';
+import '../../../widgets/ios_card.dart';
 
 class AnnouncementsScreen extends StatefulWidget {
   const AnnouncementsScreen({super.key});
@@ -27,7 +27,6 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   }
 
   Future<void> _fetchAnnouncements() async {
-    setState(() => _isLoading = true);
     try {
       final data = await _supabase
           .from('announcements')
@@ -45,97 +44,102 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
 
   Color _getTypeColor(String? type) {
     switch (type) {
-      case 'important': return Colors.red;
-      case 'warning': return Colors.orange;
-      case 'success': return Colors.green;
+      case 'important': return CupertinoColors.destructiveRed;
+      case 'warning': return CupertinoColors.systemOrange;
+      case 'success': return CupertinoColors.activeGreen;
       default: return AppConstants.primaryColor;
     }
   }
 
   IconData _getTypeIcon(String? type) {
     switch (type) {
-      case 'important': return Icons.campaign;
-      case 'warning': return Icons.warning_amber_rounded;
-      case 'success': return Icons.check_circle_outline;
-      default: return Icons.info_outline;
+      case 'important': return CupertinoIcons.speaker_3_fill;
+      case 'warning': return CupertinoIcons.exclamationmark_triangle_fill;
+      case 'success': return CupertinoIcons.checkmark_seal_fill;
+      default: return CupertinoIcons.info_circle_fill;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: context.surfaceColor,
-        title: Text('Pengumuman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: context.textPrimary)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+    final isDark = context.isDarkMode;
+
+    return CupertinoPageScaffold(
+      backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark ? CupertinoColors.black : CupertinoColors.white,
+        middle: const Text('Pengumuman'),
+        previousPageTitle: 'Kembali',
       ),
-      body: _isLoading 
-        ? _buildSkeletonLoading()
-        : _announcements.isEmpty 
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              onRefresh: _fetchAnnouncements,
-              color: AppConstants.primaryColor,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _announcements.length,
-                itemBuilder: (context, index) {
-                  final item = _announcements[index];
-                  final color = _getTypeColor(item['type']);
-                  
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: context.surfaceColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                      border: Border(left: BorderSide(color: color, width: 5))
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                                child: Icon(_getTypeIcon(item['type']), color: color, size: 20),
+      child: SafeArea(
+        child: _isLoading 
+          ? _buildSkeletonLoading(isDark)
+          : _announcements.isEmpty 
+            ? _buildEmptyState(isDark)
+            : CustomScrollView(
+                slivers: [
+                  CupertinoSliverRefreshControl(
+                    onRefresh: _fetchAnnouncements,
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final item = _announcements[index];
+                          final color = _getTypeColor(item['type']);
+                          
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: IosCard(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                                        child: Icon(_getTypeIcon(item['type']), color: color, size: 20),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(item['title'] ?? 'Pengumuman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              item['created_at'] != null ? item['created_at'].toString().substring(0, 10) : 'Hari ini',
+                                              style: const TextStyle(fontSize: 11, color: CupertinoColors.systemGrey, fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    item['content'] ?? '',
+                                    style: const TextStyle(fontSize: 13, height: 1.5, color: CupertinoColors.systemGrey),
+                                  )
+                                ],
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(item['title'] ?? 'Pengumuman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: context.textPrimary)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      item['created_at'] != null ? item['created_at'].toString().substring(0, 10) : 'Hari ini',
-                                      style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            item['content'] ?? '',
-                            style: TextStyle(fontSize: 13, height: 1.5, color: context.textSecondary),
-                          )
-                        ],
+                            ),
+                          );
+                        },
+                        childCount: _announcements.length,
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            )
+      ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -146,57 +150,54 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               color: AppConstants.primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.campaign_outlined, size: 64, color: AppConstants.primaryColor.withValues(alpha: 0.8)),
+            child: Icon(CupertinoIcons.speaker_2_fill, size: 64, color: AppConstants.primaryColor.withValues(alpha: 0.8)),
           ),
           const SizedBox(height: 24),
-          Text('Belum Ada Pengumuman', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: context.textPrimary)),
+          Text('Belum Ada Pengumuman', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
           const SizedBox(height: 8),
-          Text('Informasi terbaru dari perusahaan akan\nmuncul di sini', textAlign: TextAlign.center, style: TextStyle(color: context.textSecondary, fontSize: 13, height: 1.5)),
+          const Text('Informasi terbaru dari perusahaan akan\nmuncul di sini', textAlign: TextAlign.center, style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 13, height: 1.5)),
         ],
       ),
     );
   }
 
-  Widget _buildSkeletonLoading() {
+  Widget _buildSkeletonLoading(bool isDark) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: 5,
       itemBuilder: (context, index) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: context.surfaceColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: context.borderColor),
-          ),
-          child: Shimmer.fromColors(
-            baseColor: context.isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
-            highlightColor: context.isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(width: 36, height: 36, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(width: double.infinity, height: 14, color: Colors.white),
-                          const SizedBox(height: 6),
-                          Container(width: 80, height: 10, color: Colors.white),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Container(width: double.infinity, height: 10, color: Colors.white),
-                const SizedBox(height: 6),
-                Container(width: 200, height: 10, color: Colors.white),
-              ],
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: IosCard(
+            padding: const EdgeInsets.all(16),
+            child: Shimmer.fromColors(
+              baseColor: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.systemGrey5,
+              highlightColor: isDark ? CupertinoColors.systemGrey5 : CupertinoColors.systemGrey6,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(width: 36, height: 36, decoration: BoxDecoration(color: CupertinoColors.white, borderRadius: BorderRadius.circular(8))),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(width: double.infinity, height: 14, color: CupertinoColors.white),
+                            const SizedBox(height: 6),
+                            Container(width: 80, height: 10, color: CupertinoColors.white),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(width: double.infinity, height: 10, color: CupertinoColors.white),
+                  const SizedBox(height: 6),
+                  Container(width: 200, height: 10, color: CupertinoColors.white),
+                ],
+              ),
             ),
           ),
         );
