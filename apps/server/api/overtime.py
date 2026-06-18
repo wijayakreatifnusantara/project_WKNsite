@@ -19,7 +19,7 @@ async def get_overtime_requests(status: str = None, current_user: dict = Depends
                 job_position,
                 division_name
             )
-        """).order("created_at", { "ascending": False })
+        """).order("created_at", desc=True)
         
         if status:
             query = query.eq("status", status)
@@ -63,7 +63,7 @@ async def get_my_overtime_requests(current_user: dict = Depends(get_current_user
         res = supabase_client.client.table("overtime_requests")\
             .select("*")\
             .eq("employee_id", employee_id)\
-            .order("created_at", { "ascending": False })\
+            .order("created_at", desc=True)\
             .execute()
             
         return {"status": "success", "data": res.data}
