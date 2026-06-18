@@ -30,8 +30,8 @@ const GeolocationRadar = () => {
       
       {/* Header */}
       <div className="z-10 w-full flex justify-between items-center mb-2">
-        <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-          <IconScan size={14} className="text-[#E31E24]" /> Live Geofence
+        <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+          <IconScan size={14} className="text-ios-primary" /> Live Geofence
         </h4>
         <div className="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-full">
           <div className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -51,7 +51,7 @@ const GeolocationRadar = () => {
         <div className="radar-sweep"></div>
         
         {/* HQ Pin */}
-        <IconMapPin size={16} className="text-[#E31E24] absolute z-10 drop-shadow-sm" />
+        <IconMapPin size={16} className="text-ios-primary absolute z-10 drop-shadow-sm" />
 
         {/* Dynamic Blips */}
         {blips.map(blip => (
@@ -71,11 +71,11 @@ const GeolocationRadar = () => {
       {/* Footer Stats */}
       <div className="z-10 w-full flex gap-2 mt-2">
          <div className="flex-1 px-2 py-1.5 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-[12px] font-black text-white">42</p>
+            <p className="text-[12px] font-bold text-white">42</p>
             <p className="text-[6px] text-slate-500 uppercase font-bold">Zones</p>
          </div>
          <div className="flex-1 px-2 py-1.5 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-[12px] font-black text-emerald-400">0</p>
+            <p className="text-[12px] font-bold text-emerald-400">0</p>
             <p className="text-[6px] text-slate-500 uppercase font-bold">Breaches</p>
          </div>
       </div>

@@ -15,10 +15,10 @@ const Wellness = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 font-outfit tracking-tight uppercase">
-              Health & <span className="text-[#E31E24]">Wellness</span>
+            <h2 className="text-2xl font-bold text-slate-800 font-outfit tracking-tight uppercase">
+              Health & <span className="text-ios-primary">Wellness</span>
             </h2>
-            <p className="text-slate-400 text-xs mt-1 font-black uppercase tracking-[0.3em] opacity-70">Employee Vitality & Insurance Benefits</p>
+            <p className="text-slate-400 text-xs mt-1 font-bold uppercase tracking-widest opacity-70">Employee Vitality & Insurance Benefits</p>
           </div>
         </header>
 
@@ -34,7 +34,7 @@ const Wellness = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="border-white border-[4px] shadow-sm bg-white rounded-[2.5rem] p-8 space-y-8 relative overflow-hidden">
              <div className="relative z-10">
-               <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">Medical Profile</h3>
+               <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight mb-6">Medical Profile</h3>
                <div className="space-y-4">
                  <ProfileRow label="Blood Type" value="B+" />
                  <ProfileRow label="BPJS Kesehatan" value="000123456789" />
@@ -47,14 +47,14 @@ const Wellness = () => {
           </Card>
 
           <Card className="border-white border-[4px] shadow-sm bg-white rounded-[2.5rem] p-8">
-             <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-6">Wellness Activity</h3>
+             <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight mb-6">Wellness Activity</h3>
              <div className="h-64 flex items-end justify-around gap-2 px-4 pb-4">
                {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
                  <div key={i} className="flex-1 flex flex-col items-center gap-3">
                    <div className="w-full bg-white shadow-sm rounded-full h-48 relative overflow-hidden flex items-end">
-                     <div className="w-full bg-[#E31E24] rounded-t-full transition-all duration-1000" style={{ height: `${h}%` }}></div>
+                     <div className="w-full bg-ios-primary rounded-t-full transition-all duration-1000" style={{ height: `${h}%` }}></div>
                    </div>
-                   <span className="text-[11px] font-black text-slate-400 uppercase">Day {i+1}</span>
+                   <span className="text-[11px] font-semibold text-slate-400 uppercase">Day {i+1}</span>
                  </div>
                ))}
              </div>
@@ -72,16 +72,16 @@ const WellnessMetric = ({ label, value, icon, color }) => (
       {icon}
     </div>
     <div className="text-center">
-      <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
-      <h3 className="text-xl font-black text-slate-800 font-outfit leading-none">{value}</h3>
+      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
+      <h3 className="text-xl font-bold text-slate-800 font-outfit leading-none">{value}</h3>
     </div>
   </Card>
 );
 
 const ProfileRow = ({ label, value, color }) => (
   <div className="flex justify-between items-center py-2 border-b border-white/30 last:border-0">
-    <span className="text-xs font-black text-slate-400 uppercase tracking-tight">{label}</span>
-    <span className={`text-xs font-black ${color === 'rose' ? 'text-rose-500 font-black' : 'text-slate-700'}`}>{value}</span>
+    <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">{label}</span>
+    <span className={`text-xs font-bold ${color === 'rose' ? 'text-rose-500 font-bold' : 'text-slate-700'}`}>{value}</span>
   </div>
 );
 

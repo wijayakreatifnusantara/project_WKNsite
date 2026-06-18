@@ -59,10 +59,10 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
 
   const Field = ({ label, id, value, onChange, type = 'text', placeholder }) => (
     <div>
-      <label htmlFor={id} className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</label>
+      <label htmlFor={id} className="block text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">{label}</label>
       <input
         id={id} type={type} value={value} onChange={onChange} placeholder={placeholder}
-        className="w-full h-9 px-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+        className="w-full h-9 px-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
       />
     </div>
   );
@@ -72,8 +72,8 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
-        <IconBuildingSkyscraper size={16} className="text-[#E31E24]" />
-        <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Konfigurasi Kantor Utama (HQ)</h4>
+        <IconBuildingSkyscraper size={16} className="text-ios-primary" />
+        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Konfigurasi Kantor Utama (HQ)</h4>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -85,12 +85,12 @@ const HQConfigForm = ({ onSettingsUpdated }) => {
 
       <div className="flex items-center gap-3">
         <button id="save-hq-btn" onClick={handleSave} disabled={saving}
-          className="h-9 px-5 rounded-xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm hover:bg-[#C1181E] transition-all disabled:opacity-50">
+          className="h-9 px-5 rounded-xl bg-ios-primary text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm hover:bg-ios-primary/90 transition-all disabled:opacity-50">
           {saving ? <IconLoader2 size={14} className="animate-spin" /> : <IconDeviceFloppy size={14} />}
           {saving ? 'Menyimpan...' : 'Simpan Kantor Utama'}
         </button>
         {msg && (
-          <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
+          <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
             {msg.type === 'success' ? <IconCircleCheck size={14} /> : <IconAlertCircle size={14} />}
             {msg.text}
           </div>
@@ -142,13 +142,13 @@ const FreeAttendanceToggle = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
-        <IconCompass size={16} className="text-[#E31E24]" />
-        <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Kebijakan Absensi Global</h4>
+        <IconCompass size={16} className="text-ios-primary" />
+        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Kebijakan Absensi Global</h4>
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-[#f8fafc] border border-slate-200 rounded-2xl gap-4">
         <div className="space-y-0.5">
-          <p className="text-xs font-black text-slate-700 uppercase tracking-tight">Bebas Absen Di Mana Saja (Kebijakan Global)</p>
+          <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Bebas Absen Di Mana Saja (Kebijakan Global)</p>
           <p className="text-xs font-bold text-slate-400">
             Jika diaktifkan, seluruh karyawan dapat bebas absen masuk/keluar dari mana saja tanpa divalidasi geofencing kantor ataupun site.
           </p>
@@ -164,10 +164,10 @@ const FreeAttendanceToggle = () => {
               disabled={saving}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-transparent after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E31E24]"></div>
+            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-transparent after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ios-primary"></div>
           </label>
           {msg && (
-            <span className={`text-[11px] font-black uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
+            <span className={`text-[11px] font-semibold uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
               {msg.text}
             </span>
           )}
@@ -188,7 +188,7 @@ const LocationMapPreview = ({ lat, lon, radius, height = '140px' }) => {
         style={{ height }}
       >
         <IconMapPin size={20} className="text-slate-200" />
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Isi lat/lon untuk preview</p>
+        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Isi lat/lon untuk preview</p>
       </div>
     );
   }
@@ -222,8 +222,8 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
     onSave({ name: form.name.trim(), lat: parseFloat(form.lat), lon: parseFloat(form.lon), radius: parseInt(form.radius) || 100 });
   };
 
-  const inputCls = 'w-full h-8 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold text-[11px] focus:outline-none focus:ring-1 focus:ring-[#E31E24]/40';
-  const labelCls = 'block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1';
+  const inputCls = 'w-full h-8 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-800 font-semibold text-[11px] focus:outline-none focus:ring-1 focus:ring-ios-primary/40';
+  const labelCls = 'block text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in" style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}>
@@ -234,15 +234,15 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
         {/* Header — compact */}
         <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="h-7 w-7 bg-[#E31E24]/10 rounded-lg flex items-center justify-center shrink-0">
-              <IconMapPin size={15} className="text-[#E31E24]" />
+            <div className="h-7 w-7 bg-ios-primary/10 rounded-lg flex items-center justify-center shrink-0">
+              <IconMapPin size={15} className="text-ios-primary" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">
+              <h3 className="text-[11px] font-semibold text-slate-800 uppercase tracking-tight truncate">
                 {mode === 'add' ? 'Tambah Lokasi' : 'Edit Lokasi'}
               </h3>
               {mode === 'edit' && location?.name && (
-                <p className="text-[11px] font-bold text-slate-400 truncate">{location.name}</p>
+                <p className="text-[11px] font-semibold text-slate-400 truncate">{location.name}</p>
               )}
             </div>
           </div>
@@ -284,11 +284,11 @@ const LocationFormModal = ({ mode = 'add', location = null, onClose, onSave, sav
         {/* Footer — always visible */}
         <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-slate-200 bg-slate-50/80 shrink-0">
           <button type="button" onClick={onClose}
-            className="h-8 px-4 rounded-lg bg-transparent border border-slate-200 text-slate-600 font-black text-[11px] uppercase tracking-widest hover:shadow-sm">
+            className="h-8 px-4 rounded-lg bg-transparent border border-slate-200 text-slate-600 font-bold text-[11px] uppercase tracking-widest hover:shadow-sm">
             Batal
           </button>
           <button type="submit" disabled={saving}
-            className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[11px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-[#C1181E] disabled:opacity-50">
+            className="h-8 px-4 rounded-lg bg-ios-primary text-white font-bold text-[11px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-ios-primary/90 disabled:opacity-50">
             {saving ? <IconLoader2 size={12} className="animate-spin" /> : <IconDeviceFloppy size={12} />}
             {saving ? 'Menyimpan...' : mode === 'add' ? 'Daftarkan' : 'Simpan'}
           </button>
@@ -304,10 +304,10 @@ const LocationViewModal = ({ location, onClose, onEdit }) => (
     <div className="bg-transparent rounded-2xl shadow-sm w-full max-w-md max-h-[min(480px,88vh)] flex flex-col overflow-hidden">
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="h-7 w-7 bg-[#E31E24]/10 rounded-lg flex items-center justify-center shrink-0">
-            <IconMapPin size={15} className="text-[#E31E24]" />
+          <div className="h-7 w-7 bg-ios-primary/10 rounded-lg flex items-center justify-center shrink-0">
+            <IconMapPin size={15} className="text-ios-primary" />
           </div>
-          <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">{location.name}</h3>
+          <h3 className="text-[11px] font-semibold text-slate-800 uppercase tracking-tight truncate">{location.name}</h3>
         </div>
         <button onClick={onClose} className="h-7 w-7 rounded-lg bg-white shadow-sm border-none flex items-center justify-center text-slate-400 hover:text-slate-700 shrink-0">
           <IconX size={14} />
@@ -321,8 +321,8 @@ const LocationViewModal = ({ location, onClose, onEdit }) => (
             { label: 'Radius', value: `${location.radius}m` },
           ].map(({ label, value }) => (
             <div key={label} className="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-200">
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-              <p className="text-xs font-black text-slate-800 font-mono truncate">{value}</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{label}</p>
+              <p className="text-xs font-bold text-slate-800 font-mono truncate">{value}</p>
             </div>
           ))}
         </div>
@@ -330,11 +330,11 @@ const LocationViewModal = ({ location, onClose, onEdit }) => (
       </div>
       <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-200 bg-slate-50/80 shrink-0">
         <button onClick={onClose}
-          className="h-8 px-4 rounded-lg bg-transparent border border-slate-200 text-slate-600 font-black text-[11px] uppercase tracking-widest hover:shadow-sm">
+          className="h-8 px-4 rounded-lg bg-transparent border border-slate-200 text-slate-600 font-bold text-[11px] uppercase tracking-widest hover:shadow-sm">
           Tutup
         </button>
         <button onClick={() => { onClose(); onEdit(); }}
-          className="h-8 px-4 rounded-lg bg-amber-500 text-white font-black text-[11px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-amber-600">
+          className="h-8 px-4 rounded-lg bg-amber-500 text-white font-bold text-[11px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-amber-600">
           <IconEdit size={12} /> Edit
         </button>
       </div>
@@ -354,13 +354,13 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
       {/* Section Header + Add Button */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <IconMapPin size={16} className="text-[#E31E24]" />
-          <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Daftar Cabang &amp; Lokasi Kerja Proyek</h4>
+          <IconMapPin size={16} className="text-ios-primary" />
+          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Daftar Cabang &amp; Lokasi Kerja Proyek</h4>
         </div>
         <button
           id="add-loc-btn"
           onClick={() => setModal({ mode: 'add' })}
-          className="h-9 px-4 rounded-xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm hover:bg-[#C1181E] transition-all active:scale-95"
+          className="h-9 px-4 rounded-xl bg-ios-primary text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm hover:bg-ios-primary/90 transition-all active:scale-95"
         >
           <IconPlus size={14} /> Tambah Lokasi
         </button>
@@ -368,7 +368,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
 
       {/* Global save message */}
       {msg && (
-        <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
+        <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${msg.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}>
           {msg.type === 'success' ? <IconCircleCheck size={14} /> : <IconAlertCircle size={14} />}
           {msg.text}
         </div>
@@ -378,10 +378,10 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
       {locations.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-14 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 gap-3">
           <IconMapPin size={36} className="text-slate-200" />
-          <p className="text-xs font-black uppercase tracking-widest">Belum ada lokasi kerja custom terdaftar</p>
+          <p className="text-xs font-bold uppercase tracking-widest">Belum ada lokasi kerja custom terdaftar</p>
           <button
             onClick={() => setModal({ mode: 'add' })}
-            className="h-8 px-4 rounded-xl bg-[#E31E24]/5 text-[#E31E24] font-black text-xs uppercase tracking-widest hover:bg-[#E31E24]/10 transition-all"
+            className="h-8 px-4 rounded-xl bg-ios-primary/5 text-ios-primary font-bold text-xs uppercase tracking-widest hover:bg-ios-primary/10 transition-all"
           >
             + Tambah Lokasi Pertama
           </button>
@@ -392,7 +392,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 {['Location Name', 'Coordinates', 'Radius', 'Actions'].map(h => (
-                  <th key={h} className="px-4 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">{h}</th>
+                  <th key={h} className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -401,10 +401,10 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
                 <tr key={idx} className="transition-all group hover:bg-slate-50 transition-colors cursor-pointer">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 bg-[#E31E24]/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-[#E31E24]/20 transition-all">
-                        <IconMapPin size={15} className="text-[#E31E24]" />
+                      <div className="h-8 w-8 bg-ios-primary/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-ios-primary/20 transition-all">
+                        <IconMapPin size={15} className="text-ios-primary" />
                       </div>
-                      <p className="text-[11px] font-black text-slate-800 leading-tight uppercase">{loc.name}</p>
+                      <p className="text-[11px] font-semibold text-slate-800 leading-tight uppercase">{loc.name}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -414,7 +414,7 @@ const WorkingLocationsManager = ({ locations, loading, saving, msg, onAddLocatio
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest">{loc.radius}m</span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 font-bold text-xs uppercase tracking-widest">{loc.radius}m</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -559,8 +559,8 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-2">
-          <IconUsers size={16} className="text-[#E31E24]" />
-          <h4 className="text-xs font-black text-slate-700 uppercase tracking-widest">Penempatan Lokasi Kerja Karyawan</h4>
+          <IconUsers size={16} className="text-ios-primary" />
+          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Penempatan Lokasi Kerja Karyawan</h4>
         </div>
         <div className="relative w-full md:w-64">
           <IconSearch size={14} className="absolute left-3 top-2.5 text-slate-400" />
@@ -569,7 +569,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama, ID, posisi..."
-            className="w-full h-9 pl-9 pr-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-[#E31E24]/30"
+            className="w-full h-9 pl-9 pr-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs focus:outline-none focus:ring-1 focus:ring-ios-primary/30"
           />
         </div>
       </div>
@@ -579,7 +579,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               {['Karyawan', 'Posisi', 'Lokasi Absen Ditentukan', 'Bebas Absen (Anywhere)', 'Status'].map(h => (
-                <th key={h} className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
+                <th key={h} className="px-3 py-2.5 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{h}</th>
               ))}
             </tr>
           </thead>
@@ -597,12 +597,12 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
                   {/* Name & ID */}
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 rounded-lg bg-[#E31E24]/5 border border-[#E31E24]/10 flex items-center justify-center text-[#E31E24] font-black text-xs">
+                      <div className="h-7 w-7 rounded-lg bg-ios-primary/5 border border-ios-primary/10 flex items-center justify-center text-ios-primary font-bold text-xs">
                         {empName ? empName.substring(0, 1) : 'A'}
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-800 leading-tight">{empName}</p>
-                        <p className="text-[11px] font-bold text-slate-400 mt-0.5">{empId}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-0.5">{empId}</p>
                       </div>
                     </div>
                   </td>
@@ -616,7 +616,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
                       value={currentLocName}
                       disabled={status === 'loading'}
                       onChange={(e) => updateEmployeeSettings(empId, isBebasAbsen, e.target.value)}
-                      className="h-8 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-black text-xs uppercase tracking-wider focus:outline-none focus:ring-1 focus:ring-[#E31E24]/20"
+                      className="h-8 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider focus:outline-none focus:ring-1 focus:ring-ios-primary/20"
                     >
                       {locOptions.map(opt => (
                         <option key={opt.value} value={opt.value}>
@@ -640,7 +640,7 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
                         />
                         <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-transparent after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
                       </label>
-                      <span className={`ml-2 text-[11px] font-black uppercase tracking-wider ${isBebasAbsen ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <span className={`ml-2 text-[11px] font-semibold uppercase tracking-wider ${isBebasAbsen ? 'text-emerald-600' : 'text-slate-400'}`}>
                         {isBebasAbsen ? 'Bebas Absen' : 'Geofenced'}
                       </span>
                     </div>
@@ -649,17 +649,17 @@ const EmployeeLocationSettings = ({ workingLocations, hqLocation }) => {
                   {/* Inline Status Feedback */}
                   <td className="px-3 py-2">
                     {status === 'loading' && (
-                      <span className="flex items-center gap-1 text-[11px] font-black text-amber-500 uppercase tracking-widest animate-pulse">
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-500 uppercase tracking-widest animate-pulse">
                         <IconLoader2 size={10} className="animate-spin" /> Menyimpan
                       </span>
                     )}
                     {status === 'success' && (
-                      <span className="flex items-center gap-1 text-[11px] font-black text-emerald-600 uppercase tracking-widest">
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 uppercase tracking-widest">
                         <IconCircleCheck size={12} /> Tersimpan
                       </span>
                     )}
                     {status === 'error' && (
-                      <span className="flex items-center gap-1 text-[11px] font-black text-rose-500 uppercase tracking-widest">
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-rose-500 uppercase tracking-widest">
                         <IconAlertCircle size={12} /> Gagal
                       </span>
                     )}
@@ -771,18 +771,18 @@ const LocationManager = ({ onBack }) => {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="h-8 w-8 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
+            className="h-8 w-8 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-ios-primary hover:border-ios-primary/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
           >
             <IconArrowLeft size={16} />
           </button>
-          <div className="h-8 w-8 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+          <div className="h-8 w-8 bg-ios-primary/10 rounded-lg flex items-center justify-center text-ios-primary">
             <IconMapPin size={18} />
           </div>
           <div>
-            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
-              Lokasi <span className="text-[#E31E24]">Kerja</span>
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight leading-none">
+              Lokasi <span className="text-ios-primary">Kerja</span>
             </h2>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1">Kelola Database Lokasi & Penempatan Karyawan</p>
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Kelola Database Lokasi & Penempatan Karyawan</p>
           </div>
         </div>
 
@@ -790,7 +790,7 @@ const LocationManager = ({ onBack }) => {
         <div className="flex items-center bg-white p-1 rounded-xl">
           <button
             onClick={() => setActiveTab('database')}
-            className={`h-8 px-4 rounded-lg font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+            className={`h-8 px-4 rounded-lg font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 ${
               activeTab === 'database'
                 ? 'bg-transparent text-slate-800 shadow-sm'
                 : 'text-slate-400 hover:text-slate-600'
@@ -801,7 +801,7 @@ const LocationManager = ({ onBack }) => {
           </button>
           <button
             onClick={() => setActiveTab('employees')}
-            className={`h-8 px-4 rounded-lg font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+            className={`h-8 px-4 rounded-lg font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 ${
               activeTab === 'employees'
                 ? 'bg-transparent text-slate-800 shadow-sm'
                 : 'text-slate-400 hover:text-slate-600'

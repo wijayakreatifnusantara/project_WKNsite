@@ -151,12 +151,12 @@ const RBACManager = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
+              <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-ios-primary border border-slate-200">
                 <IconLockAccess size={20} />
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">RBAC Intelligence Center</h1>
-                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Corporate Access & Authority Management</p>
+                <h1 className="text-lg font-bold text-slate-800 tracking-tight uppercase leading-none">RBAC Intelligence Center</h1>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Corporate Access & Authority Management</p>
               </div>
             </div>
           </div>
@@ -165,7 +165,7 @@ const RBACManager = () => {
             <Button 
               onClick={handleSave} 
               disabled={isSaving || isLoading}
-              className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-lg shadow-sm transition-all active:scale-95"
+              className="h-10 px-6 bg-ios-primary hover:bg-ios-primary/90 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-sm transition-all active:scale-95"
             >
               {isSaving ? <IconLoader2 className="animate-spin mr-2" size={14} /> : <IconShieldCheck className="mr-2" size={14} />}
               Save All Changes
@@ -176,7 +176,7 @@ const RBACManager = () => {
         {message.text && (
           <div className={`p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
             {message.type === 'success' ? <IconCheck size={16} /> : <IconAlertCircle size={16} />}
-            <span className="text-xs font-black uppercase tracking-widest">{message.text}</span>
+            <span className="text-xs font-bold uppercase tracking-widest">{message.text}</span>
           </div>
         )}
 
@@ -185,10 +185,10 @@ const RBACManager = () => {
           {/* ROLE SELECTOR (Left Sidebar) */}
           <div className="lg:col-span-1 space-y-2">
             <div className="flex items-center justify-between pl-1 mb-2">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Select Target Role</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Select Target Role</h3>
               <button 
                 onClick={() => setShowAddRoleModal(true)}
-                className="text-xs font-black uppercase text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors flex items-center gap-1 shadow-sm"
+                className="text-xs font-bold uppercase text-ios-primary hover:bg-red-50 px-2 py-1 rounded transition-colors flex items-center gap-1 shadow-sm"
               >
                 <IconPlus size={10} /> New Role
               </button>
@@ -199,15 +199,15 @@ const RBACManager = () => {
                 onClick={() => setSelectedRole(role)}
                 className={`w-full p-3 rounded-xl flex items-center justify-between transition-all duration-300 group ${
                   selectedRole === role 
-                  ? 'bg-transparent border border-[#E31E24] shadow-sm' 
+                  ? 'bg-transparent border border-ios-primary shadow-sm' 
                   : 'bg-transparent border border-slate-200 hover:border-slate-200 shadow-sm hover:scale-[1.01]'
                 }`}
               >
                 <div className="flex flex-col items-start text-left">
-                  <span className={`text-xs font-black uppercase tracking-widest ${selectedRole === role ? 'text-[#E31E24]' : 'text-slate-600'}`}>{role}</span>
+                  <span className={`text-xs font-bold uppercase tracking-widest ${selectedRole === role ? 'text-ios-primary' : 'text-slate-600'}`}>{role}</span>
                   <span className="text-[11px] text-slate-400 font-bold">System Hierarchy {role === 'owner' ? '0' : '1'}</span>
                 </div>
-                <div className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${selectedRole === role ? 'bg-[#E31E24] text-white shadow-sm' : 'bg-slate-50 text-slate-400 border border-slate-200 shadow-sm'}`}>
+                <div className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${selectedRole === role ? 'bg-ios-primary text-white shadow-sm' : 'bg-slate-50 text-slate-400 border border-slate-200 shadow-sm'}`}>
                   <IconShieldCheck size={12} />
                 </div>
               </button>
@@ -218,7 +218,7 @@ const RBACManager = () => {
                 <div className="h-8 w-8 bg-white/10 rounded-lg flex items-center justify-center">
                   <IconDeviceAnalytics size={16} className="text-red-400" />
                 </div>
-                <p className="text-[11px] font-bold leading-tight opacity-70">
+                <p className="text-[11px] font-semibold leading-tight opacity-70">
                   Changes will instantly reflect across the network for the selected role.
                 </p>
               </CardContent>
@@ -229,8 +229,8 @@ const RBACManager = () => {
           <div className="lg:col-span-4">
             {isLoading ? (
               <div className="h-64 flex flex-col items-center justify-center gap-4">
-                <IconLoader2 className="animate-spin text-[#E31E24]" size={32} />
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Syncing Matrix...</p>
+                <IconLoader2 className="animate-spin text-ios-primary" size={32} />
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Syncing Matrix...</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -238,8 +238,8 @@ const RBACManager = () => {
                   <Card key={gIdx} className="border border-slate-200 shadow-sm bg-transparent rounded-xl overflow-hidden transition-all hover:shadow-sm">
                     <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="text-[#E31E24] opacity-70">{React.cloneElement(group.icon, { size: 16 })}</div>
-                        <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">{group.title}</CardTitle>
+                        <div className="text-ios-primary opacity-70">{React.cloneElement(group.icon, { size: 16 })}</div>
+                        <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">{group.title}</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent className="p-4 space-y-4">
@@ -251,13 +251,13 @@ const RBACManager = () => {
                         >
                           <div className={`mt-0.5 h-5 w-5 rounded border flex items-center justify-center transition-all ${
                             rolePermissions.includes(item.id) 
-                            ? 'bg-[#E31E24] border-[#E31E24]' 
+                            ? 'bg-ios-primary border-ios-primary' 
                             : 'border-slate-200 bg-transparent'
                           }`}>
                             {rolePermissions.includes(item.id) && <IconCheck size={14} className="text-white" stroke={4} />}
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <span className={`text-[11px] font-black transition-colors ${rolePermissions.includes(item.id) ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-700'}`}>
+                            <span className={`text-[11px] font-semibold transition-colors ${rolePermissions.includes(item.id) ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-700'}`}>
                               {item.label}
                             </span>
                             <span className="text-[11px] text-slate-400 font-medium leading-tight">
@@ -282,8 +282,8 @@ const RBACManager = () => {
           <Card className="w-full max-w-md border border-slate-200 bg-slate-50/90 shadow-sm rounded-xl overflow-hidden">
             <div className="p-6 border-b border-slate-200 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                  <IconShieldCheck className="text-[#E31E24]" />
+                <h3 className="text-lg font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                  <IconShieldCheck className="text-ios-primary" />
                   Create Custom Role
                 </h3>
                 <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">
@@ -296,7 +296,7 @@ const RBACManager = () => {
             </div>
             <form onSubmit={handleCreateRole} className="p-6 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Role Name</label>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-2">Role Name</label>
                 <input 
                   autoFocus
                   required
@@ -304,14 +304,14 @@ const RBACManager = () => {
                   value={newRoleName} 
                   onChange={(e) => setNewRoleName(e.target.value)} 
                   placeholder="e.g. HR Assistant, IT Support" 
-                  className="w-full h-12 px-6 bg-transparent border border-slate-200 shadow-sm rounded-2xl text-[12px] font-bold focus:outline-none focus:border-[#E31E24] transition-all" 
+                  className="w-full h-12 px-6 bg-transparent border border-slate-200 shadow-sm rounded-2xl text-[12px] font-bold focus:outline-none focus:border-ios-primary transition-all" 
                 />
               </div>
               <div className="pt-4">
                 <Button 
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-sm transition-all"
+                  className="w-full h-12 bg-ios-primary hover:bg-ios-primary/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-sm transition-all"
                 >
                   {isLoading ? <IconLoader2 className="animate-spin mr-2" size={16} /> : <IconPlus className="mr-2" size={16} />}
                   Create Role

@@ -22,6 +22,13 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        ios: {
+          primary: "#007AFF",
+          success: "#34C759",
+          warning: "#FF9500",
+          danger: "#FF3B30",
+          bg: "#F2F2F7",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

@@ -92,21 +92,21 @@ export default function PayslipTemplateBuilder() {
     <div className="flex-1 flex flex-col overflow-hidden bg-white animate-fade-in">
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-10">
         <div>
-          <h2 className="text-xl font-black text-slate-800 uppercase">Payslip Template Builder</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase">Payslip Template Builder</h2>
           <p className="text-xs text-slate-400 font-bold uppercase mt-1">Desain Kop Surat & Format Slip Gaji</p>
         </div>
         <div className="flex gap-4">
           <Button 
             variant="outline" 
             onClick={() => setPreviewMode(!previewMode)}
-            className="h-12 px-6 rounded-2xl bg-white shadow-sm border-white text-slate-600 font-black uppercase text-xs"
+            className="h-12 px-6 rounded-2xl bg-white shadow-sm border-white text-slate-600 font-bold uppercase text-xs"
           >
             {previewMode ? <><IconBrush size={18} className="mr-2"/> Edit Mode</> : <><IconEye size={18} className="mr-2"/> Preview PDF</>}
           </Button>
           <Button 
             onClick={handleSave}
             disabled={saving}
-            className="h-12 px-6 rounded-2xl bg-[#F97316] hover:bg-[#EA580C] text-white font-black text-xs uppercase shadow-sm disabled:opacity-50"
+            className="h-12 px-6 rounded-2xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-xs uppercase shadow-sm disabled:opacity-50"
           >
             <IconDeviceFloppy size={18} className="mr-2" /> {saving ? 'Menyimpan...' : 'Simpan Template'}
           </Button>
@@ -119,7 +119,7 @@ export default function PayslipTemplateBuilder() {
         {!previewMode && (
           <div className="w-[400px] shrink-0 space-y-6">
             <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
-              <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6">Kop Surat (Header)</CardTitle>
+              <CardTitle className="text-sm font-bold text-slate-800 uppercase mb-6">Kop Surat (Header)</CardTitle>
               
               <div className="space-y-5">
                 <div>
@@ -133,7 +133,7 @@ export default function PayslipTemplateBuilder() {
                         <span className="text-xs text-slate-400 font-bold uppercase">Upload Logo / Kop Surat</span>
                       </>
                     )}
-                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" onChange={handleLogoUpload} />
+                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all" onChange={handleLogoUpload} />
                   </div>
                 </div>
 
@@ -159,7 +159,7 @@ export default function PayslipTemplateBuilder() {
             </Card>
 
             <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
-              <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6">Warna & Tema</CardTitle>
+              <CardTitle className="text-sm font-bold text-slate-800 uppercase mb-6">Warna & Tema</CardTitle>
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Warna Aksen Utama</label>
                 <div className="flex gap-4 items-center">
@@ -178,14 +178,14 @@ export default function PayslipTemplateBuilder() {
 
         {/* Live Preview Pane */}
         <div className="flex-1 flex justify-center">
-          <div className="w-[600px] bg-transparent shadow-sm rounded-sm p-12 overflow-y-auto" style={{ height: '800px', transform: previewMode ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }}>
+          <div className="w-[600px] bg-transparent shadow-sm rounded-md p-12 overflow-y-auto" style={{ height: '800px', transform: previewMode ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }}>
             
             {/* Template Header / Kop Surat */}
             <div className="border-b-2 pb-6 mb-8 text-center" style={{ borderColor: template.primaryColor }}>
               {template.headerLogo && (
                 <img src={template.headerLogo} alt="Kop Surat" className="h-16 mx-auto mb-4 object-contain" />
               )}
-              <h1 className="text-2xl font-black" style={{ color: template.primaryColor }}>{template.companyName}</h1>
+              <h1 className="text-2xl font-bold" style={{ color: template.primaryColor }}>{template.companyName}</h1>
               {template.showAddress && (
                 <p className="text-xs text-slate-500 mt-2 max-w-sm mx-auto">{template.addressText}</p>
               )}
@@ -199,11 +199,11 @@ export default function PayslipTemplateBuilder() {
             <div className="grid grid-cols-2 gap-4 text-sm mb-8 bg-slate-50 p-4 rounded-lg">
               <div>
                 <span className="text-slate-500 font-bold">Nama Pegawai:</span>
-                <p className="font-black text-slate-800">John Doe (Demo)</p>
+                <p className="font-bold text-slate-800">John Doe (Demo)</p>
               </div>
               <div>
                 <span className="text-slate-500 font-bold">ID / NIK:</span>
-                <p className="font-black text-slate-800">WKN-001</p>
+                <p className="font-bold text-slate-800">WKN-001</p>
               </div>
             </div>
 
@@ -236,8 +236,8 @@ export default function PayslipTemplateBuilder() {
             </div>
 
             <div className="mt-8 pt-4 border-t-2 border-slate-800 flex justify-between items-center">
-              <span className="text-lg font-black uppercase tracking-widest">Take Home Pay</span>
-              <span className="text-2xl font-black">Rp 8.885.000</span>
+              <span className="text-lg font-bold uppercase tracking-widest">Take Home Pay</span>
+              <span className="text-2xl font-bold">Rp 8.885.000</span>
             </div>
 
             {template.watermarkEnabled && (

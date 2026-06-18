@@ -157,12 +157,12 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
         {/* Header */}
         <header className="h-20 bg-white border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-ios-primary">
               <IconSignature size={24} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-slate-800 font-outfit uppercase tracking-tight">E-Sign Laboratory</h1>
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest opacity-70">Secure Digital Document Execution</p>
+              <h1 className="text-lg font-bold text-slate-800 font-outfit uppercase tracking-tight">E-Sign Laboratory</h1>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider opacity-70">Secure Digital Document Execution</p>
             </div>
           </div>
           <button 
@@ -177,10 +177,10 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
         <div className="flex-1 overflow-hidden flex">
           {/* Left: Document Preview */}
           <div className="flex-1 bg-slate-200/30 p-12 overflow-y-auto custom-scrollbar flex flex-col items-center">
-            <div className="w-full max-w-2xl bg-transparent shadow-sm rounded-sm p-16 min-h-[1000px] relative">
+            <div className="w-full max-w-2xl bg-transparent shadow-sm rounded-md p-16 min-h-[1000px] relative">
               <div className="flex justify-between items-center mb-10 pb-6 border-b">
                 <img src="/assets/wkn_logo.png" alt="WKN" className="h-8 w-auto opacity-50" />
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Confidential</span>
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Confidential</span>
               </div>
               
               <h2 className="text-2xl font-serif font-bold text-slate-800 mb-8">{documentTitle}</h2>
@@ -191,7 +191,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
                 <p>The position of <strong>{employee["Job Position *"]}</strong> carries responsibilities as detailed in the attached job description. Salary and benefits are subject to the terms discussed during the recruitment process.</p>
                 <div className="py-10">
                   <div className="h-40 w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center">
-                    <p className="text-xs font-black text-slate-300 uppercase tracking-[0.3em]">Document Body Content Placeholder</p>
+                    <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">Document Body Content Placeholder</p>
                   </div>
                 </div>
                 <p>By signing below, the parties acknowledge that they have read and understood the terms of this agreement.</p>
@@ -209,7 +209,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
                   <p className="text-xs font-bold text-slate-400 uppercase mb-10">Employee Signature</p>
                   {isSigned && (
                     <div className="absolute bottom-20 right-20 transform scale-50 opacity-50 origin-bottom-right">
-                       <IconFingerprint size={120} className="text-[#E31E24]" />
+                       <IconFingerprint size={120} className="text-ios-primary" />
                     </div>
                   )}
                   <div className="h-[1px] bg-slate-300 mb-2"></div>
@@ -223,8 +223,8 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
           {/* Right: Signature Pad Panel */}
           <div className="w-[380px] bg-white border-l-2 border-white p-10 flex flex-col gap-8">
             <div>
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                <IconShieldLock size={18} className="text-[#E31E24]" />
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                <IconShieldLock size={18} className="text-ios-primary" />
                 Identity Verification
               </h3>
               <p className="text-xs font-bold text-slate-400 mt-2 leading-relaxed">
@@ -250,21 +250,21 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
                 />
                 {!isSigned && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-[0.5em]">Sign Here</p>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sign Here</p>
                   </div>
                 )}
               </div>
               <div className="flex justify-between px-2">
                 <button 
                   onClick={clearCanvas}
-                  className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:text-red-500 transition-colors"
+                  className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2 hover:text-red-500 transition-colors"
                 >
                   <IconEraser size={14} />
                   Clear Pad
                 </button>
                 <div className="flex items-center gap-2">
                   <div className={`h-2 w-2 rounded-full ${isSigned ? 'bg-green-500' : 'bg-slate-300'}`}></div>
-                  <span className="text-xs font-black text-slate-400 uppercase">{isSigned ? 'Captured' : 'Waiting'}</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase">{isSigned ? 'Captured' : 'Waiting'}</span>
                 </div>
               </div>
             </div>
@@ -272,8 +272,8 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
             <div className="mt-auto space-y-4">
               <div className="p-4 bg-white/50 border-2 border-white rounded-2xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <IconFingerprint size={16} className="text-[#E31E24]" />
-                  <span className="text-xs font-black text-slate-700 uppercase">Biometric Hash</span>
+                  <IconFingerprint size={16} className="text-ios-primary" />
+                  <span className="text-xs font-bold text-slate-700 uppercase">Biometric Hash</span>
                 </div>
                 <p className="text-[11px] font-mono text-slate-400 break-all">
                   SHA-256: 8f92b7c1a2e3d4f5g6h7i8j9k0l1m2n3o4p5q6r7s8t9u0v1w2x3y4z5a6b7c8d9
@@ -282,7 +282,7 @@ const DigitalSignature = ({ isOpen, onClose, employee, documentTitle = "Employme
 
               <Button 
                 onClick={handleFinalize}
-                className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex gap-3 ${isSigned && !loading ? 'bg-[#E31E24] text-white shadow-sm hover:bg-[#C1181E]' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
+                className={`w-full h-14 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all flex gap-3 ${isSigned && !loading ? 'bg-ios-primary text-white shadow-sm hover:bg-ios-primary/90' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
                 disabled={!isSigned || loading}
               >
                 {loading ? <IconLoader2 size={20} className="animate-spin" /> : <IconCircleCheck size={20} />}

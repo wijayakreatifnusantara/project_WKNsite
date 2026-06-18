@@ -39,14 +39,14 @@ const CustomDropdown = ({ value, onChange, options, placeholder, icon: Icon, dis
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm transition-all cursor-pointer ${disabled ? 'bg-slate-50 border-slate-200' : `${activeColorClass} ${activeBorderClass} ${isOpen ? activeRingClass : ''}`}`}
       >
-        <Icon size={16} className={`shrink-0 ${disabled ? 'text-slate-400' : (value ? (activeColorClass.includes('white') ? 'text-[#E31E24]' : 'text-slate-600') : 'text-slate-500')}`} />
+        <Icon size={16} className={`shrink-0 ${disabled ? 'text-slate-400' : (value ? (activeColorClass.includes('white') ? 'text-ios-primary' : 'text-slate-600') : 'text-slate-500')}`} />
         <span className={`font-bold text-xs lg:text-[11px] uppercase truncate flex-1 ${disabled ? 'text-slate-500' : (value ? 'text-slate-800' : 'text-slate-600')}`}>
           {value ? (options.find(o => o.value === value)?.label || value) : placeholder}
         </span>
         {value && onClear ? (
           <div 
             onClick={(e) => { e.stopPropagation(); onClear(); setIsOpen(false); }}
-            className="p-1 rounded-md hover:bg-slate-200/50 text-slate-400 hover:text-[#E31E24] transition-colors flex items-center justify-center shrink-0"
+            className="p-1 rounded-lg hover:bg-slate-200/50 text-slate-400 hover:text-ios-primary transition-colors flex items-center justify-center shrink-0"
           >
             <IconX size={14} />
           </div>
@@ -62,7 +62,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder, icon: Icon, dis
               <div
                 key={opt.value}
                 onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                className={`px-3 py-2.5 rounded-lg text-xs lg:text-[11px] font-bold uppercase cursor-pointer transition-colors ${value === opt.value ? 'bg-[#E31E24]/10 text-[#E31E24]' : 'text-slate-600 hover:shadow-sm hover:text-slate-900'}`}
+                className={`px-3 py-2.5 rounded-lg text-xs lg:text-[11px] font-semibold uppercase cursor-pointer transition-colors ${value === opt.value ? 'bg-ios-primary/10 text-ios-primary' : 'text-slate-600 hover:shadow-sm hover:text-slate-900'}`}
               >
                 {opt.label}
               </div>
@@ -275,8 +275,8 @@ const AttendanceCalendar = () => {
                icon={IconUser}
                disabled={!selectedDept}
                activeColorClass="bg-transparent"
-               activeBorderClass="border-[#E31E24]/30"
-               activeRingClass="border-[#E31E24] ring-2 ring-[#E31E24]/10"
+               activeBorderClass="border-ios-primary/30"
+               activeRingClass="border-ios-primary ring-2 ring-ios-primary/10"
              />
         </div>
 
@@ -284,18 +284,18 @@ const AttendanceCalendar = () => {
         <div className="flex-1 bg-transparent rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-0">
           {/* Calendar Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50/50">
-            <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
+            <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight flex items-center gap-3">
               {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
               {loading && <IconClock className="animate-spin text-slate-300" size={18} />}
             </h3>
             <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-10 w-10 rounded-xl border-slate-200 text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5">
+              <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-10 w-10 rounded-xl border-slate-200 text-slate-500 hover:text-ios-primary hover:bg-ios-primary/5">
                 <IconChevronLeft size={20} />
               </Button>
-              <Button variant="outline" onClick={() => setCurrentDate(new Date())} className="h-10 px-6 rounded-xl border-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest hover:text-[#E31E24] hover:bg-[#E31E24]/5">
+              <Button variant="outline" onClick={() => setCurrentDate(new Date())} className="h-10 px-6 rounded-xl border-slate-200 text-slate-600 font-bold text-xs uppercase tracking-widest hover:text-ios-primary hover:bg-ios-primary/5">
                 Today
               </Button>
-              <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-10 w-10 rounded-xl border-slate-200 text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5">
+              <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-10 w-10 rounded-xl border-slate-200 text-slate-500 hover:text-ios-primary hover:bg-ios-primary/5">
                 <IconChevronRight size={20} />
               </Button>
             </div>
@@ -307,7 +307,7 @@ const AttendanceCalendar = () => {
             {/* Days Header */}
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
               <div key={day} className="bg-transparent p-2 text-center">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-wider">{day}</span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{day}</span>
               </div>
             ))}
 
@@ -332,7 +332,7 @@ const AttendanceCalendar = () => {
                   className="bg-transparent p-1.5 min-h-0 h-full cursor-pointer hover:shadow-sm transition-colors group relative flex flex-col"
                 >
                   <div className="flex justify-between items-start mb-1 shrink-0">
-                    <span className={`text-sm font-black w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E31E24] text-white shadow-sm' : (isWeekend ? 'text-[#E31E24]' : 'text-slate-600')}`}>
+                    <span className={`text-sm font-bold w-8 h-8 flex items-center justify-center rounded-full ${isToday ? 'bg-ios-primary text-white shadow-sm' : (isWeekend ? 'text-ios-primary' : 'text-slate-600')}`}>
                       {day}
                     </span>
                     {!record && selectedEmployee && (
@@ -343,17 +343,17 @@ const AttendanceCalendar = () => {
                   {record && (
                     <div className={`mt-auto p-1.5 rounded-lg border flex flex-col shadow-sm transition-transform group-hover:scale-[1.02] ${getStatusColor(record.status)}`}>
                       <div className="flex justify-between items-center px-0.5 mb-1">
-                        <span className="text-[8.5px] font-black uppercase tracking-wider">{record.status}</span>
+                        <span className="text-[8.5px] font-bold uppercase tracking-wider">{record.status}</span>
                         <IconCheck size={10} className="opacity-70" />
                       </div>
                       <div className="flex justify-between items-center bg-white px-1.5 py-1 rounded w-full">
                         <div className="flex flex-col">
-                          <span className="text-[6.5px] font-black opacity-50 uppercase leading-none mb-[2px]">IN</span>
+                          <span className="text-[6.5px] font-bold opacity-50 uppercase leading-none mb-[2px]">IN</span>
                           <span className="text-[9.5px] font-bold tracking-tight leading-none">{record.clock_in ? record.clock_in.substring(0, 5) : '--:--'}</span>
                         </div>
                         <div className="w-[1px] h-4 bg-black/10 mx-0.5"></div>
                         <div className="flex flex-col text-right">
-                          <span className="text-[6.5px] font-black opacity-50 uppercase leading-none mb-[2px]">OUT</span>
+                          <span className="text-[6.5px] font-bold opacity-50 uppercase leading-none mb-[2px]">OUT</span>
                           <span className="text-[9.5px] font-bold tracking-tight leading-none">{record.clock_out ? record.clock_out.substring(0, 5) : '--:--'}</span>
                         </div>
                       </div>

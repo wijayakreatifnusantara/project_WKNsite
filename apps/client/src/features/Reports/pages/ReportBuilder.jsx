@@ -111,9 +111,9 @@ const ReportBuilder = () => {
         
         {/* HEADER */}
         <header>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3">
-            <IconFileExport size={32} className="text-[#E31E24]" />
-            Data <span className="text-[#E31E24]">Report Builder</span>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight uppercase flex items-center gap-3">
+            <IconFileExport size={32} className="text-ios-primary" />
+            Data <span className="text-ios-primary">Report Builder</span>
           </h2>
           <p className="text-slate-400 text-xs mt-1 font-bold uppercase tracking-wider">Pusat Ekstraksi Data Master & Transaksi</p>
         </header>
@@ -134,15 +134,15 @@ const ReportBuilder = () => {
                     onClick={() => setSelectedModule(mod.id)}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-4 ${
                       selectedModule === mod.id 
-                        ? 'border-[#E31E24] bg-red-50/30' 
+                        ? 'border-ios-primary bg-red-50/30' 
                         : 'border-slate-200 bg-transparent hover:border-slate-200'
                     }`}
                   >
-                    <div className={`p-2 rounded-lg ${selectedModule === mod.id ? 'bg-[#E31E24] text-white' : 'bg-slate-100 text-slate-500'}`}>
+                    <div className={`p-2 rounded-lg ${selectedModule === mod.id ? 'bg-ios-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
                       {mod.icon}
                     </div>
                     <div>
-                      <h4 className={`text-sm font-bold ${selectedModule === mod.id ? 'text-[#E31E24]' : 'text-slate-700'}`}>{mod.name}</h4>
+                      <h4 className={`text-sm font-bold ${selectedModule === mod.id ? 'text-ios-primary' : 'text-slate-700'}`}>{mod.name}</h4>
                       <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">{mod.type} DATA</p>
                     </div>
                   </div>
@@ -164,7 +164,7 @@ const ReportBuilder = () => {
                       type="date" 
                       value={dateRange.start}
                       onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-                      className="w-full h-10 px-3 bg-white shadow-sm border-none rounded-lg text-sm font-medium focus:outline-none focus:border-[#E31E24]/30"
+                      className="w-full h-10 px-3 bg-white shadow-sm border-none rounded-lg text-sm font-medium focus:outline-none focus:border-ios-primary/30"
                     />
                   </div>
                   <div>
@@ -173,7 +173,7 @@ const ReportBuilder = () => {
                       type="date" 
                       value={dateRange.end}
                       onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-                      className="w-full h-10 px-3 bg-white shadow-sm border-none rounded-lg text-sm font-medium focus:outline-none focus:border-[#E31E24]/30"
+                      className="w-full h-10 px-3 bg-white shadow-sm border-none rounded-lg text-sm font-medium focus:outline-none focus:border-ios-primary/30"
                       disabled // For this prototype, maybe just query by start date, or pass start/end to API if supported
                     />
                     <p className="text-xs text-slate-400 mt-2 italic">*Hanya tersedia rentang harian pada versi saat ini.</p>
@@ -181,7 +181,7 @@ const ReportBuilder = () => {
                 </div>
               ) : (
                 <div className="py-8 text-center bg-slate-50 rounded-xl border border-slate-200">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Master Data diunduh secara penuh</p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Master Data diunduh secara penuh</p>
                   <p className="text-xs text-slate-400 mt-1">Tidak memerlukan filter tanggal</p>
                 </div>
               )}
@@ -196,7 +196,7 @@ const ReportBuilder = () => {
               </div>
               
               <div className="relative z-10">
-                <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6">Ringkasan Export</h3>
+                <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">Ringkasan Export</h3>
                 
                 <div className="space-y-4 mb-8">
                   <div>
@@ -212,7 +212,7 @@ const ReportBuilder = () => {
                 <Button 
                   onClick={handleExport}
                   disabled={loading || !selectedModule}
-                  className="w-full h-12 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-sm shadow-red-500/20"
+                  className="w-full h-12 bg-ios-primary hover:bg-ios-primary/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-sm shadow-red-500/20"
                 >
                   {loading ? 'Mengekstrak Data...' : (
                     <span className="flex items-center gap-2">

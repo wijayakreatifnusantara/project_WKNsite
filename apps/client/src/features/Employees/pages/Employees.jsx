@@ -249,13 +249,13 @@ const Employees = () => {
     <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-fade-in font-outfit relative">
       
       {/* 🚀 FIXED PREMIUM COMMAND CENTER */}
-      <div className="bg-transparent border-b border-slate-200 z-30 shadow-sm shrink-0">
+      <div className="ios-glass z-30 shrink-0 sticky top-0">
         <div className="w-full mx-auto p-4 space-y-3 px-6">
           
           {/* HEADER ROW */}
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-[#E31E24]/10 rounded-xl flex items-center justify-center text-[#E31E24]">
+              <div className="h-10 w-10 bg-ios-primary/10 rounded-xl flex items-center justify-center text-ios-primary">
                 <IconUsers size={22} stroke={2} />
               </div>
               <div>
@@ -266,11 +266,11 @@ const Employees = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button onClick={() => setIsBulkModalOpen(true)} className="h-9 px-3 bg-transparent text-slate-600 shadow-sm border border-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider hover:text-blue-600 hover:shadow-sm transition-all flex items-center justify-center gap-1.5">
+              <Button onClick={() => setIsBulkModalOpen(true)} className="ios-btn h-9 px-3 bg-transparent text-slate-600 shadow-sm border border-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider hover:text-blue-600 hover:shadow-sm flex items-center justify-center gap-1.5">
                 <IconTable size={14} className="text-blue-500" /> Impor Bulk
               </Button>
               {isAdmin() && (
-                <Button onClick={() => navigate('/master/employees/create')} className="h-9 px-4 bg-[#E31E24] text-white shadow-sm rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-[#C1181E] transition-all flex items-center justify-center gap-1.5">
+                <Button onClick={() => navigate('/master/employees/create')} className="ios-btn h-9 px-4 bg-ios-primary text-white shadow-sm rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
                   <IconPlus size={14} /> Tambah Karyawan
                 </Button>
               )}
@@ -307,12 +307,12 @@ const Employees = () => {
                 placeholder="Cari karyawan berdasarkan nama atau ID..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-10 pl-11 pr-10 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-transparent focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all placeholder:text-slate-400"
+                className="w-full h-10 pl-11 pr-10 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-750 focus:outline-none focus:bg-transparent focus:border-ios-primary/30 focus:ring-1 focus:ring-ios-primary/20 transition-all placeholder:text-slate-400"
               />
               {searchTerm && (
                 <button 
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#E31E24] transition-all p-1 hover:bg-slate-100 rounded-md"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-ios-primary transition-all p-1 hover:bg-slate-100 rounded-lg"
                 >
                   <IconX size={14} stroke={3} />
                 </button>
@@ -352,7 +352,7 @@ const Employees = () => {
             {isFilterActive && (
               <button 
                 onClick={resetFilters}
-                className="h-9 px-4 bg-transparent shadow-sm border border-slate-200 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
+                className="h-9 px-4 bg-transparent shadow-sm border border-slate-200 rounded-lg text-slate-500 hover:text-ios-primary hover:bg-red-50/50 transition-all flex items-center gap-1.5 group shrink-0"
                 data-tooltip="Reset All Filters"
               >
                 <IconRefresh size={14} className="group-hover:rotate-180 transition-all duration-500" />
@@ -369,11 +369,11 @@ const Employees = () => {
               <div className="flex-1 flex flex-col min-h-0 space-y-3 overflow-y-auto pb-24 px-1">
                 {loading ? (
                   <div className="py-24 text-center">
-                    <IconLoader2 className="mx-auto animate-spin text-[#E31E24]" size={40} />
+                    <IconLoader2 className="mx-auto animate-spin text-ios-primary" size={40} />
                   </div>
                 ) : filteredEmployees.length > 0 ? (
                   filteredEmployees.map((emp, idx) => (
-                    <div key={idx} className="bg-transparent border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col space-y-3">
+                    <div key={idx} className="ios-card p-4 flex flex-col space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-lg bg-white shadow-sm border-none/60 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 overflow-hidden">
@@ -413,19 +413,19 @@ const Employees = () => {
                       <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-slate-200">
                         <button 
                           onClick={() => {setSelectedEmployee(emp); setIsDossierOpen(true);}} 
-                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-lg hover:bg-slate-100 transition-colors"
                         >
                           Lihat
                         </button>
                         <button 
                           onClick={() => navigate(`/master/employees/edit/${emp.id || emp["EMPLOYEE ID"]}`)} 
-                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-lg hover:bg-slate-100 transition-colors"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={() => {setESignTargetEmployee(emp); setIsESignOpen(true);}} 
-                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-md hover:bg-slate-100 transition-colors"
+                          className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-white shadow-sm border-none rounded-lg hover:bg-slate-100 transition-colors"
                         >
                           TTD
                         </button>
@@ -434,27 +434,27 @@ const Employees = () => {
                             {emp.is_resigned || String(emp["Status *"] || emp.status || "").toUpperCase() === 'RESIGNED' ? (
                               <button 
                                 onClick={() => handleActivateEmployee(emp.id || emp["EMPLOYEE ID"])} 
-                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-md hover:bg-emerald-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100/50 transition-colors"
                               >
                                 Aktifkan
                               </button>
                             ) : (
                               <button 
                                 onClick={() => handleResignEmployee(emp["EMPLOYEE ID"] || emp.id)} 
-                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-100 rounded-md hover:bg-rose-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-100 rounded-lg hover:bg-rose-100/50 transition-colors"
                               >
                                 Resign
                               </button>
                             )}
                             <button 
                                 onClick={() => setResetPasswordEmployee(emp)} 
-                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-100 rounded-md hover:bg-blue-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100/50 transition-colors"
                             >
                                 PWD
                             </button>
                             <button 
                                 onClick={() => handleResetDevice(emp)} 
-                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 border border-purple-100 rounded-md hover:bg-purple-100/50 transition-colors"
+                                className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 border border-purple-100 rounded-lg hover:bg-purple-100/50 transition-colors"
                             >
                                 DEV
                             </button>
@@ -482,7 +482,7 @@ const Employees = () => {
                   >
                     Prev
                   </button>
-                  <span className="text-xs font-black text-slate-600 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                     {currentPage} / {Math.ceil(totalEmployees / pageSize) || 1}
                   </span>
                   <button 
@@ -512,8 +512,8 @@ const Employees = () => {
                           }}
                           className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                             filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length
-                            ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
-                            : 'bg-transparent border-slate-200 hover:border-[#E31E24]'
+                            ? 'bg-ios-primary border-ios-primary shadow-sm' 
+                            : 'bg-transparent border-slate-200 hover:border-ios-primary'
                           }`}
                         >
                           {filteredEmployees.length > 0 && selectedIds.size === filteredEmployees.length && <IconCheck size={10} className="text-white" stroke={4} />}
@@ -565,8 +565,8 @@ const Employees = () => {
                                 }}
                                 className={`w-4 h-4 rounded border transition-all flex items-center justify-center cursor-pointer mx-auto ${
                                   selectedIds.has(emp["EMPLOYEE ID"]) 
-                                  ? 'bg-[#E31E24] border-[#E31E24] shadow-sm' 
-                                  : 'bg-transparent border-slate-200 hover:border-[#E31E24]'
+                                  ? 'bg-ios-primary border-ios-primary shadow-sm' 
+                                  : 'bg-transparent border-slate-200 hover:border-ios-primary'
                                 }`}
                               >
                                 {selectedIds.has(emp["EMPLOYEE ID"]) && <IconCheck size={10} className="text-white" stroke={4} />}
@@ -654,7 +654,7 @@ const Employees = () => {
                     </div>
                     <div className="h-4 w-[1px] bg-slate-250"></div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Terpilih: <span className="text-[#E31E24]">{selectedIds.size}</span> item
+                      Terpilih: <span className="text-ios-primary">{selectedIds.size}</span> item
                     </span>
                     
                     {/* PAGINATION CONTROLS */}
@@ -663,7 +663,7 @@ const Employees = () => {
                       <button 
                         disabled={currentPage === 1 || loading}
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-transparent text-slate-400 hover:text-ios-primary disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
                       >
                         <IconChevronDown size={14} className="rotate-90" />
                       </button>
@@ -673,7 +673,7 @@ const Employees = () => {
                       <button 
                         disabled={currentPage >= Math.ceil(totalEmployees / pageSize) || loading}
                         onClick={() => setCurrentPage(p => p + 1)}
-                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-transparent text-slate-400 hover:text-[#E31E24] disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
+                        className="h-6 w-6 flex items-center justify-center rounded border border-slate-200 bg-transparent text-slate-400 hover:text-ios-primary disabled:opacity-30 disabled:hover:text-slate-450 transition-all shadow-sm"
                       >
                         <IconChevronDown size={14} className="-rotate-90" />
                       </button>
@@ -684,7 +684,7 @@ const Employees = () => {
                         <div className="h-4 w-[1px] bg-slate-200 mx-1"></div>
                         <button 
                           onClick={handleBulkResign}
-                          className="px-2.5 py-1 bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-slate-700 transition-all flex items-center gap-1"
+                          className="px-2.5 py-1 bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-slate-700 transition-all flex items-center gap-1"
                         >
                           <IconUserX size={12} /> Bulk Resign
                         </button>
@@ -773,9 +773,9 @@ const MiniStat = ({ label, value, color, icon, onClick, isActive }) => (
 const TabButton = ({ active, onClick, label }) => (
   <button 
     onClick={onClick} 
-    className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+    className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
       active 
-        ? 'bg-transparent text-[#E31E24] shadow-sm border border-slate-200/40' 
+        ? 'bg-transparent text-ios-primary shadow-sm border border-slate-200/40' 
         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/30'
     }`}
   >
@@ -790,7 +790,7 @@ const FilterSelect = ({ label, value, options, onChange }) => (
       <select 
         value={value} 
         onChange={(e) => onChange(e.target.value)} 
-        className="w-full appearance-none h-9 pl-3 pr-8 bg-transparent border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all hover:shadow-sm cursor-pointer uppercase tracking-wide"
+        className="w-full appearance-none h-9 pl-3 pr-8 bg-transparent border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-ios-primary/30 focus:ring-1 focus:ring-ios-primary/20 transition-all hover:shadow-sm cursor-pointer uppercase tracking-wide"
       >
         {options.map((opt, i) => (
           <option key={i} value={opt}>{opt}</option>
@@ -816,11 +816,11 @@ const ActionButton = ({ onClick, icon, hover, label }) => (
   <div className="group/tip relative flex items-center justify-center">
     <button 
       onClick={onClick} 
-      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-md border border-transparent hover:border-slate-200 transition-all`}
+      className={`h-7 w-7 flex items-center justify-center text-slate-400 hover:text-slate-750 hover:bg-slate-100 rounded-lg border border-transparent hover:border-slate-200 transition-all`}
     >
       {icon}
     </button>
-    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider rounded shadow-sm opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
+    <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[11px] font-semibold uppercase tracking-wider rounded shadow-sm opacity-0 group-hover/tip:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50">
       {label}
     </div>
   </div>

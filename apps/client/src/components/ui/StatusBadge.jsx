@@ -46,7 +46,7 @@ export function StatusBadge({ status, className }) {
     <Badge 
       variant="outline" 
       className={cn(
-        "inline-flex items-center px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] border shadow-sm", 
+        "inline-flex items-center px-3 py-1 rounded-xl text-[10px] font-bold uppercase tracking-[0.1em] border shadow-sm", 
         getStatusStyle(status),
         className
       )}

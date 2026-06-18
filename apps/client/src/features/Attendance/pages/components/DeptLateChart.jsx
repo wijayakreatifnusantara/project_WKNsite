@@ -17,7 +17,7 @@ const DeptLateChart = ({ loading, height = 200 }) => {
     <div style={{ height }} className="w-full relative">
         {loading ? (
           <div className="h-full w-full flex items-center justify-center">
-            <Loader2 size={20} className="text-[#E31E24] animate-spin opacity-20" />
+            <Loader2 size={20} className="text-ios-primary animate-spin opacity-20" />
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

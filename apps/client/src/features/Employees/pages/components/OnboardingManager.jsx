@@ -60,7 +60,7 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
                 onClick={() => setActiveMode('onboarding')}
                 className={`px-5 py-2 rounded-lg flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all ${
                   activeMode === 'onboarding' 
-                    ? 'bg-[#E31E24] text-white shadow-sm' 
+                    ? 'bg-ios-primary text-white shadow-sm' 
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -81,12 +81,12 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
             </div>
             <div>
               <h1 className="text-base font-bold text-slate-850 font-outfit uppercase tracking-tight">Lifecycle Manager</h1>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Alur Kerja Masuk & Keluar Karyawan</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Alur Kerja Masuk & Keluar Karyawan</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="h-9 w-9 flex items-center justify-center bg-transparent border border-slate-200 rounded-lg text-slate-450 hover:text-[#E31E24] hover:shadow-sm transition-all shadow-sm"
+            className="h-9 w-9 flex items-center justify-center bg-transparent border border-slate-200 rounded-lg text-slate-450 hover:text-ios-primary hover:shadow-sm transition-all shadow-sm"
           >
             <IconX size={18} />
           </button>
@@ -96,14 +96,14 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
         <div className="flex-1 overflow-hidden flex">
           {/* Left: Process Queue */}
           <div className="w-[360px] border-r border-slate-200 overflow-y-auto p-6 custom-scrollbar bg-slate-50">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 pl-1">Proses Aktif ({currentQueue.length})</h3>
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 pl-1">Proses Aktif ({currentQueue.length})</h3>
             <div className="space-y-3">
               {currentQueue.map((item) => (
                 <div 
                   key={item.id} 
-                  className="group bg-transparent border border-slate-200/80 hover:border-[#E31E24]/30 hover:shadow-sm transition-all p-4 rounded-xl cursor-pointer relative overflow-hidden"
+                  className="group bg-transparent border border-slate-200/80 hover:border-ios-primary/30 hover:shadow-sm transition-all p-4 rounded-xl cursor-pointer relative overflow-hidden"
                 >
-                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${activeMode === 'onboarding' ? 'bg-[#E31E24]' : 'bg-slate-800'}`}></div>
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${activeMode === 'onboarding' ? 'bg-ios-primary' : 'bg-slate-800'}`}></div>
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h4 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-tight">{item.name}</h4>
@@ -114,11 +114,11 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-xs font-bold uppercase">
                       <span className="text-slate-400">Progress</span>
-                      <span className={activeMode === 'onboarding' ? 'text-[#E31E24]' : 'text-slate-800'}>{item.progress}%</span>
+                      <span className={activeMode === 'onboarding' ? 'text-ios-primary' : 'text-slate-800'}>{item.progress}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full transition-all duration-500 ${activeMode === 'onboarding' ? 'bg-[#E31E24]' : 'bg-slate-800'}`}
+                        className={`h-full rounded-full transition-all duration-500 ${activeMode === 'onboarding' ? 'bg-ios-primary' : 'bg-slate-800'}`}
                         style={{ width: `${item.progress}%` }}
                       ></div>
                     </div>
@@ -141,13 +141,13 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
                     <div className="flex items-center gap-2 mt-1.5">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tanggal Target:</span>
                       <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-white shadow-sm border-none rounded-full">
-                        <IconClock size={11} className="text-[#E31E24]" />
+                        <IconClock size={11} className="text-ios-primary" />
                         <span className="text-xs font-bold text-slate-650 uppercase tracking-wider">01 Jun 2024</span>
                       </div>
                     </div>
                   </div>
                 </div>
-                <button className="h-9 px-4 rounded-lg bg-transparent border border-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wider hover:text-[#E31E24] hover:shadow-sm transition-all flex items-center gap-1.5 shadow-sm">
+                <button className="h-9 px-4 rounded-lg bg-transparent border border-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wider hover:text-ios-primary hover:shadow-sm transition-all flex items-center gap-1.5 shadow-sm">
                   Lihat Berkas Lengkap
                   <IconArrowRight size={12} />
                 </button>
@@ -177,7 +177,7 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
                       <button className={`h-9 w-9 rounded-lg flex items-center justify-center transition-all ${
                         task.status === 'done' 
                           ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
-                          : 'bg-transparent border border-slate-200 text-slate-300 hover:text-[#E31E24] hover:shadow-sm hover:border-[#E31E24]/30 shadow-sm'
+                          : 'bg-transparent border border-slate-200 text-slate-300 hover:text-ios-primary hover:shadow-sm hover:border-ios-primary/30 shadow-sm'
                       }`}>
                         {task.status === 'done' ? <IconCircleCheck size={18} /> : <IconCircleDashed size={18} />}
                       </button>
@@ -187,7 +187,7 @@ const OnboardingManager = ({ isOpen, onClose, employees }) => {
               </div>
 
               <div className="mt-6 flex justify-end">
-                <button className="h-11 px-8 rounded-lg bg-[#E31E24] text-white font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex items-center gap-2">
+                <button className="h-11 px-8 rounded-lg bg-ios-primary text-white font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-ios-primary/90 transition-all flex items-center gap-2">
                   Selesaikan Onboarding
                   <IconConfetti size={16} />
                 </button>

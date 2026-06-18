@@ -51,10 +51,10 @@ const WABroadcast = () => {
             <IconBrandWhatsapp size={32} className="text-[#25D366]" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-800 font-outfit tracking-tight uppercase">
+            <h2 className="text-2xl font-bold text-slate-800 font-outfit tracking-tight uppercase">
               WhatsApp <span className="text-[#25D366]">Broadcast</span>
             </h2>
-            <p className="text-slate-400 text-xs mt-1 font-black uppercase tracking-[0.3em] opacity-70">Mass Messaging Center</p>
+            <p className="text-slate-400 text-xs mt-1 font-bold uppercase tracking-widest opacity-70">Mass Messaging Center</p>
           </div>
         </header>
 
@@ -63,13 +63,13 @@ const WABroadcast = () => {
             
             {/* Target Audience */}
             <div>
-              <label className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">
+              <label className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 ml-1">
                 <IconUsers size={14} /> Target Audience
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setTarget('all')}
-                  className={`h-12 px-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all border ${
+                  className={`h-12 px-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all border ${
                     target === 'all' 
                       ? 'bg-[#25D366]/10 border-[#25D366]/50 text-[#25D366] shadow-sm' 
                       : 'bg-transparent border-slate-200 text-slate-500 shadow-sm hover:text-[#25D366]'
@@ -79,7 +79,7 @@ const WABroadcast = () => {
                 </button>
                 <button
                   onClick={() => setTarget('managers')}
-                  className={`h-12 px-4 rounded-xl font-black uppercase tracking-widest text-xs transition-all border ${
+                  className={`h-12 px-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all border ${
                     target === 'managers' 
                       ? 'bg-[#25D366]/10 border-[#25D366]/50 text-[#25D366] shadow-sm' 
                       : 'bg-transparent border-slate-200 text-slate-500 shadow-sm hover:text-[#25D366]'
@@ -92,7 +92,7 @@ const WABroadcast = () => {
 
             {/* Message Box */}
             <div>
-              <label className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">
+              <label className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 ml-1">
                 <IconFileText size={14} /> Broadcast Message
               </label>
               <textarea
@@ -106,7 +106,7 @@ const WABroadcast = () => {
 
             <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
               {success ? (
-                <div className="flex items-center gap-2 text-[#25D366] text-xs font-black uppercase tracking-widest bg-[#25D366]/10 px-4 py-2 rounded-lg">
+                <div className="flex items-center gap-2 text-[#25D366] text-xs font-bold uppercase tracking-widest bg-[#25D366]/10 px-4 py-2 rounded-lg">
                   <IconCheck size={16} /> Pesan Berhasil Dikirim!
                 </div>
               ) : (
@@ -116,7 +116,7 @@ const WABroadcast = () => {
               <button 
                 onClick={handleSend}
                 disabled={sending || !message.trim()}
-                className={`flex items-center gap-2 h-12 px-8 rounded-xl font-black uppercase tracking-widest text-white shadow-sm transition-all ${
+                className={`flex items-center gap-2 h-12 px-8 rounded-xl font-bold uppercase tracking-widest text-white shadow-sm transition-all ${
                   sending || !message.trim() ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#25D366] hover:bg-[#1da851] active:shadow-sm active:scale-95'
                 }`}
               >

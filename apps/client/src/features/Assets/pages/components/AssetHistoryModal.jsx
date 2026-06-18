@@ -31,10 +31,10 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
         <div className="p-8 border-b border-slate-200">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight">Assignment <span className="text-[#E31E24]">History</span></h2>
+              <h2 className="text-xl font-bold text-slate-800 font-outfit uppercase tracking-tight">Assignment <span className="text-ios-primary">History</span></h2>
               <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Lifecycle Audit Log: {asset.name}</p>
             </div>
-            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] transition-all">
+            <button onClick={onClose} className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-ios-primary transition-all">
               <IconX size={20} />
             </button>
           </div>
@@ -43,7 +43,7 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
         <div className="flex-1 overflow-y-auto p-8 pt-4 custom-scrollbar">
           {loading ? (
             <div className="flex justify-center py-12">
-              <div className="h-8 w-8 border-4 border-[#E31E24] border-t-transparent rounded-full animate-spin"></div>
+              <div className="h-8 w-8 border-4 border-ios-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : history.length > 0 ? (
             <div className="space-y-6">
@@ -63,11 +63,11 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
                   <div className="flex-1 p-5 rounded-2xl bg-white shadow-sm border-white border-2">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-2">
-                        <IconUser size={14} className="text-[#E31E24]" />
-                        <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{log.employees?.name}</span>
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest opacity-60">({log.employee_id})</span>
+                        <IconUser size={14} className="text-ios-primary" />
+                        <span className="text-[11px] font-semibold text-slate-700 uppercase tracking-tight">{log.employees?.name}</span>
+                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest opacity-60">({log.employee_id})</span>
                       </div>
-                      <div className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm
+                      <div className={`px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-widest shadow-sm
                         ${log.return_date ? 'bg-slate-100 text-slate-500' : 'bg-emerald-50 text-emerald-600'}`}>
                         {log.return_date ? 'Completed' : 'Active'}
                       </div>
@@ -75,7 +75,7 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
 
                     <div className="flex items-center gap-6">
                       <div className="flex flex-col">
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Assigned</span>
+                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Assigned</span>
                         <div className="flex items-center gap-1.5">
                           <IconCalendarEvent size={12} className="text-slate-300" />
                           <span className="text-xs font-bold text-slate-600">{new Date(log.assigned_date).toLocaleDateString()}</span>
@@ -86,7 +86,7 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
                         <>
                           <IconArrowRight size={14} className="text-slate-300" />
                           <div className="flex flex-col">
-                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Returned</span>
+                            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Returned</span>
                             <div className="flex items-center gap-1.5">
                               <IconCalendarEvent size={12} className="text-slate-300" />
                               <span className="text-xs font-bold text-slate-600">{new Date(log.return_date).toLocaleDateString()}</span>
@@ -108,7 +108,7 @@ const AssetHistoryModal = ({ isOpen, asset, onClose }) => {
           ) : (
             <div className="flex flex-col items-center justify-center py-12 opacity-30">
               <IconHistory size={48} className="text-slate-300 mb-3" />
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest text-center">No assignment history found for this asset.</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">No assignment history found for this asset.</p>
             </div>
           )}
         </div>

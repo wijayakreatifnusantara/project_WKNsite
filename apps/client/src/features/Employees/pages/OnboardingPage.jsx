@@ -117,7 +117,7 @@ const OnboardingPage = () => {
           
           {/* HEADER ROW */}
           <div className="flex items-center gap-3">
-            <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white ${activeMode === 'onboarding' ? 'bg-[#E31E24]' : 'bg-slate-800'}`}>
+            <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white ${activeMode === 'onboarding' ? 'bg-ios-primary' : 'bg-slate-800'}`}>
               {activeMode === 'onboarding' ? <IconUserPlus size={22} stroke={2} /> : <IconUserMinus size={22} stroke={2} />}
             </div>
             <div>
@@ -136,7 +136,7 @@ const OnboardingPage = () => {
               onClick={() => setActiveMode('onboarding')}
               className={`px-5 py-2 rounded-lg flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all ${
                 activeMode === 'onboarding' 
-                  ? 'bg-[#E31E24] text-white shadow-sm' 
+                  ? 'bg-ios-primary text-white shadow-sm' 
                   : 'text-slate-500 hover:text-slate-850'
               }`}
             >
@@ -165,7 +165,7 @@ const OnboardingPage = () => {
         {/* Left: Process Queue List */}
         <div className="w-full md:w-[380px] border-r border-slate-200 bg-transparent flex flex-col shrink-0">
           <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Proses Aktif ({currentQueue.filter(e => !e.isCompleted).length})
             </h3>
           </div>
@@ -189,7 +189,7 @@ const OnboardingPage = () => {
                     item.isCompleted 
                       ? 'bg-emerald-500' 
                       : activeMode === 'onboarding' 
-                        ? 'bg-[#E31E24]' 
+                        ? 'bg-ios-primary' 
                         : 'bg-slate-850'
                   }`}></div>
                   
@@ -215,7 +215,7 @@ const OnboardingPage = () => {
                   <div className="space-y-1">
                     <div className="flex justify-between items-center text-xs font-bold uppercase">
                       <span className="text-slate-400">Progress</span>
-                      <span className={item.isCompleted ? 'text-emerald-600' : activeMode === 'onboarding' ? 'text-[#E31E24]' : 'text-slate-850'}>
+                      <span className={item.isCompleted ? 'text-emerald-600' : activeMode === 'onboarding' ? 'text-ios-primary' : 'text-slate-850'}>
                         {progress}%
                       </span>
                     </div>
@@ -225,7 +225,7 @@ const OnboardingPage = () => {
                           item.isCompleted 
                             ? 'bg-emerald-500' 
                             : activeMode === 'onboarding' 
-                              ? 'bg-[#E31E24]' 
+                              ? 'bg-ios-primary' 
                               : 'bg-slate-850'
                         }`}
                         style={{ width: `${progress}%` }}
@@ -255,7 +255,7 @@ const OnboardingPage = () => {
                         {selectedEmployee.name}
                       </h2>
                       {selectedEmployee.isCompleted && (
-                        <span className="px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-md">
+                        <span className="px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg">
                           Selesai
                         </span>
                       )}
@@ -264,8 +264,8 @@ const OnboardingPage = () => {
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                         {activeMode === 'onboarding' ? 'Tanggal Mulai:' : 'Tanggal Efektif:'}
                       </span>
-                      <div className="flex items-center gap-1.5 px-2 py-0.5 bg-white shadow-sm border-none rounded-md">
-                        <IconClock size={11} className={activeMode === 'onboarding' ? 'text-[#E31E24]' : 'text-slate-600'} />
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 bg-white shadow-sm border-none rounded-lg">
+                        <IconClock size={11} className={activeMode === 'onboarding' ? 'text-ios-primary' : 'text-slate-600'} />
                         <span className="text-xs font-bold text-slate-650 uppercase tracking-wider font-mono">
                           {selectedEmployee.date}
                         </span>
@@ -281,7 +281,7 @@ const OnboardingPage = () => {
                     className={`h-9 px-4 rounded-lg font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs ${
                       calculateProgress(selectedEmployee.tasks) === 100
                         ? activeMode === 'onboarding' 
-                          ? 'bg-[#E31E24] text-white hover:bg-[#C1181E]' 
+                          ? 'bg-ios-primary text-white hover:bg-ios-primary/90' 
                           : 'bg-slate-850 text-white hover:bg-slate-900'
                         : 'bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed'
                     }`}

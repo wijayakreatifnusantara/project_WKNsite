@@ -97,7 +97,7 @@ export default function CommandPalette({ isOpen, onClose }) {
       />
 
       {/* Palette Container */}
-      <div className="relative w-full max-w-xl bg-transparent rounded-2xl shadow-neu border border-white/20 overflow-hidden animate-fade-in-down">
+      <div className="relative w-full max-w-xl bg-transparent rounded-2xl shadow-sm border border-white/20 overflow-hidden animate-fade-in-down">
         
         {/* Search Input */}
         <div className="flex items-center px-4 border-b border-white/20 bg-slate-50/50">
@@ -112,7 +112,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           />
           <button 
             onClick={onClose}
-            className="text-xs font-bold text-slate-400 border border-white/20 bg-transparent px-2 py-1 rounded-md ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="text-xs font-bold text-slate-400 border border-white/20 bg-transparent px-2 py-1 rounded-lg ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           >
             ESC
           </button>
@@ -135,7 +135,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                 }, {})
               ).map(([group, items]) => (
                 <div key={group} className="mb-4 last:mb-0">
-                  <h3 className="px-3 text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                  <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
                     {group}
                   </h3>
                   <div className="space-y-1">
@@ -147,14 +147,14 @@ export default function CommandPalette({ isOpen, onClose }) {
                           key={item.id}
                           className={`flex items-center px-3 py-3 rounded-xl cursor-pointer transition-colors ${
                             isSelected 
-                              ? 'bg-[#E31E24]/10 text-[#E31E24] border border-[#E31E24]/20' 
+                              ? 'bg-ios-primary/10 text-ios-primary border border-ios-primary/20' 
                               : 'text-slate-600 hover:bg-slate-50 border border-transparent'
                           }`}
                           onClick={() => handleSelect(item)}
                           onMouseEnter={() => setSelectedIndex(globalIndex)}
                         >
                           <div className={`h-8 w-8 rounded-lg flex items-center justify-center mr-3 ${
-                            isSelected ? 'bg-[#E31E24] text-white shadow-neu shadow-neu/20' : 'bg-slate-100 text-slate-500'
+                            isSelected ? 'bg-ios-primary text-white shadow-sm shadow-sm/20' : 'bg-slate-100 text-slate-500'
                           }`}>
                             {item.icon}
                           </div>
@@ -162,8 +162,8 @@ export default function CommandPalette({ isOpen, onClose }) {
                             {item.title}
                           </span>
                           {isSelected && (
-                            <span className="ml-auto text-xs font-bold text-[#E31E24]/70 mr-2 flex items-center gap-1">
-                              <span className="border border-[#E31E24]/30 bg-[#E31E24]/10 px-1.5 py-0.5 rounded">Enter</span> untuk buka
+                            <span className="ml-auto text-xs font-bold text-ios-primary/70 mr-2 flex items-center gap-1">
+                              <span className="border border-ios-primary/30 bg-ios-primary/10 px-1.5 py-0.5 rounded">Enter</span> untuk buka
                             </span>
                           )}
                         </div>
@@ -180,17 +180,17 @@ export default function CommandPalette({ isOpen, onClose }) {
         <div className="bg-slate-50 px-4 py-3 border-t border-white/20 flex items-center justify-between text-xs font-medium text-slate-500">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
-              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">↑</span>
-              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">↓</span>
+              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-sm text-slate-700">↑</span>
+              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-sm text-slate-700">↓</span>
               Navigasi
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-neu text-slate-700">Enter</span>
+              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-sm text-slate-700">Enter</span>
               Pilih
             </span>
           </div>
           <div>
-            WKN<span className="text-[#E31E24]">site</span> Enterprise Search
+            WKN<span className="text-ios-primary">site</span> Enterprise Search
           </div>
         </div>
       </div>

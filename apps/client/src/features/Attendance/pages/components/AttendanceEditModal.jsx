@@ -137,7 +137,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
               <IconCalendar size={18} />
             </div>
             <div>
-              <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
+              <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight leading-none">
                 {record ? 'Edit Attendance' : 'Add Attendance'}
               </h2>
               <p className="text-xs font-bold text-slate-400 tracking-widest mt-1">
@@ -165,7 +165,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 value={formData.date}
                 onChange={handleChange}
                 disabled={!!record}
-                className={`w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all ${record ? 'cursor-not-allowed opacity-70' : ''}`}
+                className={`w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-ios-primary focus:ring-1 focus:ring-ios-primary/20 transition-all ${record ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                   name="clock_in"
                   value={formData.clock_in}
                   onChange={handleChange}
-                  className="w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 uppercase focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                  className="w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 uppercase focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -193,7 +193,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                   name="clock_out"
                   value={formData.clock_out}
                   onChange={handleChange}
-                  className="w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 uppercase focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                  className="w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 uppercase focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -207,7 +207,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 uppercase appearance-none focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                className="w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 uppercase appearance-none focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
               >
                 <option value="Present">PRESENT</option>
                 <option value="Late">LATE</option>
@@ -227,7 +227,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 value={formData.notes}
                 onChange={handleChange}
                 rows="3"
-                className="w-full pl-10 pr-3 py-2.5 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 resize-none focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                className="w-full pl-10 pr-3 py-2.5 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 resize-none focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
                 placeholder="Optional notes..."
               ></textarea>
             </div>
@@ -242,7 +242,7 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
                 variant="outline"
                 onClick={handleDelete}
                 disabled={deleting || loading}
-                className="h-10 px-4 rounded-xl border-rose-200 text-rose-600 font-black text-xs uppercase tracking-widest hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300"
+                className="h-10 px-4 rounded-xl border-rose-200 text-rose-600 font-bold text-xs uppercase tracking-widest hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300"
               >
                 {deleting ? 'Deleting...' : (
                   <>
@@ -257,14 +257,14 @@ const AttendanceEditModal = ({ isOpen, onClose, employeeId, record, defaultDate,
             <Button 
               variant="ghost" 
               onClick={onClose}
-              className="h-10 px-6 rounded-xl text-slate-500 font-black text-xs uppercase tracking-widest hover:bg-slate-200"
+              className="h-10 px-6 rounded-xl text-slate-500 font-bold text-xs uppercase tracking-widest hover:bg-slate-200"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleSave}
               disabled={loading || deleting}
-              className="h-10 px-6 rounded-xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] flex gap-2 items-center"
+              className="h-10 px-6 rounded-xl bg-ios-primary text-white font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-ios-primary/90 flex gap-2 items-center"
             >
               <IconDeviceFloppy size={14} />
               {loading ? 'Saving...' : 'Save'}

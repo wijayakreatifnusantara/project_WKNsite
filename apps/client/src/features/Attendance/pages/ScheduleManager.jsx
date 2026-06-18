@@ -131,33 +131,33 @@ const ScheduleManager = () => {
         {/* CONTROL CENTER */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-2.5 rounded-2xl border border-white shadow-sm ">
             {/* Month Selector */}
-            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24] relative group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-               <IconCalendarStats size={14} className="text-[#E31E24]" />
+            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary relative group focus-within:ring-2 focus-within:ring-ios-primary/20">
+               <IconCalendarStats size={14} className="text-ios-primary" />
                <div className="flex flex-col flex-1">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Pilih Bulan</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Pilih Bulan</span>
                   <div className="relative flex items-center">
                     <input 
                       type="month" 
                       value={selectedMonth}
                       onChange={(e) => handleMonthChange(e.target.value)}
-                      className="bg-transparent border-none text-slate-800 font-black text-xs uppercase focus:outline-none cursor-pointer p-0 w-full appearance-none pr-6 z-10"
+                      className="bg-transparent border-none text-slate-800 font-bold text-xs uppercase focus:outline-none cursor-pointer p-0 w-full appearance-none pr-6 z-10"
                     />
-                    <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-[#E31E24] transition-all" />
+                    <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-ios-primary transition-all" />
                   </div>
                </div>
             </div>
 
             {/* Search Input */}
-            <div className="md:col-span-5 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]  group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-                <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
+            <div className="md:col-span-5 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary  group focus-within:ring-2 focus-within:ring-ios-primary/20">
+                <IconSearch size={14} className="text-slate-300 group-focus-within:text-ios-primary transition-colors" />
                 <div className="flex flex-col flex-1">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Cari Karyawan</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Cari Karyawan</span>
                   <input 
                       type="text" 
                       placeholder="NAMA, ID KARYAWAN..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-transparent border-none w-full text-xs font-black text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
+                      className="bg-transparent border-none w-full text-xs font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
                   />
                 </div>
             </div>
@@ -165,18 +165,18 @@ const ScheduleManager = () => {
             {/* Legend & Actions */}
             <div className="md:col-span-4 flex gap-2">
                 <div className="flex-1 flex flex-col justify-center px-4 py-2 rounded-xl bg-white shadow-sm border-none">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Informasi Total</span>
-                  <p className="text-xs font-black text-slate-600 uppercase tracking-tighter truncate">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Informasi Total</span>
+                  <p className="text-xs font-bold text-slate-600 uppercase tracking-tighter truncate">
                     {filteredEmployees.length} Karyawan Aktif
                   </p>
                 </div>
                 <Button 
                   onClick={() => toast.info("Fitur Bulk Assign akan segera hadir!")}
-                  className="h-full px-4 rounded-xl bg-[#E31E24] text-white hover:bg-[#C1181E] shadow-sm flex flex-col justify-center items-center gap-1 transition-all active:scale-95 shrink-0"
+                  className="h-full px-4 rounded-xl ios-btn bg-ios-primary text-white shadow-sm flex flex-col justify-center items-center gap-1 transition-all active:scale-95 shrink-0"
                   data-tooltip="Bulk Assign"
                 >
                   <IconWand size={14} />
-                  <span className="text-[11px] font-bold tracking-widest uppercase">Assign</span>
+                  <span className="text-[11px] font-semibold tracking-widest uppercase">Assign</span>
                 </Button>
             </div>
         </div>
@@ -204,16 +204,16 @@ const ScheduleManager = () => {
 <table className="w-full text-left border-collapse min-w-max">
                 <thead>
                   <tr className="bg-slate-50/80 border-b border-slate-200/60 ">
-                    <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider sticky left-0 z-10 bg-slate-50/90 w-64 shadow-sm border-r border-slate-200/60">
+                    <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider sticky left-0 z-10 bg-slate-50/90 w-64 shadow-sm border-r border-slate-200/60">
                       Karyawan
                     </th>
                     {dateList.map((d, i) => (
                       <th key={i} className="px-3 py-4 text-center border-r border-slate-200 min-w-[50px]">
                         <div className="flex flex-col items-center">
-                          <span className={`text-[11px] font-bold uppercase tracking-widest ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-400' : 'text-slate-400'}`}>
+                          <span className={`text-[11px] font-semibold uppercase tracking-widest ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-400' : 'text-slate-400'}`}>
                             {d.toLocaleDateString('id-ID', { weekday: 'short' })}
                           </span>
-                          <span className={`text-[11px] font-black ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-500' : 'text-slate-700'}`}>
+                          <span className={`text-[11px] font-semibold ${d.getDay() === 0 || d.getDay() === 6 ? 'text-red-500' : 'text-slate-700'}`}>
                             {d.getDate()}
                           </span>
                         </div>
@@ -237,8 +237,8 @@ const ScheduleManager = () => {
                       <tr key={emp['EMPLOYEE ID']} className="transition-colors group hover:bg-slate-50 transition-colors cursor-pointer">
                         <td className="px-6 py-3 sticky left-0 z-10 bg-transparent group-hover:shadow-sm shadow-sm border-r border-slate-200">
                           <div className="flex flex-col">
-                            <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate w-56">{emp['EMPLOYEE NAME']}</span>
-                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{emp['EMPLOYEE ID']} &bull; {emp['JOB POSITION']}</span>
+                            <span className="text-[11px] font-semibold text-slate-800 uppercase tracking-tight truncate w-56">{emp['EMPLOYEE NAME']}</span>
+                            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{emp['EMPLOYEE ID']} &bull; {emp['JOB POSITION']}</span>
                           </div>
                         </td>
                         {dateList.map((d, i) => {
@@ -258,10 +258,10 @@ const ScheduleManager = () => {
                                   }}
                                   title={`${shift.name} (${shift.time_in?.substring(0,5)} - ${shift.time_out?.substring(0,5)})`}
                                 >
-                                  <span className="text-xs font-black text-slate-800">{shift.code}</span>
+                                  <span className="text-xs font-bold text-slate-800">{shift.code}</span>
                                 </div>
                               ) : (
-                                <div className="mx-auto w-[40px] h-[30px] rounded flex items-center justify-center border border-dashed border-slate-200 text-slate-300 hover:border-[#E31E24]/40 hover:text-[#E31E24] cursor-pointer transition-colors bg-transparent">
+                                <div className="mx-auto w-[40px] h-[30px] rounded flex items-center justify-center border border-dashed border-slate-200 text-slate-300 hover:border-ios-primary/40 hover:text-ios-primary cursor-pointer transition-colors bg-transparent">
                                   <IconEdit size={12} />
                                 </div>
                               )}

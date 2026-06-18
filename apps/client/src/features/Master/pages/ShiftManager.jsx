@@ -194,32 +194,32 @@ const ShiftManager = () => {
       <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-slate-200 z-10 shrink-0">
         <div className="w-full mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
+            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-ios-primary border border-slate-200">
               <IconClock size={22} stroke={2.5} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-slate-800 tracking-tighter uppercase leading-none">Shift & Libur Nasional</h1>
-              <p className="text-[11px] font-black text-[#E31E24] uppercase tracking-wider mt-0.5 opacity-80">Konfigurasi Waktu & Kehadiran</p>
+              <h1 className="text-lg font-bold text-slate-800 tracking-tighter uppercase leading-none">Shift & Libur Nasional</h1>
+              <p className="text-[11px] font-semibold text-ios-primary uppercase tracking-wider mt-0.5 opacity-80">Konfigurasi Waktu & Kehadiran</p>
             </div>
           </div>
 
           <div className="flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/60">
             <button
               onClick={() => setActiveTab('shifts')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all duration-300 ${
-                activeTab === 'shifts' ? 'bg-transparent shadow-sm border border-slate-200/50 text-[#E31E24] scale-100' : 'text-slate-500 hover:text-slate-800'
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                activeTab === 'shifts' ? 'bg-transparent shadow-sm border border-slate-200/50 text-ios-primary scale-100' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <IconClock size={16} className={activeTab === 'shifts' ? 'text-[#E31E24]' : 'text-slate-400'} />
+              <IconClock size={16} className={activeTab === 'shifts' ? 'text-ios-primary' : 'text-slate-400'} />
               <span>Master Shift</span>
             </button>
             <button
               onClick={() => setActiveTab('holidays')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all duration-300 ${
-                activeTab === 'holidays' ? 'bg-transparent shadow-sm border border-slate-200/50 text-[#E31E24] scale-100' : 'text-slate-500 hover:text-slate-800'
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                activeTab === 'holidays' ? 'bg-transparent shadow-sm border border-slate-200/50 text-ios-primary scale-100' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <IconCalendarEvent size={16} className={activeTab === 'holidays' ? 'text-[#E31E24]' : 'text-slate-400'} />
+              <IconCalendarEvent size={16} className={activeTab === 'holidays' ? 'text-ios-primary' : 'text-slate-400'} />
               <span>Libur Nasional</span>
             </button>
           </div>
@@ -231,7 +231,7 @@ const ShiftManager = () => {
         <div className="px-4 pt-4 w-full mx-auto">
           <div className={`p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 shadow-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
             {message.type === 'success' ? <IconCircleCheck size={16} /> : <IconAlertCircle size={16} />}
-            <span className="text-xs font-black uppercase tracking-widest">{message.text}</span>
+            <span className="text-xs font-bold uppercase tracking-widest">{message.text}</span>
           </div>
         </div>
       )}
@@ -241,8 +241,8 @@ const ShiftManager = () => {
         <div className="w-full mx-auto">
           {isLoading ? (
             <div className="h-64 flex flex-col items-center justify-center gap-4">
-              <IconLoader2 className="animate-spin text-[#E31E24]" size={32} />
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading data...</p>
+              <IconLoader2 className="animate-spin text-ios-primary" size={32} />
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Loading data...</p>
             </div>
           ) : activeTab === 'shifts' ? (
             // TAB: SHIFTS
@@ -250,7 +250,7 @@ const ShiftManager = () => {
               <div className="flex justify-end">
                 <button
                   onClick={() => handleOpenShiftModal()}
-                  className="h-10 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95"
+                  className="h-10 px-5 bg-ios-primary hover:bg-ios-primary/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95"
                 >
                   <IconPlus size={14} /> Tambah Shift
                 </button>
@@ -259,7 +259,7 @@ const ShiftManager = () => {
               {shifts.length === 0 ? (
                 <div className="bg-transparent rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
                   <IconClock size={48} className="mx-auto text-slate-200 mb-4" />
-                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-1">Belum ada Master Shift</h3>
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-1">Belum ada Master Shift</h3>
                   <p className="text-xs text-slate-400">Silakan tambahkan shift kerja pertama Anda.</p>
                 </div>
               ) : (
@@ -268,11 +268,11 @@ const ShiftManager = () => {
 <table className="w-full text-left border-collapse min-w-max">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200/60">
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Kode & Nama Shift</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Jam Kerja</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Info Tambahan</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Kode & Nama Shift</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Jam Kerja</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Info Tambahan</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs text-slate-600 divide-y divide-white/50">
@@ -280,7 +280,7 @@ const ShiftManager = () => {
                         <tr key={shift.id} className="transition-colors group hover:bg-slate-50 transition-colors cursor-pointer">
                           <td className="px-5 py-3">
                             <div className="flex items-center gap-3">
-                              <span className="bg-[#E31E24]/10 text-[#E31E24] font-bold text-xs uppercase tracking-wider px-2 py-1 rounded-lg border border-[#E31E24]/15">
+                              <span className="bg-ios-primary/10 text-ios-primary font-bold text-xs uppercase tracking-wider px-2 py-1 rounded-lg border border-ios-primary/15">
                                 {shift.code}
                               </span>
                               <span className="font-bold text-slate-800 uppercase tracking-tight">{shift.name}</span>
@@ -294,23 +294,23 @@ const ShiftManager = () => {
                               {shift.is_cross_day && (
                                 <div className="flex items-center gap-1 bg-indigo-50 text-indigo-600 px-2 py-1 rounded border border-indigo-100">
                                   <IconMoon size={10} />
-                                  <span className="text-[11px] font-bold uppercase tracking-wider">Lintas Hari</span>
+                                  <span className="text-[11px] font-semibold uppercase tracking-wider">Lintas Hari</span>
                                 </div>
                               )}
                               <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded border border-amber-100">
                                 <IconSun size={10} />
-                                <span className="text-[11px] font-bold uppercase tracking-wider">Toleransi {shift.grace_period}m</span>
+                                <span className="text-[11px] font-semibold uppercase tracking-wider">Toleransi {shift.grace_period}m</span>
                               </div>
                             </div>
                           </td>
                           <td className="px-5 py-3">
-                            <span className={`text-[11px] font-black px-2 py-1 rounded uppercase tracking-wider border ${shift.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                            <span className={`text-[11px] font-semibold px-2 py-1 rounded uppercase tracking-wider border ${shift.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                               {shift.is_active ? 'Aktif' : 'Non-aktif'}
                             </span>
                           </td>
                           <td className="px-5 py-3 text-right">
                             <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => handleOpenShiftModal(shift)} className="h-7 w-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-[#E31E24] hover:bg-red-50 flex items-center justify-center transition-colors">
+                              <button onClick={() => handleOpenShiftModal(shift)} className="h-7 w-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-ios-primary hover:bg-red-50 flex items-center justify-center transition-colors">
                                 <IconEdit size={14} />
                               </button>
                               <button className="h-7 w-7 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors">
@@ -332,7 +332,7 @@ const ShiftManager = () => {
               <div className="flex justify-end">
                 <button
                   onClick={() => handleOpenHolidayModal()}
-                  className="h-10 px-5 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95"
+                  className="h-10 px-5 bg-ios-primary hover:bg-ios-primary/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-sm transition-all active:scale-95"
                 >
                   <IconPlus size={14} /> Tambah Libur Nasional
                 </button>
@@ -341,7 +341,7 @@ const ShiftManager = () => {
               {holidays.length === 0 ? (
                 <div className="bg-transparent rounded-2xl border border-slate-200 p-12 text-center shadow-xs">
                   <IconCalendarEvent size={48} className="mx-auto text-slate-200 mb-4" />
-                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-1">Belum ada Hari Libur</h3>
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-1">Belum ada Hari Libur</h3>
                   <p className="text-xs text-slate-400">Silakan tambahkan data hari libur nasional atau cuti bersama.</p>
                 </div>
               ) : (
@@ -350,10 +350,10 @@ const ShiftManager = () => {
 <table className="w-full text-left border-collapse min-w-max">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200/60">
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Nama Libur</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Tipe</th>
-                        <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tanggal</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Libur</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tipe</th>
+                        <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs text-slate-600 divide-y divide-white/50">
@@ -398,8 +398,8 @@ const ShiftManager = () => {
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm  flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-transparent rounded-xl p-6 w-full max-w-lg shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                <IconClock className="text-[#E31E24]" size={18} />
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                <IconClock className="text-ios-primary" size={18} />
                 {selectedShift ? 'Edit Master Shift' : 'Tambah Master Shift'}
               </h3>
               <button onClick={() => setIsShiftModalOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -410,32 +410,32 @@ const ShiftManager = () => {
             <form onSubmit={handleSubmitShift} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Kode Shift</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Kode Shift</label>
                   <input
                     required
                     type="text"
                     value={shiftForm.code}
                     onChange={e => setShiftForm({...shiftForm, code: e.target.value})}
                     placeholder="Contoh: NS"
-                    className="w-full h-10 px-3 rounded-xl bg-white shadow-sm border-none text-slate-800 font-bold text-xs focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-10 px-3 rounded-xl bg-white shadow-sm border-none text-slate-800 font-bold text-xs focus:ring-1 focus:ring-ios-primary/30"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Nama Shift</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Nama Shift</label>
                   <input
                     required
                     type="text"
                     value={shiftForm.name}
                     onChange={e => setShiftForm({...shiftForm, name: e.target.value})}
                     placeholder="Contoh: Night Shift"
-                    className="w-full h-10 px-3 rounded-xl bg-white shadow-sm border-none text-slate-800 font-bold text-xs focus:ring-1 focus:ring-[#E31E24]/30"
+                    className="w-full h-10 px-3 rounded-xl bg-white shadow-sm border-none text-slate-800 font-bold text-xs focus:ring-1 focus:ring-ios-primary/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Jam Masuk</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Jam Masuk</label>
                   <input
                     required
                     type="time"
@@ -445,7 +445,7 @@ const ShiftManager = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Jam Keluar</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Jam Keluar</label>
                   <input
                     required
                     type="time"
@@ -455,7 +455,7 @@ const ShiftManager = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Toleransi (Menit)</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Toleransi (Menit)</label>
                   <input
                     required
                     type="number"
@@ -474,17 +474,17 @@ const ShiftManager = () => {
                 <button
                   type="button"
                   onClick={() => setShiftForm({...shiftForm, is_cross_day: !shiftForm.is_cross_day})}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${shiftForm.is_cross_day ? 'bg-[#E31E24]' : 'bg-slate-300'}`}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${shiftForm.is_cross_day ? 'bg-ios-primary' : 'bg-slate-300'}`}
                 >
                   <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-transparent shadow-xs ring-0 transition duration-200 ease-in-out ${shiftForm.is_cross_day ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
               <div className="pt-2 flex justify-end gap-2">
-                <button type="button" onClick={() => setIsShiftModalOpen(false)} className="h-10 px-5 bg-transparent text-slate-600 font-black text-xs uppercase tracking-widest rounded-xl hover:shadow-sm border border-slate-200 transition-colors">
+                <button type="button" onClick={() => setIsShiftModalOpen(false)} className="h-10 px-5 bg-transparent text-slate-600 font-bold text-xs uppercase tracking-widest rounded-xl hover:shadow-sm border border-slate-200 transition-colors">
                   Batal
                 </button>
-                <button type="submit" disabled={isSubmitting} className="h-10 px-5 bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-[#C1181E] transition-colors flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="h-10 px-5 bg-ios-primary text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-ios-primary/90 transition-colors flex items-center gap-2">
                   {isSubmitting ? <IconLoader2 size={14} className="animate-spin" /> : 'Simpan Shift'}
                 </button>
               </div>
@@ -498,8 +498,8 @@ const ShiftManager = () => {
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm  flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-transparent rounded-xl p-6 w-full max-w-md shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                <IconCalendarEvent className="text-[#E31E24]" size={18} />
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                <IconCalendarEvent className="text-ios-primary" size={18} />
                 {selectedHoliday ? 'Edit Hari Libur' : 'Tambah Hari Libur'}
               </h3>
               <button onClick={() => setIsHolidayModalOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -509,7 +509,7 @@ const ShiftManager = () => {
 
             <form onSubmit={handleSubmitHoliday} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Nama Libur</label>
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Nama Libur</label>
                 <input
                   required
                   type="text"
@@ -521,7 +521,7 @@ const ShiftManager = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Tanggal Mulai</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Tanggal Mulai</label>
                   <input
                     required
                     type="date"
@@ -531,7 +531,7 @@ const ShiftManager = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Tanggal Selesai (Opsional)</label>
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Tanggal Selesai (Opsional)</label>
                   <input
                     type="date"
                     value={holidayForm.end_date}
@@ -542,7 +542,7 @@ const ShiftManager = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Tipe Libur</label>
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block">Tipe Libur</label>
                 <select
                   value={holidayForm.type}
                   onChange={e => setHolidayForm({...holidayForm, type: e.target.value})}
@@ -555,10 +555,10 @@ const ShiftManager = () => {
               </div>
 
               <div className="pt-2 flex justify-end gap-2">
-                <button type="button" onClick={() => setIsHolidayModalOpen(false)} className="h-10 px-5 bg-transparent text-slate-600 font-black text-xs uppercase tracking-widest rounded-xl hover:shadow-sm border border-slate-200 transition-colors">
+                <button type="button" onClick={() => setIsHolidayModalOpen(false)} className="h-10 px-5 bg-transparent text-slate-600 font-bold text-xs uppercase tracking-widest rounded-xl hover:shadow-sm border border-slate-200 transition-colors">
                   Batal
                 </button>
-                <button type="submit" disabled={isSubmitting} className="h-10 px-5 bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-[#C1181E] transition-colors flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="h-10 px-5 bg-ios-primary text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-ios-primary/90 transition-colors flex items-center gap-2">
                   {isSubmitting ? <IconLoader2 size={14} className="animate-spin" /> : 'Simpan Libur'}
                 </button>
               </div>

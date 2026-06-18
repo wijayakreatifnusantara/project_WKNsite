@@ -18,18 +18,18 @@ const RunPayrollModal = ({ isOpen, onClose, onCalculate, loading }) => {
       <div className="bg-white w-full max-w-md rounded-[2.5rem] border-4 border-white shadow-sm overflow-hidden">
         <div className="p-8 space-y-6">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 bg-transparent shadow-sm rounded-2xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-14 w-14 bg-transparent shadow-sm rounded-2xl flex items-center justify-center text-ios-primary">
               <IconCalculator size={28} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight font-outfit">Run Payroll Engine</h3>
-              <p className="text-xs text-slate-400 font-black uppercase tracking-widest mt-0.5">Initialize Monthly Disbursement</p>
+              <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight font-outfit">Run Payroll Engine</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Initialize Monthly Disbursement</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Target Period</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Target Period</label>
               <input 
                 type="month" 
                 value={selectedMonth}
@@ -50,14 +50,14 @@ const RunPayrollModal = ({ isOpen, onClose, onCalculate, loading }) => {
             <Button 
               onClick={onClose}
               variant="outline" 
-              className="flex-1 h-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-500 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all"
+              className="flex-1 h-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-500 font-bold text-xs uppercase tracking-widest hover:shadow-none transition-all"
             >
               Cancel
             </Button>
             <Button 
               onClick={() => onCalculate(selectedMonth)}
               disabled={loading}
-              className="flex-1 h-12 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-2"
+              className="flex-1 h-12 rounded-2xl bg-ios-primary text-white font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-ios-primary/90 transition-all flex gap-2"
             >
               {loading ? <IconLoader2 className="animate-spin" size={16} /> : <IconCheck size={16} />}
               {loading ? 'Calculating...' : 'Start Logic'}

@@ -54,12 +54,12 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
         {/* Header */}
         <header className="h-20 bg-white border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-ios-primary">
               <IconCalculator size={24} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-slate-800 font-outfit uppercase tracking-tight">Salary Projection Lab</h1>
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest opacity-70">Budget Impact Simulator & Forecast</p>
+              <h1 className="text-lg font-bold text-slate-800 font-outfit uppercase tracking-tight">Salary Projection Lab</h1>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider opacity-70">Budget Impact Simulator & Forecast</p>
             </div>
           </div>
           <button 
@@ -74,11 +74,11 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
           {/* Left Panel: Inputs */}
           <div className="w-[350px] bg-white border-r-2 border-white p-10 space-y-8 overflow-y-auto custom-scrollbar">
             <div className="space-y-4">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest pl-2">Target Personnel</label>
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-2">Target Personnel</label>
               <select 
                 value={selectedEmpId}
                 onChange={(e) => setSelectedEmpId(e.target.value)}
-                className="w-full h-12 px-5 bg-white shadow-sm border-none rounded-2xl text-xs font-black text-slate-700 focus:outline-none cursor-pointer"
+                className="w-full h-12 px-5 bg-white shadow-sm border-none rounded-2xl text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
               >
                 {employees.map(emp => (
                   <option key={emp["EMPLOYEE ID"]} value={emp["EMPLOYEE ID"]}>{emp["EMPLOYEE NAME"]}</option>
@@ -88,8 +88,8 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
 
             <div className="space-y-6">
               <div className="flex justify-between items-center px-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Salary Adjustment</label>
-                <span className="text-xs font-black text-[#E31E24]">{adjustmentPercent}%</span>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Salary Adjustment</label>
+                <span className="text-xs font-bold text-ios-primary">{adjustmentPercent}%</span>
               </div>
               <input 
                 type="range" 
@@ -99,7 +99,7 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
                 onChange={(e) => setAdjustmentPercent(parseInt(e.target.value))}
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#E31E24]"
               />
-              <div className="flex justify-between text-[11px] font-black text-slate-300 uppercase px-1">
+              <div className="flex justify-between text-[11px] font-semibold text-slate-300 uppercase px-1">
                 <span>Decrease</span>
                 <span>Neutral</span>
                 <span>Growth</span>
@@ -107,16 +107,16 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
             </div>
 
             <div className="p-6 bg-white/40 border-2 border-white rounded-2xl space-y-4">
-              <div className="flex items-center gap-3 text-[#E31E24]">
+              <div className="flex items-center gap-3 text-ios-primary">
                 <IconAlertCircle size={18} />
-                <span className="text-xs font-black uppercase tracking-widest">Simulation Context</span>
+                <span className="text-xs font-bold uppercase tracking-widest">Simulation Context</span>
               </div>
               <p className="text-xs font-bold text-slate-400 leading-relaxed italic">
                 This simulation includes BPJS Ketenagakerjaan (5.7%), BPJS Kesehatan (5%), and estimated PPh 21 based on PTKP 2024.
               </p>
             </div>
 
-            <Button className="w-full h-14 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-wider shadow-sm hover:bg-[#C1181E] transition-all flex gap-3">
+            <Button className="w-full h-14 rounded-2xl bg-ios-primary text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:bg-ios-primary/90 transition-all flex gap-3">
               <IconChartBar size={18} />
               Commit to Forecast
             </Button>
@@ -128,36 +128,36 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
             <div className="grid grid-cols-3 gap-8">
               <div className="bg-white shadow-sm rounded-[2.5rem] p-8 border-4 border-white text-center">
                 <IconWallet size={20} className="text-slate-300 mx-auto mb-4" />
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Current Base</p>
-                <h3 className="text-xl font-black text-slate-700">Rp {calculations.current.toLocaleString()}</h3>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Current Base</p>
+                <h3 className="text-xl font-bold text-slate-700">Rp {calculations.current.toLocaleString()}</h3>
               </div>
               <div className="bg-white shadow-sm rounded-[2.5rem] p-8 border-4 border-white text-center">
                 <IconTrendingUp size={20} className="text-green-500 mx-auto mb-4" />
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Proposed Base</p>
-                <h3 className="text-xl font-black text-green-600">Rp {calculations.proposed.toLocaleString()}</h3>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Proposed Base</p>
+                <h3 className="text-xl font-bold text-green-600">Rp {calculations.proposed.toLocaleString()}</h3>
               </div>
               <div className="bg-white shadow-sm rounded-[2.5rem] p-8 border-4 border-white text-center">
                 <IconCoins size={20} className="text-blue-500 mx-auto mb-4" />
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Take Home Pay</p>
-                <h3 className="text-xl font-black text-blue-600">Rp {Math.round(calculations.takeHome).toLocaleString()}</h3>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Take Home Pay</p>
+                <h3 className="text-xl font-bold text-blue-600">Rp {Math.round(calculations.takeHome).toLocaleString()}</h3>
               </div>
             </div>
 
             {/* Projection Chart Mockup */}
             <div className="bg-white shadow-sm rounded-[3rem] p-10 border-2 border-white relative overflow-hidden">
               <div className="flex justify-between items-center mb-10">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3">
-                  <IconTrendingUp size={20} className="text-[#E31E24]" />
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-3">
+                  <IconTrendingUp size={20} className="text-ios-primary" />
                   Annual Budget Projection
                 </h3>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-slate-300"></div>
-                    <span className="text-[11px] font-black text-slate-400 uppercase">Baseline</span>
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase">Baseline</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-[#E31E24]"></div>
-                    <span className="text-[11px] font-black text-slate-400 uppercase">Simulated</span>
+                    <div className="h-2 w-2 rounded-full bg-ios-primary"></div>
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase">Simulated</span>
                   </div>
                 </div>
               </div>
@@ -168,9 +168,9 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
                   <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
                     <div className="w-full relative">
                       <div className="absolute bottom-0 w-full bg-slate-200 rounded-t-lg transition-all duration-500" style={{ height: `${h-10}%` }}></div>
-                      <div className="absolute bottom-0 w-full bg-[#E31E24] rounded-t-lg transition-all duration-500 opacity-60 group-hover:opacity-100" style={{ height: `${h + (adjustmentPercent/2)}%` }}></div>
+                      <div className="absolute bottom-0 w-full bg-ios-primary rounded-t-lg transition-all duration-500 opacity-60 group-hover:opacity-100" style={{ height: `${h + (adjustmentPercent/2)}%` }}></div>
                     </div>
-                    <span className="text-[11px] font-black text-slate-300 uppercase">M{i+1}</span>
+                    <span className="text-[11px] font-semibold text-slate-300 uppercase">M{i+1}</span>
                   </div>
                 ))}
               </div>
@@ -179,37 +179,37 @@ const SalarySimulator = ({ isOpen, onClose, employees }) => {
             {/* Detailed Breakdown */}
             <div className="grid grid-cols-2 gap-8">
               <div className="space-y-4">
-                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-4">Company Cost Breakdown</h4>
+                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-4">Company Cost Breakdown</h4>
                 <div className="bg-white/40 border-2 border-white rounded-2xl p-8 space-y-4">
-                  <div className="flex justify-between items-center text-xs font-black text-slate-600">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-600">
                     <span>Base Salary</span>
                     <span>Rp {calculations.proposed.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-black text-slate-400">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-400">
                     <span>BPJS TK (Company 4.54%)</span>
                     <span>Rp {Math.round(calculations.proposed * 0.0454).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-black text-slate-400">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-400">
                     <span>BPJS Kes (Company 4.0%)</span>
                     <span>Rp {Math.round(calculations.proposed * 0.04).toLocaleString()}</span>
                   </div>
                   <div className="pt-4 border-t-2 border-[#f0f2f5] flex justify-between items-center">
-                    <span className="text-xs font-black text-slate-800 uppercase tracking-widest">Total Monthly Cost</span>
-                    <span className="text-xs font-black text-[#E31E24]">Rp {Math.round(calculations.proposed * 1.0854).toLocaleString()}</span>
+                    <span className="text-xs font-bold text-slate-800 uppercase tracking-widest">Total Monthly Cost</span>
+                    <span className="text-xs font-bold text-ios-primary">Rp {Math.round(calculations.proposed * 1.0854).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-4">Yearly Impact Forecast</h4>
+                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-4">Yearly Impact Forecast</h4>
                 <div className="bg-white/40 border-2 border-white rounded-2xl p-8 space-y-6">
                   <div className="flex items-center gap-6">
                     <div className="h-12 w-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-500 shrink-0">
                       <IconTrendingUp size={24} />
                     </div>
                     <div>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Budget Delta</p>
-                      <h5 className="text-lg font-black text-green-600">+ Rp {(calculations.diff * 12).toLocaleString()} / Year</h5>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider leading-none mb-1">Budget Delta</p>
+                      <h5 className="text-lg font-bold text-green-600">+ Rp {(calculations.diff * 12).toLocaleString()} / Year</h5>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 bg-white p-4 rounded-xl">

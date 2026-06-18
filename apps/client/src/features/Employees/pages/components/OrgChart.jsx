@@ -84,14 +84,14 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
       {/* Chart Header */}
       <header className="h-16 bg-transparent border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-10 relative">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+          <div className="h-9 w-9 bg-ios-primary/10 rounded-lg flex items-center justify-center text-ios-primary">
             <IconHierarchy2 size={18} />
           </div>
           <div>
             <h1 className="text-xs font-bold text-slate-800 font-outfit uppercase tracking-tight leading-none">Struktur Organisasi</h1>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[11px] font-bold text-[#E31E24] bg-red-50/50 px-2 py-0.5 rounded-full border border-red-100/60">{employees.length} KARYAWAN TERLOAD</span>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider opacity-70">• Geser untuk menggeser bagan</p>
+              <span className="text-[11px] font-semibold text-ios-primary bg-red-50/50 px-2 py-0.5 rounded-full border border-red-100/60">{employees.length} KARYAWAN TERLOAD</span>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider opacity-70">• Geser untuk menggeser bagan</p>
             </div>
           </div>
         </div>
@@ -105,20 +105,20 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
               placeholder="Cari Karyawan..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-44 h-9 pl-9 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:bg-transparent focus:border-[#E31E24]/30 focus:ring-1 focus:ring-[#E31E24]/20 transition-all uppercase tracking-wider"
+              className="w-44 h-9 pl-9 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:bg-transparent focus:border-ios-primary/30 focus:ring-1 focus:ring-ios-primary/20 transition-all uppercase tracking-wider"
             />
           </div>
 
           <div className="flex items-center gap-1 bg-transparent border border-slate-200 p-1 rounded-lg shadow-sm">
-            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-sm transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-sm transition-all text-slate-400 hover:text-ios-primary">
               <IconZoomOut size={14} />
             </button>
             <span className="text-xs font-bold text-slate-500 min-w-[36px] text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-sm transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-sm transition-all text-slate-400 hover:text-ios-primary">
               <IconZoomIn size={14} />
             </button>
             <div className="w-[1px] h-3 bg-slate-200 mx-1"></div>
-            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-sm transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded hover:shadow-sm transition-all text-slate-400 hover:text-ios-primary">
               <IconMaximize size={14} />
             </button>
           </div>
@@ -140,11 +140,11 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
         >
           {/* Root Node: Company */}
           <div className="bg-transparent border border-slate-200 shadow-sm rounded-xl p-5 w-[260px] text-center mb-16 relative">
-            <div className="h-10 w-10 bg-[#E31E24]/10 rounded-lg flex items-center justify-center mx-auto mb-3 text-[#E31E24]">
+            <div className="h-10 w-10 bg-ios-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3 text-ios-primary">
               <IconBuildingSkyscraper size={22} />
             </div>
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight font-outfit">PT. Wijaya Karya Nusantara</h2>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Kantor Pusat / Head Office</p>
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Kantor Pusat / Head Office</p>
             
             <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-[1px] h-16 bg-slate-250"></div>
           </div>
@@ -161,7 +161,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
                     </div>
                     <div>
                       <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-tight">{dept}</h3>
-                      <p className="text-[11px] font-bold text-[#E31E24] uppercase mt-0.5">{staff.length} Karyawan</p>
+                      <p className="text-[11px] font-semibold text-ios-primary uppercase mt-0.5">{staff.length} Karyawan</p>
                     </div>
                   </div>
                   <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-8 bg-slate-200"></div>
@@ -172,9 +172,9 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
                   {staff.filter(e => !searchTerm || e["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 15).map((emp) => (
                     <div 
                       key={emp["EMPLOYEE ID"]} 
-                      className={`group bg-transparent border border-slate-200/60 shadow-sm rounded-lg p-2.5 w-[190px] flex items-center gap-2.5 hover:border-[#E31E24]/20 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-1 ring-[#E31E24] bg-red-50/10' : ''}`}
+                      className={`group bg-transparent border border-slate-200/60 shadow-sm rounded-lg p-2.5 w-[190px] flex items-center gap-2.5 hover:border-ios-primary/20 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-1 ring-ios-primary bg-red-50/10' : ''}`}
                     >
-                      <div className="h-7 w-7 bg-white shadow-sm border-none rounded-md flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
+                      <div className="h-7 w-7 bg-white shadow-sm border-none rounded-lg flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
                         {emp["EMPLOYEE NAME"].split(' ').map(n => n[0]).join('')}
                       </div>
                       <div className="flex-1 overflow-hidden text-left leading-none">
@@ -184,7 +184,7 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
                     </div>
                   ))}
                   {staff.length > 15 && (
-                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-2">
+                    <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest py-2">
                       +{staff.length - 15} Karyawan Lainnya
                     </div>
                   )}
@@ -200,11 +200,11 @@ const OrgChart = ({ employees, viewMode, setViewMode }) => {
         <div className="bg-white/90 backdrop-blur border border-slate-200/80 shadow-sm rounded-xl p-3 flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
-            <span className="text-[11px] font-bold text-slate-550 uppercase tracking-wider">Kluster Divisi / Unit</span>
+            <span className="text-[11px] font-semibold text-slate-550 uppercase tracking-wider">Kluster Divisi / Unit</span>
           </div>
           <div className="flex items-center gap-2">
             <IconArrowsMove size={11} className="text-slate-400" />
-            <span className="text-[11px] font-bold text-slate-450 uppercase tracking-wider">Klik-Kiri & Tahan untuk Menggeser</span>
+            <span className="text-[11px] font-semibold text-slate-450 uppercase tracking-wider">Klik-Kiri & Tahan untuk Menggeser</span>
           </div>
         </div>
       </div>

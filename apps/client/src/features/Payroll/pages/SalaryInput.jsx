@@ -144,13 +144,13 @@ export default function SalaryInput() {
     <div className="flex-1 flex flex-col overflow-hidden bg-white animate-fade-in">
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 z-10">
         <div>
-          <h2 className="text-xl font-black text-slate-800 uppercase">Input Master Gaji</h2>
+          <h2 className="text-xl font-bold text-slate-800 uppercase">Input Master Gaji</h2>
           <p className="text-xs text-slate-400 font-bold uppercase mt-1">Kelola Komponen Gaji Karyawan</p>
         </div>
         <Button 
           onClick={handleSave}
           disabled={!selectedEmployee || saving}
-          className="h-12 px-6 rounded-2xl bg-[#E31E24] hover:bg-[#C1181E] disabled:opacity-50 text-white font-black text-xs uppercase shadow-sm"
+          className="h-12 px-6 rounded-2xl bg-ios-primary hover:bg-ios-primary/90 disabled:opacity-50 text-white font-bold text-xs uppercase shadow-sm"
         >
           <IconDeviceFloppy size={18} className="mr-2" /> {saving ? 'Menyimpan...' : 'Simpan Gaji'}
         </Button>
@@ -172,7 +172,7 @@ export default function SalaryInput() {
             {/* Sidebar: Karyawan */}
             <div className="col-span-4 space-y-6">
               <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6 h-[800px] flex flex-col">
-                <CardTitle className="text-sm font-black text-slate-800 uppercase mb-6 shrink-0">Pilih Karyawan</CardTitle>
+                <CardTitle className="text-sm font-bold text-slate-800 uppercase mb-6 shrink-0">Pilih Karyawan</CardTitle>
                 <div className="h-12 relative group shrink-0 mb-4">
                   <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input 
@@ -195,7 +195,7 @@ export default function SalaryInput() {
                         : 'bg-white/50 border border-white hover:bg-transparent'
                       }`}
                     >
-                      <p className="text-sm font-black text-slate-800">{emp.name}</p>
+                      <p className="text-sm font-bold text-slate-800">{emp.name}</p>
                       <p className="text-xs font-bold text-slate-500">{emp.job_position || 'Staff'}</p>
                     </div>
                   ))}
@@ -224,13 +224,13 @@ export default function SalaryInput() {
                       <IconUser size={24} />
                     </div>
                     <div>
-                      <h3 className="font-black text-lg">{selectedEmployee.name}</h3>
+                      <h3 className="font-bold text-lg">{selectedEmployee.name}</h3>
                       <p className="text-xs font-medium opacity-80 uppercase tracking-widest">{selectedEmployee.id}</p>
                     </div>
                   </div>
 
                   <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
-                    <CardTitle className="text-sm font-black text-[#F97316] uppercase mb-6 border-b pb-4">Profil Gaji Pokok</CardTitle>
+                    <CardTitle className="text-sm font-bold text-[#F97316] uppercase mb-6 border-b pb-4">Profil Gaji Pokok</CardTitle>
                     <div className="grid grid-cols-2 gap-6">
                       <div>
                         <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Grade / Golongan</label>
@@ -242,7 +242,7 @@ export default function SalaryInput() {
 
                   <div className="grid grid-cols-2 gap-6">
                     <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
-                      <CardTitle className="text-sm font-black text-blue-500 uppercase mb-6 border-b pb-4">Tunjangan Tetap</CardTitle>
+                      <CardTitle className="text-sm font-bold text-blue-500 uppercase mb-6 border-b pb-4">Tunjangan Tetap</CardTitle>
                       <div className="space-y-4">
                         <InputField label="Tunjangan Posisi" fieldKey="position_allowance" />
                         <InputField label="Tunjangan Keahlian (Skill)" fieldKey="skill_allowance" />
@@ -257,7 +257,7 @@ export default function SalaryInput() {
                     </Card>
 
                     <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
-                      <CardTitle className="text-sm font-black text-indigo-500 uppercase mb-6 border-b pb-4">Tunjangan Variabel & Non-Upah</CardTitle>
+                      <CardTitle className="text-sm font-bold text-indigo-500 uppercase mb-6 border-b pb-4">Tunjangan Variabel & Non-Upah</CardTitle>
                       <div className="space-y-4">
                         <InputField label="Tunjangan Work Order" fieldKey="work_order_allowance" />
                         <InputField label="Tunjangan Makan" fieldKey="meals_allowance" />
@@ -273,7 +273,7 @@ export default function SalaryInput() {
                   </div>
 
                   <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-6">
-                    <CardTitle className="text-sm font-black text-rose-500 uppercase mb-6 border-b pb-4">Potongan (Deductions)</CardTitle>
+                    <CardTitle className="text-sm font-bold text-rose-500 uppercase mb-6 border-b pb-4">Potongan (Deductions)</CardTitle>
                     <div className="grid grid-cols-2 gap-6">
                       <InputField label="PPh 21" fieldKey="pph21" />
                       <InputField label="BPJS TK JHT" fieldKey="deduction_jht" />

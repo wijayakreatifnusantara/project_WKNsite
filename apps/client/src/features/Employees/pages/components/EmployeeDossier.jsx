@@ -31,7 +31,7 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
       >
         {/* 🏆 COMPACT IDENTITY TOP BAR */}
         <header className="relative h-16 bg-transparent border-b border-slate-200/80 flex items-center px-8 gap-4 shrink-0">
-          <div className="h-10 w-10 rounded-lg bg-transparent border border-slate-200/80 flex items-center justify-center text-[#E31E24] overflow-hidden shrink-0">
+          <div className="h-10 w-10 rounded-lg bg-transparent border border-slate-200/80 flex items-center justify-center text-ios-primary overflow-hidden shrink-0">
             {employee["Photo"] ? (
               <img src={employee["Photo"]} alt={employee["EMPLOYEE NAME"]} className="w-full h-full object-cover" />
             ) : (
@@ -47,7 +47,7 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                 </h1>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1 text-slate-400">
-                    <IconId size={10} className="text-[#E31E24]" />
+                    <IconId size={10} className="text-ios-primary" />
                     <span className="text-xs font-semibold tracking-wider">{employee["EMPLOYEE ID"]}</span>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${employee.is_resigned || String(employee["Status *"] || employee.status || "").toUpperCase() === 'RESIGNED' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'}`}>
@@ -63,13 +63,13 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                   onEdit(employee);
                   onClose();
                 }}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-semibold text-xs uppercase tracking-wider hover:bg-[#C1181E] transition-all active:scale-95 shadow-sm"
+                className="h-8 px-4 rounded-lg bg-ios-primary text-white font-semibold text-xs uppercase tracking-wider hover:bg-ios-primary/90 transition-all active:scale-95 shadow-sm"
               >
                 Edit Dossier
               </Button>
               <button 
                 onClick={onClose}
-                className="h-8 w-8 flex items-center justify-center bg-transparent border border-slate-200 rounded-lg text-slate-400 hover:text-[#E31E24] transition-all"
+                className="h-8 w-8 flex items-center justify-center bg-transparent border border-slate-200 rounded-lg text-slate-400 hover:text-ios-primary transition-all"
               >
                 <IconX size={16} />
               </button>
@@ -101,8 +101,8 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                 <SimpleInfo label="Service Level" value={employee["Job Level *"] || employee.job_level} icon={<IconAward />} />
                 <SimpleInfo label="Work Pattern" value={employee.shifts?.name || employee.work_pattern || 'N/A'} icon={<IconClock />} />
                 <div className="space-y-2">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Contract Status</p>
-                  <p className="text-sm font-black text-[#E31E24] uppercase tracking-tighter">{employee["Status *"]}</p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Contract Status</p>
+                  <p className="text-sm font-bold text-ios-primary uppercase tracking-tighter">{employee["Status *"]}</p>
                 </div>
               </div>
             </div>
@@ -120,7 +120,7 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
                     <p className="text-xs font-bold text-slate-400 uppercase">Belum ada dokumen</p>
                   </div>
                 )}
-                <button className="w-full h-12 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-xs font-black text-slate-400 uppercase tracking-widest hover:border-[#E31E24] hover:text-[#E31E24] transition-all">
+                <button className="w-full h-12 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-xs font-semibold text-slate-500 uppercase tracking-wider hover:border-ios-primary hover:text-ios-primary transition-all">
                   + Add Document
                 </button>
               </div>
@@ -128,13 +128,13 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
               {/* Tanda Tangan Elektronik Section */}
               <div className="pt-6 border-t border-slate-200/50 space-y-4">
                 <div className="flex justify-between items-center px-1">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Electronic Signature</p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Electronic Signature</p>
                   <button 
                     onClick={() => {
                       onSign(employee);
                       onClose();
                     }}
-                    className="text-xs font-black text-[#E31E24] uppercase tracking-widest hover:underline"
+                    className="text-xs font-bold text-ios-primary uppercase tracking-widest hover:underline"
                   >
                     {employee.signature_url ? 'Update TTD' : '+ Buat TTD'}
                   </button>
@@ -162,21 +162,21 @@ const EmployeeDossier = ({ employee, isOpen, onClose, onEdit, onSign }) => {
 
 const SectionHeader = ({ title, icon }) => (
   <div className="flex items-center gap-3">
-    <div className="h-8 w-8 bg-transparent shadow-sm border border-slate-200 rounded-lg flex items-center justify-center text-[#E31E24]">
+    <div className="h-8 w-8 bg-transparent shadow-sm border border-slate-200 rounded-lg flex items-center justify-center text-ios-primary">
       {icon}
     </div>
-    <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">{title}</h3>
+    <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{title}</h3>
   </div>
 );
 
 const SimpleInfo = ({ label, value, icon }) => (
   <div className="flex items-center gap-4 group">
-    <div className="h-10 w-10 bg-transparent shadow-sm border border-white rounded-xl flex items-center justify-center text-slate-300 group-hover:text-[#E31E24] transition-all">
+    <div className="h-10 w-10 bg-transparent shadow-sm border border-white rounded-xl flex items-center justify-center text-slate-300 group-hover:text-ios-primary transition-all">
       {React.cloneElement(icon, { size: 18 })}
     </div>
     <div>
-      <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
-      <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight truncate max-w-[200px]">{value || 'N/A'}</p>
+      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
+      <p className="text-[11px] font-semibold text-slate-700 uppercase tracking-tight truncate max-w-[200px]">{value || 'N/A'}</p>
     </div>
   </div>
 );
@@ -184,8 +184,8 @@ const SimpleInfo = ({ label, value, icon }) => (
 const DocumentItem = ({ name }) => (
   <div className="flex items-center justify-between p-4 bg-transparent shadow-sm border border-white rounded-2xl hover:shadow-sm transition-all cursor-pointer group">
     <div className="flex items-center gap-3">
-      <IconFileText size={18} className="text-slate-300 group-hover:text-[#E31E24]" />
-      <span className="text-xs font-black text-slate-600 truncate max-w-[180px]">{name}</span>
+      <IconFileText size={18} className="text-slate-300 group-hover:text-ios-primary" />
+      <span className="text-xs font-bold text-slate-600 truncate max-w-[180px]">{name}</span>
     </div>
     <IconDownload size={14} className="text-slate-300 group-hover:text-slate-800" />
   </div>
@@ -194,8 +194,8 @@ const DocumentItem = ({ name }) => (
 const SimpleMetric = ({ label, value, color }) => (
   <div className="space-y-3">
     <div className="flex justify-between items-end">
-      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{label}</span>
-      <span className="text-[11px] font-black text-slate-800">{value}%</span>
+      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</span>
+      <span className="text-[11px] font-semibold text-slate-800">{value}%</span>
     </div>
     <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
       <div className={`h-full ${color} rounded-full transition-all duration-1000`} style={{ width: `${value}%` }}></div>

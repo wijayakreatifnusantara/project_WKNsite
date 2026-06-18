@@ -73,8 +73,8 @@ const Overview = () => {
         {/* Morning Briefing / Greeting */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-2">
           <div className="space-y-1">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
-              Selamat Pagi, <span className="text-[#E31E24]">{profile?.full_name?.split(' ')[0] || 'Administrator'}</span> 👋
+            <h2 className="text-2xl md:text-3xl ios-title">
+              Selamat Pagi, <span className="text-ios-primary">{profile?.full_name?.split(' ')[0] || 'Administrator'}</span> 👋
             </h2>
             <p className="text-sm text-slate-500 font-medium">
               Berikut adalah ringkasan operasional dan kehadiran tim Anda hari ini.
@@ -89,7 +89,7 @@ const Overview = () => {
                   if (success) toast.success("Laporan berhasil diekspor.");
                   else toast.error("Gagal membuat laporan.");
                 }}
-                className="h-10 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm transition-all flex gap-2 items-center"
+                className="ios-btn h-10 px-4 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm flex gap-2 items-center"
               >
                 <IconChartBar size={16} />
                 Export Data
@@ -97,7 +97,7 @@ const Overview = () => {
               <Button 
                 onClick={fetchData}
                 disabled={loading}
-                className="h-10 px-4 rounded-lg bg-[#E31E24] text-white hover:bg-[#C1181E] shadow-sm hover:shadow-md active:scale-[0.98] transition-all flex gap-2 items-center border border-transparent"
+                className="ios-btn h-10 px-4 rounded-xl bg-ios-primary text-white shadow-sm flex gap-2 items-center border border-transparent"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <IconRefresh size={16} />}
                 Refresh
@@ -152,28 +152,28 @@ const Overview = () => {
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-800">Analitik Kehadiran</h3>
-              <Button variant="ghost" size="sm" className="text-[#E31E24] text-xs font-semibold hover:bg-red-50">
+              <Button variant="ghost" size="sm" className="text-ios-primary text-xs font-semibold hover:bg-red-50">
                 Lihat Detail Laporan
               </Button>
             </div>
             {loading ? (
-              <div className="h-96 w-full bg-white shadow-sm border border-slate-200 rounded-xl p-6 space-y-4">
+              <div className="h-96 w-full ios-card p-6 space-y-4">
                 <Skeleton className="h-8 w-1/3 opacity-50" />
-                <Skeleton className="h-[280px] w-full rounded-lg opacity-50" />
+                <Skeleton className="h-[280px] w-full rounded-xl opacity-50" />
               </div>
             ) : employees.length === 0 ? (
-              <div className="h-96 w-full bg-white shadow-sm border border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center text-center animate-fade-in">
+              <div className="h-96 w-full ios-card p-8 flex flex-col items-center justify-center text-center animate-fade-in">
                  <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
                     <IconUsers size={32} className="text-slate-400" />
                  </div>
                  <h4 className="text-lg font-bold text-slate-800">Belum Ada Data Karyawan</h4>
                  <p className="text-sm text-slate-500 mt-2 max-w-sm">Data analitik kehadiran akan otomatis dibuat setelah Anda mendaftarkan karyawan ke dalam sistem.</p>
-                 <Button className="mt-6 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-lg active:scale-[0.98] transition-all shadow-sm">
+                 <Button className="mt-6 ios-btn bg-ios-primary text-white rounded-xl shadow-sm">
                     Undang Karyawan
                  </Button>
               </div>
             ) : (
-              <div className="bg-white shadow-sm border border-slate-200 rounded-xl p-2 overflow-hidden">
+              <div className="ios-card p-2 overflow-hidden">
                 <AnalyticsGrid employees={employees} />
               </div>
             )}
@@ -186,7 +186,7 @@ const Overview = () => {
               <IconDotsVertical size={16} className="text-slate-500" />
             </div>
             
-            <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden flex flex-col h-[400px]">
+            <Card className="ios-card overflow-hidden flex flex-col h-[400px]">
               <CardContent className="p-0 flex-1 overflow-y-auto custom-scrollbar">
                 <div className="p-5 relative h-full flex flex-col">
                   {activities.length > 0 ? (
@@ -213,7 +213,7 @@ const Overview = () => {
                           { title: "Budi Santoso Clock-in", time: "Baru saja", icon: <IconCheck size={14} />, type: "success", desc: "Via Mobile App di Area WKN HQ" },
                           { title: "Pengajuan Lembur: Ahmad", time: "10 menit lalu", icon: <IconInfoCircle size={14} />, type: "info", desc: "Mengajukan 4 jam lembur untuk proyek X" }
                         ])}
-                        className="mt-6 text-xs font-bold text-[#E31E24] border-red-100 bg-red-50 hover:bg-red-100 rounded-lg active:scale-[0.98] transition-all duration-200"
+                        className="mt-6 text-xs font-bold text-ios-primary border-red-100 bg-red-50 hover:bg-red-100 rounded-lg active:scale-[0.98] transition-all duration-200"
                       >
                         Muat Data Simulasi
                       </Button>
@@ -231,7 +231,7 @@ const Overview = () => {
 };
 
 const StatCard = ({ title, value, subtitle, icon, trend, positive, colorClass }) => (
-  <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer group relative overflow-hidden">
+  <div className="ios-card p-6 ios-btn cursor-pointer group relative overflow-hidden">
     {/* Subtle Background Accent */}
     <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 transition-transform group-hover:scale-150 ${colorClass.split(' ')[1]}`}></div>
     
@@ -246,7 +246,7 @@ const StatCard = ({ title, value, subtitle, icon, trend, positive, colorClass })
         </div>
       </div>
       <div>
-        <h3 className="text-3xl font-black text-slate-800 tracking-tight">{value}</h3>
+        <h3 className="text-3xl font-bold text-slate-800 tracking-tight">{value}</h3>
         <p className="text-sm font-bold text-slate-600 mt-1">{title}</p>
         <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
       </div>
@@ -271,7 +271,7 @@ const ActivityItem = ({ title, time, icon, type, desc }) => {
       </div>
       <div className="pt-2 pb-1">
         <div className="flex items-baseline gap-2">
-          <h5 className="text-sm font-bold text-slate-800 group-hover:text-[#E31E24] transition-colors">{title}</h5>
+          <h5 className="text-sm font-bold text-slate-800 group-hover:text-ios-primary transition-colors">{title}</h5>
           <span className="text-xs font-semibold text-slate-500">{time}</span>
         </div>
         <p className="text-xs text-slate-500 mt-1 leading-relaxed">{desc}</p>

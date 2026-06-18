@@ -47,12 +47,12 @@ const AnalyticsGrid = ({ employees }) => {
       {/* 1. Headcount Distribution by Department */}
       <Card className="col-span-12 md:col-span-4 border-white border-[4px] shadow-sm bg-white rounded-2xl overflow-hidden">
         <CardHeader className="px-6 py-4 border-b border-slate-200 flex flex-row items-center gap-3">
-          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
+          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-ios-primary">
             <IconChartPie size={20} />
           </div>
           <div>
-            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Division Distribution</CardTitle>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Top 5 Departments</p>
+            <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Division Distribution</CardTitle>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Top 5 Departments</p>
           </div>
         </CardHeader>
         <CardContent className="p-4 h-64 flex items-center">
@@ -90,12 +90,12 @@ const AnalyticsGrid = ({ employees }) => {
       {/* 2. Workforce Mutation Trends */}
       <Card className="col-span-12 md:col-span-8 border-white border-[4px] shadow-sm bg-white rounded-2xl overflow-hidden">
         <CardHeader className="px-6 py-4 border-b border-slate-200 flex flex-row items-center gap-3">
-          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
+          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-ios-primary">
             <IconChartAreaLine size={20} />
           </div>
           <div>
-            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Workforce Mutation Trends</CardTitle>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Monthly Hired vs Resigned</p>
+            <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Workforce Mutation Trends</CardTitle>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Monthly Hired vs Resigned</p>
           </div>
         </CardHeader>
         <CardContent className="p-4 h-64">
@@ -133,12 +133,12 @@ const AnalyticsGrid = ({ employees }) => {
       {/* 3. Employment Status Bar Chart */}
       <Card className="col-span-12 border-white border-[4px] shadow-sm bg-white rounded-2xl overflow-hidden">
         <CardHeader className="px-6 py-4 border-b border-slate-200 flex flex-row items-center gap-3">
-          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
+          <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-ios-primary">
             <IconChartBar size={20} />
           </div>
           <div>
-            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Workforce Status Distribution</CardTitle>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Aggregated by Contract Type</p>
+            <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Workforce Status Distribution</CardTitle>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Aggregated by Contract Type</p>
           </div>
         </CardHeader>
         <CardContent className="p-6 h-72">

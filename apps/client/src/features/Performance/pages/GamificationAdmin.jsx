@@ -71,10 +71,10 @@ const GamificationAdmin = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 font-outfit tracking-tight uppercase">
-              Gamification <span className="text-[#E31E24]">Control</span>
+            <h2 className="text-2xl font-bold text-slate-800 font-outfit tracking-tight uppercase">
+              Gamification <span className="text-ios-primary">Control</span>
             </h2>
-            <p className="text-slate-400 text-xs mt-1 font-black uppercase tracking-[0.3em] opacity-70">Rewards & Point Adjustment</p>
+            <p className="text-slate-400 text-xs mt-1 font-bold uppercase tracking-widest opacity-70">Rewards & Point Adjustment</p>
           </div>
         </header>
 
@@ -88,7 +88,7 @@ const GamificationAdmin = () => {
               placeholder="Search employee..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-12 pr-4 bg-transparent border border-slate-200 rounded-2xl shadow-sm text-sm font-bold focus:outline-none focus:border-[#E31E24]/30 transition-all"
+              className="w-full h-12 pl-12 pr-4 bg-transparent border border-slate-200 rounded-2xl shadow-sm text-sm font-bold focus:outline-none focus:border-ios-primary/30 transition-all"
             />
           </div>
         </div>
@@ -98,13 +98,13 @@ const GamificationAdmin = () => {
 <table className="w-full text-left min-w-max">
             <thead>
               <tr className="border-b border-slate-200">
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-slate-400">Rank</th>
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-slate-400">Employee</th>
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-slate-400">Streak</th>
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-slate-400">Base Points</th>
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-slate-400">Bonus Points</th>
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-[#E31E24]">Total Points</th>
-                <th className="pb-4 px-4 text-xs font-black uppercase tracking-widest text-slate-400 text-right">Action</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Rank</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Employee</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Streak</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Base Points</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Bonus Points</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-ios-primary">Total Points</th>
+                <th className="pb-4 px-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -115,12 +115,12 @@ const GamificationAdmin = () => {
               ) : (
                 filteredLeaderboard.map((emp, index) => (
                   <tr key={emp.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
-                    <td className="py-4 px-4 font-black text-slate-700">#{index + 1}</td>
+                    <td className="py-4 px-4 font-bold text-slate-700">#{index + 1}</td>
                     <td className="py-4 px-4 flex items-center gap-3">
                       <img src={emp.avatar_url || `https://ui-avatars.com/api/?name=${emp.name}`} alt={emp.name} className="w-10 h-10 rounded-xl shadow-sm border border-slate-200" />
                       <div>
                         <p className="text-sm font-bold text-slate-800">{emp.name}</p>
-                        <p className="text-xs font-black uppercase tracking-wider text-slate-400">{emp.department}</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{emp.department}</p>
                       </div>
                     </td>
                     <td className="py-4 px-4">
@@ -130,11 +130,11 @@ const GamificationAdmin = () => {
                     </td>
                     <td className="py-4 px-4 text-xs font-bold text-slate-600">{emp.base_points} pts</td>
                     <td className="py-4 px-4 text-xs font-bold text-emerald-600">{emp.bonus_points > 0 ? '+' : ''}{emp.bonus_points} pts</td>
-                    <td className="py-4 px-4 text-sm font-black text-[#E31E24]">{emp.points} PTS</td>
+                    <td className="py-4 px-4 text-sm font-bold text-ios-primary">{emp.points} PTS</td>
                     <td className="py-4 px-4 text-right">
                       <button 
                         onClick={() => setAdjustingUser(emp)}
-                        className="h-8 px-4 rounded-xl bg-transparent border border-slate-200 shadow-sm text-xs font-black uppercase tracking-widest text-slate-600 hover:text-[#E31E24] transition-all"
+                        className="h-8 px-4 rounded-xl bg-transparent border border-slate-200 shadow-sm text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-ios-primary transition-all"
                       >
                         Adjust Bonus
                       </button>
@@ -155,8 +155,8 @@ const GamificationAdmin = () => {
             <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-black text-slate-800 font-outfit uppercase tracking-tight">Adjust Bonus Points</h3>
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">For {adjustingUser.name}</p>
+                  <h3 className="text-lg font-bold text-slate-800 font-outfit uppercase tracking-tight">Adjust Bonus Points</h3>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">For {adjustingUser.name}</p>
                 </div>
                 <div className="w-12 h-12 rounded-2xl bg-transparent shadow-sm border border-slate-200 flex items-center justify-center text-amber-500">
                   <IconGift size={24} />
@@ -165,12 +165,12 @@ const GamificationAdmin = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Point Adjustment (+ or -)</label>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 ml-2">Point Adjustment (+ or -)</label>
                   <input 
                     type="number"
                     value={bonusAmount}
                     onChange={(e) => setBonusAmount(e.target.value)}
-                    className="w-full h-12 px-4 bg-transparent border border-slate-200 rounded-xl shadow-sm text-sm font-bold focus:outline-none focus:border-[#E31E24]/30 transition-all"
+                    className="w-full h-12 px-4 bg-transparent border border-slate-200 rounded-xl shadow-sm text-sm font-bold focus:outline-none focus:border-ios-primary/30 transition-all"
                   />
                 </div>
                 
@@ -185,13 +185,13 @@ const GamificationAdmin = () => {
               <div className="flex gap-3 pt-2">
                 <button 
                   onClick={() => { setAdjustingUser(null); setBonusAmount(0); }}
-                  className="flex-1 h-12 rounded-xl bg-transparent border border-slate-200 shadow-sm text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 transition-all active:shadow-sm"
+                  className="flex-1 h-12 rounded-xl bg-transparent border border-slate-200 shadow-sm text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-slate-700 transition-all active:shadow-sm"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleAdjustBonus}
-                  className="flex-1 h-12 rounded-xl bg-[#E31E24] shadow-[4px_4px_10px_rgba(227,30,36,0.3),-4px_-4px_10px_rgba(255,255,255,0.9)] text-xs font-black uppercase tracking-widest text-white hover:bg-red-700 transition-all active:shadow-inset"
+                  className="flex-1 h-12 rounded-xl bg-ios-primary shadow-[4px_4px_10px_rgba(227,30,36,0.3),-4px_-4px_10px_rgba(255,255,255,0.9)] text-xs font-bold uppercase tracking-widest text-white hover:bg-red-700 transition-all active:shadow-inset"
                 >
                   Apply Bonus
                 </button>

@@ -10,11 +10,11 @@ const AnomalyAlerts = () => {
   return (
     <div className="bg-transparent rounded-2xl border border-rose-200 p-4 shadow-sm flex flex-col h-full">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
           <IconAlertTriangle size={14} className="text-rose-500" />
           AI Fraud Alerts
         </h3>
-        <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[11px] font-black rounded-full uppercase tracking-widest">
+        <span className="px-2 py-0.5 bg-rose-100 text-rose-600 text-[11px] font-semibold rounded-full uppercase tracking-widest">
           {alerts.length} Detected
         </span>
       </div>
@@ -26,10 +26,10 @@ const AnomalyAlerts = () => {
               {alert.type === 'location' ? <IconCurrentLocation size={16} /> : <IconDeviceMobile size={16} />}
             </div>
             <div className="min-w-0 flex-1">
-              <h4 className="text-xs font-black text-slate-800 uppercase tracking-tight truncate">{alert.message}</h4>
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-tight truncate">{alert.message}</h4>
               <div className="flex items-center justify-between mt-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">{alert.user}</span>
-                <span className="text-[11px] font-black text-rose-400">{alert.time}</span>
+                <span className="text-[11px] font-semibold text-slate-500 uppercase">{alert.user}</span>
+                <span className="text-[11px] font-semibold text-rose-400">{alert.time}</span>
               </div>
             </div>
           </div>

@@ -217,42 +217,42 @@ const AttendanceRecap = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/attendance')}
-              className="h-8 w-8 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
+              className="h-8 w-8 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-ios-primary hover:border-ios-primary/20 hover:bg-transparent transition-all active:scale-95 shrink-0"
             >
               <IconArrowLeft size={16} />
             </button>
-            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2 leading-none">
-              <IconClipboardList size={18} className="text-[#E31E24]" />
-              Attendance <span className="text-[#E31E24]">Performance Index</span>
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2 leading-none">
+              <IconClipboardList size={18} className="text-ios-primary" />
+              Attendance <span className="text-ios-primary">Performance Index</span>
             </h2>
           </div>
 
           <div className="flex items-center gap-3">
              <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-               <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Cycle:</span>
+               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Cycle:</span>
                <input 
                   type="month" 
                   value={selectedMonth}
                   onChange={(e) => handleMonthChange(e.target.value)}
-                  className="bg-transparent border-none text-slate-800 font-black text-xs uppercase focus:outline-none cursor-pointer"
+                  className="bg-transparent border-none text-slate-800 font-bold text-xs uppercase focus:outline-none cursor-pointer"
                />
              </div>
              <div className="h-6 w-[1px] bg-slate-200"></div>
              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black text-slate-400 uppercase">{dateRange.start}</span>
+                <span className="text-[11px] font-semibold text-slate-400 uppercase">{dateRange.start}</span>
                 <span className="text-slate-300">-</span>
-                <span className="text-[11px] font-black text-slate-400 uppercase">{dateRange.end}</span>
+                <span className="text-[11px] font-semibold text-slate-400 uppercase">{dateRange.end}</span>
              </div>
              <Button 
                 onClick={handleExportCSV}
-                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-900 shadow-sm flex gap-2 items-center print:hidden"
+                className="h-8 px-4 rounded-lg bg-slate-800 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-slate-900 shadow-sm flex gap-2 items-center print:hidden"
               >
                 <IconDownload size={12} />
                 CSV
               </Button>
               <Button 
                 onClick={() => setIsPreviewMode(true)}
-                className="h-8 px-4 rounded-lg bg-[#E31E24] text-white font-black text-[11px] uppercase tracking-widest hover:bg-[#c8191f] shadow-sm flex gap-2 items-center print:hidden"
+                className="h-8 px-4 rounded-lg bg-ios-primary text-white font-bold text-[11px] uppercase tracking-widest hover:bg-[#c8191f] shadow-sm flex gap-2 items-center print:hidden"
               >
                 <IconClipboardList size={12} />
                 PDF
@@ -269,7 +269,7 @@ const AttendanceRecap = () => {
               <Button onClick={() => setIsPreviewMode(false)} variant="ghost" className="h-8 text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold">
                 BATAL
               </Button>
-              <Button onClick={() => window.print()} className="h-8 bg-[#E31E24] hover:bg-[#c8191f] text-white text-xs font-bold shadow-sm">
+              <Button onClick={() => window.print()} className="h-8 bg-ios-primary hover:bg-[#c8191f] text-white text-xs font-bold shadow-sm">
                 <IconDownload size={14} className="mr-1" />
                 UNDUH PDF
               </Button>
@@ -279,7 +279,7 @@ const AttendanceRecap = () => {
 
         {/* 🖨️ PRINT HEADER (Visible when printing or in preview mode) */}
         <div className={`${isPreviewMode ? 'block' : 'hidden'} print:block mb-8 border-b-2 border-slate-800 pb-4`}>
-            <h1 className="text-2xl font-black uppercase text-slate-800">PT Wijaya Kreatif Nusantara</h1>
+            <h1 className="text-2xl font-bold uppercase text-slate-800">PT Wijaya Kreatif Nusantara</h1>
             <h2 className="text-lg font-bold text-slate-600">Laporan Rekapitulasi Kehadiran (Attendance Recap)</h2>
             <p className="text-sm text-slate-500 mt-2">Periode: {dateRange.start} s/d {dateRange.end}</p>
         </div>
@@ -287,12 +287,12 @@ const AttendanceRecap = () => {
         {/* 📊 COMPACT STATS BAR */}
         <div className={`flex flex-wrap items-center gap-3 print:hidden ${isPreviewMode ? 'hidden' : ''}`}>
             <div className="flex-1 flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="h-8 w-8 bg-white shadow-sm border-none rounded-lg flex items-center justify-center text-[#E31E24] shadow-sm">
+                <div className="h-8 w-8 bg-white shadow-sm border-none rounded-lg flex items-center justify-center text-ios-primary shadow-sm">
                     <IconCalendarStats size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Base Target</h4>
-                    <p className="text-xs font-black text-slate-800 leading-none">{calculateWorkingDays(dateRange.start, dateRange.end, 0)} <span className="text-[11px] text-slate-400">Days</span></p>
+                    <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">Base Target</h4>
+                    <p className="text-xs font-bold text-slate-800 leading-none">{calculateWorkingDays(dateRange.start, dateRange.end, 0)} <span className="text-[11px] text-slate-400">Days</span></p>
                 </div>
             </div>
 
@@ -301,14 +301,14 @@ const AttendanceRecap = () => {
                     <IconSettings size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                    <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">
                       Holidays <span className="text-amber-500 font-bold">(Auto {autoHolidays} + Adj)</span>
                     </h4>
                     <input 
                         type="number" 
                         value={manualHolidays}
                         onChange={(e) => setManualHolidays(e.target.value)}
-                        className="w-10 bg-transparent border-b border-amber-200 text-xs font-black text-slate-800 focus:outline-none leading-none"
+                        className="w-10 bg-transparent border-b border-amber-200 text-xs font-bold text-slate-800 focus:outline-none leading-none"
                     />
                 </div>
             </div>
@@ -318,19 +318,19 @@ const AttendanceRecap = () => {
                     <IconBriefcase size={16} />
                 </div>
                 <div>
-                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Net Target</h4>
-                    <p className="text-xs font-black text-slate-800 leading-none">{workingDaysTarget} <span className="text-[11px] text-slate-400">Days</span></p>
+                    <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">Net Target</h4>
+                    <p className="text-xs font-bold text-slate-800 leading-none">{workingDaysTarget} <span className="text-[11px] text-slate-400">Days</span></p>
                 </div>
             </div>
 
-            <div className="flex-[2] flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]  group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-                <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
+            <div className="flex-[2] flex items-center gap-3 bg-transparent p-2 px-4 rounded-2xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary  group focus-within:ring-2 focus-within:ring-ios-primary/20">
+                <IconSearch size={14} className="text-slate-300 group-focus-within:text-ios-primary transition-colors" />
                 <input 
                     type="text" 
                     placeholder="Search Personnel..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="bg-transparent border-none w-full text-xs font-black text-slate-700 placeholder:text-slate-300 focus:outline-none uppercase tracking-widest"
+                    className="bg-transparent border-none w-full text-xs font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none uppercase tracking-widest"
                 />
             </div>
         </div>
@@ -341,25 +341,25 @@ const AttendanceRecap = () => {
             <table className="w-full text-left border-collapse min-w-max">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 ">
-                  <th className="px-6 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Employee</th>
-                  <th className="px-6 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Department</th>
-                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Target</th>
-                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Present</th>
-                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Late</th>
-                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Sick/Leave</th>
-                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Absent</th>
-                  <th className="px-6 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider">Overtime (Jam)</th>
-                  <th className="px-6 py-3 text-right text-[11px] font-black text-slate-400 uppercase tracking-wider">Achievement</th>
+                  <th className="px-6 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Employee</th>
+                  <th className="px-6 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Target</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Present</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Late</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Sick/Leave</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Absent</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Overtime (Jam)</th>
+                  <th className="px-6 py-3 text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Achievement</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="py-12 text-center text-xs font-black text-slate-300 uppercase tracking-widest animate-pulse">Syncing Metrics...</td>
+                    <td colSpan="8" className="py-12 text-center text-xs font-bold text-slate-300 uppercase tracking-widest animate-pulse">Syncing Metrics...</td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="py-12 text-center text-xs font-black text-slate-300 uppercase tracking-widest">No matching records found</td>
+                    <td colSpan="8" className="py-12 text-center text-xs font-bold text-slate-300 uppercase tracking-widest">No matching records found</td>
                   </tr>
                 ) : (
                   filteredData.map((emp) => {
@@ -374,32 +374,32 @@ const AttendanceRecap = () => {
                         >
                           <td className="px-6 py-2">
                             <div className="flex items-center gap-3">
-                              <div className="h-8 w-8 rounded-lg bg-[#E31E24]/10 border border-[#E31E24]/5 flex items-center justify-center text-xs font-black text-[#E31E24]">
+                              <div className="h-8 w-8 rounded-lg bg-ios-primary/10 border border-ios-primary/5 flex items-center justify-center text-xs font-bold text-ios-primary">
                                 {emp.name?.charAt(0)}
                               </div>
                               <div>
-                                <p className="text-xs font-black text-slate-800 uppercase tracking-tight leading-none">{emp.name}</p>
-                                <p className="text-[11px] font-bold text-slate-400 uppercase mt-1">{emp.id}</p>
+                                <p className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-none">{emp.name}</p>
+                                <p className="text-[11px] font-semibold text-slate-400 uppercase mt-1">{emp.id}</p>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-2">
-                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{emp.organization}</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{emp.organization}</span>
                           </td>
-                          <td className="px-6 py-2 text-center text-xs font-black text-slate-400">{workingDaysTarget}</td>
-                          <td className="px-6 py-2 text-center text-xs font-black text-emerald-600">{emp.present}</td>
-                          <td className="px-6 py-2 text-center text-xs font-black text-amber-500">
+                          <td className="px-6 py-2 text-center text-xs font-bold text-slate-400">{workingDaysTarget}</td>
+                          <td className="px-6 py-2 text-center text-xs font-bold text-emerald-600">{emp.present}</td>
+                          <td className="px-6 py-2 text-center text-xs font-bold text-amber-500">
                             {emp.late}
                             {emp.late_minutes > 0 && (
                               <span className="block text-[11px] text-rose-500 mt-0.5">({emp.late_minutes}m)</span>
                             )}
                           </td>
-                          <td className="px-6 py-2 text-center text-xs font-black text-indigo-500">{emp.sick + emp.leave}</td>
-                          <td className="px-6 py-2 text-center text-xs font-black text-rose-500">{emp.absent}</td>
-                          <td className="px-6 py-2 text-center text-xs font-black text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
+                          <td className="px-6 py-2 text-center text-xs font-bold text-indigo-500">{emp.sick + emp.leave}</td>
+                          <td className="px-6 py-2 text-center text-xs font-bold text-rose-500">{emp.absent}</td>
+                          <td className="px-6 py-2 text-center text-xs font-bold text-blue-500">{emp.overtime_hours > 0 ? emp.overtime_hours : '-'}</td>
                           <td className="px-6 py-2 text-right">
                             <div className="flex flex-col items-end gap-1">
-                              <span className={`text-xs font-black ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>
+                              <span className={`text-xs font-bold ${achievement >= 95 ? 'text-emerald-600' : achievement >= 80 ? 'text-amber-500' : 'text-rose-500'}`}>
                                 {achievement}%
                               </span>
                               <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden">
@@ -415,18 +415,18 @@ const AttendanceRecap = () => {
                           <tr className="bg-slate-50/50">
                             <td colSpan="9" className="px-6 py-4 border-b border-slate-200">
                               <div className="bg-transparent rounded-xl border border-slate-200 p-4 shadow-sm">
-                                <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-3">Detail Pelanggaran Kehadiran</h4>
+                                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-widest mb-3">Detail Pelanggaran Kehadiran</h4>
                                 {emp.logs && emp.logs.filter(l => l.status !== 'Present').length > 0 ? (
                                   <div className="grid grid-cols-3 gap-3">
                                     {emp.logs.filter(l => l.status !== 'Present').map((log, idx) => (
                                       <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-slate-200 bg-slate-50">
                                         <div>
-                                          <p className="text-xs font-black text-slate-700">{log.date}</p>
-                                          <p className="text-[11px] font-bold text-slate-400 uppercase mt-0.5">{log.status}</p>
+                                          <p className="text-xs font-bold text-slate-700">{log.date}</p>
+                                          <p className="text-[11px] font-semibold text-slate-400 uppercase mt-0.5">{log.status}</p>
                                         </div>
                                         {log.late_minutes > 0 && (
                                           <div className="text-right">
-                                            <span className="text-xs font-black text-rose-500">Telat {log.late_minutes}m</span>
+                                            <span className="text-xs font-bold text-rose-500">Telat {log.late_minutes}m</span>
                                             <p className="text-[11px] text-slate-400 uppercase">{log.clock_in?.slice(0,5)}</p>
                                           </div>
                                         )}

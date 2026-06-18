@@ -43,7 +43,7 @@ const SignaturePad = ({ onSave, onCancel }) => {
         
         {isEmpty && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-xs font-black text-slate-300 uppercase tracking-[0.4em] select-none">Draw Signature Here</p>
+            <p className="text-xs font-bold text-slate-300 uppercase tracking-widest select-none">Draw Signature Here</p>
           </div>
         )}
       </div>
@@ -52,7 +52,7 @@ const SignaturePad = ({ onSave, onCancel }) => {
         <Button 
           variant="outline"
           onClick={clear}
-          className="h-12 w-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-400 hover:text-[#E31E24] transition-all flex items-center justify-center p-0"
+          className="h-12 w-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-400 hover:text-ios-primary transition-all flex items-center justify-center p-0"
         >
           <IconRefresh size={20} />
         </Button>
@@ -60,17 +60,17 @@ const SignaturePad = ({ onSave, onCancel }) => {
         <div className="flex gap-3">
           <Button 
             onClick={onCancel}
-            className="h-12 px-6 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-500 font-black text-xs uppercase tracking-widest hover:shadow-none transition-all"
+            className="h-12 px-6 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-500 font-bold text-xs uppercase tracking-widest hover:shadow-none transition-all"
           >
             Cancel
           </Button>
           <Button 
             onClick={save}
             disabled={isEmpty}
-            className={`h-12 px-8 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex gap-3 items-center
+            className={`h-12 px-8 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all flex gap-3 items-center
               ${isEmpty 
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50' 
-                : 'bg-[#E31E24] text-white shadow-sm hover:bg-[#C1181E]'}`}
+                : 'bg-ios-primary text-white shadow-sm hover:bg-ios-primary/90'}`}
           >
             <IconCheck size={18} />
             Capture Signature

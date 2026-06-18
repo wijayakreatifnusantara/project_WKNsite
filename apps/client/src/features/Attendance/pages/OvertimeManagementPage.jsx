@@ -87,24 +87,24 @@ const OvertimeManagementPage = () => {
       <div className="w-full mx-auto space-y-4">
         
         {/* 🚀 HEADER & FILTER BAR */}
-        <div className="flex items-center justify-between bg-transparent p-2 px-5 rounded-2xl border border-slate-200 shadow-sm ">
+        <div className="flex items-center justify-between ios-card p-3 px-5">
           <div className="flex items-center gap-4">
              <button 
                onClick={() => navigate('/attendance')}
-               className="h-8 w-8 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-[#E31E24] hover:border-[#E31E24]/20 hover:bg-transparent transition-all active:scale-95"
+               className="ios-btn h-8 w-8 rounded-lg bg-white shadow-sm border-none flex items-center justify-center text-slate-400 hover:text-ios-danger transition-all"
              >
                <IconArrowLeft size={16} />
              </button>
-             <div className="h-8 w-8 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+             <div className="h-8 w-8 bg-ios-primary/10 rounded-lg flex items-center justify-center text-ios-primary">
                 <IconClock size={18} />
              </div>
              <div>
-                <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
-                  Overtime <span className="text-[#E31E24]">Management</span>
+                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight leading-none">
+                  Overtime <span className="text-ios-primary">Management</span>
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                   <div className="h-1 w-1 bg-[#E31E24] rounded-full animate-pulse"></div>
-                   <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Overtime requests sync active</span>
+                   <div className="h-1 w-1 bg-ios-primary rounded-full animate-pulse"></div>
+                   <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none">Overtime requests sync active</span>
                 </div>
              </div>
           </div>
@@ -115,7 +115,7 @@ const OvertimeManagementPage = () => {
                     <button 
                       key={s}
                       onClick={() => setFilterStatus(s)}
-                      className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-400 hover:text-slate-600'}`}
+                      className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-transparent shadow-sm text-ios-primary' : 'text-slate-400 hover:text-slate-600'}`}
                     >
                       {s}
                     </button>
@@ -154,71 +154,71 @@ const OvertimeManagementPage = () => {
         </div>
 
         {/* 📜 TABLE VIEW OF OVERTIME REQUESTS */}
-        <div className="bg-white rounded-xl border-none shadow-sm overflow-hidden">
+        <div className="ios-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-max">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-200">
-                  <th className="px-5 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest">Karyawan</th>
-                  <th className="px-5 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest">Tanggal Lembur</th>
-                  <th className="px-5 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest">Jam & Durasi</th>
-                  <th className="px-5 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest">Alasan Lembur</th>
-                  <th className="px-5 py-3 text-center text-[11px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                  <th className="px-5 py-3 text-right text-[11px] font-black text-slate-400 uppercase tracking-widest">Otorisasi</th>
+                  <th className="px-5 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Karyawan</th>
+                  <th className="px-5 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Tanggal Lembur</th>
+                  <th className="px-5 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Jam & Durasi</th>
+                  <th className="px-5 py-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Alasan Lembur</th>
+                  <th className="px-5 py-3 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Otorisasi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading && requests.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="py-12 text-center">
-                       <div className="h-6 w-6 border-2 border-t-transparent border-[#E31E24] rounded-full animate-spin mx-auto mb-2" />
-                       <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Syncing overtime requests...</p>
+                       <div className="h-6 w-6 border-2 border-t-transparent border-ios-primary rounded-full animate-spin mx-auto mb-2" />
+                       <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">Syncing overtime requests...</p>
                     </td>
                   </tr>
                 ) : requests.filter(r => filterStatus === 'All' || (filterStatus === 'Pending' ? r.status?.startsWith('Pending') : r.status === filterStatus)).length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-12 text-center text-slate-300 uppercase font-black text-xs tracking-widest">Tidak ada data lembur di kategori ini</td>
+                    <td colSpan="6" className="py-12 text-center text-slate-300 uppercase font-bold text-xs tracking-widest">Tidak ada data lembur di kategori ini</td>
                   </tr>
                 ) : (
                   requests.filter(r => filterStatus === 'All' || (filterStatus === 'Pending' ? r.status?.startsWith('Pending') : r.status === filterStatus)).map((row) => (
                     <tr key={row.id} className="transition-all group hover:bg-slate-50 transition-colors cursor-pointer">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-black text-[#E31E24]">
+                          <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-ios-primary">
                             {row.employees?.name?.charAt(0) || 'E'}
                           </div>
                           <div>
-                            <p className="text-xs font-black text-slate-800 uppercase leading-none mb-1 group-hover:text-[#E31E24] transition-colors">{row.employees?.name || 'Karyawan'}</p>
-                            <p className="text-[11px] font-bold text-slate-400 tracking-widest uppercase">{row.employees?.division_name || 'Staff'}</p>
+                            <p className="text-xs font-bold text-slate-800 uppercase leading-none mb-1 group-hover:text-ios-primary transition-colors">{row.employees?.name || 'Karyawan'}</p>
+                            <p className="text-[11px] font-semibold text-slate-400 tracking-widest uppercase">{row.employees?.division_name || 'Staff'}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-5 py-2">
-                         <span className="text-xs font-black text-slate-600">
+                         <span className="text-xs font-bold text-slate-600">
                            {new Date(row.date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                          </span>
                       </td>
                       <td className="px-5 py-2">
                         <div className="flex flex-col">
-                           <span className="text-xs font-black text-slate-600 uppercase tracking-tight">
+                           <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">
                              {formatTime(row.start_time)} - {formatTime(row.end_time)}
                            </span>
-                           <span className="text-[11px] font-bold text-[#E31E24] uppercase mt-0.5">{row.duration_hours} Jam Kerja</span>
+                           <span className="text-[11px] font-semibold text-ios-primary uppercase mt-0.5">{row.duration_hours} Jam Kerja</span>
                            
                            {row.attendance && row.attendance.clock_out ? (
-                              <div className="flex items-center gap-1 mt-1.5 bg-white shadow-sm border-none rounded-md px-1.5 py-0.5 w-fit" title={`Clock In: ${formatTime(row.attendance.clock_in)} | Clock Out: ${formatTime(row.attendance.clock_out)}`}>
+                              <div className="flex items-center gap-1 mt-1.5 bg-white shadow-sm border-none rounded-lg px-1.5 py-0.5 w-fit" title={`Clock In: ${formatTime(row.attendance.clock_in)} | Clock Out: ${formatTime(row.attendance.clock_out)}`}>
                                 <IconClock size={10} className="text-slate-400" />
-                                <span className="text-[11px] font-bold text-slate-500 uppercase">
+                                <span className="text-[11px] font-semibold text-slate-500 uppercase">
                                   Absen: {formatTime(row.attendance.clock_in)} - {formatTime(row.attendance.clock_out)}
                                 </span>
                                 {row.end_time > row.attendance.clock_out && (
-                                  <IconAlertCircle size={10} className="text-[#E31E24] ml-1 animate-pulse" data-tooltip="Peringatan Anomali: Jam selesai lembur melebihi jam Clock-Out aktual!" />
+                                  <IconAlertCircle size={10} className="text-ios-primary ml-1 animate-pulse" data-tooltip="Peringatan Anomali: Jam selesai lembur melebihi jam Clock-Out aktual!" />
                                 )}
                               </div>
                            ) : (
-                              <div className="flex items-center gap-1 mt-1.5 bg-rose-50 border border-rose-100 rounded-md px-1.5 py-0.5 w-fit">
-                                <IconAlertCircle size={10} className="text-[#E31E24]" />
-                                <span className="text-[11px] font-bold text-rose-600 uppercase">
+                              <div className="flex items-center gap-1 mt-1.5 bg-rose-50 border border-rose-100 rounded-lg px-1.5 py-0.5 w-fit">
+                                <IconAlertCircle size={10} className="text-ios-primary" />
+                                <span className="text-[11px] font-semibold text-rose-600 uppercase">
                                   Absensi Tidak Ditemukan
                                 </span>
                               </div>
@@ -230,7 +230,7 @@ const OvertimeManagementPage = () => {
                            {row.reason}
                          </p>
                          {row.compensation_type && (
-                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[11px] font-black uppercase tracking-widest bg-slate-50 border-slate-200 text-slate-500">
+                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[11px] font-semibold uppercase tracking-widest bg-slate-50 border-slate-200 text-slate-500">
                                {row.compensation_type == 'Paid' ? '💰 Dibayar (Uang)' : '🏝️ Ditukar Cuti (Time-off)'}
                                {row.multiplier && row.multiplier > 1.5 && (
                                  <span className="text-rose-500 ml-1">• {row.multiplier}x (Libur)</span>
@@ -251,7 +251,7 @@ const OvertimeManagementPage = () => {
                               className="h-7 w-7 rounded-lg bg-white shadow-sm border-none shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-transparent transition-all active:scale-95 shrink-0"
                               data-tooltip="Unduh PDF TTD Resmi"
                             >
-                              <IconFileText size={14} className="text-[#E31E24]" />
+                              <IconFileText size={14} className="text-ios-primary" />
                             </a>
                           )}
                           {row.status?.startsWith('Pending') ? (
@@ -314,10 +314,10 @@ const StatCard = ({ title, value, unit = "", icon, color }) => {
         {icon}
       </div>
       <div>
-        <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">{title}</p>
+        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">{title}</p>
         <div className="flex items-baseline gap-1">
-          <h3 className="text-sm font-black text-slate-800 leading-none">{value}</h3>
-          {unit && <span className="text-[11px] font-black text-slate-400 uppercase">{unit}</span>}
+          <h3 className="text-sm font-bold text-slate-800 leading-none">{value}</h3>
+          {unit && <span className="text-[11px] font-semibold text-slate-400 uppercase">{unit}</span>}
         </div>
       </div>
     </Card>

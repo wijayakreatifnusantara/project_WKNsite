@@ -102,8 +102,8 @@ const OrgChart = () => {
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
-          <IconLoader2 size={40} className="animate-spin text-[#E31E24]" />
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Constructing Neural Map...</p>
+          <IconLoader2 size={40} className="animate-spin text-ios-primary" />
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Constructing Neural Map...</p>
         </div>
       </div>
     );
@@ -114,16 +114,16 @@ const OrgChart = () => {
       {/* Chart Header */}
       <header className="h-20 bg-white/90  border-b border-white flex items-center justify-between px-10 shrink-0 z-20 sticky top-0 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
+          <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-ios-primary border border-white">
             <IconHierarchy2 size={20} />
           </div>
           <div>
-            <h1 className="text-sm font-black text-slate-800 font-outfit uppercase tracking-tight">Organization Neural Structure</h1>
+            <h1 className="text-sm font-bold text-slate-800 font-outfit uppercase tracking-tight">Organization Neural Structure</h1>
             <div className="flex items-center gap-2">
-               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest opacity-70">Interactive Canvas • </p>
+               <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest opacity-70">Interactive Canvas • </p>
                <div className="flex items-center gap-1">
                   <IconHandGrab size={10} className="text-slate-400" />
-                  <span className="text-[11px] font-black text-[#E31E24] uppercase tracking-widest">Drag to Pan</span>
+                  <span className="text-[11px] font-semibold text-ios-primary uppercase tracking-widest">Drag to Pan</span>
                </div>
             </div>
           </div>
@@ -131,26 +131,26 @@ const OrgChart = () => {
 
         <div className="flex items-center gap-6">
           <div className="relative group">
-            <IconSearch size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#E31E24] transition-colors" />
+            <IconSearch size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-ios-primary transition-colors" />
             <input 
               type="text" 
               placeholder="SEARCH..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-48 h-9 pl-10 pr-4 bg-white shadow-sm border-none rounded-xl text-xs font-black text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all uppercase tracking-widest"
+              className="w-48 h-9 pl-10 pr-4 bg-white shadow-sm border-none rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all uppercase tracking-widest"
             />
           </div>
 
           <div className="flex items-center gap-2 bg-white shadow-sm p-1 rounded-xl border-white border">
-            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-transparent transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => handleZoom(-0.1)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-transparent transition-all text-slate-400 hover:text-ios-primary">
               <IconZoomOut size={14} />
             </button>
-            <span className="text-xs font-black text-slate-500 min-w-[40px] text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-transparent transition-all text-slate-400 hover:text-[#E31E24]">
+            <span className="text-xs font-bold text-slate-500 min-w-[40px] text-center">{Math.round(zoom * 100)}%</span>
+            <button onClick={() => handleZoom(0.1)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-transparent transition-all text-slate-400 hover:text-ios-primary">
               <IconZoomIn size={14} />
             </button>
             <div className="w-[1px] h-4 bg-slate-200 mx-0.5"></div>
-            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-transparent transition-all text-slate-400 hover:text-[#E31E24]">
+            <button onClick={() => setZoom(0.8)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-transparent transition-all text-slate-400 hover:text-ios-primary">
               <IconMaximize size={14} />
             </button>
           </div>
@@ -173,17 +173,17 @@ const OrgChart = () => {
           {employees.length === 0 ? (
             <div className="bg-transparent p-12 rounded-[3rem] shadow-sm text-center border-2 border-dashed border-slate-200">
               <IconUsers size={48} className="text-slate-200 mx-auto mb-4" />
-              <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No Personnel Data Found</p>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Personnel Data Found</p>
             </div>
           ) : (
             <>
               {/* Root Node: Company (More Compact) */}
               <div className="bg-transparent shadow-sm rounded-2xl border-[4px] border-white p-6 w-[280px] text-center mb-16 relative">
-                <div className="h-14 w-14 bg-white shadow-sm rounded-xl flex items-center justify-center mx-auto mb-4 border border-slate-200 text-[#E31E24]">
+                <div className="h-14 w-14 bg-white shadow-sm rounded-xl flex items-center justify-center mx-auto mb-4 border border-slate-200 text-ios-primary">
                   <IconBuildingSkyscraper size={28} />
                 </div>
-                <h2 className="text-base font-black text-slate-800 uppercase tracking-tight font-outfit">PT. Wijaya Karya Nusantara</h2>
-                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1">HQ Master Node</p>
+                <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight font-outfit">PT. Wijaya Karya Nusantara</h2>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1">HQ Master Node</p>
                 
                 {/* Spine */}
                 <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-1 h-16 bg-gradient-to-b from-slate-200 to-transparent"></div>
@@ -200,8 +200,8 @@ const OrgChart = () => {
                           <IconUsers size={20} />
                         </div>
                         <div>
-                          <h3 className="text-xs font-black text-slate-800 uppercase tracking-tight leading-tight">{dept}</h3>
-                          <p className="text-[11px] font-black text-[#E31E24] uppercase mt-0.5">{staff.length} Units</p>
+                          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-tight">{dept}</h3>
+                          <p className="text-[11px] font-semibold text-ios-primary uppercase mt-0.5">{staff.length} Units</p>
                         </div>
                       </div>
                       <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-8 bg-slate-200"></div>
@@ -212,19 +212,19 @@ const OrgChart = () => {
                       {staff.filter(e => !searchTerm || e["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 15).map((emp) => (
                         <div 
                           key={emp["EMPLOYEE ID"]} 
-                          className={`group bg-white/80 shadow-sm rounded-xl border border-slate-200 p-3 w-[200px] flex items-center gap-3 hover:translate-x-1 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-2 ring-[#E31E24] bg-red-50' : ''}`}
+                          className={`group bg-white/80 shadow-sm rounded-xl border border-slate-200 p-3 w-[200px] flex items-center gap-3 hover:translate-x-1 transition-all cursor-default ${searchTerm && emp["EMPLOYEE NAME"].toLowerCase().includes(searchTerm.toLowerCase()) ? 'ring-2 ring-ios-primary bg-red-50' : ''}`}
                         >
-                          <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-xs font-black text-[#E31E24] shrink-0">
+                          <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center text-xs font-bold text-ios-primary shrink-0">
                             {emp["EMPLOYEE NAME"].split(' ').map(n => n[0]).join('')}
                           </div>
                           <div className="flex-1 overflow-hidden text-left">
-                            <h4 className="text-xs font-black text-slate-800 uppercase truncate leading-none mb-1">{emp["EMPLOYEE NAME"]}</h4>
-                            <p className="text-[11px] font-bold text-slate-400 uppercase truncate">{emp["Job Position *"]}</p>
+                            <h4 className="text-xs font-bold text-slate-800 uppercase truncate leading-none mb-1">{emp["EMPLOYEE NAME"]}</h4>
+                            <p className="text-[11px] font-semibold text-slate-400 uppercase truncate">{emp["Job Position *"]}</p>
                           </div>
                         </div>
                       ))}
                       {staff.length > 15 && (
-                        <div className="text-[11px] font-black text-slate-300 uppercase tracking-widest py-2">
+                        <div className="text-[11px] font-semibold text-slate-300 uppercase tracking-widest py-2">
                           +{staff.length - 15} More Nodes
                         </div>
                       )}
@@ -242,11 +242,11 @@ const OrgChart = () => {
          <div className="bg-white/90 backdrop-blur shadow-sm rounded-2xl p-4 border border-white flex flex-col gap-3">
             <div className="flex items-center gap-3">
                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-               <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Division Node</span>
+               <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest">Division Node</span>
             </div>
             <div className="flex items-center gap-3">
                <IconArrowsMove size={12} className="text-slate-400" />
-               <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Hold Left-Click to Move Canvas</span>
+               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Hold Left-Click to Move Canvas</span>
             </div>
          </div>
       </div>

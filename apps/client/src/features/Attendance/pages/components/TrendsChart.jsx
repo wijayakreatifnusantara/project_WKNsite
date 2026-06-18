@@ -7,8 +7,8 @@ const TrendsChart = ({ data, loading, height = 300 }) => {
     <div style={{ height }} className="w-full relative">
         {loading ? (
           <div className="h-full w-full flex flex-col items-center justify-center">
-            <Loader2 size={24} className="text-[#E31E24] animate-spin opacity-20 mb-2" />
-            <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">Analyzing Vectors...</p>
+            <Loader2 size={24} className="text-ios-primary animate-spin opacity-20 mb-2" />
+            <p className="text-[11px] font-semibold text-slate-300 uppercase tracking-widest">Analyzing Vectors...</p>
           </div>
         ) : data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
@@ -67,7 +67,7 @@ const TrendsChart = ({ data, loading, height = 300 }) => {
           </ResponsiveContainer>
         ) : (
           <div className="h-full w-full flex flex-col items-center justify-center opacity-40">
-            <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">No Intelligence Data</p>
+            <p className="text-[11px] font-semibold text-slate-300 uppercase tracking-widest">No Intelligence Data</p>
           </div>
         )}
     </div>

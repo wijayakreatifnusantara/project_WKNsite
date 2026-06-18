@@ -134,7 +134,7 @@ const LiveTracking = () => {
                   <div className="p-1">
                     <h3 className="font-bold text-slate-800 text-sm">{emp.name}</h3>
                     <p className="text-xs text-slate-500 mb-2">{emp.job_position} • {emp.division_name}</p>
-                    <div className="flex items-center gap-1.5 text-xs bg-slate-50 p-2 rounded-md border border-slate-200">
+                    <div className="flex items-center gap-1.5 text-xs bg-slate-50 p-2 rounded-lg border border-slate-200">
                       <IconMapPin size={12} className="text-rose-500" />
                       <span className="text-slate-600">
                         Diperbarui: <strong className="text-slate-800">{dayjs().to(dayjs(emp.last_location_update))}</strong>

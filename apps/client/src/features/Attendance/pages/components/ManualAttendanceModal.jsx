@@ -69,23 +69,23 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
       <div className="w-full max-w-md bg-white border-white border-[4px] shadow-sm rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-[#E31E24] transition-all"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-ios-primary transition-all"
         >
           <IconX size={20} />
         </button>
 
         <div className="mb-8">
-          <h3 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight flex items-center gap-3">
-            <IconClock size={24} className="text-[#E31E24]" />
+          <h3 className="text-xl font-bold text-slate-800 font-outfit uppercase tracking-tight flex items-center gap-3">
+            <IconClock size={24} className="text-ios-primary" />
             Manual Attendance
           </h3>
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Administrative Correction Override</p>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Administrative Correction Override</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Employee Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-2">
               <IconUser size={12} />
               Select Personnel
             </label>
@@ -105,7 +105,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="grid grid-cols-2 gap-4">
             {/* Date Selection */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-2">
                 <IconCalendar size={12} />
                 Date
               </label>
@@ -120,7 +120,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
 
             {/* Status Selection */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-2">
                 <IconCheck size={12} />
                 Status
               </label>
@@ -141,7 +141,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="grid grid-cols-2 gap-4">
             {/* Clock In */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-2">
                 Clock In
               </label>
               <input 
@@ -153,7 +153,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             {/* Clock Out */}
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-2">
                 Clock Out
               </label>
               <input 
@@ -167,7 +167,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
 
           {/* Notes */}
           <div className="space-y-2">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-2">
               <IconNote size={12} />
               Reason / Notes
             </label>
@@ -182,7 +182,7 @@ const ManualAttendanceModal = ({ isOpen, onClose, onSuccess }) => {
           <Button 
             type="submit"
             disabled={loading}
-            className="w-full h-14 mt-4 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-wider shadow-sm hover:bg-[#C1181E] transition-all flex gap-3 items-center justify-center"
+            className="w-full h-14 mt-4 rounded-2xl bg-ios-primary text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:bg-ios-primary/90 transition-all flex gap-3 items-center justify-center"
           >
             {loading ? 'Processing...' : 'Authorize Manual Entry'}
           </Button>

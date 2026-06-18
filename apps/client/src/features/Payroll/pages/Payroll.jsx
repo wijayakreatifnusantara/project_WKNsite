@@ -73,10 +73,10 @@ const Payroll = () => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-white animate-fade-in">
       {/* Page Header */}
-      <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0 shadow-sm z-10">
+      <header className="h-20 ios-glass flex items-center justify-between px-10 shrink-0 z-10 sticky top-0">
         <div className="flex flex-col leading-none">
-          <h2 className="text-xl font-black text-slate-800 font-outfit uppercase tracking-tight">Treasury Operations</h2>
-          <p className="text-xs text-slate-400 font-black mt-1.5 uppercase tracking-[0.3em] opacity-70">
+          <h2 className="text-xl font-bold text-slate-800 font-outfit uppercase tracking-tight">Treasury Operations</h2>
+          <p className="text-xs text-slate-400 font-bold mt-1.5 uppercase tracking-widest opacity-70">
             {currentPeriod ? `Active Cycle: ${dayjs(currentPeriod).format('MMMM YYYY')}` : 'Salary Disbursements & Tax Engine'}
           </p>
         </div>
@@ -85,14 +85,14 @@ const Payroll = () => {
             <Button 
               onClick={handleFinalize}
               variant="outline" 
-              className="h-12 px-6 rounded-2xl bg-green-50 shadow-sm border-white border-2 text-green-600 font-black text-xs uppercase tracking-widest flex gap-2 transition-all"
+              className="ios-btn h-10 px-6 rounded-xl bg-green-50 shadow-sm border border-green-200 text-green-600 font-bold text-xs flex gap-2 items-center"
             >
               <IconCircleCheck size={18} /> Finalize Run
             </Button>
           )}
           <Button 
             onClick={() => setIsModalOpen(true)}
-            className="h-12 px-6 rounded-2xl bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest shadow-sm flex gap-2 transition-all"
+            className="ios-btn h-10 px-6 rounded-xl bg-ios-primary text-white font-bold text-xs shadow-sm flex gap-2 items-center"
           >
             <IconPlus size={18} /> Run Logic
           </Button>
@@ -134,24 +134,24 @@ const Payroll = () => {
           </div>
 
           {/* Table Area (Neumorphic Component) */}
-          <Card className="border-white border-4 shadow-sm bg-white rounded-[2.5rem] overflow-hidden">
+          <Card className="ios-card overflow-hidden">
             <CardHeader className="p-8 border-b border-slate-200 flex flex-row items-center justify-between">
               <div className="flex items-center gap-6">
-                <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-wider">Disbursement List</CardTitle>
+                <CardTitle className="text-sm font-bold text-slate-800 uppercase tracking-wider">Disbursement List</CardTitle>
                 <div className="h-12 w-80 relative group hidden md:block">
-                  <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
+                  <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-ios-primary transition-colors" />
                   <input 
                     type="text" 
                     placeholder="Search personnel or ID..." 
-                    className="w-full h-full pl-12 pr-6 bg-white shadow-sm border-none rounded-2xl text-[11px] font-bold text-slate-700 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                    className="w-full h-full pl-12 pr-6 bg-white shadow-sm border-none rounded-2xl text-[11px] font-semibold text-slate-700 focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
                   />
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-white shadow-sm rounded-2xl transition-all hover:text-[#E31E24] active:shadow-none">
+                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-white shadow-sm rounded-2xl transition-all hover:text-ios-primary active:shadow-none">
                   <IconFilter size={18} />
                 </button>
-                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-white shadow-sm rounded-2xl transition-all hover:text-[#E31E24] active:shadow-none">
+                <button className="h-12 w-12 flex items-center justify-center text-slate-400 bg-white shadow-sm rounded-2xl transition-all hover:text-ios-primary active:shadow-none">
                   <IconTableExport size={18} />
                 </button>
               </div>
@@ -161,20 +161,20 @@ const Payroll = () => {
                 <table className="w-full text-left border-collapse min-w-max">
                   <thead>
                     <tr className="bg-white/30">
-                      <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Employee</th>
-                      <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Tax Cat</th>
-                      <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Gross Salary</th>
-                      <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Deductions</th>
-                      <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Net Salary</th>
-                      <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Action</th>
+                      <th className="px-8 py-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Employee</th>
+                      <th className="px-8 py-5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">Tax Cat</th>
+                      <th className="px-8 py-5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Gross Salary</th>
+                      <th className="px-8 py-5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Deductions</th>
+                      <th className="px-8 py-5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Net Salary</th>
+                      <th className="px-8 py-5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/20">
                     {loading ? (
                       <tr>
                         <td colSpan="6" className="py-20 text-center">
-                          <IconLoader2 className="animate-spin mx-auto text-[#E31E24] mb-4" size={32} />
-                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Processing Calculation Engine...</p>
+                          <IconLoader2 className="animate-spin mx-auto text-ios-primary mb-4" size={32} />
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Processing Calculation Engine...</p>
                         </td>
                       </tr>
                     ) : displayData.length > 0 ? (
@@ -188,7 +188,7 @@ const Payroll = () => {
                     ) : (
                       <tr>
                         <td colSpan="6" className="py-20 text-center">
-                          <p className="text-xs font-black text-slate-300 uppercase tracking-widest">No payroll records found for this period</p>
+                          <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">No payroll records found for this period</p>
                         </td>
                       </tr>
                     )}
@@ -196,10 +196,10 @@ const Payroll = () => {
                 </table>
               </div>
               <div className="p-6 border-t border-slate-200 flex items-center justify-between">
-                <p className="text-xs text-slate-400 font-black uppercase tracking-widest">Active Pool: {displayData.length} records</p>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Active Pool: {displayData.length} records</p>
                 <div className="flex gap-3">
-                  <Button variant="outline" size="sm" className="h-10 px-5 text-xs font-black uppercase tracking-widest rounded-xl bg-white shadow-sm border-white border-2 disabled:opacity-30" disabled>Prev</Button>
-                  <Button variant="outline" size="sm" className="h-10 px-5 text-xs font-black uppercase tracking-widest rounded-xl bg-white shadow-sm border-white border-2">Next</Button>
+                  <Button variant="outline" size="sm" className="h-10 px-5 text-xs font-bold uppercase tracking-widest rounded-xl bg-white shadow-sm border-white border-2 disabled:opacity-30" disabled>Prev</Button>
+                  <Button variant="outline" size="sm" className="h-10 px-5 text-xs font-bold uppercase tracking-widest rounded-xl bg-white shadow-sm border-white border-2">Next</Button>
                 </div>
               </div>
             </CardContent>
@@ -222,23 +222,23 @@ const KPICard = ({ title, value, subtitle, icon, trend, positive, color = "blue"
   const colors = {
     blue: "text-blue-500 shadow-sm",
     amber: "text-amber-500 shadow-sm",
-    indigo: "text-[#E31E24] shadow-sm",
+    indigo: "text-ios-primary shadow-sm",
   };
 
   return (
-    <Card className="border-white border-2 shadow-sm bg-white rounded-2xl p-8 hover:scale-[1.02] transition-all cursor-pointer group">
+    <Card className="ios-card p-6 cursor-pointer group">
       <div className="flex justify-between items-start mb-6">
         <div className={`h-14 w-14 rounded-2xl flex items-center justify-center bg-white ${colors[color]} group-hover:scale-110 transition-transform duration-300`}>
           {icon}
         </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-sm text-xs font-black ${positive ? 'text-green-500' : 'text-rose-500'}`}>
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-sm text-xs font-bold ${positive ? 'text-green-500' : 'text-rose-500'}`}>
           {trend}
           {positive ? <IconArrowUpRight size={14} /> : <IconArrowDownRight size={14} />}
         </div>
       </div>
       <div className="space-y-1 leading-none">
-        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] opacity-80">{title}</p>
-        <h3 className="text-2xl font-black text-slate-800 tracking-tight font-outfit">{value}</h3>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider opacity-80">{title}</p>
+        <h3 className="text-2xl font-bold text-slate-800 tracking-tight font-outfit">{value}</h3>
         <p className="text-xs text-slate-400 font-bold pt-2 uppercase tracking-widest opacity-60">{subtitle}</p>
       </div>
     </Card>
@@ -298,34 +298,34 @@ const PayrollRow = ({ data, formatIDR }) => {
     <tr className="group hover:bg-white/40 transition-all cursor-pointer">
       <td className="px-8 py-4 border-b border-slate-200">
         <div className="flex items-center gap-4">
-          <div className="h-10 w-10 bg-white rounded-xl shadow-sm border-2 border-white flex items-center justify-center text-slate-400 font-black text-[11px] uppercase group-hover:text-[#E31E24] transition-colors">
+          <div className="h-10 w-10 bg-white rounded-xl shadow-sm border-2 border-white flex items-center justify-center text-slate-400 font-bold text-[11px] uppercase group-hover:text-ios-primary transition-colors">
             {name.charAt(0)}
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-[11px] font-black text-slate-800 group-hover:text-[#E31E24] transition-colors uppercase tracking-tight">{name}</span>
-            <span className="text-[11px] text-slate-400 font-black uppercase tracking-tighter mt-1">{id}</span>
+            <span className="text-[11px] font-semibold text-slate-800 group-hover:text-ios-primary transition-colors uppercase tracking-tight">{name}</span>
+            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-tighter mt-1">{id}</span>
           </div>
         </div>
       </td>
       <td className="px-8 py-4 border-b border-slate-200 text-center">
-        <span className={`px-3 py-1 rounded-lg bg-white shadow-sm text-xs font-black uppercase tracking-widest text-slate-500`}>
+        <span className={`px-3 py-1 rounded-lg bg-white shadow-sm text-xs font-bold uppercase tracking-widest text-slate-500`}>
           Cat {category}
         </span>
       </td>
-      <td className="px-8 py-4 border-b border-slate-200 text-right text-[11px] font-bold text-slate-500 uppercase tracking-tight">
+      <td className="px-8 py-4 border-b border-slate-200 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-tight">
         {formatIDR(gross_salary)}
       </td>
-      <td className="px-8 py-4 border-b border-slate-200 text-right text-[11px] font-black text-rose-500/70">
+      <td className="px-8 py-4 border-b border-slate-200 text-right text-[11px] font-semibold text-rose-500/70">
         - {formatIDR(totalDeductions)}
       </td>
       <td className="px-8 py-4 border-b border-slate-200 text-right">
-        <span className="text-[12px] font-black text-slate-900 font-outfit">{formatIDR(net_salary)}</span>
+        <span className="text-[12px] font-bold text-slate-900 font-outfit">{formatIDR(net_salary)}</span>
       </td>
       <td className="px-8 py-4 border-b border-slate-200 text-center">
         <button 
           onClick={handleDownloadPDF}
           disabled={isGenerating}
-          className="h-10 w-10 mx-auto flex items-center justify-center text-slate-300 hover:text-[#E31E24] transition-colors disabled:opacity-50"
+          className="h-10 w-10 mx-auto flex items-center justify-center text-slate-300 hover:text-ios-primary transition-colors disabled:opacity-50"
         >
           {isGenerating ? <IconLoader2 size={18} className="animate-spin" /> : <IconDownload size={20} />}
         </button>

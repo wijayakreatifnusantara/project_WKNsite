@@ -28,18 +28,18 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
         {/* Header */}
         <header className="h-20 bg-white border-b-2 border-white flex items-center justify-between px-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-[#E31E24]">
+            <div className="h-10 w-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-ios-primary">
               <IconId size={24} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-slate-800 font-outfit uppercase tracking-tight">Smart ID Generator</h1>
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest opacity-70">Corporate Identity Studio</p>
+              <h1 className="text-lg font-bold text-slate-800 font-outfit uppercase tracking-tight">Smart ID Generator</h1>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider opacity-70">Corporate Identity Studio</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Button 
               onClick={handlePrint}
-              className="h-11 px-5 rounded-xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-3"
+              className="h-11 px-5 rounded-xl bg-ios-primary text-white font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-ios-primary/90 transition-all flex gap-3"
             >
               <IconPrinter size={16} />
               Print Card
@@ -62,23 +62,23 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
               {/* Header Logo */}
               <div className="flex flex-col items-center mb-10">
                 <img src="/assets/wkn_logo.png" alt="WKN" className="h-10 w-auto object-contain mb-2" />
-                <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.3em] leading-none">WIJAYA KARYA</h3>
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest leading-none">WIJAYA KARYA</h3>
               </div>
 
               {/* Avatar Slot */}
               <div className="h-32 w-32 bg-white shadow-sm rounded-2xl border-4 border-white flex items-center justify-center mb-8 relative group">
-                <div className="text-4xl font-black text-slate-300 uppercase select-none group-hover:scale-110 transition-transform">
+                <div className="text-4xl font-bold text-slate-300 uppercase select-none group-hover:scale-110 transition-transform">
                   {employee["EMPLOYEE NAME"]?.split(' ').map(n => n[0]).join('')}
                 </div>
-                <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-[#E31E24] rounded-xl flex items-center justify-center text-white shadow-sm border-4 border-white">
+                <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-ios-primary rounded-xl flex items-center justify-center text-white shadow-sm border-4 border-white">
                   <IconShieldCheck size={20} />
                 </div>
               </div>
 
               {/* Employee Info */}
               <div className="space-y-2 mb-10">
-                <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight leading-none">{employee["EMPLOYEE NAME"]}</h2>
-                <p className="text-xs font-black text-[#E31E24] uppercase tracking-widest">{employee["Job Position *"]}</p>
+                <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight leading-none">{employee["EMPLOYEE NAME"]}</h2>
+                <p className="text-xs font-bold text-ios-primary uppercase tracking-widest">{employee["Job Position *"]}</p>
               </div>
 
               {/* ID Barcode / QR Placeholder */}
@@ -87,27 +87,27 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
                   <IconQrcode size={64} className="text-slate-800" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Identity Number</span>
-                  <span className="text-[12px] font-black text-slate-700 tracking-wider mt-1">{employee["EMPLOYEE ID"]}</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest leading-none">Identity Number</span>
+                  <span className="text-[12px] font-bold text-slate-700 tracking-wider mt-1">{employee["EMPLOYEE ID"]}</span>
                 </div>
               </div>
 
               {/* Decoration */}
-              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#E31E24] opacity-5 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-ios-primary opacity-5 rounded-full blur-3xl"></div>
             </div>
 
             {/* BACK CARD */}
             <div className="relative w-[320px] h-[500px] bg-white shadow-sm rounded-[2.5rem] border-[6px] border-white overflow-hidden flex flex-col p-10 items-center justify-between">
               <div className="w-full">
-                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 border-b-2 border-white pb-4">Terms & Conditions</h3>
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest mb-6 border-b-2 border-white pb-4">Terms & Conditions</h3>
                 <div className="space-y-4 text-left">
-                  <p className="text-[11px] font-bold text-slate-400 leading-relaxed italic">
+                  <p className="text-[11px] font-semibold text-slate-400 leading-relaxed italic">
                     1. This identity card is strictly for official use within PT. WIJAYA KARYA NUSANTARA premises.
                   </p>
-                  <p className="text-[11px] font-bold text-slate-400 leading-relaxed italic">
+                  <p className="text-[11px] font-semibold text-slate-400 leading-relaxed italic">
                     2. If found, please return to the nearest HR department or office location mentioned below.
                   </p>
-                  <p className="text-[11px] font-bold text-slate-400 leading-relaxed italic">
+                  <p className="text-[11px] font-semibold text-slate-400 leading-relaxed italic">
                     3. Misuse of this card may result in disciplinary actions as per corporate policy.
                   </p>
                 </div>
@@ -115,22 +115,22 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
 
               <div className="w-full space-y-4 pt-6 border-t-2 border-white">
                 <div className="flex items-center gap-3">
-                  <IconBuildingSkyscraper size={14} className="text-[#E31E24]" />
-                  <span className="text-[11px] font-black text-slate-500 uppercase">WKN Tower, Jakarta Selatan, ID</span>
+                  <IconBuildingSkyscraper size={14} className="text-ios-primary" />
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase">WKN Tower, Jakarta Selatan, ID</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <IconPhone size={14} className="text-[#E31E24]" />
-                  <span className="text-[11px] font-black text-slate-500 uppercase">+62 21 555 0123</span>
+                  <IconPhone size={14} className="text-ios-primary" />
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase">+62 21 555 0123</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <IconWorld size={14} className="text-[#E31E24]" />
-                  <span className="text-[11px] font-black text-slate-500 uppercase">www.wijayakn.com</span>
+                  <IconWorld size={14} className="text-ios-primary" />
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase">www.wijayakn.com</span>
                 </div>
               </div>
 
               <div className="mt-6 flex flex-col items-center">
                 <div className="h-10 w-full bg-white shadow-sm rounded-lg flex items-center justify-center px-4">
-                  <span className="text-xs font-black text-slate-400 tracking-[0.5em] uppercase">Security Verified</span>
+                  <span className="text-xs font-bold text-slate-400 tracking-widest uppercase">Security Verified</span>
                 </div>
               </div>
             </div>
@@ -148,7 +148,7 @@ const IDCardGenerator = ({ isOpen, onClose, employee }) => {
              {employee["EMPLOYEE NAME"]?.split(' ').map(n => n[0]).join('')}
            </div>
            <h2 className="text-sm font-bold uppercase">{employee["EMPLOYEE NAME"]}</h2>
-           <p className="text-[11px] font-bold text-red-600 uppercase mb-4">{employee["Job Position *"]}</p>
+           <p className="text-[11px] font-semibold text-red-600 uppercase mb-4">{employee["Job Position *"]}</p>
            <IconQrcode size={32} />
            <p className="text-xs font-mono mt-2">{employee["EMPLOYEE ID"]}</p>
         </div>

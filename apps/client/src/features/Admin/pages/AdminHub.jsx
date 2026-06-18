@@ -34,12 +34,12 @@ const AdminHub = () => {
       <div className="bg-[#f8fafc]/95 backdrop-blur-xl border-b border-slate-200 z-10 shrink-0">
         <div className="max-w-[1400px] mx-auto p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
+            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-ios-primary border border-slate-200">
               <IconShieldCheck size={22} stroke={2.5} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-slate-800 tracking-tighter uppercase leading-none">Administrasi Sistem</h1>
-              <p className="text-[11px] font-black text-[#E31E24] uppercase tracking-wider mt-0.5 opacity-80">Security & Core Configurations</p>
+              <h1 className="text-lg font-bold text-slate-800 tracking-tighter uppercase leading-none">Administrasi Sistem</h1>
+              <p className="text-[11px] font-semibold text-ios-primary uppercase tracking-wider mt-0.5 opacity-80">Security & Core Configurations</p>
             </div>
           </div>
 
@@ -51,13 +51,13 @@ const AdminHub = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all duration-300 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                     isActive 
-                      ? 'bg-transparent shadow-sm border border-slate-200/50 text-[#E31E24]' 
+                      ? 'bg-transparent shadow-sm border border-slate-200/50 text-ios-primary' 
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  <span className={`transition-transform duration-300 ${isActive ? 'scale-110 text-[#E31E24]' : 'text-slate-400'}`}>
+                  <span className={`transition-transform duration-300 ${isActive ? 'scale-110 text-ios-primary' : 'text-slate-400'}`}>
                     {tab.icon}
                   </span>
                   <span>{tab.label}</span>

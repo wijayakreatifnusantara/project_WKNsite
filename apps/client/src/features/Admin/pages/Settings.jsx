@@ -288,8 +288,8 @@ const Settings = () => {
   const SettingRow = ({ label, desc, children }) => (
     <div className="flex items-center justify-between py-3 border-b border-slate-200 last:border-0">
       <div className="space-y-0.5">
-        <p className="text-xs font-black text-slate-800 uppercase tracking-widest">{label}</p>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{desc}</p>
+        <p className="text-xs font-bold text-slate-800 uppercase tracking-widest">{label}</p>
+        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-tighter">{desc}</p>
       </div>
       <div>{children}</div>
     </div>
@@ -301,14 +301,14 @@ const Settings = () => {
       placeholder={placeholder}
       value={value ?? ''}
       onChange={onChange}
-      className="h-8 w-48 bg-white shadow-sm border-none rounded-lg px-3 text-xs font-bold text-slate-700 font-mono focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+      className="h-8 w-48 bg-white shadow-sm border-none rounded-lg px-3 text-xs font-bold text-slate-700 font-mono focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
     />
   );
 
   const CompactToggle = ({ active, onClick }) => (
     <div 
       onClick={onClick}
-      className={`w-8 h-4 rounded-full p-0.5 transition-all cursor-pointer ${active ? 'bg-[#E31E24]' : 'bg-slate-300'}`}
+      className={`w-8 h-4 rounded-full p-0.5 transition-all cursor-pointer ${active ? 'bg-ios-primary' : 'bg-slate-300'}`}
     >
       <div className={`h-3 w-3 bg-transparent rounded-full transition-all shadow-sm ${active ? 'translate-x-4' : 'translate-x-0'}`}></div>
     </div>
@@ -317,8 +317,8 @@ const Settings = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 p-4 bg-[#f8fafc]">
-        <IconLoader2 className="animate-spin text-[#E31E24]" size={36} />
-        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading System settings...</p>
+        <IconLoader2 className="animate-spin text-ios-primary" size={36} />
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Loading System settings...</p>
       </div>
     );
   }
@@ -330,19 +330,19 @@ const Settings = () => {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-white">
+            <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-ios-primary border border-white">
               <IconSettings size={20} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">System Intelligence Center</h1>
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Global Configuration & Control Panel</p>
+              <h1 className="text-lg font-bold text-slate-800 tracking-tight uppercase leading-none">System Intelligence Center</h1>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Global Configuration & Control Panel</p>
             </div>
           </div>
           
           <Button 
             onClick={handleSave} 
             disabled={isSaving}
-            className="h-10 px-6 bg-[#E31E24] hover:bg-[#C1181E] text-white font-black text-xs uppercase tracking-widest rounded-lg shadow-sm transition-all active:scale-95"
+            className="h-10 px-6 bg-ios-primary hover:bg-ios-primary/90 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-sm transition-all active:scale-95"
           >
             {isSaving ? <IconLoader2 className="animate-spin mr-2" size={14} /> : <IconDeviceFloppy className="mr-2" size={14} />}
             Synchronize Config
@@ -352,7 +352,7 @@ const Settings = () => {
         {message.text && (
           <div className={`p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
             {message.type === 'success' ? <IconCheck size={16} /> : <IconAlertCircle size={16} />}
-            <span className="text-xs font-black uppercase tracking-widest">{message.text}</span>
+            <span className="text-xs font-bold uppercase tracking-widest">{message.text}</span>
           </div>
         )}
 
@@ -360,7 +360,7 @@ const Settings = () => {
           
           {/* CATEGORY NAV */}
           <div className="lg:col-span-1 space-y-2">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1 mb-2">Modules</h3>
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-1 mb-2">Modules</h3>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -371,11 +371,11 @@ const Settings = () => {
                   : 'bg-transparent border-transparent hover:bg-slate-100/50 hover:translate-x-0.5'
                 }`}
               >
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all border ${activeTab === tab.id ? 'bg-[#E31E24] border-[#E31E24] text-white shadow-sm' : 'bg-transparent border-slate-200 text-slate-400 shadow-sm'}`}>
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all border ${activeTab === tab.id ? 'bg-ios-primary border-ios-primary text-white shadow-sm' : 'bg-transparent border-slate-200 text-slate-400 shadow-sm'}`}>
                   {tab.icon}
                 </div>
                 <div className="text-left leading-none">
-                  <p className={`text-xs font-black uppercase tracking-widest ${activeTab === tab.id ? 'text-[#E31E24]' : 'text-slate-600'}`}>{tab.label}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${activeTab === tab.id ? 'text-ios-primary' : 'text-slate-600'}`}>{tab.label}</p>
                   <p className="text-[11px] text-slate-400 font-bold mt-1 uppercase tracking-tighter truncate w-24">{tab.desc}</p>
                 </div>
               </button>
@@ -388,7 +388,7 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                   <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                    <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Brand Identity</CardTitle>
+                    <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Brand Identity</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
                     <SettingRow label="System Name" desc="Main corporate branding title">
@@ -406,13 +406,13 @@ const Settings = () => {
                       />
                     </SettingRow>
                     <SettingRow label="Version" desc="Current software release">
-                      <span className="text-xs font-black text-slate-400 tracking-widest">v3.4.0-PRO</span>
+                      <span className="text-xs font-bold text-slate-400 tracking-widest">v3.4.0-PRO</span>
                     </SettingRow>
                   </CardContent>
                 </Card>
                 <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                   <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                    <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Environment</CardTitle>
+                    <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Environment</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
                     <SettingRow label="Maintenance Mode" desc="Block public access to system">
@@ -430,7 +430,7 @@ const Settings = () => {
                     <SettingRow label="API Status" desc="External gateway heartbeat">
                       <div className="flex items-center gap-1.5">
                         <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs font-black text-green-600 uppercase">Online</span>
+                        <span className="text-xs font-bold text-green-600 uppercase">Online</span>
                       </div>
                     </SettingRow>
                   </CardContent>
@@ -441,7 +441,7 @@ const Settings = () => {
             {activeTab === 'security' && (
               <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                 <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                  <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Security & Auth Policy</CardTitle>
+                  <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Security & Auth Policy</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                   <SettingRow label="Session Timeout" desc="Auto logout after inactivity (min)">
@@ -471,7 +471,7 @@ const Settings = () => {
                     />
                   </SettingRow>
                   <SettingRow label="Encryption" desc="AES-256 Record Layer">
-                    <div className="px-2 py-0.5 bg-slate-800 rounded text-[11px] text-white font-black tracking-widest">ACTIVE</div>
+                    <div className="px-2 py-0.5 bg-slate-800 rounded text-[11px] text-white font-bold tracking-widest">ACTIVE</div>
                   </SettingRow>
                   <SettingRow label="Max Login Attempts" desc="Block IP after 5 failures">
                     <CompactInput 
@@ -488,7 +488,7 @@ const Settings = () => {
             {activeTab === 'antifraud' && (
               <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                 <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                  <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Anti-Fraud & Geofencing Settings</CardTitle>
+                  <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Anti-Fraud & Geofencing Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 gap-y-2">
                   <SettingRow label="Geofence Radius (meters)" desc="Global tolerance for check-in distance from target location">
@@ -503,7 +503,7 @@ const Settings = () => {
                     <select 
                       value={settings.antifraud?.liveness_strictness || 'high'}
                       onChange={e => setSettings(prev => ({ ...prev, antifraud: { ...prev.antifraud, liveness_strictness: e.target.value } }))}
-                      className="h-8 px-2 bg-transparent border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 focus:outline-none focus:border-[#E31E24]/30"
+                      className="h-8 px-2 bg-transparent border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 focus:outline-none focus:border-ios-primary/30"
                     >
                       <option value="low">Low (Faster)</option>
                       <option value="medium">Medium</option>
@@ -517,25 +517,25 @@ const Settings = () => {
             {activeTab === 'approval' && (
               <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                 <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                  <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Dynamic Approval Matrix</CardTitle>
+                  <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Dynamic Approval Matrix</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Leave Matrix */}
                   <div className="space-y-4 border border-slate-200 rounded-xl p-4 bg-white/50">
                     <div className="flex justify-between items-center">
-                      <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Leave (Cuti)</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-slate-700">Leave (Cuti)</h4>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" checked={settings.approval?.leave?.enabled || false} onChange={e => setSettings(prev => ({ ...prev, approval: { ...prev.approval, leave: { ...prev.approval.leave, enabled: e.target.checked } } }))} />
-                        <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#E31E24]"></div>
+                        <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-ios-primary"></div>
                       </label>
                     </div>
                     {settings.approval?.leave?.enabled && (
                       <div className="space-y-2">
                         {(settings.approval.leave.tiers || []).map((tier, idx) => (
                           <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                            <span className="text-xs font-black text-slate-400">L{tier.level}</span>
+                            <span className="text-xs font-bold text-slate-400">L{tier.level}</span>
                             <input 
-                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all" 
                               placeholder="Role (e.g. SPV)" 
                               value={tier.role}
                               onChange={e => {
@@ -545,7 +545,7 @@ const Settings = () => {
                               }}
                             />
                             <input 
-                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all" 
                               placeholder="Label (e.g. Pending L1)" 
                               value={tier.label}
                               onChange={e => {
@@ -568,7 +568,7 @@ const Settings = () => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="w-full h-8 text-xs font-black uppercase tracking-widest mt-2"
+                          className="w-full h-8 text-xs font-bold uppercase tracking-widest mt-2"
                           onClick={() => {
                             const newTiers = [...(settings.approval?.leave?.tiers || [])];
                             newTiers.push({ level: newTiers.length + 1, role: "", label: `Pending L${newTiers.length + 1}` });
@@ -584,19 +584,19 @@ const Settings = () => {
                   {/* Overtime Matrix */}
                   <div className="space-y-4 border border-slate-200 rounded-xl p-4 bg-white/50">
                     <div className="flex justify-between items-center">
-                      <h4 className="text-xs font-black uppercase tracking-widest text-slate-700">Overtime (Lembur)</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-slate-700">Overtime (Lembur)</h4>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" checked={settings.approval?.overtime?.enabled || false} onChange={e => setSettings(prev => ({ ...prev, approval: { ...prev.approval, overtime: { ...prev.approval.overtime, enabled: e.target.checked } } }))} />
-                        <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#E31E24]"></div>
+                        <div className="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-ios-primary"></div>
                       </label>
                     </div>
                     {settings.approval?.overtime?.enabled && (
                       <div className="space-y-2">
                         {(settings.approval.overtime.tiers || []).map((tier, idx) => (
                           <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                            <span className="text-xs font-black text-slate-400">L{tier.level}</span>
+                            <span className="text-xs font-bold text-slate-400">L{tier.level}</span>
                             <input 
-                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all" 
                               placeholder="Role" 
                               value={tier.role}
                               onChange={e => {
@@ -606,7 +606,7 @@ const Settings = () => {
                               }}
                             />
                             <input 
-                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all" 
+                              className="flex-1 h-7 px-2 text-xs border rounded shadow-sm focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all" 
                               placeholder="Label" 
                               value={tier.label}
                               onChange={e => {
@@ -629,7 +629,7 @@ const Settings = () => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="w-full h-8 text-xs font-black uppercase tracking-widest mt-2"
+                          className="w-full h-8 text-xs font-bold uppercase tracking-widest mt-2"
                           onClick={() => {
                             const newTiers = [...(settings.approval?.overtime?.tiers || [])];
                             newTiers.push({ level: newTiers.length + 1, role: "", label: `Pending L${newTiers.length + 1}` });
@@ -649,7 +649,7 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                   <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
-                    <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Email Engine (SMTP)</CardTitle>
+                    <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Email Engine (SMTP)</CardTitle>
                     <IconMail size={14} className="text-slate-400" />
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -678,7 +678,7 @@ const Settings = () => {
                       <Button 
                         onClick={handleTestSMTP}
                         disabled={testingSMTP}
-                        className="w-full h-8 text-xs font-black uppercase tracking-widest flex gap-2 items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm"
+                        className="w-full h-8 text-xs font-bold uppercase tracking-widest flex gap-2 items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm"
                         variant="outline"
                       >
                         {testingSMTP ? <IconLoader2 size={14} className="animate-spin" /> : <IconRefresh size={14} />}
@@ -689,7 +689,7 @@ const Settings = () => {
                 </Card>
                 <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                   <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3 flex flex-row items-center justify-between">
-                    <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">WhatsApp Gateway</CardTitle>
+                    <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">WhatsApp Gateway</CardTitle>
                     <IconMessageDots size={14} className="text-green-500" />
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
@@ -718,7 +718,7 @@ const Settings = () => {
                       <Button 
                         onClick={handleTestWA}
                         disabled={testingWA}
-                        className="w-full h-8 text-xs font-black uppercase tracking-widest flex gap-2 items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm"
+                        className="w-full h-8 text-xs font-bold uppercase tracking-widest flex gap-2 items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm"
                         variant="outline"
                       >
                         {testingWA ? <IconLoader2 size={14} className="animate-spin" /> : <IconRefresh size={14} />}
@@ -733,17 +733,17 @@ const Settings = () => {
             {activeTab === 'network' && (
               <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                 <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                  <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Localization & Global Settings</CardTitle>
+                  <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Localization & Global Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                   <SettingRow label="System Timezone" desc="Current server clock">
-                    <span className="text-xs font-black text-slate-700">Asia/Jakarta (GMT+7)</span>
+                    <span className="text-xs font-bold text-slate-700">Asia/Jakarta (GMT+7)</span>
                   </SettingRow>
                   <SettingRow label="Currency Format" desc="Local monetary display">
-                    <span className="text-xs font-black text-slate-700">IDR (Rp)</span>
+                    <span className="text-xs font-bold text-slate-700">IDR (Rp)</span>
                   </SettingRow>
                   <SettingRow label="Language" desc="Global UI vocabulary">
-                    <span className="text-xs font-black text-slate-700 uppercase">English (US)</span>
+                    <span className="text-xs font-bold text-slate-700 uppercase">English (US)</span>
                   </SettingRow>
                   <SettingRow label="CDN Acceleration" desc="Boost asset loading speed">
                     <CompactToggle 
@@ -765,8 +765,8 @@ const Settings = () => {
                   ].map((stat, i) => (
                     <div key={i} className="bg-transparent border border-slate-200 shadow-sm rounded-xl p-3 flex items-center justify-between transition-all hover:translate-y-[-1px]">
                       <div className="space-y-0.5">
-                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                        <p className="text-xs font-black text-slate-800">{stat.val}</p>
+                        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                        <p className="text-xs font-bold text-slate-800">{stat.val}</p>
                       </div>
                       <div className="h-8 w-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
                         {stat.icon}
@@ -776,7 +776,7 @@ const Settings = () => {
                 </div>
                 <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden">
                   <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                    <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Maintenance & Recovery</CardTitle>
+                    <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Maintenance & Recovery</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4 space-y-1">
                     <SettingRow label="Auto-Backup" desc="Scheduled daily at 02:00 AM">
@@ -803,7 +803,7 @@ const Settings = () => {
                       <Button 
                         onClick={handleForceBackup}
                         disabled={isBackupRunning}
-                        className="h-8 px-4 bg-slate-800 text-white text-[11px] font-black uppercase tracking-widest rounded hover:bg-slate-700 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
+                        className="h-8 px-4 bg-slate-800 text-white text-[11px] font-semibold uppercase tracking-widest rounded hover:bg-slate-700 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
                       >
                         {isBackupRunning ? <IconLoader2 size={12} className="animate-spin" /> : <IconRefresh size={12} />}
                         {isBackupRunning ? 'Backing up...' : 'Force Backup Now'}
@@ -815,7 +815,7 @@ const Settings = () => {
                 {/* Backups table */}
                 <Card className="border-slate-200 border bg-transparent shadow-sm rounded-xl overflow-hidden mt-4">
                   <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-3">
-                    <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest">Backup Archives</CardTitle>
+                    <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest">Backup Archives</CardTitle>
                   </CardHeader>
                   <CardContent className="p-4">
                     {loadingBackups ? (
@@ -832,7 +832,7 @@ const Settings = () => {
                           <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
                               {['Filename', 'Created At', 'Size', 'Initiator', 'Actions'].map(h => (
-                                <th key={h} className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
+                                <th key={h} className="px-3 py-2.5 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -848,20 +848,20 @@ const Settings = () => {
                                 <td className="px-3 py-2.5 text-slate-500 font-medium">
                                   {backup.size}
                                 </td>
-                                <td className="px-3 py-2.5 uppercase tracking-wide text-[11px] text-slate-500 font-black">
+                                <td className="px-3 py-2.5 uppercase tracking-wide text-[11px] text-slate-500 font-bold">
                                   {backup.initiated_by}
                                 </td>
                                 <td className="px-3 py-2.5">
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => handleDownloadBackup(backup.filename)}
-                                      className="px-2 py-1 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-1"
+                                      className="px-2 py-1 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11px] font-semibold uppercase tracking-widest transition-all flex items-center gap-1"
                                     >
                                       <IconDownload size={10} /> Download
                                     </button>
                                     <button
                                       onClick={() => handleDeleteBackup(backup.filename)}
-                                      className="px-2 py-1 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-1"
+                                      className="px-2 py-1 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 text-[11px] font-semibold uppercase tracking-widest transition-all flex items-center gap-1"
                                     >
                                       <IconTrash size={10} /> Delete
                                     </button>

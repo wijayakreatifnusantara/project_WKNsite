@@ -48,8 +48,8 @@ const RiskGauge = ({ score, level, color }) => {
 
         {/* Center Text */}
         <div className="absolute flex flex-col items-center">
-          <span className="text-3xl font-black text-slate-800 font-outfit">{score}%</span>
-          <span className={`text-[11px] font-black uppercase tracking-widest ${level === 'High' ? 'text-rose-500' : 'text-slate-400'}`}>
+          <span className="text-3xl font-bold text-slate-800 font-outfit">{score}%</span>
+          <span className={`text-[11px] font-semibold uppercase tracking-widest ${level === 'High' ? 'text-rose-500' : 'text-slate-400'}`}>
             Risk Level
           </span>
         </div>
@@ -58,7 +58,7 @@ const RiskGauge = ({ score, level, color }) => {
       <div className={`px-4 py-1.5 rounded-xl border-2 border-white shadow-sm flex items-center gap-2
         ${level === 'High' ? 'bg-rose-50 text-rose-600' : level === 'Medium' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
         {level === 'High' ? <IconAlertTriangle size={14} /> : <IconActivity size={14} />}
-        <span className="text-xs font-black uppercase tracking-widest">{level} Risk Detected</span>
+        <span className="text-xs font-bold uppercase tracking-widest">{level} Risk Detected</span>
       </div>
     </div>
   );

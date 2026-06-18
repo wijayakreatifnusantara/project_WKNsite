@@ -48,7 +48,7 @@ const Login = () => {
             <div className="flex flex-col items-center text-center mb-4 sm:mb-5 space-y-2 sm:space-y-3">
               <img src="/assets/wkn_logo.png" alt="WKN Logo" className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-md" />
               <div className="space-y-1">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">WKN<span className="text-[#E31E24]">site</span></h1>
+                <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">WKN<span className="text-ios-primary">site</span></h1>
                 <p className="text-slate-400 text-xs sm:text-xs font-black uppercase tracking-widest opacity-60">Corporate Management System</p>
               </div>
             </div>
@@ -63,7 +63,7 @@ const Login = () => {
                       id="email"
                       type="email"
                       placeholder="name@company.com"
-                      className="h-10 sm:h-11 pl-11 border-transparent bg-white shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-[#E31E24]/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                      className="h-10 sm:h-11 pl-11 border-transparent bg-white shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-ios-primary/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -79,7 +79,7 @@ const Login = () => {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="h-10 sm:h-11 pl-11 pr-11 border-transparent bg-white shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-[#E31E24]/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
+                      className="h-10 sm:h-11 pl-11 pr-11 border-transparent bg-white shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] focus:ring-1 focus:ring-ios-primary/20 transition-all rounded-xl text-xs sm:text-sm font-bold text-slate-700 placeholder:text-slate-300"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -121,7 +121,7 @@ const Login = () => {
             <div className="mt-6 flex flex-col items-center space-y-4">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1.5 text-[11px] font-black text-slate-300 uppercase tracking-wider">
-                  <Shield className="w-3 h-3 text-[#E31E24]/40" />
+                  <Shield className="w-3 h-3 text-ios-primary/40" />
                   <span>Secure SSL</span>
                 </div>
                 <div className="w-1 h-1 bg-slate-200 rounded-full" />

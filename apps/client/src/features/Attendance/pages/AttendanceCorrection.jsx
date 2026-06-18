@@ -69,16 +69,16 @@ const AttendanceCorrection = () => {
         {/* CONTROL CENTER */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-2.5 rounded-2xl border border-white shadow-sm ">
             {/* Search Input */}
-            <div className="md:col-span-8 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]  group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
+            <div className="md:col-span-8 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary  group focus-within:ring-2 focus-within:ring-ios-primary/20">
                 <IconSearch size={14} className="text-slate-300 group-focus-within:text-amber-500 transition-colors" />
                 <div className="flex flex-col flex-1">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Cari Pengajuan</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Cari Pengajuan</span>
                   <input 
                       type="text" 
                       placeholder="NAMA ATAU ID KARYAWAN..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-transparent border-none w-full text-xs font-black text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
+                      className="bg-transparent border-none w-full text-xs font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
                   />
                 </div>
             </div>
@@ -86,8 +86,8 @@ const AttendanceCorrection = () => {
             {/* Legend / Information */}
             <div className="md:col-span-4 flex items-center justify-between px-5 py-2 rounded-xl bg-white shadow-sm border-none shadow-inner">
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Total Menunggu</span>
-                  <p className="text-xs font-black text-slate-600 uppercase tracking-tighter">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Total Menunggu</span>
+                  <p className="text-xs font-bold text-slate-600 uppercase tracking-tighter">
                     {corrections.filter(c => c.status === 'PENDING').length} Pengajuan
                   </p>
                 </div>
@@ -101,12 +101,12 @@ const AttendanceCorrection = () => {
             <table className="w-full text-left border-collapse min-w-max">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 ">
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Tanggal & Pegawai</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Jam Asli</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Jam Usulan</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Alasan Koreksi</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider text-center">Status</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider text-right">Aksi</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tanggal & Pegawai</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Jam Asli</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Jam Usulan</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Alasan Koreksi</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -152,28 +152,28 @@ const AttendanceCorrection = () => {
                     <tr key={row.id} className="transition-all group border-b border-transparent hover:border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
                       <td className="px-6 py-3">
                         <div className="flex flex-col">
-                           <span className="text-[11px] font-black text-slate-700 tracking-tight">{row.date}</span>
-                           <p className="text-[11px] font-black text-slate-800 uppercase leading-none mt-1">{row.employees?.name}</p>
+                           <span className="text-[11px] font-semibold text-slate-700 tracking-tight">{row.date}</span>
+                           <p className="text-[11px] font-semibold text-slate-800 uppercase leading-none mt-1">{row.employees?.name}</p>
                            <p className="text-xs font-bold text-slate-400 tracking-widest">{row.employees?.id}</p>
                         </div>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex flex-col gap-1">
                           <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                            In: <span className="font-black text-slate-700">{row.original_clock_in?.substring(0, 5) || '--:--'}</span>
+                            In: <span className="font-bold text-slate-700">{row.original_clock_in?.substring(0, 5) || '--:--'}</span>
                           </span>
                           <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                            Out: <span className="font-black text-slate-700">{row.original_clock_out?.substring(0, 5) || '--:--'}</span>
+                            Out: <span className="font-bold text-slate-700">{row.original_clock_out?.substring(0, 5) || '--:--'}</span>
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex flex-col gap-1 bg-amber-50/50 p-2 rounded-lg border border-amber-100/50 w-fit">
                           <span className="text-xs font-bold text-amber-600 uppercase tracking-widest">
-                            In: <span className="font-black text-amber-700">{row.proposed_clock_in?.substring(0, 5) || '--:--'}</span>
+                            In: <span className="font-bold text-amber-700">{row.proposed_clock_in?.substring(0, 5) || '--:--'}</span>
                           </span>
                           <span className="text-xs font-bold text-amber-600 uppercase tracking-widest">
-                            Out: <span className="font-black text-amber-700">{row.proposed_clock_out?.substring(0, 5) || '--:--'}</span>
+                            Out: <span className="font-bold text-amber-700">{row.proposed_clock_out?.substring(0, 5) || '--:--'}</span>
                           </span>
                         </div>
                       </td>
@@ -181,7 +181,7 @@ const AttendanceCorrection = () => {
                         <p className="text-xs font-bold text-slate-500 italic break-words">"{row.reason}"</p>
                       </td>
                       <td className="px-6 py-3 text-center">
-                        <span className={`inline-flex px-2 py-1 rounded text-[11px] font-black uppercase tracking-wider border ${
+                        <span className={`inline-flex px-2 py-1 rounded text-[11px] font-semibold uppercase tracking-wider border ${
                           row.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                           row.status === 'REJECTED' ? 'bg-rose-50 text-rose-600 border-rose-100' :
                           'bg-amber-50 text-amber-600 border-amber-100 animate-pulse'
@@ -195,25 +195,25 @@ const AttendanceCorrection = () => {
                             <div className="flex items-center justify-end gap-2">
                               <button 
                                 onClick={() => handleProcess(row.id, 'APPROVED')}
-                                className="h-8 px-3 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors font-black text-xs tracking-wider uppercase gap-1"
+                                className="h-8 px-3 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors font-bold text-xs tracking-wider uppercase gap-1"
                               >
                                 <IconCheck size={14} /> Setuju
                               </button>
                               <button 
                                 onClick={() => handleProcess(row.id, 'REJECTED')}
-                                className="h-8 px-3 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-colors font-black text-xs tracking-wider uppercase gap-1"
+                                className="h-8 px-3 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-colors font-bold text-xs tracking-wider uppercase gap-1"
                               >
                                 <IconX size={14} /> Tolak
                               </button>
                             </div>
                           ) : (
-                            <span className="text-[11px] font-bold text-amber-500 uppercase tracking-widest">
+                            <span className="text-[11px] font-semibold text-amber-500 uppercase tracking-widest">
                               Menunggu Review
                             </span>
                           )
                         )}
                         {row.status !== 'PENDING' && (
-                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                             {row.status === 'APPROVED' ? 'Selesai' : 'Ditolak'} oleh {row.reviewed_by}
                           </span>
                         )}

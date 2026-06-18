@@ -18,11 +18,11 @@ const MiniMapModal = ({ isOpen, onClose, data }) => {
       <Card className="w-full max-w-md overflow-hidden bg-transparent shadow-sm rounded-2xl animate-scale-up border-0 ring-1 ring-slate-200">
         <div className="flex items-center justify-between px-5 py-4 bg-slate-50/80  border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#E31E24]/10">
-              <IconMapPin size={18} className="text-[#E31E24]" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-ios-primary/10">
+              <IconMapPin size={18} className="text-ios-primary" />
             </div>
             <div>
-              <h3 className="text-xs font-black tracking-widest text-slate-800 uppercase">Location Data</h3>
+              <h3 className="text-xs font-bold tracking-widest text-slate-800 uppercase">Location Data</h3>
               <p className="text-xs font-medium text-slate-500">{target_name || 'Unknown Location'}</p>
             </div>
           </div>
@@ -56,17 +56,17 @@ const MiniMapModal = ({ isOpen, onClose, data }) => {
           
           <div className="grid grid-cols-2 gap-3">
              <div className="p-3 bg-white shadow-sm border-none rounded-xl">
-                <p className="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Target Location</p>
+                <p className="text-[11px] font-semibold tracking-widest text-slate-400 uppercase mb-1">Target Location</p>
                 <p className="text-xs font-bold text-slate-700 truncate">{target_name || '-'}</p>
              </div>
              <div className="p-3 bg-white shadow-sm border-none rounded-xl">
-                <p className="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Distance Variance</p>
+                <p className="text-[11px] font-semibold tracking-widest text-slate-400 uppercase mb-1">Distance Variance</p>
                 <p className="text-xs font-bold text-slate-700">
                    {distance_meters != null ? `${distance_meters} meters` : '-'}
                 </p>
              </div>
              <div className="p-3 bg-white shadow-sm border-none rounded-xl col-span-2">
-                <p className="text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Coordinates</p>
+                <p className="text-[11px] font-semibold tracking-widest text-slate-400 uppercase mb-1">Coordinates</p>
                 <p className="text-xs font-mono font-medium text-slate-600">
                    {location_lat && location_lng ? `${location_lat}, ${location_lng}` : 'N/A'}
                 </p>

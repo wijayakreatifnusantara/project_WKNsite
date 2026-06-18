@@ -26,14 +26,14 @@ const Recruitment = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex justify-between items-end">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 font-outfit tracking-tight uppercase">
-              Talent <span className="text-[#E31E24]">Acquisition</span>
+            <h2 className="text-2xl font-bold text-slate-800 font-outfit tracking-tight uppercase">
+              Talent <span className="text-ios-primary">Acquisition</span>
             </h2>
-            <p className="text-slate-400 text-xs mt-1 font-black uppercase tracking-[0.3em] opacity-70">Applicant Tracking & Recruitment Pipeline</p>
+            <p className="text-slate-400 text-xs mt-1 font-bold uppercase tracking-widest opacity-70">Applicant Tracking & Recruitment Pipeline</p>
           </div>
           <Button 
             onClick={() => setIsModalOpen(true)}
-            className="h-12 px-6 rounded-2xl bg-[#E31E24] text-white font-black text-xs uppercase tracking-widest shadow-sm hover:bg-[#C1181E] transition-all flex gap-3 items-center"
+            className="h-12 px-6 rounded-2xl bg-ios-primary text-white font-bold text-xs uppercase tracking-widest shadow-sm hover:bg-ios-primary/90 transition-all flex gap-3 items-center"
           >
             <IconUserPlus size={16} />
             Post New Job
@@ -50,7 +50,7 @@ const Recruitment = () => {
         {/* Job Openings */}
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
-             <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Active Vacancies</h3>
+             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Vacancies</h3>
              {loading && <IconLoader2 size={14} className="text-slate-400 animate-spin" />}
           </div>
           
@@ -63,24 +63,24 @@ const Recruitment = () => {
               jobs.map(job => (
                 <Card key={job.id} className="border-white border-[3px] shadow-sm bg-white rounded-xl p-6 flex items-center justify-between group hover:shadow-none transition-all">
                   <div className="flex items-center gap-6">
-                    <div className="h-14 w-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-[#E31E24]">
+                    <div className="h-14 w-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-ios-primary">
                       <IconBriefcase size={24} />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">{job.title}</h4>
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{job.dept}</p>
+                      <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight">{job.title}</h4>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{job.dept}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-12">
                     <div className="text-center">
-                      <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Applicants</p>
-                      <p className="text-sm font-black text-slate-700">{job.applicants}</p>
+                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Applicants</p>
+                      <p className="text-sm font-bold text-slate-700">{job.applicants}</p>
                     </div>
-                    <div className={`px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest
+                    <div className={`px-4 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-widest
                       ${job.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
                       {job.status}
                     </div>
-                    <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-400 hover:text-[#E31E24] p-0 flex items-center justify-center">
+                    <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-white shadow-sm border-white border-2 text-slate-400 hover:text-ios-primary p-0 flex items-center justify-center">
                       <IconArrowRight size={20} />
                     </Button>
                   </div>
@@ -109,8 +109,8 @@ const StatCard = ({ label, value, icon, color }) => (
         {icon}
       </div>
       <div>
-        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{label}</p>
-        <h3 className="text-xl font-black text-slate-800 font-outfit">{value}</h3>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</p>
+        <h3 className="text-xl font-bold text-slate-800 font-outfit">{value}</h3>
       </div>
     </div>
   </Card>

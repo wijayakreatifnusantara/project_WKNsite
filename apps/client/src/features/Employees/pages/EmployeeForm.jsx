@@ -29,8 +29,8 @@ const InputWrapper = ({ label, icon: Icon, children, labelRight }) => (
   </div>
 );
 
-const inputStyle = "w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
-const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
+const inputStyle = "w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-ios-primary focus:ring-1 focus:ring-ios-primary/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
+const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-ios-primary focus:ring-1 focus:ring-ios-primary/20 transition-all cursor-pointer flex items-center";
 
 const initialFormData = {
   employee_id: '', name: '', nickname: '', email: '', phone: '', gender: 'Laki-laki',
@@ -425,7 +425,7 @@ const EmployeeForm = () => {
 
           {/* KOLOM KANAN: FOTO */}
           <div className="w-full lg:w-56 shrink-0 flex flex-col gap-3">
-            <h4 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider text-center">Foto Karyawan</h4>
+            <h4 className="text-[11px] font-semibold text-slate-700 uppercase tracking-wider text-center">Foto Karyawan</h4>
             <div className={`relative w-full aspect-[3/4] rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-all border-2 ${formData.employee_id ? 'bg-blue-50 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400' : 'bg-slate-50 border-slate-200 opacity-50'}`}>
               {formData.photo ? (
                 <>
@@ -451,7 +451,7 @@ const EmployeeForm = () => {
               <input 
                 type="file" 
                 accept=".jpg,.jpeg,.png"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10 focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10 focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
                 onChange={handlePhotoUpload}
                 disabled={uploadingDoc === 'photo' || !formData.employee_id}
               />
@@ -469,7 +469,7 @@ const EmployeeForm = () => {
         </div>
         
         {!formData.employee_id && (
-          <div className="mt-6 p-3 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-lg border border-amber-200 flex items-center gap-2 animate-pulse">
+          <div className="mt-6 p-3 bg-amber-50 text-amber-700 text-[11px] font-semibold rounded-lg border border-amber-200 flex items-center gap-2 animate-pulse">
             <IconBuildingSkyscraper size={16} />
             Silakan pilih Organisasi terlebih dahulu untuk menghasilkan ID Karyawan dan membuka form isian.
           </div>
@@ -598,7 +598,7 @@ const EmployeeForm = () => {
                       setFormData(prev => ({...prev, domicile_address: ''}));
                     }
                   }} 
-                  className="rounded border-slate-200 text-[#E31E24] focus:ring-[#E31E24]"
+                  className="rounded border-slate-200 text-ios-primary focus:ring-ios-primary"
                   disabled={!formData.employee_id || !formData.ktp_address}
                 />
                 <span>Sama dengan KTP</span>
@@ -863,7 +863,7 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Daftar Anggota Keluarga</h3>
-          <button type="button" onClick={() => addArrayItem('family_members', { name: '', relation: '', occupation: '', phone: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('family_members', { name: '', relation: '', occupation: '', phone: '' })} className="flex items-center gap-1 text-xs font-bold text-ios-primary hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Keluarga
           </button>
         </div>
@@ -918,7 +918,7 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Histori Pendidikan</h3>
-          <button type="button" onClick={() => addArrayItem('education_history', { level: '', major: '', institution: '', year: '', certificate_number: '', city: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('education_history', { level: '', major: '', institution: '', year: '', certificate_number: '', city: '' })} className="flex items-center gap-1 text-xs font-bold text-ios-primary hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Pendidikan
           </button>
         </div>
@@ -955,7 +955,7 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pengalaman Kerja</h3>
-          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '', city: '', manager_name: '', manager_phone: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('work_experience', { company: '', position: '', duration: '', city: '', manager_name: '', manager_phone: '' })} className="flex items-center gap-1 text-xs font-bold text-ios-primary hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Pengalaman
           </button>
         </div>
@@ -979,7 +979,7 @@ const EmployeeForm = () => {
       <div>
         <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Kursus atau Sertifikasi</h3>
-          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', city: '', phone: '', year: '', certificate_number: '' })} className="flex items-center gap-1 text-xs font-bold text-[#E31E24] hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
+          <button type="button" onClick={() => addArrayItem('certifications', { name: '', institution: '', city: '', phone: '', year: '', certificate_number: '' })} className="flex items-center gap-1 text-xs font-bold text-ios-primary hover:bg-red-50 px-2 py-1 rounded transition-colors disabled:opacity-50" disabled={!formData.employee_id}>
             <IconPlus size={14} /> Tambah Sertifikasi
           </button>
         </div>
@@ -1047,7 +1047,7 @@ const EmployeeForm = () => {
               <div className="flex gap-2">
                 {isUploaded ? (
                   <>
-                    <a href={formData.documents[doc.id]} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 h-8 bg-transparent border border-slate-200 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all">
+                    <a href={formData.documents[doc.id]} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 h-8 bg-transparent border border-slate-200 text-slate-700 text-[11px] font-semibold rounded-lg hover:bg-slate-100 transition-all">
                       Lihat File
                     </a>
                     <button type="button" onClick={() => handleRemoveDocument(doc.id)} className="h-8 w-8 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-all">
@@ -1059,11 +1059,11 @@ const EmployeeForm = () => {
                     <input 
                       type="file" 
                       accept=".pdf,.jpg,.jpeg,.png"
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed focus:outline-none focus:border-[#E31E24] focus:ring-2 focus:ring-[#E31E24]/20 transition-all"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed focus:outline-none focus:border-ios-primary focus:ring-2 focus:ring-ios-primary/20 transition-all"
                       onChange={(e) => handleFileUpload(e, doc.id)}
                       disabled={isUploading || !formData.employee_id}
                     />
-                    <button type="button" disabled={isUploading || !formData.employee_id} className="w-full flex items-center justify-center gap-2 h-8 bg-transparent border border-slate-200 text-slate-700 text-[11px] font-bold rounded-lg hover:bg-slate-100 transition-all disabled:opacity-50">
+                    <button type="button" disabled={isUploading || !formData.employee_id} className="w-full flex items-center justify-center gap-2 h-8 bg-transparent border border-slate-200 text-slate-700 text-[11px] font-semibold rounded-lg hover:bg-slate-100 transition-all disabled:opacity-50">
                       {isUploading ? <IconLoader2 size={14} className="animate-spin" /> : <IconFileUpload size={14} />}
                       {isUploading ? 'Mengunggah...' : 'Pilih File'}
                     </button>
@@ -1098,11 +1098,11 @@ const EmployeeForm = () => {
         
         {/* TAB NAVIGATION */}
         <div className="flex p-1 bg-slate-100 border border-slate-200/60 rounded-lg">
-          <button type="button" onClick={() => setActiveTab('main')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'main' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Utama</button>
-          <button type="button" onClick={() => setActiveTab('family')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'family' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Data Keluarga</button>
-          <button type="button" onClick={() => setActiveTab('history')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'history' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Pendidikan & Pengalaman</button>
-          <button type="button" onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
-          <button type="button" onClick={() => setActiveTab('documents')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'documents' ? 'bg-transparent shadow-sm text-[#E31E24]' : 'text-slate-500 hover:bg-slate-200'}`}>Dokumen</button>
+          <button type="button" onClick={() => setActiveTab('main')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'main' ? 'bg-transparent shadow-sm text-ios-primary' : 'text-slate-500 hover:bg-slate-200'}`}>Data Utama</button>
+          <button type="button" onClick={() => setActiveTab('family')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'family' ? 'bg-transparent shadow-sm text-ios-primary' : 'text-slate-500 hover:bg-slate-200'}`}>Data Keluarga</button>
+          <button type="button" onClick={() => setActiveTab('history')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'history' ? 'bg-transparent shadow-sm text-ios-primary' : 'text-slate-500 hover:bg-slate-200'}`}>Pendidikan & Pengalaman</button>
+          <button type="button" onClick={() => setActiveTab('financial')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'financial' ? 'bg-transparent shadow-sm text-ios-primary' : 'text-slate-500 hover:bg-slate-200'}`}>Finansial & Payroll</button>
+          <button type="button" onClick={() => setActiveTab('documents')} className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'documents' ? 'bg-transparent shadow-sm text-ios-primary' : 'text-slate-500 hover:bg-slate-200'}`}>Dokumen</button>
         </div>
       </header>
 
@@ -1128,7 +1128,7 @@ const EmployeeForm = () => {
           <button type="button" onClick={() => navigate('/master/employees')} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all">
             Batal
           </button>
-          <button type="submit" form="employee-form" disabled={loading} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-[#E31E24] text-white shadow-sm hover:bg-[#C1181E] disabled:opacity-50 transition-all flex items-center gap-2">
+          <button type="submit" form="employee-form" disabled={loading} className="h-10 px-6 rounded-lg font-bold text-[11px] uppercase tracking-wider bg-ios-primary text-white shadow-sm hover:bg-ios-primary/90 disabled:opacity-50 transition-all flex items-center gap-2">
             {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconDeviceFloppy size={16} />}
             Simpan Data
           </button>

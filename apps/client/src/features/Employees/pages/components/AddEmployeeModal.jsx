@@ -52,8 +52,8 @@ const InputWrapper = ({ label, icon: Icon, children }) => (
   </div>
 );
 
-const inputStyle = "w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
-const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/20 transition-all cursor-pointer flex items-center";
+const inputStyle = "w-full h-10 pl-10 pr-3 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-ios-primary focus:ring-1 focus:ring-ios-primary/20 transition-all appearance-none uppercase placeholder:normal-case placeholder:text-slate-400";
+const dateInputStyle = "w-full h-10 pl-10 pr-8 bg-white shadow-sm border-none rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:bg-transparent focus:border-ios-primary focus:ring-1 focus:ring-ios-primary/20 transition-all cursor-pointer flex items-center";
 
 const ProfessionalDatePicker = ({ selected, onChange, placeholder, icon: Icon, disabled }) => (
   <div className="relative w-full">
@@ -685,14 +685,14 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
       >
         <header className="h-14 bg-transparent border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`h-9 w-9 ${editData ? 'bg-green-500' : 'bg-[#E31E24]'} shadow-sm rounded-lg flex items-center justify-center text-white`}>
+            <div className={`h-9 w-9 ${editData ? 'bg-green-500' : 'bg-ios-primary'} shadow-sm rounded-lg flex items-center justify-center text-white`}>
               {editData ? <IconEdit size={18} /> : <IconUserPlus size={18} />}
             </div>
             <div>
               <h2 className="text-xs font-bold text-slate-850 uppercase tracking-tight leading-none">
                 {editData ? 'Update Talent Profile' : 'Master Personnel Onboarding'}
               </h2>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-[0.3em] mt-1 opacity-70">
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1 opacity-70">
                 {editData ? `Editing ID: ${editData.id}` : 'Cloud identity synchronization'}
               </p>
             </div>
@@ -705,7 +705,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
               className={`h-9 px-4 bg-transparent border rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-sm group ${
                 isFieldsLocked 
                   ? 'border-slate-200 text-slate-400 cursor-not-allowed bg-slate-50' 
-                  : 'border-[#E31E24] text-[#E31E24] hover:bg-[#E31E24] hover:text-white'
+                  : 'border-ios-primary text-ios-primary hover:bg-ios-primary hover:text-white'
               }`}
             >
               {isScanning ? (
@@ -758,7 +758,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   <label className={`absolute -bottom-2 -right-2 h-9 w-9 text-white rounded-lg flex items-center justify-center shadow-sm cursor-pointer transition-all ${
                     isFieldsLocked 
                       ? 'bg-slate-300 text-slate-400 cursor-not-allowed hover:scale-100' 
-                      : 'bg-[#E31E24] hover:bg-[#C1181E] hover:scale-105 active:scale-95'
+                      : 'bg-ios-primary hover:bg-ios-primary/90 hover:scale-105 active:scale-95'
                   }`}>
                     <IconCamera size={18} />
                     <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={isFieldsLocked} />
@@ -767,7 +767,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                     <button 
                       type="button"
                       onClick={() => setFormData(prev => ({...prev, photo: ''}))}
-                      className="absolute -top-2 -right-2 h-7 w-7 bg-transparent text-slate-400 rounded-lg flex items-center justify-center border border-slate-200 shadow hover:text-[#E31E24] transition-all"
+                      className="absolute -top-2 -right-2 h-7 w-7 bg-transparent text-slate-400 rounded-lg flex items-center justify-center border border-slate-200 shadow hover:text-ios-primary transition-all"
                     >
                       <IconX size={14} />
                     </button>
@@ -890,7 +890,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
               {/* SECTION 2: IDENTITY (Unlocked only after Org selected) */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <span className="w-1 h-3 bg-[#E31E24] rounded-full"></span> Identity Profile
+                  <span className="w-1 h-3 bg-ios-primary rounded-full"></span> Identity Profile
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <InputWrapper label="Full Name" icon={IconUser}>
@@ -958,10 +958,10 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                       <button 
                         type="button"
                         onClick={() => setFormData(prev => ({...prev, domicile_address: prev.ktp_address}))}
-                        className={`text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded border transition-all flex items-center gap-1 ${
+                        className={`text-[11px] font-semibold uppercase tracking-wider px-2 py-1 rounded border transition-all flex items-center gap-1 ${
                           isFieldsLocked 
                             ? 'border-slate-200 text-slate-400 bg-slate-55/40 cursor-not-allowed' 
-                            : 'text-[#E31E24] hover:bg-red-50 border-[#E31E24]/20'
+                            : 'text-ios-primary hover:bg-red-50 border-ios-primary/20'
                         }`}
                         disabled={isFieldsLocked}
                       >
@@ -994,7 +994,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                 <div className="grid grid-cols-2 gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
                   {/* Contact 1 */}
                   <div className="space-y-3">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider italic">Primary Contact</p>
+                    <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider italic">Primary Contact</p>
                     <div className="grid grid-cols-1 gap-2">
                       <InputWrapper label="Full Name" icon={IconUser}>
                         <input name="emergency_contact_1_name" value={formData.emergency_contact_1_name} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
@@ -1011,7 +1011,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
                   </div>
                   {/* Contact 2 */}
                   <div className="space-y-3">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider italic">Secondary Contact</p>
+                    <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider italic">Secondary Contact</p>
                     <div className="grid grid-cols-1 gap-2">
                       <InputWrapper label="Full Name" icon={IconUser}>
                         <input name="emergency_contact_2_name" value={formData.emergency_contact_2_name} onChange={handleChange} className={getFieldStyle(isFieldsLocked)} disabled={isFieldsLocked} />
@@ -1071,7 +1071,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onRefresh, editData }) => {
               <div className="pt-2">
                 <Button 
                   disabled={loading}
-                  className="w-full h-11 rounded-lg bg-[#E31E24] text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:bg-[#C1181E] active:scale-98 transition-all flex gap-3"
+                  className="w-full h-11 rounded-lg bg-ios-primary text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:bg-ios-primary/90 active:scale-98 transition-all flex gap-3"
                 >
                   {loading ? (
                     <IconLoader2 size={18} className="animate-spin" />

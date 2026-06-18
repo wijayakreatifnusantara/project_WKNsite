@@ -74,18 +74,18 @@ const AttendanceHub = () => {
       <div className="w-full mx-auto space-y-6">
         
         {/* 🚀 ULTRA-COMPACT HEADER & NAV BAR */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-transparent p-5 px-8 rounded-2xl border border-slate-200 shadow-sm ">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 ios-card p-5 px-8">
           <div className="flex items-center gap-4">
-             <div className="h-10 w-10 bg-[#E31E24]/10 rounded-lg flex items-center justify-center text-[#E31E24]">
+             <div className="h-10 w-10 bg-ios-primary/10 rounded-lg flex items-center justify-center text-ios-primary">
                 <IconClock size={18} />
              </div>
              <div>
-                <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">
-                  Attendance <span className="text-[#E31E24]">Hub</span>
+                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight leading-none">
+                  Attendance <span className="text-ios-primary">Hub</span>
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                    <div className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></div>
-                   <span className="text-xs font-black text-slate-400 uppercase tracking-widest">HQ Live Metrics</span>
+                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">HQ Live Metrics</span>
                 </div>
              </div>
           </div>
@@ -98,20 +98,20 @@ const AttendanceHub = () => {
                  data-tooltip="Terdapat pengajuan menunggu persetujuan"
                >
                  <IconAlertTriangle size={14} className="text-amber-500" />
-                 <span className="text-xs font-black text-amber-700 uppercase tracking-widest">
+                 <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">
                    Pending Approvals: <span className="text-amber-600 text-sm">{totalPending}</span>
                  </span>
                </div>
              )}
 
              {/* Period Selector */}
-              <div className="h-10 px-4 rounded-xl bg-white shadow-sm border-none flex items-center gap-2 transition-all focus-within:border-[#E31E24] focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-                 <IconCalendarEvent size={12} className="text-[#E31E24]" />
+              <div className="h-10 px-4 rounded-xl bg-white shadow-sm border-none flex items-center gap-2 transition-all focus-within:border-ios-primary focus-within:ring-2 focus-within:ring-ios-primary/20">
+                 <IconCalendarEvent size={12} className="text-ios-primary" />
                  <input 
                   type="month" 
                   value={selectedPeriod}
                   onChange={(e) => setSelectedPeriod(e.target.value)}
-                  className="bg-transparent border-none text-slate-800 font-black text-sm uppercase tracking-widest focus:outline-none w-24"
+                  className="bg-transparent border-none text-slate-800 font-bold text-sm uppercase tracking-widest focus:outline-none w-24"
                 />
               </div>
 
@@ -124,7 +124,7 @@ const AttendanceHub = () => {
                     <Button 
                       variant="ghost"
                       onClick={() => navigate('/attendance/report')}
-                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-ios-primary hover:bg-ios-primary/5 flex gap-2 items-center"
                     >
                       <IconHistory size={14} />
                       Logs
@@ -132,7 +132,7 @@ const AttendanceHub = () => {
                     <Button 
                       variant="ghost"
                       onClick={() => navigate('/attendance/recap')}
-                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-ios-primary hover:bg-ios-primary/5 flex gap-2 items-center"
                     >
                       <IconChartPie size={14} />
                       Performance
@@ -141,7 +141,7 @@ const AttendanceHub = () => {
                     <Button 
                       variant="ghost"
                       onClick={() => navigate('/attendance/calendar')}
-                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-ios-primary hover:bg-ios-primary/5 flex gap-2 items-center"
                     >
                       <IconCalendarEvent size={14} />
                       Calendar
@@ -149,7 +149,7 @@ const AttendanceHub = () => {
                     <Button 
                       variant="ghost"
                       onClick={() => navigate('/attendance/overtime')}
-                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-[#E31E24] hover:bg-[#E31E24]/5 flex gap-2 items-center"
+                      className="h-10 px-4 rounded-lg text-slate-500 font-semibold text-xs tracking-wide hover:text-ios-primary hover:bg-ios-primary/5 flex gap-2 items-center"
                     >
                       <IconClock size={14} />
                       Overtime
@@ -162,7 +162,7 @@ const AttendanceHub = () => {
                   <Button 
                     variant="ghost"
                     onClick={() => navigate('/attendance/location')}
-                    className="h-10 px-4 rounded-lg text-slate-500 hover:text-[#E31E24] hover:bg-[#E31E24]/5 font-semibold text-xs tracking-wide flex gap-2 items-center transition-all"
+                    className="h-10 px-4 rounded-lg text-slate-500 hover:text-ios-primary hover:bg-ios-primary/5 font-semibold text-xs tracking-wide flex gap-2 items-center transition-all"
                   >
                     <IconMapPin size={14} />
                     Location
@@ -180,22 +180,22 @@ const AttendanceHub = () => {
                       const success = await exportDailyAttendance();
                       if (success) toast.success("Daily report downloaded.");
                     }}
-                    className="h-10 px-6 rounded-lg bg-white border-2 border-white text-slate-700 font-semibold text-xs tracking-wide hover:shadow-sm shadow-sm flex gap-2 items-center transition-all"
+                    className="ios-btn h-10 px-6 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs tracking-wide hover:shadow-sm shadow-sm flex gap-2 items-center"
                   >
                     <IconDownload size={14} className="text-slate-500" />
                     Export
                   </Button>
                   <Button 
                     onClick={() => setIsBulkModalOpen(true)}
-                    className="h-10 px-6 rounded-lg bg-transparent border border-slate-200 text-slate-700 font-semibold text-xs tracking-wide hover:shadow-sm shadow-sm flex gap-2 items-center"
+                    className="ios-btn h-10 px-6 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs tracking-wide hover:shadow-sm shadow-sm flex gap-2 items-center"
                   >
-                    <IconCloudUpload size={14} className="text-[#E31E24]" />
+                    <IconCloudUpload size={14} className="text-ios-primary" />
                     Bulk
                   </Button>
                   
                   <Button 
                     onClick={() => setIsManualModalOpen(true)}
-                    className="h-10 px-6 rounded-lg bg-[#E31E24] text-white font-semibold text-xs tracking-wide shadow-sm hover:bg-[#C1181E] flex gap-2 items-center"
+                    className="ios-btn h-10 px-6 rounded-xl bg-ios-primary text-white font-semibold text-xs tracking-wide shadow-sm flex gap-2 items-center"
                   >
                     <IconPlus size={14} />
                     Entry
@@ -242,10 +242,10 @@ const AttendanceHub = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-9 space-y-6">
-             <div className="bg-transparent rounded-2xl border border-slate-200 p-4 shadow-sm">
+             <div className="ios-card p-4">
                 <div className="flex items-center justify-between mb-4">
                    <h3 className="text-sm font-bold text-slate-800 tracking-wide flex items-center gap-2">
-                     <IconChartBar size={14} className="text-[#E31E24]" />
+                     <IconChartBar size={14} className="text-ios-primary" />
                      Attendance Flow & Trends
                    </h3>
                 </div>

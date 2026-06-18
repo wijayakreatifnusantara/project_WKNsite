@@ -138,54 +138,54 @@ const AttendanceReport = () => {
         {/* 🔍 SLEEK CONTROL CENTER */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-2.5 rounded-2xl border border-white shadow-sm ">
             {/* Month Selector */}
-            <div className="md:col-span-2 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24] relative group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-               <IconCalendarStats size={14} className="text-[#E31E24]" />
+            <div className="md:col-span-2 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary relative group focus-within:ring-2 focus-within:ring-ios-primary/20">
+               <IconCalendarStats size={14} className="text-ios-primary" />
                <div className="flex flex-col flex-1">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Cycle</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Cycle</span>
                   <div className="relative flex items-center">
                     <input 
                       type="month" 
                       value={selectedMonth}
                       onChange={(e) => handleMonthChange(e.target.value)}
-                      className="bg-transparent border-none text-slate-800 font-black text-xs uppercase focus:outline-none cursor-pointer p-0 w-full appearance-none pr-6 z-10"
+                      className="bg-transparent border-none text-slate-800 font-bold text-xs uppercase focus:outline-none cursor-pointer p-0 w-full appearance-none pr-6 z-10"
                     />
-                    <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-[#E31E24] transition-all" />
+                    <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-ios-primary transition-all" />
                   </div>
                </div>
             </div>
 
             {/* Personnel Filter */}
-            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24] relative group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-               <IconUser size={14} className="text-slate-400 group-focus-within:text-[#E31E24] transition-colors" />
+            <div className="md:col-span-3 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary relative group focus-within:ring-2 focus-within:ring-ios-primary/20">
+               <IconUser size={14} className="text-slate-400 group-focus-within:text-ios-primary transition-colors" />
                <div className="flex flex-col flex-1">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Personnel</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Personnel</span>
                   <div className="relative flex items-center">
                     <select 
                       value={selectedEmployee}
                       onChange={(e) => setSelectedEmployee(e.target.value)}
-                      className="bg-transparent border-none text-slate-800 font-black text-xs uppercase focus:outline-none cursor-pointer w-full p-0 appearance-none z-10 pr-6"
+                      className="bg-transparent border-none text-slate-800 font-bold text-xs uppercase focus:outline-none cursor-pointer w-full p-0 appearance-none z-10 pr-6"
                     >
                       <option value="ALL">ALL PERSONNEL</option>
                       {employees.map(emp => (
                         <option key={emp.id} value={emp.id}>{emp.name}</option>
                       ))}
                     </select>
-                    <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-[#E31E24] transition-all" />
+                    <IconChevronDown size={12} className="absolute right-0 text-slate-300 pointer-events-none group-focus-within:text-ios-primary transition-all" />
                   </div>
                </div>
             </div>
 
             {/* Search Input */}
-            <div className="md:col-span-4 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-[#E31E24]  group focus-within:ring-2 focus-within:ring-[#E31E24]/20">
-                <IconSearch size={14} className="text-slate-300 group-focus-within:text-[#E31E24] transition-colors" />
+            <div className="md:col-span-4 flex items-center gap-3 bg-transparent px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-ios-primary  group focus-within:ring-2 focus-within:ring-ios-primary/20">
+                <IconSearch size={14} className="text-slate-300 group-focus-within:text-ios-primary transition-colors" />
                 <div className="flex flex-col flex-1">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Quick Search</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Quick Search</span>
                   <input 
                       type="text" 
                       placeholder="NAME, DEPT, OR ID..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-transparent border-none w-full text-xs font-black text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
+                      className="bg-transparent border-none w-full text-xs font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none uppercase tracking-widest p-0"
                   />
                 </div>
             </div>
@@ -193,8 +193,8 @@ const AttendanceReport = () => {
             {/* Period & Actions */}
             <div className="md:col-span-3 flex gap-2">
                 <div className="flex-1 flex flex-col justify-center px-4 py-2 rounded-xl bg-white shadow-sm border-none">
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Period</span>
-                  <p className="text-xs font-black text-slate-600 uppercase tracking-tighter truncate">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">Period</span>
+                  <p className="text-xs font-bold text-slate-600 uppercase tracking-tighter truncate">
                     {startDate.substring(5)} <span className="text-slate-300 mx-0.5">/</span> {endDate.substring(5)}
                   </p>
                 </div>
@@ -215,15 +215,15 @@ const AttendanceReport = () => {
             <table className="w-full text-left border-collapse min-w-max">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200 ">
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider w-32">Date</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Personnel Information</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Department & Position</th>
-                  <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-wider w-24">In</th>
-                  <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-wider w-24">Out</th>
-                  <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-wider w-32">Status</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-wider w-24">Distance</th>
-                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Notes</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider w-32">Date</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Personnel Information</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Department & Position</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider w-24">In</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider w-24">Out</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider w-32">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider w-24">Distance</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Notes</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -261,36 +261,36 @@ const AttendanceReport = () => {
                     <tr key={row.id} className="transition-all group border-b border-transparent hover:border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
                       <td className="px-6 py-2 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                           <div className="h-7 w-7 rounded-lg bg-white shadow-sm border-none flex items-center justify-center text-slate-400 group-hover:text-[#E31E24] transition-colors">
+                           <div className="h-7 w-7 rounded-lg bg-white shadow-sm border-none flex items-center justify-center text-slate-400 group-hover:text-ios-primary transition-colors">
                             <IconCalendar size={14} />
                            </div>
-                           <span className="text-[11px] font-black text-slate-700 tracking-tight">{row.date}</span>
+                           <span className="text-[11px] font-semibold text-slate-700 tracking-tight">{row.date}</span>
                         </div>
                       </td>
                       <td className="px-6 py-2">
                         <div className="flex flex-col">
-                           <p className="text-[11px] font-black text-slate-800 uppercase leading-none mb-1 group-hover:text-[#E31E24] transition-colors">{row.employees?.name}</p>
+                           <p className="text-[11px] font-semibold text-slate-800 uppercase leading-none mb-1 group-hover:text-ios-primary transition-colors">{row.employees?.name}</p>
                            <p className="text-xs font-bold text-slate-400 tracking-widest">{row.employees?.id}</p>
                         </div>
                       </td>
                       <td className="px-6 py-2">
                         <div className="flex flex-col">
-                           <p className="text-xs font-black text-slate-600 uppercase leading-none mb-1 tracking-tight">{row.employees?.division_name}</p>
-                           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest opacity-80">{row.employees?.job_position}</p>
+                           <p className="text-xs font-bold text-slate-600 uppercase leading-none mb-1 tracking-tight">{row.employees?.division_name}</p>
+                           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest opacity-80">{row.employees?.job_position}</p>
                         </div>
                       </td>
                       <td className="px-6 py-2 text-center">
-                        <span className="text-[11px] font-black text-slate-600 tracking-tighter">{row.clock_in || '--:--'}</span>
+                        <span className="text-[11px] font-semibold text-slate-600 tracking-tighter">{row.clock_in || '--:--'}</span>
                       </td>
                       <td className="px-6 py-2 text-center">
-                        <span className="text-[11px] font-black text-slate-600 tracking-tighter">{row.clock_out || '--:--'}</span>
+                        <span className="text-[11px] font-semibold text-slate-600 tracking-tighter">{row.clock_out || '--:--'}</span>
                       </td>
                       <td className="px-6 py-2 text-center">
                         <StatusBadge status={row.status} />
                       </td>
                       <td className="px-6 py-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-black text-slate-600 uppercase truncate max-w-[100px]">
+                          <span className="text-xs font-bold text-slate-600 uppercase truncate max-w-[100px]">
                             {row.target_name || "HQ"}
                           </span>
                           {(row.location_lat && row.location_lng) && (
@@ -299,7 +299,7 @@ const AttendanceReport = () => {
                                 setSelectedMapData(row);
                                 setIsMapOpen(true);
                               }}
-                              className="text-slate-400 hover:text-[#E31E24] transition-colors p-1"
+                              className="text-slate-400 hover:text-ios-primary transition-colors p-1"
                               data-tooltip="View Map"
                             >
                               <IconMapPin size={14} />
@@ -309,7 +309,7 @@ const AttendanceReport = () => {
                       </td>
                       <td className="px-6 py-2 text-center">
                         {row.distance_meters != null ? (
-                          <span className={`text-xs font-black tracking-tight ${row.distance_meters > 100 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                          <span className={`text-xs font-bold tracking-tight ${row.distance_meters > 100 ? 'text-rose-500' : 'text-emerald-500'}`}>
                             {row.distance_meters}m
                           </span>
                         ) : (

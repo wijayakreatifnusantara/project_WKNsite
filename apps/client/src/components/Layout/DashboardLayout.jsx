@@ -290,26 +290,27 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
   };
 
   return (
-    <div className="admin-dashboard-layout flex h-screen bg-background overflow-hidden font-inter animate-fade-in text-[13px]">
-      {/* Sidebar Backdrop on Mobile */}
-      {!isSidebarCollapsed && (
+    <div className="flex h-screen w-full bg-[#F2F2F7] overflow-hidden text-slate-800 font-sans selection:bg-ios-primary/20">
+      
+      {/* Mobile Sidebar Backdrop */}
+      {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
-          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
-      {/* Clean Modern Flat Sidebar */}
-      <aside className={`bg-white flex flex-col shrink-0 border-r border-slate-200 transition-all duration-300 fixed lg:relative inset-y-0 left-0 z-50 lg:translate-x-0 lg:flex ${
-        isSidebarCollapsed 
-          ? '-translate-x-full lg:w-20' 
-          : 'translate-x-0 w-[260px]'
-      }`}>
-        <div className={`h-16 flex items-center border-b border-slate-100 shrink-0 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-6 gap-3'}`}>
+      {/* Sidebar */}
+      <aside 
+        className={`fixed md:relative top-0 left-0 z-50 h-full ios-glass border-r border-black/5 flex flex-col shrink-0 transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        } ${isSidebarCollapsed ? 'w-20' : 'w-[280px]'}`}
+      >
+        <div className={`h-16 flex items-center border-b border-slate-100 shrink-0 bg-white/80 backdrop-blur-md transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-6 gap-3'}`}>
           <img src="/assets/wkn_logo.png" alt="WKN" className="h-6 w-auto object-contain" />
           {!isSidebarCollapsed && (
             <div className="flex flex-col animate-fade-in min-w-0">
-              <h1 className="font-outfit font-black text-lg text-slate-800 tracking-tight leading-none">WKN<span className="text-[#E31E24]">site</span></h1>
+              <h1 className="font-outfit font-bold text-lg text-slate-800 tracking-tight leading-none">WKN<span className="text-ios-primary">site</span></h1>
               <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 truncate">Corporate Management System</span>
             </div>
           )}
@@ -324,14 +325,14 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
 
           {/* Quick Access / Favorites */}
           <div className={`py-3 space-y-1 transition-all duration-300 ${isSidebarCollapsed ? 'hidden' : 'block'}`}>
-             <div className="px-4 mb-1.5 flex items-center justify-between text-[11px] font-black text-slate-500 uppercase tracking-widest group">
+             <div className="px-4 mb-1.5 flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-widest group">
                <div className="flex items-center gap-2">
                  <IconStar size={12} className="text-amber-400 fill-amber-400" />
                  <span>Quick Access</span>
                </div>
                <button 
                  onClick={() => setIsQuickAccessModalOpen(true)}
-                 className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-100 hover:text-[#E31E24] rounded transition-all text-slate-400"
+                 className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-100 hover:text-ios-primary rounded transition-all text-slate-400"
                  title="Edit Quick Access"
                >
                  <IconSettings size={12} />
@@ -536,27 +537,27 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <button 
             onClick={onLogout}
             title={isSidebarCollapsed ? "Sign Out Session" : undefined}
-            className={`flex items-center justify-center bg-slate-50 text-slate-600 font-semibold hover:bg-red-50 hover:text-[#E31E24] active:scale-[0.96] transition-all duration-200 group ${
+            className={`flex items-center justify-center bg-slate-50 text-slate-600 font-semibold hover:bg-red-50 hover:text-ios-primary active:scale-[0.96] transition-all duration-200 group ${
               isSidebarCollapsed 
                 ? 'w-10 h-10 rounded-lg mx-auto' 
                 : 'w-full h-11 gap-3 px-4 rounded-lg text-sm'
             }`}
           >
-            <IconPower size={18} className="text-slate-500 group-hover:text-[#E31E24] transition-colors" />
+            <IconPower size={18} className="text-slate-500 group-hover:text-ios-primary transition-colors" />
             {!isSidebarCollapsed && <span>Sign Out Session</span>}
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden relative bg-slate-50">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10 sticky top-0 shadow-sm">
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        <header className="h-16 ios-glass flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
           <div className="flex flex-col justify-center min-w-0">
             <div className="flex items-center gap-4">
               {/* Toggle Sidebar Button */}
               <button 
                 onClick={toggleSidebar}
-                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-[#E31E24] active:scale-[0.92] transition-all duration-200 select-none shrink-0"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-ios-primary active:scale-[0.92] transition-all duration-200 select-none shrink-0"
                 title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               >
                 <IconMenu2 size={18} />
@@ -573,7 +574,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               <div className="hidden md:flex flex-col gap-1">
                 {/* Minimalist Breadcrumbs */}
                 <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                  <span className="hover:text-[#E31E24] cursor-pointer transition-colors text-slate-700">WKNsite</span>
+                  <span className="hover:text-ios-primary cursor-pointer transition-colors text-slate-700">WKNsite</span>
                   <span className="text-slate-400">/</span>
                   {getBreadcrumbs().map((part, index, arr) => (
                     <React.Fragment key={index}>
@@ -607,7 +608,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
             >
               <IconSearch size={16} className="text-slate-500 group-hover:text-slate-500 mr-2" />
               <span className="text-sm font-medium mr-auto text-slate-500">Cari menu, halaman, dsb...</span>
-              <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 font-mono text-xs font-semibold text-slate-500 bg-white border border-slate-200 rounded-md">
+              <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 font-mono text-xs font-semibold text-slate-500 bg-white border border-slate-200 rounded-lg">
                 <span>Ctrl</span>K
               </kbd>
             </button>
@@ -616,7 +617,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 bg-transparent p-1 relative" id="notification-container">
               <button 
-                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#E31E24] hover:bg-[#C1181E] text-white rounded-lg active:scale-[0.96] hover:shadow-md transition-all duration-200 text-sm font-semibold shadow-sm"
+                className="hidden lg:flex items-center gap-2 px-4 py-2 bg-ios-primary hover:bg-ios-primary/90 text-white rounded-lg active:scale-[0.96] hover:shadow-md transition-all duration-200 text-sm font-semibold shadow-sm"
                 title="Tindakan Cepat"
               >
                 <IconPlus size={16} />
@@ -625,7 +626,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               
               <button 
                 onClick={() => setIsDiagnosticsOpen(true)}
-                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-slate-100 text-[#E31E24] active:scale-[0.92] transition-all duration-200 relative group"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-slate-100 text-ios-primary active:scale-[0.92] transition-all duration-200 relative group"
                 title="AI Diagnostics"
               >
                 <IconBrain size={18} />
@@ -633,7 +634,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               <button 
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className={`h-10 w-10 flex items-center justify-center rounded-lg active:scale-[0.92] transition-all duration-200 relative ${
-                  isNotificationOpen ? 'bg-slate-200 text-[#E31E24]' : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+                  isNotificationOpen ? 'bg-slate-200 text-ios-primary' : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
                 }`}
                 title="Notifications"
               >
@@ -645,8 +646,8 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               {isNotificationOpen && (
                 <div className="absolute top-14 right-0 w-80 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden animate-fade-in-down z-50">
                   <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Notifikasi</h3>
-                    <button className="text-xs font-bold text-slate-500 hover:text-[#E31E24]">Tandai Dibaca</button>
+                    <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">Notifikasi</h3>
+                    <button className="text-xs font-bold text-slate-500 hover:text-ios-primary">Tandai Dibaca</button>
                   </div>
                   <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                     {notifications.map(notif => (
@@ -662,19 +663,19 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                              <IconBell size={14} />}
                           </div>
                           <div>
-                            <h4 className={`text-[11px] font-bold ${!notif.isRead ? 'text-slate-800' : 'text-slate-600'}`}>{notif.title}</h4>
+                            <h4 className={`text-[11px] font-semibold ${!notif.isRead ? 'text-slate-800' : 'text-slate-600'}`}>{notif.title}</h4>
                             <p className="text-xs text-slate-500 mt-0.5 leading-snug">{notif.desc}</p>
                             <span className="text-xs font-semibold text-slate-500 mt-1 block">{notif.time}</span>
                           </div>
                           {!notif.isRead && (
-                            <div className="h-2 w-2 bg-[#E31E24] rounded-full shrink-0 mt-1"></div>
+                            <div className="h-2 w-2 bg-ios-primary rounded-full shrink-0 mt-1"></div>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
                   <div className="p-2 bg-slate-50 border-t border-white/20 text-center">
-                    <button className="text-xs font-bold text-[#E31E24] uppercase tracking-widest w-full py-1.5 hover:bg-[#E31E24]/10 rounded-lg transition-colors">
+                    <button className="text-xs font-bold text-ios-primary uppercase tracking-widest w-full py-1.5 hover:bg-ios-primary/10 rounded-lg transition-colors">
                       Lihat Semua
                     </button>
                   </div>
@@ -691,7 +692,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
               >
                 <div className="hidden md:flex flex-col items-end pl-2">
                   <span className="text-sm font-semibold text-slate-800 leading-tight">{user?.fullName || user?.full_name || 'Administrator'}</span>
-                  <span className="text-xs font-medium text-[#E31E24] capitalize">{user?.role || 'Owner'}</span>
+                  <span className="text-xs font-medium text-ios-primary capitalize">{user?.role || 'Owner'}</span>
                 </div>
                 <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-700">
                   {(user?.fullName || user?.full_name)?.split(' ').map(n => n[0]).join('') || 'A'}
@@ -729,7 +730,7 @@ const DashboardLayout = ({ user: legacyUser, onLogout, children }) => {
                   <div className="p-2 border-t border-white/20">
                     <button 
                       onClick={onLogout}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-[#E31E24] hover:bg-red-50 rounded-lg transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-ios-primary hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <IconLogout size={16} />
                       Log Out Securely
@@ -781,7 +782,7 @@ const NavGroup = ({ label, isCollapsed, isExpanded, onToggle, children }) => {
   return (
     <div className="mb-2">
       <div 
-        className={`px-4 py-2 flex items-center justify-between text-[11px] font-bold tracking-wider select-none cursor-pointer transition-colors group ${isExpanded ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+        className={`px-4 py-2 flex items-center justify-between text-[11px] font-semibold tracking-wider select-none cursor-pointer transition-colors group ${isExpanded ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
         onClick={onToggle}
       >
         <span>{label}</span>
@@ -803,16 +804,16 @@ const NavItem = ({ icon, label, to, isCollapsed, end = true }) => (
       relative flex items-center rounded-lg text-[13px] font-medium transition-all duration-200 group
       ${isCollapsed ? 'w-10 h-10 justify-center mx-auto' : 'w-full px-4 py-2.5 gap-3'}
       ${isActive 
-        ? 'bg-red-50 text-[#E31E24]' 
-        : 'text-slate-600 hover:text-[#E31E24] hover:bg-slate-50'}
+        ? 'bg-red-50 text-ios-primary' 
+        : 'text-slate-600 hover:text-ios-primary hover:bg-slate-50'}
     `}
   >
     {({ isActive }) => (
       <>
         {isActive && (
-          <span className={`absolute bg-[#E31E24] rounded-r transition-all ${isCollapsed ? 'left-0 top-2 bottom-2 w-[3px]' : 'left-0 top-1.5 bottom-1.5 w-[3px]'}`} />
+          <span className={`absolute bg-ios-primary rounded-r transition-all ${isCollapsed ? 'left-0 top-2 bottom-2 w-[3px]' : 'left-0 top-1.5 bottom-1.5 w-[3px]'}`} />
         )}
-        <span className={`transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-3 ${isActive ? 'text-[#E31E24]' : 'text-slate-500 group-hover:text-[#E31E24]'}`}>
+        <span className={`transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-3 ${isActive ? 'text-ios-primary' : 'text-slate-500 group-hover:text-ios-primary'}`}>
           {icon}
         </span>
         {!isCollapsed && <span className="animate-fade-in transition-transform duration-300 ease-out group-hover:translate-x-1">{label}</span>}

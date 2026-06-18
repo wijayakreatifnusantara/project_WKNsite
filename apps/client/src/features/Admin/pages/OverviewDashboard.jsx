@@ -38,16 +38,16 @@ const OverviewDashboard = () => {
     <Card className="border border-slate-200 bg-transparent shadow-sm rounded-2xl overflow-hidden hover:shadow-sm transition-all">
       <CardContent className="p-5 flex items-center justify-between">
         <div className="space-y-2">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
             {icon} {title}
           </p>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl font-black text-slate-800 tracking-tighter">
+            <h3 className="text-3xl font-bold text-slate-800 tracking-tighter">
               {typeof value === 'number' ? value.toFixed(0) : value}
               <span className="text-sm font-bold text-slate-400 ml-1">{suffix}</span>
             </h3>
             {trend && (
-              <span className={`text-xs font-black flex items-center ${trend > 0 ? 'text-red-500' : 'text-green-500'}`}>
+              <span className={`text-xs font-bold flex items-center ${trend > 0 ? 'text-red-500' : 'text-green-500'}`}>
                 {trend > 0 ? <IconArrowUpRight size={12} /> : <IconArrowDownRight size={12} />}
                 {Math.abs(trend)}%
               </span>
@@ -71,16 +71,16 @@ const OverviewDashboard = () => {
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-[#E31E24] border border-slate-200">
+              <div className="h-10 w-10 bg-transparent shadow-sm rounded-xl flex items-center justify-center text-ios-primary border border-slate-200">
                 <IconActivity size={20} />
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-800 tracking-tight uppercase leading-none">System Telemetry</h1>
-                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Real-time infrastructure health</p>
+                <h1 className="text-lg font-bold text-slate-800 tracking-tight uppercase leading-none">System Telemetry</h1>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Real-time infrastructure health</p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm">
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
             System Operational
           </div>
@@ -92,7 +92,7 @@ const OverviewDashboard = () => {
             data-tooltip="CPU Usage" 
             value={metrics.cpu} 
             icon={<IconCpu />} 
-            color={metrics.cpu > 80 ? 'text-red-500' : 'text-[#E31E24]'} 
+            color={metrics.cpu > 80 ? 'text-red-500' : 'text-ios-primary'} 
             trend={+2.4} 
           />
           <MetricCard 
@@ -135,8 +135,8 @@ const OverviewDashboard = () => {
         {/* RECENT ALERTS / LOGS MOCK */}
         <Card className="border border-slate-200 bg-transparent shadow-sm rounded-2xl overflow-hidden mt-6">
           <CardHeader className="border-b border-slate-200 bg-slate-50/50 px-5 py-4 flex flex-row items-center justify-between">
-            <CardTitle className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-              <IconBug size={14} className="text-[#E31E24]" />
+            <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+              <IconBug size={14} className="text-ios-primary" />
               Recent Infrastructure Alerts
             </CardTitle>
           </CardHeader>
@@ -145,12 +145,12 @@ const OverviewDashboard = () => {
 <table className="w-full text-left border-collapse min-w-max">
               <thead>
                 <tr className="bg-slate-100/50 border-b border-slate-200">
-                  <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Time</th>
-                  <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Severity</th>
-                  <th className="px-5 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Message</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Time</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Severity</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Message</th>
                 </tr>
               </thead>
-              <tbody className="text-[11px] font-bold text-slate-600">
+              <tbody className="text-[11px] font-semibold text-slate-600">
                 <tr className="border-b border-slate-200 hover:bg-white/50 transition-colors">
                   <td className="px-5 py-3">10 mins ago</td>
                   <td className="px-5 py-3"><span className="text-[11px] px-2 py-1 bg-yellow-100 text-yellow-600 rounded uppercase tracking-widest">Warning</span></td>

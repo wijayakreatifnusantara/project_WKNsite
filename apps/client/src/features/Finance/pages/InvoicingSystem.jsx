@@ -79,8 +79,8 @@ const InvoicingSystem = () => {
                 <IconFileInvoice size={20} />
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-800 font-outfit tracking-tight leading-none uppercase">Invoicing Engine</h1>
-                <p className="text-slate-400 text-[11px] font-black uppercase tracking-widest mt-1 opacity-70">Finance & Billing Management</p>
+                <h1 className="text-lg font-bold text-slate-800 font-outfit tracking-tight leading-none uppercase">Invoicing Engine</h1>
+                <p className="text-slate-400 text-[11px] font-semibold uppercase tracking-widest mt-1 opacity-70">Finance & Billing Management</p>
               </div>
             </div>
           </header>
@@ -89,7 +89,7 @@ const InvoicingSystem = () => {
           <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">Due Date & Terms</label>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-1">Due Date & Terms</label>
                 <div className="relative group">
                   <div className="w-full h-10 bg-white shadow-sm rounded-xl flex items-center px-4 text-slate-700 font-bold text-[11px]">
                     <IconCalendarTime size={16} className="mr-2 text-slate-400" />
@@ -103,8 +103,8 @@ const InvoicingSystem = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">Payment Instruction</label>
-                <div className="w-full h-10 bg-white shadow-sm rounded-xl flex items-center px-4 text-slate-700 font-black text-xs tracking-wider">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-1">Payment Instruction</label>
+                <div className="w-full h-10 bg-white shadow-sm rounded-xl flex items-center px-4 text-slate-700 font-bold text-xs tracking-wider">
                   <IconCreditCard size={16} className="mr-2 text-blue-500 shrink-0" />
                   BCA 123-456-7890 (WKN SITE)
                 </div>
@@ -116,10 +116,10 @@ const InvoicingSystem = () => {
           <Card className="border-white border-2 shadow-sm bg-white rounded-xl p-5 flex flex-col max-h-[450px]">
             <div className="space-y-4 flex flex-col h-full">
               <div className="flex justify-between items-center px-1 shrink-0">
-                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Billable Items</h3>
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">Billable Items</h3>
                 <Button 
                   onClick={addItem}
-                  className="h-8 px-4 rounded-lg bg-blue-500 text-white font-black text-[11px] uppercase tracking-widest shadow-sm hover:bg-blue-600 transition-all flex gap-1.5"
+                  className="h-8 px-4 rounded-lg bg-blue-500 text-white font-bold text-[11px] uppercase tracking-widest shadow-sm hover:bg-blue-600 transition-all flex gap-1.5"
                 >
                   <IconPlus size={12} /> Add Line Item
                 </Button>
@@ -129,29 +129,29 @@ const InvoicingSystem = () => {
                 {items.map((item, idx) => (
                   <div key={item.id} className="flex gap-3 items-end">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label>
+                      <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest pl-1">Description</label>
                       <input 
                         value={item.description}
                         onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                        className="w-full h-10 bg-white shadow-sm border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
+                        className="w-full h-10 bg-white shadow-sm border-none rounded-lg px-3 text-[11px] font-semibold text-slate-700 focus:outline-none"
                       />
                     </div>
                     <div className="w-16 space-y-1">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1">Qty</label>
+                      <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest pl-1">Qty</label>
                       <input 
                         type="number"
                         value={item.qty}
                         onChange={(e) => updateItem(item.id, 'qty', parseFloat(e.target.value) || 0)}
-                        className="w-full h-10 bg-white shadow-sm border-none rounded-lg px-2 text-[11px] font-bold text-slate-700 text-center focus:outline-none"
+                        className="w-full h-10 bg-white shadow-sm border-none rounded-lg px-2 text-[11px] font-semibold text-slate-700 text-center focus:outline-none"
                       />
                     </div>
                     <div className="w-32 space-y-1">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1">Rate</label>
+                      <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest pl-1">Rate</label>
                       <input 
                         type="number"
                         value={item.rate}
                         onChange={(e) => updateItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
-                        className="w-full h-10 bg-white shadow-sm border-none rounded-lg px-3 text-[11px] font-bold text-slate-700 focus:outline-none"
+                        className="w-full h-10 bg-white shadow-sm border-none rounded-lg px-3 text-[11px] font-semibold text-slate-700 focus:outline-none"
                       />
                     </div>
                     <button 
@@ -170,8 +170,8 @@ const InvoicingSystem = () => {
         {/* Invoice Preview */}
         <div className="w-full lg:w-[380px] space-y-4">
           <header className="flex justify-between items-center h-10 px-1">
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Official Invoice</h3>
-            <div className={`px-2 py-0.5 rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm ${invoiceDetails.status === 'Unpaid' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'}`}>
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">Official Invoice</h3>
+            <div className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-widest shadow-sm ${invoiceDetails.status === 'Unpaid' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'}`}>
               {invoiceDetails.status}
             </div>
           </header>
@@ -183,8 +183,8 @@ const InvoicingSystem = () => {
               {/* Header */}
               <div className="flex justify-between items-start mb-6 leading-none">
                 <div>
-                  <h2 className="text-xl font-black text-slate-900 font-outfit uppercase">Invoice</h2>
-                  <p className="text-[11px] font-black text-blue-500 tracking-widest mt-1">NO: {invoiceDetails.invoiceNo}</p>
+                  <h2 className="text-xl font-bold text-slate-900 font-outfit uppercase">Invoice</h2>
+                  <p className="text-[11px] font-semibold text-blue-500 tracking-widest mt-1">NO: {invoiceDetails.invoiceNo}</p>
                 </div>
                 <img src="/assets/wkn_logo.png" alt="WKN" className="h-8 w-auto grayscale opacity-80" />
               </div>
@@ -192,12 +192,12 @@ const InvoicingSystem = () => {
               {/* Status & Date */}
               <div className="bg-slate-50 rounded-xl p-3 mb-6 flex justify-between items-center border border-slate-200">
                 <div>
-                  <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">Date Issued</p>
-                  <p className="text-xs font-black text-slate-800">May 02, 2026</p>
+                  <p className="text-[11px] font-semibold text-slate-300 uppercase tracking-widest">Date Issued</p>
+                  <p className="text-xs font-bold text-slate-800">May 02, 2026</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">Due Date</p>
-                  <p className="text-xs font-black text-red-500">{invoiceDetails.dueDate}</p>
+                  <p className="text-[11px] font-semibold text-slate-300 uppercase tracking-widest">Due Date</p>
+                  <p className="text-xs font-bold text-red-500">{invoiceDetails.dueDate}</p>
                 </div>
               </div>
 
@@ -206,10 +206,10 @@ const InvoicingSystem = () => {
                 {items.map(item => (
                   <div key={item.id} className="flex justify-between items-center border-b border-slate-50 pb-2">
                     <div>
-                      <p className="text-xs font-black text-slate-800 leading-tight">{item.description || 'Consultancy Service'}</p>
+                      <p className="text-xs font-bold text-slate-800 leading-tight">{item.description || 'Consultancy Service'}</p>
                       <p className="text-[11px] text-slate-400 font-bold">{item.qty} Unit(s)</p>
                     </div>
-                    <p className="text-xs font-black text-slate-800">{formatCurrency(item.qty * item.rate)}</p>
+                    <p className="text-xs font-bold text-slate-800">{formatCurrency(item.qty * item.rate)}</p>
                   </div>
                 ))}
               </div>
@@ -221,22 +221,22 @@ const InvoicingSystem = () => {
                 </div>
                 <div className="space-y-1 relative z-10">
                   <div className="flex justify-between items-center opacity-60">
-                    <span className="text-[11px] font-black uppercase tracking-widest">Tax (PPN 11%)</span>
+                    <span className="text-[11px] font-semibold uppercase tracking-widest">Tax (PPN 11%)</span>
                     <span className="text-xs font-bold">{formatCurrency(totals.taxTotal)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t border-white/10">
-                    <span className="text-xs font-black uppercase tracking-wider">Total Amount</span>
-                    <span className="text-lg font-black">{formatCurrency(totals.grandTotal)}</span>
+                    <span className="text-xs font-bold uppercase tracking-wider">Total Amount</span>
+                    <span className="text-lg font-bold">{formatCurrency(totals.grandTotal)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Action */}
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <Button className="h-10 bg-transparent border border-slate-200 text-slate-700 rounded-lg font-black text-xs uppercase tracking-widest hover:shadow-sm">
+                <Button className="h-10 bg-transparent border border-slate-200 text-slate-700 rounded-lg font-bold text-xs uppercase tracking-widest hover:shadow-sm">
                   <IconDownload size={14} className="mr-1.5" /> Download
                 </Button>
-                <Button className="h-10 bg-blue-500 text-white rounded-lg font-black text-xs uppercase tracking-widest shadow-sm shadow-blue-500/20 hover:bg-blue-600">
+                <Button className="h-10 bg-blue-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-sm shadow-blue-500/20 hover:bg-blue-600">
                   <IconSend size={14} className="mr-1.5" /> Send
                 </Button>
               </div>

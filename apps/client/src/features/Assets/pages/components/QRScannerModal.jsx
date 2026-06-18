@@ -42,17 +42,17 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
       <div className="w-full max-w-lg bg-white border-white border-[4px] shadow-sm rounded-[2.5rem] p-8 relative overflow-hidden">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-[#E31E24] transition-all z-20"
+          className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-2xl bg-white shadow-sm text-slate-400 hover:text-ios-primary transition-all z-20"
         >
           <IconX size={20} />
         </button>
 
         <div className="text-center mb-8">
-          <h3 className="text-lg font-black text-slate-800 font-outfit uppercase tracking-tight flex items-center justify-center gap-3">
-            <IconCamera size={24} className="text-[#E31E24]" />
+          <h3 className="text-lg font-bold text-slate-800 font-outfit uppercase tracking-tight flex items-center justify-center gap-3">
+            <IconCamera size={24} className="text-ios-primary" />
             Asset Intelligence Scanner
           </h3>
-          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Point your camera at an Asset QR Code</p>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Point your camera at an Asset QR Code</p>
         </div>
 
         <div className="relative rounded-2xl overflow-hidden bg-black shadow-sm border-4 border-white aspect-square">
@@ -60,7 +60,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess }) => {
           
           {/* Scanning Overlay UI */}
           <div className="absolute inset-0 border-[40px] border-black/20 pointer-events-none">
-            <div className="h-full w-full border-2 border-[#E31E24] animate-pulse"></div>
+            <div className="h-full w-full border-2 border-ios-primary animate-pulse"></div>
           </div>
         </div>
 
