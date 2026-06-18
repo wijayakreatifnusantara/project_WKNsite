@@ -153,11 +153,14 @@ class _MyAppState extends State<MyApp> {
       darkTheme: AppTheme.darkTheme,
       routerConfig: _router,
       builder: (context, child) {
-        return Stack(
-          children: [
-            if (child != null) child,
-            FloatingAssistant(router: _router),
-          ],
+        return Material(
+          type: MaterialType.transparency,
+          child: Stack(
+            children: [
+              if (child != null) child,
+              FloatingAssistant(router: _router),
+            ],
+          ),
         );
       },
     );

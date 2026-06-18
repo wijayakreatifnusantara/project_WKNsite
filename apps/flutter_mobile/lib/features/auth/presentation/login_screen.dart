@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../../../core/theme/theme_extension.dart';
 import '../../../core/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -111,25 +112,29 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             child: SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-              child: Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 420),
-                decoration: BoxDecoration(
-                  color: isDark ? CupertinoColors.darkBackgroundGray : CupertinoColors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: isDark ? CupertinoColors.systemGrey4 : CupertinoColors.systemGrey5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: CupertinoColors.black.withValues(alpha: 0.05),
-                      offset: const Offset(0, 10),
-                      blurRadius: 30,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    decoration: BoxDecoration(
+                      color: isDark ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.6) : CupertinoColors.white.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: isDark ? CupertinoColors.systemGrey4.withValues(alpha: 0.5) : CupertinoColors.white.withValues(alpha: 0.5)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: CupertinoColors.black.withValues(alpha: 0.05),
+                          offset: const Offset(0, 10),
+                          blurRadius: 30,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                     // Logo and Header
                     Image.asset(
                       'assets/wkn_logo.png',
@@ -137,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       height: 80,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 2),
                     RichText(
                       text: TextSpan(
                         children: [
@@ -145,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             text: 'WKN',
                             style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               color: isDark ? CupertinoColors.white : CupertinoColors.black,
                               letterSpacing: -0.5,
                             ),
@@ -154,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             text: 'site',
                             style: TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               color: Color(0xFFE31E24),
                               letterSpacing: -0.5,
                             ),
@@ -167,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       'CORPORATE MANAGEMENT SYSTEM',
                       style: TextStyle(
                         fontSize: 10,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w700,
                         color: CupertinoColors.systemGrey,
                         letterSpacing: 1.5,
                       ),
@@ -184,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             'EMAIL ADDRESS',
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               color: CupertinoColors.systemGrey,
                               letterSpacing: 1.5,
                             ),
@@ -230,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             'PASSWORD',
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               color: CupertinoColors.systemGrey,
                               letterSpacing: 1.5,
                             ),
@@ -281,11 +286,26 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     const SizedBox(height: 32),
 
                     // Login Button
-                    SizedBox(
+                    Container(
                       width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFF4B4B), Color(0xFFE31E24)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFE31E24).withValues(alpha: 0.3),
+                            offset: const Offset(0, 8),
+                            blurRadius: 16,
+                          ),
+                        ],
+                      ),
                       child: CupertinoButton(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        color: const Color(0xFFE31E24),
+                        color: null,
                         borderRadius: BorderRadius.circular(12),
                         onPressed: isLoading ? null : _handleLogin,
                         child: isLoading
@@ -294,7 +314,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 'SIGN IN',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w900,
+                                  fontWeight: FontWeight.w700,
                                   letterSpacing: 2.0,
                                   color: CupertinoColors.white,
                                 ),
@@ -338,32 +358,32 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.shield, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), size: 14),
+                        const Icon(CupertinoIcons.shield, color: CupertinoColors.systemGrey, size: 14),
                         const SizedBox(width: 4),
-                        Text(
+                        const Text(
                           'SECURE SSL',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), letterSpacing: 1.0),
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: CupertinoColors.systemGrey, letterSpacing: 1.0),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('•', style: TextStyle(color: CupertinoColors.systemGrey.withValues(alpha: 0.5))),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('•', style: TextStyle(color: CupertinoColors.systemGrey)),
                         ),
-                        Icon(CupertinoIcons.check_mark_circled, color: CupertinoColors.activeGreen.withValues(alpha: 0.5), size: 14),
+                        Icon(CupertinoIcons.check_mark_circled, color: CupertinoColors.activeGreen.withValues(alpha: 0.8), size: 14),
                         const SizedBox(width: 4),
-                        Text(
+                        const Text(
                           'ENCRYPTED',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), letterSpacing: 1.0),
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: CupertinoColors.systemGrey, letterSpacing: 1.0),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       '© 2026 WIJAYA KREATIF NUSANTARA',
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey.withValues(alpha: 0.5), letterSpacing: 1.0),
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: CupertinoColors.systemGrey, letterSpacing: 1.0),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
                         borderRadius: BorderRadius.circular(12),
@@ -371,7 +391,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                       child: const Text(
                         'IMS VERSION 1.2.0 • OPTIMIZED FOR MOBILE',
-                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: CupertinoColors.systemGrey, letterSpacing: 1.0),
+                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: CupertinoColors.systemGrey, letterSpacing: 1.0),
                       ),
                     ),
                   ],
@@ -380,6 +400,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             ),
           ),
         ),
+        ),
+      ),
       ),
     );
   }
