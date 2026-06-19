@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../theme/theme_extension.dart';
 import '../utils/constants.dart';
 import 'dart:async';
 
@@ -104,26 +103,27 @@ class _FloatingAssistantState extends State<FloatingAssistant> {
         },
         child: Material(
           color: Colors.transparent,
-          child: AnimatedOpacity(
+          child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            opacity: _isIdle ? 0.4 : 1.0,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _isIdle ? Colors.red : AppConstants.secondaryColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: (_isIdle ? Colors.red : AppConstants.secondaryColor).withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 5),
-                  )
-                ],
-              ),
-              child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _isIdle ? Colors.transparent : AppConstants.primaryColor,
+              border: _isIdle ? Border.all(color: Colors.grey.withValues(alpha: 0.3), width: 1) : null,
+              boxShadow: _isIdle ? [] : [
+                BoxShadow(
+                  color: AppConstants.primaryColor.withValues(alpha: 0.3),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 5),
+                )
+              ],
+            ),
+            child: Icon(
+              Icons.auto_awesome, 
+              color: _isIdle ? Colors.grey.withValues(alpha: 0.6) : Colors.white, 
+              size: 28
             ),
           ),
         ),

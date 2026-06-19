@@ -111,7 +111,7 @@ class _AttendanceFormScreenState extends State<AttendanceFormScreen> {
             title: const Text('Lokasi Palsu Terdeteksi'),
             content: const Text('Anda menggunakan aplikasi pemalsu lokasi (Fake GPS). Absensi ditolak demi keamanan dan integritas.'),
             actions: [
-              CupertinoDialogAction(child: const Text('Tutup'), isDestructiveAction: true, onPressed: () => Navigator.pop(context))
+              CupertinoDialogAction(isDestructiveAction: true, onPressed: () => Navigator.pop(context), child: const Text('Tutup'))
             ],
           ),
         );

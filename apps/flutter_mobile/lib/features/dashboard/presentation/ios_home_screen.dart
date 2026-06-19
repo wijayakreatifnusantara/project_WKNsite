@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import '../../../widgets/ios_card.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +50,6 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
     {'id': 'leaderboard', 'icon': CupertinoIcons.rosette, 'label': 'Peringkat', 'route': '/leaderboard'},
   ];
 
-  // Default active actions if user hasn't customized
   List<String> _activeActionIds = ['leave', 'overtime', 'payslip', 'reimburse', 'leaderboard', 'performance', 'assistant'];
   bool _isLoading = true;
   String _todayStatus = 'Memuat...';
@@ -66,11 +64,11 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
   String _currentDate = '';
   String _weatherTemp = '--';
   String _weatherCondition = 'Memuat Cuaca...';
-  String _humidity = '--';
   String? _clockInTime;
   String? _clockOutTime;
   String? _workDuration;
-  String? _clockInNotes;
+  DateTime? _rawClockInTime;
+  DateTime? _rawClockOutTime;
   String _locationName = 'Memuat Lokasi...';
   String _locationDetail = 'Mencari sinyal GPS...';
   int? _weatherCode;
@@ -121,6 +119,12 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
       setState(() {
         _currentTime = timeStr;
         _currentDate = dateStr;
+        
+        if (_hasClockedIn && _rawClockInTime != null && _rawClockOutTime == null) {
+          Duration diff = now.difference(_rawClockInTime!);
+          if (diff.isNegative) diff += const Duration(hours: 24);
+          _workDuration = "${diff.inHours}j ${diff.inMinutes % 60}m";
+        }
       });
     }
   }
@@ -149,7 +153,6 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
             if (mounted) {
               setState(() {
                 _weatherTemp = "${current['temperature_2m']}°C";
-                _humidity = "${current['relative_humidity_2m']}%";
                 _weatherCondition = _getWeatherDesc(current['weather_code']);
                 _weatherCode = current['weather_code'];
               });
@@ -180,9 +183,7 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
                  if (loc['name'] == workingLocName) { matchedLoc = loc; break; }
                }
                
-               if (matchedLoc == null) {
-                  matchedLoc = data['hq_location'] ?? {'name': 'WKN HQ', 'lat': -6.2088, 'lon': 106.8456, 'radius': 100};
-               }
+               matchedLoc ??= data['hq_location'] ?? {'name': 'WKN HQ', 'lat': -6.2088, 'lon': 106.8456, 'radius': 100};
                
                double dist = Geolocator.distanceBetween(
                  pos.latitude, pos.longitude,
@@ -198,8 +199,8 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
 
           if (insideZone && zoneName.isNotEmpty) {
              if (mounted) setState(() {
-                _locationName = zoneName;
-                _locationDetail = 'Sesuai dengan titik koordinat terdaftar';
+               _locationName = zoneName;
+               _locationDetail = 'Sesuai dengan titik koordinat terdaftar';
              });
           } else {
              // Fallback to Reverse Geocoding
@@ -207,15 +208,15 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
              if (placemarks.isNotEmpty) {
                final place = placemarks.first;
                if (mounted) setState(() {
-                  _locationName = place.name ?? place.street ?? 'Lokasi Tidak Dikenal';
-                  _locationDetail = '${place.subLocality ?? place.locality ?? ''}, ${place.subAdministrativeArea ?? place.administrativeArea ?? ''}';
+                 _locationName = place.name ?? place.street ?? 'Lokasi Tidak Dikenal';
+                 _locationDetail = '${place.subLocality ?? place.locality ?? ''}, ${place.subAdministrativeArea ?? place.administrativeArea ?? ''}';
                });
              }
           }
         } catch(e) {
              if (mounted) setState(() {
-                _locationName = 'Lokasi GPS';
-                _locationDetail = '${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}';
+               _locationName = 'Lokasi GPS';
+               _locationDetail = '${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}';
              });
         }
       }
@@ -254,14 +255,6 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
     return CupertinoIcons.cloud;
   }
 
-  String get _greeting {
-    final hour = DateTime.now().hour;
-    if (hour < 11) return 'Selamat Pagi,';
-    if (hour < 15) return 'Selamat Siang,';
-    if (hour < 18) return 'Selamat Sore,';
-    return 'Selamat Malam,';
-  }
-
   Future<void> _fetchTodayAttendance() async {
     try {
       final user = context.read<AuthProvider>().userData;
@@ -283,7 +276,8 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
             _clockInTime = null;
             _clockOutTime = null;
             _workDuration = null;
-            _clockInNotes = null;
+            _rawClockInTime = null;
+            _rawClockOutTime = null;
             return;
           }
 
@@ -297,7 +291,8 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
             _clockInTime = null;
             _clockOutTime = null;
             _workDuration = null;
-            _clockInNotes = null;
+            _rawClockInTime = null;
+            _rawClockOutTime = null;
           } else {
             if (res['clock_out'] != null) {
               _todayStatus = 'Selesai (Pulang)';
@@ -305,10 +300,12 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
               _todayStatus = res['status'] ?? 'Sudah Absen';
             }
             _hasClockedIn = true;
-            _clockInNotes = res['notes'];
             
             final inTime = _parseTime(res['clock_in']?.toString(), isPendingNightShift);
             final outTime = _parseTime(res['clock_out']?.toString(), false);
+            
+            _rawClockInTime = inTime;
+            _rawClockOutTime = outTime;
             
             if (inTime != null) {
               _clockInTime = "${inTime.hour.toString().padLeft(2, '0')}:${inTime.minute.toString().padLeft(2, '0')}";
@@ -369,7 +366,6 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
       final pending = await _offlineService.getPendingAttendances();
       if (user == null || user['id'] == null) throw Exception('No user');
 
-      int successCount = 0;
       final AttendanceService apiService = AttendanceService();
       
       for (var record in pending) {
@@ -384,7 +380,6 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
         
         if (result['status'] == 'success') {
           await _offlineService.removePendingAttendance(record['id']);
-          successCount++;
         }
       }
     } catch (e) {
@@ -423,7 +418,10 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-            largeTitle: Text('Halo, ${user?['name']?.split(' ')[0] ?? 'Karyawan'}'),
+            backgroundColor: context.isDarkMode 
+                ? CupertinoColors.black 
+                : CupertinoColors.systemGroupedBackground,
+            largeTitle: Text('Halo, ${user?['name']?.toString().split(' ').map((w) => w.isNotEmpty ? w[0].toUpperCase() + w.substring(1).toLowerCase() : '').join(' ').split(' ')[0] ?? 'Karyawan'}'),
             border: null,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -440,7 +438,6 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
                     name: user?['name'] ?? 'User',
                     radius: 16,
                     fontSize: 12,
-                    backgroundColor: AppConstants.slate100,
                   ),
                 ),
               ],
@@ -530,12 +527,24 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
                             },
                             hapticType: HapticType.medium,
                             enableHaptic: false, // already handled above
-                            child: CupertinoButton.filled(
+                            child: Container(
+                              width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              onPressed: null,
+                              decoration: BoxDecoration(
+                                color: (!_hasClockedIn || _clockOutTime == null) 
+                                    ? AppConstants.primaryColor 
+                                    : CupertinoColors.systemGrey6,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              alignment: Alignment.center,
                               child: Text(
-                                _hasClockedIn && _clockOutTime == null ? 'Clock Out Sekarang' : 'Clock In Sekarang',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                _hasClockedIn && _clockOutTime == null ? 'Clock Out Sekarang' : (!_hasClockedIn ? 'Clock In Sekarang' : 'Selesai Hari Ini'),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: (!_hasClockedIn || _clockOutTime == null) 
+                                      ? CupertinoColors.white 
+                                      : CupertinoColors.systemGrey,
+                                ),
                               ),
                             ),
                           ),
@@ -544,21 +553,36 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16.0, bottom: 8.0),
-                    child: Text(
-                      'PINTASAN UTAMA',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: CupertinoColors.systemGrey,
-                        fontWeight: FontWeight.w600,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16.0, bottom: 8.0),
+                        child: Text(
+                          'PINTASAN UTAMA',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: CupertinoColors.systemGrey,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
+                      CupertinoButton(
+                        padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                        minSize: 0,
+                        onPressed: _showEditMenuSheet,
+                        child: const Text('Edit', style: TextStyle(fontSize: 13, color: AppConstants.primaryColor, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
-                  _buildCupertinoList(context),
+                  _buildShortcutGrid(context),
                 ],
               ),
             ),
+          ),
+          // Extra padding at the bottom so the floating assistant doesn't cover the list
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 100),
           ),
         ],
       ),
@@ -642,81 +666,172 @@ class _IosHomeScreenState extends State<IosHomeScreen> {
     );
   }
 
-  Widget _buildCupertinoList(BuildContext context) {
+  Widget _buildShortcutGrid(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark 
-        ? CupertinoColors.systemGrey6.darkColor 
-        : CupertinoColors.white;
-
-    // Filter active actions
     final activeItems = _allActions.where((a) => _activeActionIds.contains(a['id'])).toList();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: activeItems.asMap().entries.map((entry) {
-          final int idx = entry.key;
-          final Map<String, dynamic> item = entry.value;
-          final bool isLast = idx == activeItems.length - 1;
-          
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: GridView.builder(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.75,
+        ),
+        itemCount: activeItems.length,
+        itemBuilder: (context, index) {
+          final item = activeItems[index];
           return FadeSlideIn(
-            delay: Duration(milliseconds: 50 * idx),
-            child: Column(
-              children: [
-                _buildListItem(item['icon'] as IconData, item['label'] as String, item['route'] as String, isDark),
-                if (!isLast) _buildDivider(isDark),
-              ],
-            ),
+            delay: Duration(milliseconds: 50 * index),
+            child: _buildShortcutIcon(item['icon'] as IconData, item['label'] as String, item['route'] as String, isDark),
           );
-        }).toList(),
+        },
       ),
     );
   }
 
-  Widget _buildListItem(IconData icon, String title, String route, bool isDark) {
+  Widget _buildShortcutIcon(IconData icon, String title, String route, bool isDark) {
     return AnimatedTapButton(
       onTap: () {
         if (context.read<ThemeProvider>().hapticEnabled) HapticFeedback.lightImpact();
         context.push(route);
       },
       enableHaptic: false,
-      scaleDown: 0.97,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Icon(icon, color: CupertinoColors.activeBlue, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
-                  fontSize: 16,
-                ),
-              ),
+      scaleDown: 0.92,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 56,
+            width: 56,
+            decoration: BoxDecoration(
+              color: isDark ? CupertinoColors.systemGrey6.darkColor : CupertinoColors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                )
+              ],
             ),
-            const Icon(
-              CupertinoIcons.chevron_right,
-              color: CupertinoColors.systemGrey3,
-              size: 20,
+            child: Icon(icon, color: AppConstants.primaryColor, size: 26),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildDivider(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 52.0),
-      child: Container(
-        height: 0.5,
-        color: isDark ? CupertinoColors.systemGrey4.darkColor : CupertinoColors.systemGrey4,
-      ),
+  void _showEditMenuSheet() {
+    List<String> tempActive = List.from(_activeActionIds);
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              decoration: BoxDecoration(
+                color: context.isDarkMode ? CupertinoColors.black : CupertinoColors.systemGroupedBackground,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(color: CupertinoColors.systemGrey.withValues(alpha: 0.2))),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 0,
+                          child: const Text('Batal', style: TextStyle(color: CupertinoColors.systemGrey)),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const Text('Edit Pintasan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 0,
+                          child: const Text('Simpan', style: TextStyle(color: AppConstants.primaryColor, fontWeight: FontWeight.bold)),
+                          onPressed: () async {
+                            setState(() {
+                              _activeActionIds = tempActive;
+                            });
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('custom_dashboard_actions', jsonEncode(_activeActionIds));
+                            if (mounted) Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _allActions.length,
+                      itemBuilder: (context, index) {
+                        final item = _allActions[index];
+                        final isActive = tempActive.contains(item['id']);
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: CupertinoColors.systemGrey.withValues(alpha: 0.1))),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: Row(
+                              children: [
+                                Icon(item['icon'] as IconData, color: isActive ? AppConstants.primaryColor : CupertinoColors.systemGrey),
+                                const SizedBox(width: 16),
+                                Expanded(child: Text(item['label'] as String, style: TextStyle(color: context.isDarkMode ? CupertinoColors.white : CupertinoColors.black))),
+                                CupertinoSwitch(
+                                  value: isActive,
+                                  activeColor: AppConstants.primaryColor,
+                                  onChanged: (val) {
+                                    setModalState(() {
+                                      if (val) {
+                                        if (tempActive.length < 12) { // max 12 items
+                                          tempActive.add(item['id']);
+                                        }
+                                      } else {
+                                        if (tempActive.length > 1) { // min 1 item
+                                          tempActive.remove(item['id']);
+                                        }
+                                      }
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -7,6 +7,7 @@ import '../../helpdesk/presentation/helpdesk_screen.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/utils/tracking_service.dart';
 import 'ios_home_screen.dart';
+import 'menu_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,6 +19,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const IosHomeScreen(),
+    const MenuScreen(),
     const InboxScreen(),
     const HelpdeskScreen(),
     const ProfileScreen(),
@@ -49,6 +51,11 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(CupertinoIcons.home),
             activeIcon: Icon(CupertinoIcons.house_fill),
             label: 'Beranda',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.square_grid_2x2),
+            activeIcon: Icon(CupertinoIcons.square_grid_2x2_fill),
+            label: 'Menu',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.mail),

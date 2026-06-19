@@ -4,7 +4,6 @@ import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:local_auth/local_auth.dart';
-import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/profile_service.dart';
 import '../../../widgets/ios_card.dart';

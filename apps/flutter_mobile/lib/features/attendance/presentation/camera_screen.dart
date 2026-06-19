@@ -3,7 +3,6 @@ import 'package:camera/camera.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:io'; 
 
 import '../../../core/utils/constants.dart';

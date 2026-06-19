@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';

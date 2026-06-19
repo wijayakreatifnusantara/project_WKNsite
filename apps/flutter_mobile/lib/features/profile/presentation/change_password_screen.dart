@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/utils/constants.dart';
 import '../data/profile_service.dart';
 import '../../../widgets/ios_card.dart';
 

@@ -245,11 +245,9 @@ const EmployeeForm = () => {
     const org = divisions.find(o => o.name === e.target.value);
     if (org) {
       setFormData(prev => ({ ...prev, division_name: org.name, division_id: org.id, department_id: '' }));
-      if (!id && !formData.employee_id) {
-        apiClient.get(`/api/employees/generate-id?org_code=${org.code || 'TMP'}`)
-          .then(res => { if (res.data.status === 'success') setFormData(prev => ({ ...prev, employee_id: res.data.data })); })
-          .catch(() => setFormData(prev => ({ ...prev, employee_id: `${org.code}-TMP-${Math.floor(Math.random() * 1000)}` })));
-      }
+      apiClient.get(`/api/employees/generate-id?org_code=${org.code || 'TMP'}`)
+        .then(res => { if (res.data.status === 'success') setFormData(prev => ({ ...prev, employee_id: res.data.data })); })
+        .catch(() => setFormData(prev => ({ ...prev, employee_id: `${org.code}-TMP-${Math.floor(Math.random() * 1000)}` })));
     } else {
       setFormData(prev => ({ ...prev, division_name: '', division_id: '', department_id: '' }));
     }
@@ -336,7 +334,7 @@ const EmployeeForm = () => {
     try {
       const payload = { ...formData, id: formData.employee_id };
       delete payload.employee_id;
-      if (!payload.mobile_password) payload.mobile_password = '12345';
+      if (!payload.mobile_password) payload.mobile_password = '123456';
       if (!/^[a-fA-F0-9]{64}$/.test(payload.mobile_password)) {
         payload.mobile_password = CryptoJS.SHA256(payload.mobile_password).toString();
       }
@@ -513,18 +511,7 @@ const EmployeeForm = () => {
             <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="Password Mobile App" icon={IconUserCircle}>
-            <div className="relative">
-              <input type="text" name="mobile_password" value={formData.mobile_password || ''} onChange={handleChange} placeholder="Default: 12345" className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
-              <button 
-                type="button" 
-                onClick={() => setFormData(p => ({...p, mobile_password: p.nik}))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition-colors"
-                disabled={!formData.employee_id || !formData.nik}
-                data-tooltip="Gunakan NIK sebagai Password"
-              >
-                Samakan NIK
-              </button>
-            </div>
+            <input type="text" name="mobile_password" value={formData.mobile_password || ''} onChange={handleChange} placeholder="Default: 123456" className={inputStyle.replace('uppercase', '')} disabled={!formData.employee_id} />
           </InputWrapper>
           <InputWrapper label="No. Handphone" icon={IconPhone}>
             <input required name="phone" value={formData.phone} onChange={handleChange} className={inputStyle} disabled={!formData.employee_id} />
@@ -874,9 +861,10 @@ const EmployeeForm = () => {
                 <IconX size={16} />
               </button>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pr-6">
-                <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nama</label><input value={member.name} onChange={e => handleArrayChange('family_members', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Hubungan</label>
+                <InputWrapper label="Nama" icon={IconUserCircle}>
+                  <input value={member.name} onChange={e => handleArrayChange('family_members', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                </InputWrapper>
+                <InputWrapper label="Hubungan" icon={IconUserCircle}>
                   <select 
                     value={member.relation || ''} 
                     onChange={e => handleArrayChange('family_members', idx, 'relation', e.target.value)} 
@@ -898,9 +886,13 @@ const EmployeeForm = () => {
                     <option value="Nenek">Nenek</option>
                     <option value="Lain-lain">Lain-lain</option>
                   </select>
-                </div>
-                <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Pekerjaan</label><input value={member.occupation} onChange={e => handleArrayChange('family_members', idx, 'occupation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-                <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">No. Telepon</label><input value={member.phone} onChange={e => handleArrayChange('family_members', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+                </InputWrapper>
+                <InputWrapper label="Pekerjaan" icon={IconBriefcase}>
+                  <input value={member.occupation} onChange={e => handleArrayChange('family_members', idx, 'occupation', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                </InputWrapper>
+                <InputWrapper label="No. Telepon" icon={IconPhone}>
+                  <input value={member.phone} onChange={e => handleArrayChange('family_members', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+                </InputWrapper>
               </div>
             </div>
           ))}
@@ -927,8 +919,7 @@ const EmployeeForm = () => {
             <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('education_history', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
               
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase">Tingkat</label>
+              <InputWrapper label="Tingkat" icon={IconAward}>
                 <select value={edu.level || edu.degree || ''} onChange={e => handleArrayChange('education_history', idx, 'level', e.target.value)} className={inputStyle} disabled={!formData.employee_id}>
                   <option value="">Pilih Tingkat</option>
                   <option value="SD">SD</option>
@@ -938,13 +929,23 @@ const EmployeeForm = () => {
                   <option value="S1">S1</option>
                   <option value="S2">S2</option>
                 </select>
-              </div>
+              </InputWrapper>
               
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Jurusan</label><input value={edu.major || ''} onChange={e => handleArrayChange('education_history', idx, 'major', e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Institusi/Sekolah</label><input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Kota</label><input value={edu.city || ''} onChange={e => handleArrayChange('education_history', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Tahun Lulus</label><input value={edu.year || ''} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Ijazah</label><input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <InputWrapper label="Jurusan" icon={IconBriefcase}>
+                <input value={edu.major || ''} onChange={e => handleArrayChange('education_history', idx, 'major', e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Institusi/Sekolah" icon={IconBuildingSkyscraper}>
+                <input value={edu.institution || ''} onChange={e => handleArrayChange('education_history', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Kota" icon={IconMapPin}>
+                <input value={edu.city || ''} onChange={e => handleArrayChange('education_history', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Tahun Lulus" icon={IconCalendarEvent}>
+                <input value={edu.year || ''} onChange={e => handleArrayChange('education_history', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Nomor Ijazah" icon={IconId}>
+                <input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper
             </div>
           ))}
           {(!formData.education_history || formData.education_history.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada histori pendidikan.</div>}
@@ -963,12 +964,24 @@ const EmployeeForm = () => {
           {formData.work_experience?.map((work, idx) => (
             <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('work_experience', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Perusahaan</label><input value={work.company || ''} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Posisi</label><input value={work.position || ''} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Kota</label><input value={work.city || ''} onChange={e => handleArrayChange('work_experience', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Durasi (Bulan & Tahun)</label><input value={work.duration || ''} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="Contoh: Jan 2018 - Des 2021" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nama Atasan/HRD</label><input value={work.manager_name || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Telp Atasan/HRD</label><input value={work.manager_phone || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <InputWrapper label="Perusahaan" icon={IconBuildingSkyscraper}>
+                <input value={work.company || ''} onChange={e => handleArrayChange('work_experience', idx, 'company', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Posisi" icon={IconBriefcase}>
+                <input value={work.position || ''} onChange={e => handleArrayChange('work_experience', idx, 'position', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Kota" icon={IconMapPin}>
+                <input value={work.city || ''} onChange={e => handleArrayChange('work_experience', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Durasi (Bulan & Tahun)" icon={IconCalendarEvent}>
+                <input value={work.duration || ''} onChange={e => handleArrayChange('work_experience', idx, 'duration', e.target.value)} placeholder="Contoh: Jan 2018 - Des 2021" className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Nama Atasan/HRD" icon={IconUserCircle}>
+                <input value={work.manager_name || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Nomor Telp Atasan/HRD" icon={IconPhone}>
+                <input value={work.manager_phone || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper
             </div>
           ))}
           {(!formData.work_experience || formData.work_experience.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada pengalaman kerja.</div>}
@@ -987,12 +1000,24 @@ const EmployeeForm = () => {
           {formData.certifications?.map((cert, idx) => (
             <div key={idx} className="relative bg-white shadow-sm border-none p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-8">
               <button type="button" onClick={() => removeArrayItem('certifications', idx)} className="absolute top-2 right-2 text-slate-400 hover:text-red-500"><IconX size={16} /></button>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nama Sertifikasi</label><input value={cert.name || ''} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Institusi / Penyelenggara</label><input value={cert.institution || ''} onChange={e => handleArrayChange('certifications', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Kota</label><input value={cert.city || ''} onChange={e => handleArrayChange('certifications', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Telp Institusi</label><input value={cert.phone || ''} onChange={e => handleArrayChange('certifications', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Tahun</label><input value={cert.year || ''} onChange={e => handleArrayChange('certifications', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} /></div>
-              <div className="space-y-1.5"><label className="text-xs font-bold text-slate-500 uppercase">Nomor Sertifikat</label><input value={cert.certificate_number || ''} onChange={e => handleArrayChange('certifications', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} /></div>
+              <InputWrapper label="Nama Sertifikasi" icon={IconAward}>
+                <input value={cert.name || ''} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Institusi / Penyelenggara" icon={IconBuildingSkyscraper}>
+                <input value={cert.institution || ''} onChange={e => handleArrayChange('certifications', idx, 'institution', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Kota" icon={IconMapPin}>
+                <input value={cert.city || ''} onChange={e => handleArrayChange('certifications', idx, 'city', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Nomor Telp Institusi" icon={IconPhone}>
+                <input value={cert.phone || ''} onChange={e => handleArrayChange('certifications', idx, 'phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Tahun" icon={IconCalendarEvent}>
+                <input value={cert.year || ''} onChange={e => handleArrayChange('certifications', idx, 'year', e.target.value)} type="number" className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper>
+              <InputWrapper label="Nomor Sertifikat" icon={IconId}>
+                <input value={cert.certificate_number || ''} onChange={e => handleArrayChange('certifications', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
+              </InputWrapper
             </div>
           ))}
           {(!formData.certifications || formData.certifications.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada kursus atau sertifikasi.</div>}

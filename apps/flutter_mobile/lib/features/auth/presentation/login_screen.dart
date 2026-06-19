@@ -7,8 +7,6 @@ import '../../../core/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../data/auth_provider.dart';
 import '../../../core/utils/biometric_helper.dart';
-import '../../../widgets/ios_card.dart';
-import '../../../core/utils/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -257,12 +255,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ),
                           suffix: CupertinoButton(
                             padding: const EdgeInsets.only(right: 16.0),
-                            minSize: 0,
                             onPressed: () {
                               setState(() {
                                 _obscurePassword = !_obscurePassword;
                               });
-                            },
+                            }, minimumSize: Size(0, 0),
                             child: Icon(
                               _obscurePassword ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
                               color: CupertinoColors.systemGrey2,

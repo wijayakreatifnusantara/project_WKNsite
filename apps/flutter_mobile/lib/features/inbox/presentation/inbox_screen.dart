@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
-import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../../../widgets/ios_card.dart';
 

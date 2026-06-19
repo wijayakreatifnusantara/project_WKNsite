@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import '../data/profile_service.dart';
 import '../../../widgets/ios_card.dart';
@@ -175,8 +173,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                   if (!_isEditingBank)
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      minSize: 0,
-                      onPressed: () => setState(() => _isEditingBank = true),
+                      onPressed: () => setState(() => _isEditingBank = true), minimumSize: Size(0, 0),
                       child: const Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: CupertinoColors.activeBlue)),
                     )
                 ],

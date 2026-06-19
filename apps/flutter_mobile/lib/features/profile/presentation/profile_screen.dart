@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import '../../../core/theme/theme_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../../core/utils/constants.dart';
 import '../../auth/data/auth_provider.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -559,7 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               CupertinoSwitch(
                 value: value,
-                activeColor: CupertinoColors.activeGreen,
+                activeTrackColor: CupertinoColors.activeGreen,
                 onChanged: onChanged,
               ),
             ],

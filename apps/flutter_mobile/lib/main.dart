@@ -157,7 +157,7 @@ class _MyAppState extends State<MyApp> {
           type: MaterialType.transparency,
           child: Stack(
             children: [
-              if (child != null) child,
+              ?child,
               FloatingAssistant(router: _router),
             ],
           ),
