@@ -945,7 +945,7 @@ const EmployeeForm = () => {
               </InputWrapper>
               <InputWrapper label="Nomor Ijazah" icon={IconId}>
                 <input value={edu.certificate_number || ''} onChange={e => handleArrayChange('education_history', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
-              </InputWrapper
+              </InputWrapper>
             </div>
           ))}
           {(!formData.education_history || formData.education_history.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada histori pendidikan.</div>}
@@ -981,7 +981,7 @@ const EmployeeForm = () => {
               </InputWrapper>
               <InputWrapper label="Nomor Telp Atasan/HRD" icon={IconPhone}>
                 <input value={work.manager_phone || ''} onChange={e => handleArrayChange('work_experience', idx, 'manager_phone', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
-              </InputWrapper
+              </InputWrapper>
             </div>
           ))}
           {(!formData.work_experience || formData.work_experience.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada pengalaman kerja.</div>}
@@ -1017,7 +1017,7 @@ const EmployeeForm = () => {
               </InputWrapper>
               <InputWrapper label="Nomor Sertifikat" icon={IconId}>
                 <input value={cert.certificate_number || ''} onChange={e => handleArrayChange('certifications', idx, 'certificate_number', e.target.value)} className={inputStyle} disabled={!formData.employee_id} />
-              </InputWrapper
+              </InputWrapper>
             </div>
           ))}
           {(!formData.certifications || formData.certifications.length === 0) && <div className="text-center text-slate-400 text-xs py-4">Belum ada kursus atau sertifikasi.</div>}
