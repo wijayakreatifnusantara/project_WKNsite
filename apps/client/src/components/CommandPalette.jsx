@@ -97,10 +97,10 @@ export default function CommandPalette({ isOpen, onClose }) {
       />
 
       {/* Palette Container */}
-      <div className="relative w-full max-w-xl bg-transparent rounded-2xl shadow-sm border border-white/20 overflow-hidden animate-fade-in-down">
+      <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 overflow-hidden animate-fade-in-down">
         
         {/* Search Input */}
-        <div className="flex items-center px-4 border-b border-white/20 bg-slate-50/50">
+        <div className="flex items-center px-4 border-b border-slate-200 bg-transparent">
           <IconSearch className="text-slate-400 mr-3" size={22} />
           <input
             ref={inputRef}
@@ -112,7 +112,7 @@ export default function CommandPalette({ isOpen, onClose }) {
           />
           <button 
             onClick={onClose}
-            className="text-xs font-bold text-slate-400 border border-white/20 bg-transparent px-2 py-1 rounded-lg ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="text-xs font-bold text-slate-400 border border-slate-200 bg-slate-50 px-2 py-1 rounded-lg ml-3 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           >
             ESC
           </button>
@@ -177,15 +177,15 @@ export default function CommandPalette({ isOpen, onClose }) {
         </div>
         
         {/* Footer */}
-        <div className="bg-slate-50 px-4 py-3 border-t border-white/20 flex items-center justify-between text-xs font-medium text-slate-500">
+        <div className="bg-slate-50/80 px-4 py-3 border-t border-slate-200 flex items-center justify-between text-xs font-medium text-slate-500">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
-              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-sm text-slate-700">↑</span>
-              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-sm text-slate-700">↓</span>
+              <span className="border border-slate-200 bg-white px-1.5 py-0.5 rounded shadow-sm text-slate-700">↑</span>
+              <span className="border border-slate-200 bg-white px-1.5 py-0.5 rounded shadow-sm text-slate-700">↓</span>
               Navigasi
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="border border-white/20 bg-transparent px-1.5 py-0.5 rounded shadow-sm text-slate-700">Enter</span>
+              <span className="border border-slate-200 bg-white px-1.5 py-0.5 rounded shadow-sm text-slate-700">Enter</span>
               Pilih
             </span>
           </div>
